@@ -8,7 +8,7 @@ Uma plataforma completa de gestão de tickets de suporte técnico, desenvolvida 
 
 ## Sobre o Projeto
 
-OrionOne é um sistema ITSM (IT Service Management) desenvolvido como projeto final de Engenharia de Software. Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, o OrionOne oferece uma alternativa moderna, ágil e intuitiva para gestão de suporte técnico.
+OrionOne é um sistema ITSM (IT Service Management) desenvolvido como projeto final do CET - Técnico especialista em tecnologias e programação de sistemas de informação. inspirado em soluções enterprise como ServiceNow e Jira Service Desk, o OrionOne oferece uma alternativa moderna, ágil e intuitiva para gestão de suporte técnico.
 
 ### Principais Características
 
@@ -147,7 +147,7 @@ docker-compose exec app cp .env.example .env
 docker-compose exec app php artisan key:generate
 docker-compose exec app php artisan migrate --seed
 
-# Aceder em: http://localhost:8000
+# Aceder em: http://orionone.test:8888/
 ```
 
 ---
