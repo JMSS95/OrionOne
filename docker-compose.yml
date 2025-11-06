@@ -1,0 +1,32 @@
+services:
+  orionone-db:
+    image: postgres:16-alpine
+    container_name: orionone_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: orionone
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - orionone_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U laravel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  orionone-redis:
+    image: redis:7-alpine
+    container_name: orionone_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - orionone_redisdata:/data
+
+volumes:
+  orionone_pgdata:
+  orionone_redisdata:
