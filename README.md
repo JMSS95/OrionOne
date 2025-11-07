@@ -392,11 +392,7 @@ test: testes
 -   [Requisitos Funcionais e Não-Funcionais](docs/requirements.md)
 -   [Arquitetura da Aplicação](docs/architecture.md)
 -   [Schema da Base de Dados](docs/database-schema.md)
--   [Workflow de Desenvolvimento](docs/development-workflow.md)
--   [Estratégia de Testes](docs/testing-strategy.md)
--   [Development Tools](docs/development-tools.md)
--   [Docker Deep Dive](docs/docker-deep-dive.md)
--   [Scripts Úteis](docs/scripts.md)
+-   [Guia de Desenvolvimento](docs/development-guide.md)
 
 ### Guias de Setup
 

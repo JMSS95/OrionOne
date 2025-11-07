@@ -517,11 +517,11 @@ Jobs que falharam (retry mechanism)
 
 ### Boas Práticas
 
--   ✅ Foreign keys com constraints apropriados
--   ✅ Indexes em colunas frequentemente consultadas
--   ✅ Soft deletes em tabelas críticas
--   ✅ Timestamps automáticos
--   ✅ Default values sensatos
+-   Foreign keys com constraints apropriados
+-   Indexes em colunas frequentemente consultadas
+-   Soft deletes em tabelas críticas
+-   Timestamps automáticos
+-   Default values sensatos
 
 ---
 
@@ -589,10 +589,10 @@ Se o volume crescer:
 
 Este schema foi desenhado para:
 
--   ✅ **Performance:** indexes estratégicos, queries otimizadas
--   ✅ **Escalabilidade:** estrutura normalizada, suporta growth
--   ✅ **Auditoria:** soft deletes, activity log completo
--   ✅ **Flexibilidade:** JSONB para campos customizáveis
--   ✅ **Best Practices:** convenções Laravel, Spatie packages
+-   **Performance:** indexes estratégicos, queries otimizadas
+-   **Escalabilidade:** estrutura normalizada, suporta growth
+-   **Auditoria:** soft deletes, activity log completo
+-   **Flexibilidade:** JSONB para campos customizáveis
+-   **Best Practices:** convenções Laravel, Spatie packages
 
 O schema suporta todos os requisitos funcionais do OrionOne enquanto mantém performance e manutenibilidade.

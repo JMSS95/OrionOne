@@ -4,10 +4,10 @@
 
 OrionOne seguirá uma arquitetura **MVC com Service Layer**, equilibrando simplicidade com boas práticas de Engenharia de Software. Esta decisão arquitetural foi tomada considerando:
 
--   ✅ Prazo de desenvolvimento (2.5 meses para MVP)
--   ✅ Manutenibilidade e testabilidade
--   ✅ Aproveitamento das convenções do Laravel
--   ✅ Escalabilidade para funcionalidades futuras
+-   Prazo de desenvolvimento (2.5 meses para MVP)
+-   Manutenibilidade e testabilidade
+-   Aproveitamento das convenções do Laravel
+-   Escalabilidade para funcionalidades futuras
 
 ## Padrão Arquitetural
 
@@ -195,42 +195,42 @@ Observers implementarão hooks automáticos de lifecycle:
 
 **Considerado mas rejeitado porque:**
 
--   ❌ Overkill para MVP de 2.5 meses
--   ❌ Complexidade sem benefício real no contexto académico
--   ❌ Laravel não tem suporte nativo (requer packages third-party)
--   ❌ Overhead de setup vs. benefícios em projeto com 1 developer
+-   Overkill para MVP de 2.5 meses
+-   Complexidade sem benefício real no contexto académico
+-   Laravel não tem suporte nativo (requer packages third-party)
+-   Overhead de setup vs. benefícios em projeto com 1 developer
 
 **Quando seria apropriado:**
 
--   ✅ Equipas com 5+ developers a trabalhar em paralelo
--   ✅ Domínios muito distintos (10+ bounded contexts)
--   ✅ Necessidade de deploy independente de módulos
+-   Equipas com 5+ developers a trabalhar em paralelo
+-   Domínios muito distintos (10+ bounded contexts)
+-   Necessidade de deploy independente de módulos
 
 ### Porquê NÃO Hexagonal/Clean Architecture?
 
 **Considerado mas rejeitado porque:**
 
--   ❌ Tempo de desenvolvimento duplicado para abstrações
--   ❌ Luta contra convenções idiomáticas do Laravel
--   ❌ Abstração excessiva para o domínio do problema
--   ❌ Curva de aprendizagem alta sem ganhos claros no prazo
+-   Tempo de desenvolvimento duplicado para abstrações
+-   Luta contra convenções idiomáticas do Laravel
+-   Abstração excessiva para o domínio do problema
+-   Curva de aprendizagem alta sem ganhos claros no prazo
 
 **Quando seria apropriado:**
 
--   ✅ Aplicações enterprise de longa duração (10+ anos)
--   ✅ Múltiplos frontends (web, mobile, desktop, third-party APIs)
--   ✅ Necessidade de trocar framework no futuro
--   ✅ Domínios extremamente complexos
+-   Aplicações enterprise de longa duração (10+ anos)
+-   Múltiplos frontends (web, mobile, desktop, third-party APIs)
+-   Necessidade de trocar framework no futuro
+-   Domínios extremamente complexos
 
 ### Porquê Services + Actions?
 
 **Escolhido porque:**
 
--   ✅ Equilibra simplicidade com boas práticas
--   ✅ Testável e manutenível
--   ✅ Idiomático ao Laravel (community best practices)
--   ✅ Escalável para crescimento futuro
--   ✅ Fácil de explicar ao júri e documentar
+-   Equilibra simplicidade com boas práticas
+-   Testável e manutenível
+-   Idiomático ao Laravel (community best practices)
+-   Escalável para crescimento futuro
+-   Fácil de explicar ao júri e documentar
 
 ---
 
@@ -512,9 +512,9 @@ Dependency injection em todos os Services:
 
 A arquitetura escolhida para OrionOne equilibra:
 
--   ✅ **Pragmatismo:** MVP entregue no prazo de 2.5 meses
--   ✅ **Qualidade:** Código testável, manutenível e profissional
--   ✅ **Aprendizagem:** Demonstra conhecimento sólido de Engenharia de Software
--   ✅ **Escalabilidade:** Preparado para crescimento futuro sem rewrite
+-   **Pragmatismo:** MVP entregue no prazo de 2.5 meses
+-   **Qualidade:** Código testável, manutenível e profissional
+-   **Aprendizagem:** Demonstra conhecimento sólido de Engenharia de Software
+-   **Escalabilidade:** Preparado para crescimento futuro sem rewrite
 
 Esta arquitetura não é a mais complexa possível, mas é **apropriada para o contexto e objetivos** do projeto académico OrionOne, demonstrando maturidade técnica ao escolher a solução adequada ao problema, não a mais "fancy".
