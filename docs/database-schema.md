@@ -4,148 +4,148 @@
 
 OrionOne utilizará **PostgreSQL 16** como base de dados relacional, aproveitando features avançadas como JSONB para custom fields, full-text search para knowledge base, e indexes otimizados para performance.```
 
-┌─────────┐ ┌──────────┐ ┌─────────┐
+ 
 
-**Características principais:**│ users │──────<│ tickets │>──────│ teams │
+**Características principais:** users < tickets > teams 
 
--   Normalização até 3NF (evitar redundância)└────┬────┘ └────┬─────┘ └─────────┘
+- Normalização até 3NF (evitar redundância) 
 
--   Soft deletes em tabelas críticas (auditoria) │ │
+- Soft deletes em tabelas críticas (auditoria) 
 
--   Timestamps automáticos (created_at, updated_at) │ ┌────▼─────┐
+- Timestamps automáticos (created_at, updated_at) 
 
--   Foreign keys com ON DELETE CASCADE/SET NULL apropriados │ │ comments │
+- Foreign keys com ON DELETE CASCADE/SET NULL apropriados comments 
 
--   Indexes estratégicos para queries comuns │ └──────────┘
+- Indexes estratégicos para queries comuns 
 
-    │
+ 
 
---- │ ┌──────────┐ ┌────────────┐
+--- 
 
-     └───────────<│ articles │>──────│ categories │
+ < articles > categories 
 
-## Diagrama ER Completo └──────────┘ └────────────┘
-
-```
+## Diagrama ER Completo 
 
 ```
 
-                    ┌──────────────┐## Tabelas Principais
+```
 
-                    │    users     │
+ ## Tabelas Principais
 
-                    │──────────────│### users
+ users 
 
-                    │ id  PK       │
+ ### users
 
-                    │ name         │| Campo    | Tipo         | Descrição          |
+ id PK 
 
-                    │ email  UQ    │| -------- | ------------ | ------------------ |
+ name | Campo | Tipo | Descrição |
 
-                    │ password     │| id       | BIGSERIAL    | Primary key        |
+ email UQ | -------- | ------------ | ------------------ |
 
-                    └───────┬──────┘| name     | VARCHAR(255) | Nome do utilizador |
+ password | id | BIGSERIAL | Primary key |
 
-                            │| email    | VARCHAR(255) | Email (único)      |
+ | name | VARCHAR(255) | Nome do utilizador |
 
-        ┌───────────────────┼───────────────────┐| password | VARCHAR(255) | Password hash      |
+ | email | VARCHAR(255) | Email (único) |
 
-        │ 1                 │ N                 │ N
+ | password | VARCHAR(255) | Password hash |
 
-        │                   │                   │### tickets
+ 1 N N
 
-┌────▼─────┐ ┌────▼─────────┐ ┌────▼────────┐
+ ### tickets
 
-│ roles │ │ tickets │ │ comments │| Campo | Tipo | Descrição |
+ 
 
-│──────────│ │──────────────│ │─────────────│| ------------- | ------------ | ----------------------------------- |
+ roles tickets comments | Campo | Tipo | Descrição |
 
-│ id PK │◄───┐ │ id PK │ │ id PK │| id | BIGSERIAL | Primary key |
+ | ------------- | ------------ | ----------------------------------- |
 
-│ name UQ │ │ │ number UQ │ │ content │| ticket_number | VARCHAR(20) | Número único (TKT-000001) |
+ id PK id PK id PK | id | BIGSERIAL | Primary key |
 
-└──────────┘ │ │ title │ │ ticket_id FK│──┐| title | VARCHAR(255) | Título do ticket |
+ name UQ number UQ content | ticket_number | VARCHAR(20) | Número único (TKT-000001) |
 
-                   │   │ description  │   │ user_id FK  │  │| description   | TEXT         | Descrição detalhada                 |
+ title ticket_id FK| title | VARCHAR(255) | Título do ticket |
 
-                   │   │ status       │   │ is_internal │  │| status        | VARCHAR(50)  | open, in_progress, resolved, closed |
+ description user_id FK | description | TEXT | Descrição detalhada |
 
-        ┌──────────┼───│ priority     │   └─────────────┘  │| priority      | VARCHAR(50)  | low, medium, high, urgent           |
+ status is_internal | status | VARCHAR(50) | open, in_progress, resolved, closed |
 
-        │          │   │ requester FK │                    │| requester_id  | BIGINT FK    | Quem criou (users.id)               |
+ priority | priority | VARCHAR(50) | low, medium, high, urgent |
 
-        │          │   │ assigned FK  │                    │| assigned_to   | BIGINT FK    | Agent atribuído (users.id)          |
+ requester FK | requester_id | BIGINT FK | Quem criou (users.id) |
 
-        │ N        │   │ team_id FK   │                    │ N| team_id       | BIGINT FK    | Equipa responsável (teams.id)       |
+ assigned FK | assigned_to | BIGINT FK | Agent atribuído (users.id) |
 
-┌────▼─────┐ │ │ sla_fields │ │
+ N team_id FK N| team_id | BIGINT FK | Equipa responsável (teams.id) |
 
-│ teams │ │ │ custom_fields│ │ 1### comments
+ sla_fields 
 
-│──────────│ │ └──────────────┘ ┌─────▼────────┐
+ teams custom_fields 1### comments
 
-│ id PK │ │ │ tickets │| Campo | Tipo | Descrição |
+ 
 
-│ name │ │ └──────────────┘| ----------- | --------- | ----------------------- |
+ id PK tickets | Campo | Tipo | Descrição |
 
-│ slug UQ │ │| id | BIGSERIAL | Primary key |
+ name | ----------- | --------- | ----------------------- |
 
-└────┬─────┘ │| ticket_id | BIGINT FK | Ticket relacionado |
+ slug UQ | id | BIGSERIAL | Primary key |
 
-        │         │| user_id     | BIGINT FK | Autor do comentário     |
+ | ticket_id | BIGINT FK | Ticket relacionado |
 
-        │ N       │| content     | TEXT      | Conteúdo                |
+ | user_id | BIGINT FK | Autor do comentário |
 
-┌────▼──────────▼──┐| is_internal | BOOLEAN | Visível só para agents? |
+ N | content | TEXT | Conteúdo |
 
-│ team_user │ ← PIVOT TABLE
+| is_internal | BOOLEAN | Visível só para agents? |
 
-│──────────────────│## Indexes
+ team_user ← PIVOT TABLE
 
-│ team_id FK │
+## Indexes
 
-│ user_id FK │```sql
+ team_id FK 
 
-│ role (member/lead)│-- Performance indexes
+ user_id FK ```sql
 
-│ joined_at │CREATE INDEX idx_tickets_status ON tickets(status);
+ role (member/lead)-- Performance indexes
 
-└──────────────────┘CREATE INDEX idx_tickets_priority ON tickets(priority);
+ joined_at CREATE INDEX idx_tickets_status ON tickets(status);
+
+CREATE INDEX idx_tickets_priority ON tickets(priority);
 
 CREATE INDEX idx_tickets_requester ON tickets(requester_id);
 
 CREATE INDEX idx_tickets_assigned ON tickets(assigned_to);
 
-┌──────────────┐ ┌───────────────┐ ┌──────────────┐CREATE INDEX idx_comments_ticket ON comments(ticket_id);
+ CREATE INDEX idx_comments_ticket ON comments(ticket_id);
 
-│ categories │ 1 │ articles │ N │ users │```
+ categories 1 articles N users ```
 
-│──────────────│◄───────│───────────────│────────►│ (author_id) │
-│ id PK │ │ id PK │ └──────────────┘
-│ name │ │ title │
-│ slug UQ │ │ slug UQ │
-│ icon │ │ content │
-│ parent_id FK │ │ category_id FK│
-└──────────────┘ │ author_id FK │
-│ is_published │
-│ views │
-│ helpful_count │
-└───────────────┘
+ (author_id) 
+ id PK id PK 
+ name title 
+ slug UQ slug UQ 
+ icon content 
+ parent_id FK category_id FK
+ author_id FK 
+ is_published 
+ views 
+ helpful_count 
 
-┌───────────────────┐ ┌──────────────┐
-│ model_has_roles │◄───────│ permissions │
-│───────────────────│ │──────────────│
-│ role_id FK │ │ id PK │
-│ model_type │ │ name UQ │
-│ model_id FK │ └──────────────┘
-└───────────────────┘ ▲
-│ N
-┌───────────────────┐ │
-│ role_has_perms │◄──────────────┘
-│───────────────────│
-│ permission_id FK │
-│ role_id FK │
-└───────────────────┘
+
+ 
+ model_has_roles permissions 
+ 
+ role_id FK id PK 
+ model_type name UQ 
+ model_id FK 
+ 
+ N
+ 
+ role_has_perms 
+
+ permission_id FK 
+ role_id FK 
+
 
 ````
 
@@ -180,12 +180,12 @@ CREATE INDEX idx_users_active ON users(is_active) WHERE deleted_at IS NULL;
 
 **Relacionamentos:**
 
--   `hasMany`: tickets (como requester)
--   `hasMany`: tickets (como assigned agent)
--   `hasMany`: comments
--   `hasMany`: articles (como author)
--   `belongsToMany`: teams (pivot: team_user)
--   `belongsToMany`: roles (via Spatie Permission)
+- `hasMany`: tickets (como requester)
+- `hasMany`: tickets (como assigned agent)
+- `hasMany`: comments
+- `hasMany`: articles (como author)
+- `belongsToMany`: teams (pivot: team_user)
+- `belongsToMany`: roles (via Spatie Permission)
 
 ---
 
@@ -193,16 +193,16 @@ CREATE INDEX idx_users_active ON users(is_active) WHERE deleted_at IS NULL;
 
 **Descrição:** Equipas de suporte especializadas (Hardware, Software, Network, etc.)
 
-| Campo         | Tipo         | Constraints      | Descrição                         |
+| Campo | Tipo | Constraints | Descrição |
 | ------------- | ------------ | ---------------- | --------------------------------- |
-| `id`          | BIGSERIAL    | PRIMARY KEY      | Identificador único               |
-| `name`        | VARCHAR(255) | NOT NULL         | Nome da equipa                    |
-| `slug`        | VARCHAR(255) | UNIQUE, NOT NULL | URL-friendly (hardware, software) |
-| `description` | TEXT         | NULLABLE         | Descrição da equipa               |
-| `email`       | VARCHAR(255) | NULLABLE         | Email da equipa                   |
-| `is_active`   | BOOLEAN      | DEFAULT true     | Equipa ativa?                     |
-| `created_at`  | TIMESTAMP    | NOT NULL         |                                   |
-| `updated_at`  | TIMESTAMP    | NOT NULL         |                                   |
+| `id` | BIGSERIAL | PRIMARY KEY | Identificador único |
+| `name` | VARCHAR(255) | NOT NULL | Nome da equipa |
+| `slug` | VARCHAR(255) | UNIQUE, NOT NULL | URL-friendly (hardware, software) |
+| `description` | TEXT | NULLABLE | Descrição da equipa |
+| `email` | VARCHAR(255) | NULLABLE | Email da equipa |
+| `is_active` | BOOLEAN | DEFAULT true | Equipa ativa? |
+| `created_at` | TIMESTAMP | NOT NULL | |
+| `updated_at` | TIMESTAMP | NOT NULL | |
 
 **Indexes:**
 
@@ -213,8 +213,8 @@ CREATE INDEX idx_teams_active ON teams(is_active);
 
 **Relacionamentos:**
 
--   `hasMany`: tickets
--   `belongsToMany`: users (pivot: team_user)
+- `hasMany`: tickets
+- `belongsToMany`: users (pivot: team_user)
 
 ---
 
@@ -222,13 +222,13 @@ CREATE INDEX idx_teams_active ON teams(is_active);
 
 **Descrição:** Relacionamento muitos-para-muitos entre users e teams
 
-| Campo       | Tipo        | Constraints      | Descrição    |
+| Campo | Tipo | Constraints | Descrição |
 | ----------- | ----------- | ---------------- | ------------ |
-| `id`        | BIGSERIAL   | PRIMARY KEY      |              |
-| `team_id`   | BIGINT      | FK → teams(id)   |              |
-| `user_id`   | BIGINT      | FK → users(id)   |              |
-| `role`      | VARCHAR(50) | DEFAULT 'member' | member, lead |
-| `joined_at` | TIMESTAMP   | NOT NULL         |              |
+| `id` | BIGSERIAL | PRIMARY KEY | |
+| `team_id` | BIGINT | FK → teams(id) | |
+| `user_id` | BIGINT | FK → users(id) | |
+| `role` | VARCHAR(50) | DEFAULT 'member' | member, lead |
+| `joined_at` | TIMESTAMP | NOT NULL | |
 
 **Indexes:**
 
@@ -244,28 +244,28 @@ CREATE INDEX idx_team_user_user ON team_user(user_id);
 
 **Descrição:** Tickets de suporte criados por utilizadores
 
-| Campo                     | Tipo         | Constraints          | Descrição                           |
+| Campo | Tipo | Constraints | Descrição |
 | ------------------------- | ------------ | -------------------- | ----------------------------------- |
-| `id`                      | BIGSERIAL    | PRIMARY KEY          |                                     |
-| `ticket_number`           | VARCHAR(20)  | UNIQUE, NOT NULL     | TKT-000001 (auto-gerado)            |
-| `title`                   | VARCHAR(255) | NOT NULL             | Título do ticket                    |
-| `description`             | TEXT         | NOT NULL             | Descrição detalhada                 |
-| `status`                  | VARCHAR(50)  | NOT NULL             | open, in_progress, resolved, closed |
-| `priority`                | VARCHAR(50)  | NOT NULL             | low, medium, high, urgent           |
-| `requester_id`            | BIGINT       | FK → users(id)       | Quem criou                          |
-| `assigned_to`             | BIGINT       | FK → users(id), NULL | Agent atribuído                     |
-| `team_id`                 | BIGINT       | FK → teams(id), NULL | Equipa responsável                  |
-| `category`                | VARCHAR(100) | NULLABLE             | Categoria do problema               |
-| `first_response_at`       | TIMESTAMP    | NULLABLE             | Primeira resposta do agent          |
-| `first_response_deadline` | TIMESTAMP    | NULLABLE             | SLA: deadline 1ª resposta           |
-| `resolution_deadline`     | TIMESTAMP    | NULLABLE             | SLA: deadline resolução             |
-| `resolved_at`             | TIMESTAMP    | NULLABLE             | Data de resolução                   |
-| `closed_at`               | TIMESTAMP    | NULLABLE             | Data de fecho                       |
-| `is_escalated`            | BOOLEAN      | DEFAULT false        | Escalado para manager?              |
-| `custom_fields`           | JSONB        | NULLABLE             | Campos customizáveis                |
-| `created_at`              | TIMESTAMP    | NOT NULL             |                                     |
-| `updated_at`              | TIMESTAMP    | NOT NULL             |                                     |
-| `deleted_at`              | TIMESTAMP    | NULLABLE             | Soft delete                         |
+| `id` | BIGSERIAL | PRIMARY KEY | |
+| `ticket_number` | VARCHAR(20) | UNIQUE, NOT NULL | TKT-000001 (auto-gerado) |
+| `title` | VARCHAR(255) | NOT NULL | Título do ticket |
+| `description` | TEXT | NOT NULL | Descrição detalhada |
+| `status` | VARCHAR(50) | NOT NULL | open, in_progress, resolved, closed |
+| `priority` | VARCHAR(50) | NOT NULL | low, medium, high, urgent |
+| `requester_id` | BIGINT | FK → users(id) | Quem criou |
+| `assigned_to` | BIGINT | FK → users(id), NULL | Agent atribuído |
+| `team_id` | BIGINT | FK → teams(id), NULL | Equipa responsável |
+| `category` | VARCHAR(100) | NULLABLE | Categoria do problema |
+| `first_response_at` | TIMESTAMP | NULLABLE | Primeira resposta do agent |
+| `first_response_deadline` | TIMESTAMP | NULLABLE | SLA: deadline 1ª resposta |
+| `resolution_deadline` | TIMESTAMP | NULLABLE | SLA: deadline resolução |
+| `resolved_at` | TIMESTAMP | NULLABLE | Data de resolução |
+| `closed_at` | TIMESTAMP | NULLABLE | Data de fecho |
+| `is_escalated` | BOOLEAN | DEFAULT false | Escalado para manager? |
+| `custom_fields` | JSONB | NULLABLE | Campos customizáveis |
+| `created_at` | TIMESTAMP | NOT NULL | |
+| `updated_at` | TIMESTAMP | NOT NULL | |
+| `deleted_at` | TIMESTAMP | NULLABLE | Soft delete |
 
 **Indexes:**
 
@@ -283,16 +283,16 @@ CREATE INDEX idx_tickets_custom_fields ON tickets USING GIN(custom_fields);
 
 **Relacionamentos:**
 
--   `belongsTo`: user (requester)
--   `belongsTo`: user (assigned agent)
--   `belongsTo`: team
--   `hasMany`: comments
--   `morphMany`: activity_log (via Spatie Activity Log)
+- `belongsTo`: user (requester)
+- `belongsTo`: user (assigned agent)
+- `belongsTo`: team
+- `hasMany`: comments
+- `morphMany`: activity_log (via Spatie Activity Log)
 
 **Enums (implementados via validation):**
 
--   **status:** `open`, `in_progress`, `on_hold`, `resolved`, `closed`
--   **priority:** `low`, `medium`, `high`, `urgent`
+- **status:** `open`, `in_progress`, `on_hold`, `resolved`, `closed`
+- **priority:** `low`, `medium`, `high`, `urgent`
 
 ---
 
@@ -300,16 +300,16 @@ CREATE INDEX idx_tickets_custom_fields ON tickets USING GIN(custom_fields);
 
 **Descrição:** Comentários em tickets (públicos ou internos)
 
-| Campo         | Tipo      | Constraints              | Descrição               |
+| Campo | Tipo | Constraints | Descrição |
 | ------------- | --------- | ------------------------ | ----------------------- |
-| `id`          | BIGSERIAL | PRIMARY KEY              |                         |
-| `ticket_id`   | BIGINT    | FK → tickets(id) CASCADE | Ticket relacionado      |
-| `user_id`     | BIGINT    | FK → users(id)           | Autor do comentário     |
-| `content`     | TEXT      | NOT NULL                 | Conteúdo do comentário  |
-| `is_internal` | BOOLEAN   | DEFAULT false            | Visível só para agents? |
-| `created_at`  | TIMESTAMP | NOT NULL                 |                         |
-| `updated_at`  | TIMESTAMP | NOT NULL                 |                         |
-| `deleted_at`  | TIMESTAMP | NULLABLE                 | Soft delete             |
+| `id` | BIGSERIAL | PRIMARY KEY | |
+| `ticket_id` | BIGINT | FK → tickets(id) CASCADE | Ticket relacionado |
+| `user_id` | BIGINT | FK → users(id) | Autor do comentário |
+| `content` | TEXT | NOT NULL | Conteúdo do comentário |
+| `is_internal` | BOOLEAN | DEFAULT false | Visível só para agents? |
+| `created_at` | TIMESTAMP | NOT NULL | |
+| `updated_at` | TIMESTAMP | NOT NULL | |
+| `deleted_at` | TIMESTAMP | NULLABLE | Soft delete |
 
 **Indexes:**
 
@@ -322,8 +322,8 @@ CREATE INDEX idx_comments_internal ON comments(is_internal);
 
 **Relacionamentos:**
 
--   `belongsTo`: ticket
--   `belongsTo`: user (author)
+- `belongsTo`: ticket
+- `belongsTo`: user (author)
 
 ---
 
@@ -331,18 +331,18 @@ CREATE INDEX idx_comments_internal ON comments(is_internal);
 
 **Descrição:** Categorias para Knowledge Base (pode ser hierárquico)
 
-| Campo         | Tipo         | Constraints               | Descrição                  |
+| Campo | Tipo | Constraints | Descrição |
 | ------------- | ------------ | ------------------------- | -------------------------- |
-| `id`          | BIGSERIAL    | PRIMARY KEY               |                            |
-| `name`        | VARCHAR(255) | NOT NULL                  | Nome da categoria          |
-| `slug`        | VARCHAR(255) | UNIQUE, NOT NULL          | URL-friendly               |
-| `description` | TEXT         | NULLABLE                  | Descrição                  |
-| `icon`        | VARCHAR(100) | NULLABLE                  | Nome do ícone (Heroicons)  |
-| `parent_id`   | BIGINT       | FK → categories(id), NULL | Categoria pai (hierarquia) |
-| `order`       | INTEGER      | DEFAULT 0                 | Ordem de exibição          |
-| `is_visible`  | BOOLEAN      | DEFAULT true              | Visível no frontend?       |
-| `created_at`  | TIMESTAMP    | NOT NULL                  |                            |
-| `updated_at`  | TIMESTAMP    | NOT NULL                  |                            |
+| `id` | BIGSERIAL | PRIMARY KEY | |
+| `name` | VARCHAR(255) | NOT NULL | Nome da categoria |
+| `slug` | VARCHAR(255) | UNIQUE, NOT NULL | URL-friendly |
+| `description` | TEXT | NULLABLE | Descrição |
+| `icon` | VARCHAR(100) | NULLABLE | Nome do ícone (Heroicons) |
+| `parent_id` | BIGINT | FK → categories(id), NULL | Categoria pai (hierarquia) |
+| `order` | INTEGER | DEFAULT 0 | Ordem de exibição |
+| `is_visible` | BOOLEAN | DEFAULT true | Visível no frontend? |
+| `created_at` | TIMESTAMP | NOT NULL | |
+| `updated_at` | TIMESTAMP | NOT NULL | |
 
 **Indexes:**
 
@@ -354,9 +354,9 @@ CREATE INDEX idx_categories_visible ON categories(is_visible);
 
 **Relacionamentos:**
 
--   `hasMany`: articles
--   `belongsTo`: category (parent) - self-referencing
--   `hasMany`: categories (children)
+- `hasMany`: articles
+- `belongsTo`: category (parent) - self-referencing
+- `hasMany`: categories (children)
 
 ---
 
@@ -364,25 +364,25 @@ CREATE INDEX idx_categories_visible ON categories(is_visible);
 
 **Descrição:** Artigos da Knowledge Base
 
-| Campo               | Tipo         | Constraints         | Descrição                 |
+| Campo | Tipo | Constraints | Descrição |
 | ------------------- | ------------ | ------------------- | ------------------------- |
-| `id`                | BIGSERIAL    | PRIMARY KEY         |                           |
-| `title`             | VARCHAR(255) | NOT NULL            | Título do artigo          |
-| `slug`              | VARCHAR(255) | UNIQUE, NOT NULL    | URL-friendly              |
-| `content`           | TEXT         | NOT NULL            | Conteúdo (Markdown/HTML)  |
-| `excerpt`           | TEXT         | NULLABLE            | Resumo curto              |
-| `category_id`       | BIGINT       | FK → categories(id) | Categoria                 |
-| `author_id`         | BIGINT       | FK → users(id)      | Quem criou                |
-| `is_published`      | BOOLEAN      | DEFAULT false       | Publicado?                |
-| `published_at`      | TIMESTAMP    | NULLABLE            | Data de publicação        |
-| `views`             | INTEGER      | DEFAULT 0           | Contador de visualizações |
-| `helpful_count`     | INTEGER      | DEFAULT 0           | "Foi útil?" - Sim         |
-| `not_helpful_count` | INTEGER      | DEFAULT 0           | "Foi útil?" - Não         |
-| `featured`          | BOOLEAN      | DEFAULT false       | Destacado no homepage?    |
-| `meta_description`  | VARCHAR(160) | NULLABLE            | SEO                       |
-| `created_at`        | TIMESTAMP    | NOT NULL            |                           |
-| `updated_at`        | TIMESTAMP    | NOT NULL            |                           |
-| `deleted_at`        | TIMESTAMP    | NULLABLE            | Soft delete               |
+| `id` | BIGSERIAL | PRIMARY KEY | |
+| `title` | VARCHAR(255) | NOT NULL | Título do artigo |
+| `slug` | VARCHAR(255) | UNIQUE, NOT NULL | URL-friendly |
+| `content` | TEXT | NOT NULL | Conteúdo (Markdown/HTML) |
+| `excerpt` | TEXT | NULLABLE | Resumo curto |
+| `category_id` | BIGINT | FK → categories(id) | Categoria |
+| `author_id` | BIGINT | FK → users(id) | Quem criou |
+| `is_published` | BOOLEAN | DEFAULT false | Publicado? |
+| `published_at` | TIMESTAMP | NULLABLE | Data de publicação |
+| `views` | INTEGER | DEFAULT 0 | Contador de visualizações |
+| `helpful_count` | INTEGER | DEFAULT 0 | "Foi útil?" - Sim |
+| `not_helpful_count` | INTEGER | DEFAULT 0 | "Foi útil?" - Não |
+| `featured` | BOOLEAN | DEFAULT false | Destacado no homepage? |
+| `meta_description` | VARCHAR(160) | NULLABLE | SEO |
+| `created_at` | TIMESTAMP | NOT NULL | |
+| `updated_at` | TIMESTAMP | NOT NULL | |
+| `deleted_at` | TIMESTAMP | NULLABLE | Soft delete |
 
 **Indexes:**
 
@@ -398,8 +398,8 @@ CREATE INDEX idx_articles_fulltext ON articles USING GIN(to_tsvector('portuguese
 
 **Relacionamentos:**
 
--   `belongsTo`: category
--   `belongsTo`: user (author)
+- `belongsTo`: category
+- `belongsTo`: user (author)
 
 ---
 
@@ -407,57 +407,57 @@ CREATE INDEX idx_articles_fulltext ON articles USING GIN(to_tsvector('portuguese
 
 ### 8. roles
 
-| Campo        | Tipo         | Descrição          |
+| Campo | Tipo | Descrição |
 | ------------ | ------------ | ------------------ |
-| `id`         | BIGSERIAL    | PRIMARY KEY        |
-| `name`       | VARCHAR(255) | admin, agent, user |
-| `guard_name` | VARCHAR(255) | web                |
-| `created_at` | TIMESTAMP    |                    |
-| `updated_at` | TIMESTAMP    |                    |
+| `id` | BIGSERIAL | PRIMARY KEY |
+| `name` | VARCHAR(255) | admin, agent, user |
+| `guard_name` | VARCHAR(255) | web |
+| `created_at` | TIMESTAMP | |
+| `updated_at` | TIMESTAMP | |
 
 **Roles planeados:**
 
--   **admin:** acesso total ao sistema
--   **agent:** gestão de tickets, KB
--   **user:** criar tickets, ver KB
+- **admin:** acesso total ao sistema
+- **agent:** gestão de tickets, KB
+- **user:** criar tickets, ver KB
 
 ---
 
 ### 9. permissions
 
-| Campo        | Tipo         | Descrição                         |
+| Campo | Tipo | Descrição |
 | ------------ | ------------ | --------------------------------- |
-| `id`         | BIGSERIAL    | PRIMARY KEY                       |
-| `name`       | VARCHAR(255) | view-tickets, create-tickets, etc |
-| `guard_name` | VARCHAR(255) | web                               |
-| `created_at` | TIMESTAMP    |                                   |
-| `updated_at` | TIMESTAMP    |                                   |
+| `id` | BIGSERIAL | PRIMARY KEY |
+| `name` | VARCHAR(255) | view-tickets, create-tickets, etc |
+| `guard_name` | VARCHAR(255) | web |
+| `created_at` | TIMESTAMP | |
+| `updated_at` | TIMESTAMP | |
 
 **Permissions planeados:**
 
--   `view-all-tickets`, `create-ticket`, `update-ticket`, `delete-ticket`
--   `assign-ticket`, `close-ticket`, `escalate-ticket`
--   `view-kb`, `create-article`, `publish-article`
--   `manage-users`, `manage-teams`, `view-dashboard`
+- `view-all-tickets`, `create-ticket`, `update-ticket`, `delete-ticket`
+- `assign-ticket`, `close-ticket`, `escalate-ticket`
+- `view-kb`, `create-article`, `publish-article`
+- `manage-users`, `manage-teams`, `view-dashboard`
 
 ---
 
 ### 10. model_has_roles (Pivot)
 
-| Campo        | Tipo         | Descrição       |
+| Campo | Tipo | Descrição |
 | ------------ | ------------ | --------------- |
-| `role_id`    | BIGINT       | FK → roles(id)  |
+| `role_id` | BIGINT | FK → roles(id) |
 | `model_type` | VARCHAR(255) | App\Models\User |
-| `model_id`   | BIGINT       | FK → users(id)  |
+| `model_id` | BIGINT | FK → users(id) |
 
 ---
 
 ### 11. role_has_permissions (Pivot)
 
-| Campo           | Tipo   | Descrição            |
+| Campo | Tipo | Descrição |
 | --------------- | ------ | -------------------- |
 | `permission_id` | BIGINT | FK → permissions(id) |
-| `role_id`       | BIGINT | FK → roles(id)       |
+| `role_id` | BIGINT | FK → roles(id) |
 
 ---
 
@@ -485,17 +485,17 @@ Jobs que falharam (retry mechanism)
 
 **Descrição:** Auditoria de ações no sistema
 
-| Campo          | Tipo         | Descrição                 |
+| Campo | Tipo | Descrição |
 | -------------- | ------------ | ------------------------- |
-| `id`           | BIGSERIAL    | PRIMARY KEY               |
-| `log_name`     | VARCHAR(255) | ticket, user, article     |
-| `description`  | TEXT         | created, updated, deleted |
-| `subject_type` | VARCHAR(255) | Modelo afetado            |
-| `subject_id`   | BIGINT       | ID do modelo              |
-| `causer_type`  | VARCHAR(255) | Quem fez (User)           |
-| `causer_id`    | BIGINT       | User ID                   |
-| `properties`   | JSON         | Dados antes/depois        |
-| `created_at`   | TIMESTAMP    |                           |
+| `id` | BIGSERIAL | PRIMARY KEY |
+| `log_name` | VARCHAR(255) | ticket, user, article |
+| `description` | TEXT | created, updated, deleted |
+| `subject_type` | VARCHAR(255) | Modelo afetado |
+| `subject_id` | BIGINT | ID do modelo |
+| `causer_type` | VARCHAR(255) | Quem fez (User) |
+| `causer_id` | BIGINT | User ID |
+| `properties` | JSON | Dados antes/depois |
+| `created_at` | TIMESTAMP | |
 
 ---
 
@@ -517,11 +517,11 @@ Jobs que falharam (retry mechanism)
 
 ### Boas Práticas
 
--   Foreign keys com constraints apropriados
--   Indexes em colunas frequentemente consultadas
--   Soft deletes em tabelas críticas
--   Timestamps automáticos
--   Default values sensatos
+- Foreign keys com constraints apropriados
+- Indexes em colunas frequentemente consultadas
+- Soft deletes em tabelas críticas
+- Timestamps automáticos
+- Default values sensatos
 
 ---
 
@@ -533,7 +533,7 @@ Jobs que falharam (retry mechanism)
 SELECT status, COUNT(*) as total
 FROM tickets
 WHERE deleted_at IS NULL
-  AND team_id = ?
+ AND team_id = ?
 GROUP BY status;
 -- Usa: idx_tickets_status
 ```
@@ -544,8 +544,8 @@ GROUP BY status;
 SELECT *
 FROM tickets
 WHERE status IN ('open', 'in_progress')
-  AND resolution_deadline < NOW()
-  AND resolved_at IS NULL;
+ AND resolution_deadline < NOW()
+ AND resolved_at IS NULL;
 -- Usa: idx_tickets_sla_deadline
 ```
 
@@ -555,7 +555,7 @@ WHERE status IN ('open', 'in_progress')
 SELECT *
 FROM articles
 WHERE is_published = true
-  AND to_tsvector('portuguese', title || ' ' || content) @@ plainto_tsquery('portuguese', ?);
+ AND to_tsvector('portuguese', title || ' ' || content) @@ plainto_tsquery('portuguese', ?);
 -- Usa: idx_articles_fulltext
 ```
 
@@ -565,23 +565,23 @@ WHERE is_published = true
 
 ### Indexes Estratégicos
 
--   **Foreign keys:** sempre indexadas
--   **Status/Priority:** queries de filtro comuns
--   **Timestamps:** ordenação cronológica
--   **JSONB fields:** GIN index para custom_fields
--   **Full-text:** GIN index para search
+- **Foreign keys:** sempre indexadas
+- **Status/Priority:** queries de filtro comuns
+- **Timestamps:** ordenação cronológica
+- **JSONB fields:** GIN index para custom_fields
+- **Full-text:** GIN index para search
 
 ### Soft Deletes
 
--   Tickets, Comments, Articles: mantém histórico
--   Indexes com `WHERE deleted_at IS NULL` para performance
+- Tickets, Comments, Articles: mantém histórico
+- Indexes com `WHERE deleted_at IS NULL` para performance
 
 ### Partitioning (Futuro)
 
 Se o volume crescer:
 
--   Particionar `tickets` por data (`created_at`)
--   Particionar `activity_log` por mês
+- Particionar `tickets` por data (`created_at`)
+- Particionar `activity_log` por mês
 
 ---
 
@@ -589,10 +589,10 @@ Se o volume crescer:
 
 Este schema foi desenhado para:
 
--   **Performance:** indexes estratégicos, queries otimizadas
--   **Escalabilidade:** estrutura normalizada, suporta growth
--   **Auditoria:** soft deletes, activity log completo
--   **Flexibilidade:** JSONB para campos customizáveis
--   **Best Practices:** convenções Laravel, Spatie packages
+- **Performance:** indexes estratégicos, queries otimizadas
+- **Escalabilidade:** estrutura normalizada, suporta growth
+- **Auditoria:** soft deletes, activity log completo
+- **Flexibilidade:** JSONB para campos customizáveis
+- **Best Practices:** convenções Laravel, Spatie packages
 
 O schema suporta todos os requisitos funcionais do OrionOne enquanto mantém performance e manutenibilidade.

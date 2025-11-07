@@ -1,8 +1,16 @@
 # OrionOne
 
+[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
+[![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?style=flat&logo=vue.js&logoColor=white)](https://vuejs.org/)
+[![Inertia](https://img.shields.io/badge/Inertia.js-1.0-9553E9?style=flat&logo=inertia&logoColor=white)](https://inertiajs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 **Modern IT Service Management Platform**
 
-## Uma plataforma completa de gestão de tickets de suporte técnico, desenvolvida com Laravel 11 e Vue 3, focada em simplicidade, performance e experiência do utilizador.
+> Uma plataforma completa de gestão de tickets de suporte técnico, desenvolvida com Laravel 11 e Vue 3, focada em simplicidade, performance e experiência do utilizador.
 
 ## Sobre o Projeto
 
@@ -59,10 +67,10 @@ OrionOne é um sistema ITSM (IT Service Management) desenvolvido como projeto fi
 ### Packages Principais
 
 ```
-spatie/laravel-permission     # Role & Permission management
-spatie/laravel-activitylog    # Audit trail
-laravel/breeze               # Authentication scaffolding
-laravel/sanctum              # API authentication
+spatie/laravel-permission # Role & Permission management
+spatie/laravel-activitylog # Audit trail
+laravel/breeze # Authentication scaffolding
+laravel/sanctum # API authentication
 ```
 
 ---
@@ -168,9 +176,9 @@ Após executar `php artisan db:seed`:
 OrionOne segue uma arquitetura **MVC com Service Layer + Actions**, equilibrando simplicidade com boas práticas de Engenharia de Software:
 
 ```
-Controllers (thin)  →  Services (business logic)  →  Models (data)
-                    ↓
-                  Actions (atomic operations)
+Controllers (thin) → Services (business logic) → Models (data)
+ ↓
+ Actions (atomic operations)
 ```
 
 **Camadas principais:**
@@ -180,7 +188,7 @@ Controllers (thin)  →  Services (business logic)  →  Models (data)
 -   **Data:** Models, Observers, Migrations
 -   **Infrastructure:** PostgreSQL, Redis, Queue Jobs
 
-📖 **Documentação completa:** [docs/architecture.md](docs/architecture.md)
+    **Documentação completa:** [docs/architecture.md](docs/architecture.md)
 
 ---
 
@@ -193,7 +201,7 @@ PostgreSQL 16 com 15+ tabelas otimizadas:
 -   **Permissions:** roles, permissions (Spatie)
 -   **Auditoria:** activity_log, soft deletes
 
-📖 **Schema completo:** [docs/database-schema.md](docs/database-schema.md)
+    **Schema completo:** [docs/database-schema.md](docs/database-schema.md)
 
 ---
 
@@ -201,37 +209,37 @@ PostgreSQL 16 com 15+ tabelas otimizadas:
 
 ```
 OrionOne/
-├── app/
-│   ├── Http/              # Controllers, Requests, Middleware
-│   ├── Services/          # Business logic (TicketService, SLAService, etc)
-│   ├── Actions/           # Atomic operations (CreateTicketAction, etc)
-│   ├── Models/            # Eloquent models
-│   ├── Policies/          # Authorization
-│   ├── Observers/         # Model hooks
-│   ├── Notifications/     # Email, Slack, Database
-│   ├── Events/            # Domain events
-│   ├── Listeners/         # Event handlers
-│   └── Jobs/              # Async tasks
-│
-├── database/
-│   ├── migrations/        # Schema definitions
-│   ├── seeders/           # Test data
-│   └── factories/         # Model factories
-│
-├── resources/
-│   ├── js/
-│   │   ├── Pages/         # Inertia.js pages (Vue 3)
-│   │   ├── Components/    # Reusable Vue components
-│   │   ├── Composables/   # Vue composables
-│   │   └── Utils/         # Helper functions
-│   └── css/
-│       └── app.css        # Tailwind CSS
-│
-├── tests/
-│   ├── Feature/           # HTTP tests
-│   └── Unit/              # Logic tests
-│
-└── docs/                  # Technical documentation
+ app/
+ Http/ # Controllers, Requests, Middleware
+ Services/ # Business logic (TicketService, SLAService, etc)
+ Actions/ # Atomic operations (CreateTicketAction, etc)
+ Models/ # Eloquent models
+ Policies/ # Authorization
+ Observers/ # Model hooks
+ Notifications/ # Email, Slack, Database
+ Events/ # Domain events
+ Listeners/ # Event handlers
+ Jobs/ # Async tasks
+
+ database/
+ migrations/ # Schema definitions
+ seeders/ # Test data
+ factories/ # Model factories
+
+ resources/
+ js/
+ Pages/ # Inertia.js pages (Vue 3)
+ Components/ # Reusable Vue components
+ Composables/ # Vue composables
+ Utils/ # Helper functions
+ css/
+ app.css # Tailwind CSS
+
+ tests/
+ Feature/ # HTTP tests
+ Unit/ # Logic tests
+
+ docs/ # Technical documentation
 ```
 
 ---
@@ -419,7 +427,7 @@ Projeto académico desenvolvido para o CET - Técnico especialista em tecnologia
 
 ## Agradecimentos
 
-Desenvolvido com Laravel, Vue.js, e ❤️
+Desenvolvido com Laravel, Vue.js, e
 
 Stack construída sobre os ombros de gigantes:
 
