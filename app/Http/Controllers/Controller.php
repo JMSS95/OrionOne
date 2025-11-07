@@ -11,12 +11,12 @@ namespace App\Http\Controllers;
  *         email="support@orionone.pt"
  *     )
  * )
- * 
+ *
  * @OA\Server(
  *     url="http://localhost:8888/api",
  *     description="Development Server"
  * )
- * 
+ *
  * @OA\SecurityScheme(
  *     securityScheme="sanctum",
  *     type="http",

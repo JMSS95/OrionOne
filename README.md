@@ -236,6 +236,36 @@ OrionOne/
 
 ---
 
+## Metodologia de Desenvolvimento
+
+Este projeto segue **boas práticas profissionais** de desenvolvimento:
+
+### Feature-Driven Development + TDD
+
+-   **Desenvolvimento iterativo**: Uma feature completa de cada vez (não todas as camadas de uma vez)
+-   **Test-Driven Development**: Testes escritos **antes** do código (RED → GREEN → REFACTOR)
+-   **Qualidade contínua**: PHPStan level 5, Laravel Pint, >80% code coverage
+
+### 6-Phase Workflow por Feature
+
+1. **Planning** (30min) - User stories e critérios de aceitação
+2. **Database** (45min) - Migration, Model, Factory, Seeder
+3. **Backend TDD** (2-3h) - Tests primeiro, depois implementação
+4. **Frontend** (1-2h) - Componentes Vue 3 + Inertia.js
+5. **API** (1h) - Endpoints opcionais se necessário
+6. **Commit** (15min) - Git commit com mensagem descritiva
+
+**Documentação completa**: Ver [`docs/development-workflow.md`](docs/development-workflow.md)
+
+### Scripts de Automação
+
+```powershell
+# Scaffold completo de uma feature (migration, model, controller, tests, etc)
+.\scripts\feature.ps1 Ticket
+```
+
+---
+
 ## Funcionalidades Planeadas
 
 ### MVP (Fase 1) - 2.5 meses
@@ -357,10 +387,21 @@ test: testes
 
 ## Documentação
 
--   [Requisitos](docs/requirements.md)
--   [Arquitetura](docs/architecture.md)
--   [Database Schema](docs/database-schema.md)
--   [API Reference](docs/api.md) (em desenvolvimento)
+### Documentação do Projeto
+
+-   [Requisitos Funcionais e Não-Funcionais](docs/requirements.md)
+-   [Arquitetura da Aplicação](docs/architecture.md)
+-   [Schema da Base de Dados](docs/database-schema.md)
+-   [Workflow de Desenvolvimento](docs/development-workflow.md)
+-   [Estratégia de Testes](docs/testing-strategy.md)
+-   [Development Tools](docs/development-tools.md)
+-   [Docker Deep Dive](docs/docker-deep-dive.md)
+-   [Scripts Úteis](docs/scripts.md)
+
+### Guias de Setup
+
+-   [Setup Completo](SETUP.md)
+-   [Como Contribuir](CONTRIBUTING.md)
 
 ---
 
