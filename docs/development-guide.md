@@ -34,7 +34,7 @@ Cada feature passa por **TODAS as camadas** antes de passar para a próxima.
 ### Fase 1: Planeamento (30 min)
 
 ```
-📋 Definir feature
+ Definir feature
    ├─ Requisito funcional (do requirements.md)
    ├─ User story
    └─ Critérios de aceitação
@@ -325,7 +325,7 @@ git push origin main
 
 ---
 
-## 📅 Exemplo de Sprint (1 Semana)
+##  Exemplo de Sprint (1 Semana)
 
 ### Segunda-feira: RF02 - Criar Tickets
 
@@ -411,8 +411,8 @@ docker-compose exec orionone-app php artisan make:test ${FEATURE}ServiceTest --u
 # Policy
 docker-compose exec orionone-app php artisan make:policy ${FEATURE}Policy
 
-echo "✅ Feature scaffold criado: $FEATURE"
-echo "📝 Próximos passos:"
+echo " Feature scaffold criado: $FEATURE"
+echo " Próximos passos:"
 echo "   1. Escrever migration em database/migrations/"
 echo "   2. Escrever testes em tests/"
 echo "   3. Implementar lógica até testes passarem"
@@ -695,13 +695,13 @@ Este documento define a estratégia de testes do OrionOne, estabelecendo guideli
 
 | Layer           | Coverage Alvo | Obrigatório    |
 | --------------- | ------------- | -------------- |
-| **Services**    | 90-100%       | ✅ Sim         |
-| **Actions**     | 90-100%       | ✅ Sim         |
-| **Controllers** | 80-90%        | ✅ Sim         |
-| **Models**      | 70-80%        | ⚠️ Recomendado |
-| **Policies**    | 100%          | ✅ Sim         |
-| **Observers**   | 80-90%        | ✅ Sim         |
-| **Geral**       | >80%          | ✅ Sim         |
+| **Services**    | 90-100%       |  Sim         |
+| **Actions**     | 90-100%       |  Sim         |
+| **Controllers** | 80-90%        |  Sim         |
+| **Models**      | 70-80%        |  Recomendado |
+| **Policies**    | 100%          |  Sim         |
+| **Observers**   | 80-90%        |  Sim         |
+| **Geral**       | >80%          |  Sim         |
 
 ### Comandos
 
@@ -919,13 +919,13 @@ php artisan test --stop-on-failure
 
 | Layer           | Coverage Alvo | Obrigatório    |
 | --------------- | ------------- | -------------- |
-| **Services**    | 90-100%       | ✅ Sim         |
-| **Actions**     | 90-100%       | ✅ Sim         |
-| **Controllers** | 80-90%        | ✅ Sim         |
-| **Models**      | 70-80%        | ⚠️ Recomendado |
-| **Policies**    | 100%          | ✅ Sim         |
-| **Observers**   | 80-90%        | ✅ Sim         |
-| **Geral**       | >80%          | ✅ Sim         |
+| **Services**    | 90-100%       |  Sim         |
+| **Actions**     | 90-100%       |  Sim         |
+| **Controllers** | 80-90%        |  Sim         |
+| **Models**      | 70-80%        |  Recomendado |
+| **Policies**    | 100%          |  Sim         |
+| **Observers**   | 80-90%        |  Sim         |
+| **Geral**       | >80%          |  Sim         |
 
 ### Comandos
 

@@ -1,14 +1,14 @@
 # Setup Completo - OrionOne
 
-## ✅ Instalado e Configurado
+##  Instalado e Configurado
 
 ### 1. Docker (5 containers rodando)
 
--   ✅ `orionone-app` - Laravel + PHP 8.2-FPM
--   ✅ `orionone-frontend` - Vite dev server (porta 5173)
--   ✅ `orionone-nginx` - Nginx (porta 8888)
--   ✅ `orionone-postgres` - PostgreSQL 16
--   ✅ `orionone-redis` - Redis 7
+-    `orionone-app` - Laravel + PHP 8.2-FPM
+-    `orionone-frontend` - Vite dev server (porta 5173)
+-    `orionone-nginx` - Nginx (porta 8888)
+-    `orionone-postgres` - PostgreSQL 16
+-    `orionone-redis` - Redis 7
 
 **Acesso:**
 
@@ -56,7 +56,7 @@ app/
 
 ### 4. Base de Dados
 
-✅ Migrations executadas:
+ Migrations executadas:
 
 -   `users` table
 -   `cache` table
@@ -65,11 +65,11 @@ app/
 
 ### 5. Documentação Criada
 
--   ✅ `docs/docker-deep-dive.md` - Explicação completa de Docker
--   ✅ `docs/development-tools.md` - Ferramentas e boas práticas
--   ✅ `docs/scripts.md` - Comandos úteis do dia-a-dia
+-    `docs/docker-deep-dive.md` - Explicação completa de Docker
+-    `docs/development-tools.md` - Ferramentas e boas práticas
+-    `docs/scripts.md` - Comandos úteis do dia-a-dia
 
-## 🚀 Próximos Passos
+##  Próximos Passos
 
 ### 1. Começar Desenvolvimento (Prioridade Alta)
 
@@ -227,11 +227,11 @@ resources/js/
     └── GuestLayout.vue
 ```
 
-## 📋 Timeline Sugerida (2.5 meses)
+##  Timeline Sugerida (2.5 meses)
 
 ### Semana 1-2: Setup + Authentication + Tickets
 
--   ✅ Docker e ambiente (concluído)
+-    Docker e ambiente (concluído)
 -   Models base + migrations
 -   Authentication (Breeze + roles)
 -   CRUD de tickets básico
@@ -264,7 +264,7 @@ resources/js/
 -   Deploy (VPS/Cloud)
 -   Apresentação final
 
-## 🔧 Comandos Rápidos
+##  Comandos Rápidos
 
 ### Desenvolvimento
 
@@ -298,7 +298,7 @@ docker-compose run --rm orionone-frontend npm install --legacy-peer-deps
 docker-compose exec orionone-app php artisan migrate
 ```
 
-## 📚 Documentação de Referência
+##  Documentação de Referência
 
 -   `docs/requirements.md` - Requisitos funcionais e não-funcionais
 -   `docs/architecture.md` - Arquitetura e decisões técnicas
@@ -307,7 +307,7 @@ docker-compose exec orionone-app php artisan migrate
 -   `docs/development-tools.md` - Ferramentas e workflow
 -   `docs/scripts.md` - Comandos úteis
 
-## ✅ Checklist Atual
+##  Checklist Atual
 
 -   [x] Docker configurado (5 containers)
 -   [x] Migrations executadas
@@ -332,4 +332,4 @@ docker-compose exec orionone-app php artisan migrate
 
 ---
 
-**Status:** Ambiente 100% configurado, pronto para desenvolvimento! 🚀
+**Status:** Ambiente 100% configurado, pronto para desenvolvimento! 
