@@ -1,4 +1,9 @@
+<div align="center">
+  <img src="public/images/logo.png" alt="OrionOne Logo" width="300">
+
 # OrionOne
+
+**Modern IT Service Management Platform**
 
 [![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
@@ -8,7 +13,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Modern IT Service Management Platform**
+</div>
 
 > Uma plataforma completa de gestão de tickets de suporte técnico, desenvolvida com Laravel 11 e Vue 3, focada em simplicidade, performance e experiência do utilizador.
 
