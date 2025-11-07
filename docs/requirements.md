@@ -1,4 +1,4 @@
-# Requisitos do Sistema OrionOne
+﻿# Requisitos do Sistema OrionOne
 
 ## Visão Geral
 
@@ -16,12 +16,12 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Login com email e password
-- Recuperação de password via email
-- Verificação de email obrigatória
-- Logout seguro
-- Sistema de roles: Admin, Agent, User
-- Permissões granulares via Spatie Permission
+-   Login com email e password
+-   Recuperação de password via email
+-   Verificação de email obrigatória
+-   Logout seguro
+-   Sistema de roles: Admin, Agent, User
+-   Permissões granulares via Spatie Permission
 
 **Prioridade:** Alta
 **Complexidade:** Média
@@ -34,23 +34,23 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Criar ticket com título, descrição, prioridade
-- Visualizar lista de tickets (filtros: status, prioridade, equipa)
-- Visualizar detalhes de ticket individual
-- Editar ticket (título, descrição, prioridade, status)
-- Atribuir ticket a agent ou equipa
-- Alterar status: Open → In Progress → Resolved → Closed
-- Fechar/reabrir ticket
-- Soft delete (manter histórico)
-- Geração automática de ticket_number (TKT-000001)
+-   Criar ticket com título, descrição, prioridade
+-   Visualizar lista de tickets (filtros: status, prioridade, equipa)
+-   Visualizar detalhes de ticket individual
+-   Editar ticket (título, descrição, prioridade, status)
+-   Atribuir ticket a agent ou equipa
+-   Alterar status: Open → In Progress → Resolved → Closed
+-   Fechar/reabrir ticket
+-   Soft delete (manter histórico)
+-   Geração automática de ticket_number (TKT-000001)
 
 **Regras de Negócio:**
 
-- User pode criar tickets
-- User pode ver apenas os seus tickets
-- Agent pode ver tickets da sua equipa
-- Admin pode ver todos os tickets
-- Apenas Agent/Admin podem alterar status
+-   User pode criar tickets
+-   User pode ver apenas os seus tickets
+-   Agent pode ver tickets da sua equipa
+-   Admin pode ver todos os tickets
+-   Apenas Agent/Admin podem alterar status
 
 **Prioridade:** Alta
 **Complexidade:** Alta
@@ -63,13 +63,13 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Adicionar comentário a ticket
-- Comentários públicos (visíveis ao requester)
-- Comentários internos (apenas Agent/Admin)
-- Editar comentário (apenas autor, dentro de 15min)
-- Soft delete de comentários
-- Timestamp de criação/edição
-- Notificação ao requester em novos comentários públicos
+-   Adicionar comentário a ticket
+-   Comentários públicos (visíveis ao requester)
+-   Comentários internos (apenas Agent/Admin)
+-   Editar comentário (apenas autor, dentro de 15min)
+-   Soft delete de comentários
+-   Timestamp de criação/edição
+-   Notificação ao requester em novos comentários públicos
 
 **Prioridade:** Alta
 **Complexidade:** Média
@@ -82,12 +82,12 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Criar/editar/eliminar equipas
-- Atribuir agents a equipas (many-to-many)
-- Definir team lead
-- Categorias de equipas (Hardware, Software, Network, etc)
-- Email da equipa
-- Estatísticas por equipa
+-   Criar/editar/eliminar equipas
+-   Atribuir agents a equipas (many-to-many)
+-   Definir team lead
+-   Categorias de equipas (Hardware, Software, Network, etc)
+-   Email da equipa
+-   Estatísticas por equipa
 
 **Prioridade:** Média
 **Complexidade:** Média
@@ -100,13 +100,13 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Atribuição manual (Admin/Team Lead escolhe agent)
-- Atribuição automática baseada em:
- - Keywords no título/descrição
- - Carga de trabalho do agent (round-robin)
- - Especialização da equipa
-- Reatribuição de tickets
-- Histórico de atribuições
+-   Atribuição manual (Admin/Team Lead escolhe agent)
+-   Atribuição automática baseada em:
+    -   Keywords no título/descrição
+    -   Carga de trabalho do agent (round-robin)
+    -   Especialização da equipa
+-   Reatribuição de tickets
+-   Histórico de atribuições
 
 **Prioridade:** Média
 **Complexidade:** Alta
@@ -119,15 +119,15 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Cálculo automático de deadlines baseado em prioridade:
- - **Urgent:** 2h primeira resposta, 8h resolução
- - **High:** 4h primeira resposta, 24h resolução
- - **Medium:** 8h primeira resposta, 48h resolução
- - **Low:** 24h primeira resposta, 5 dias resolução
-- Excluir fins de semana do cálculo
-- Alertas de violação de SLA
-- Dashboard com métricas de SLA
-- Campo `is_escalated` para tickets com SLA violado
+-   Cálculo automático de deadlines baseado em prioridade:
+    -   **Urgent:** 2h primeira resposta, 8h resolução
+    -   **High:** 4h primeira resposta, 24h resolução
+    -   **Medium:** 8h primeira resposta, 48h resolução
+    -   **Low:** 24h primeira resposta, 5 dias resolução
+-   Excluir fins de semana do cálculo
+-   Alertas de violação de SLA
+-   Dashboard com métricas de SLA
+-   Campo `is_escalated` para tickets com SLA violado
 
 **Prioridade:** Média
 **Complexidade:** Alta
@@ -140,15 +140,15 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Criar/editar/eliminar artigos
-- Sistema de categorias hierárquico
-- Editor de conteúdo (Markdown/WYSIWYG)
-- Sistema de publicação (draft/published)
-- Pesquisa full-text (PostgreSQL)
-- Contador de visualizações
-- Feedback "Foi útil?" (Sim/Não)
-- Artigos destacados (featured)
-- SEO-friendly URLs (slugs)
+-   Criar/editar/eliminar artigos
+-   Sistema de categorias hierárquico
+-   Editor de conteúdo (Markdown/WYSIWYG)
+-   Sistema de publicação (draft/published)
+-   Pesquisa full-text (PostgreSQL)
+-   Contador de visualizações
+-   Feedback "Foi útil?" (Sim/Não)
+-   Artigos destacados (featured)
+-   SEO-friendly URLs (slugs)
 
 **Prioridade:** Média
 **Complexidade:** Média
@@ -161,14 +161,14 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Tickets por status (gráfico)
-- Tickets por prioridade
-- Tickets por equipa
-- Performance de SLA (% compliance)
-- Tempo médio de resolução
-- Tickets abertos vs fechados (timeline)
-- Top agents (mais tickets resolvidos)
-- Filtros por período (hoje, semana, mês, ano)
+-   Tickets por status (gráfico)
+-   Tickets por prioridade
+-   Tickets por equipa
+-   Performance de SLA (% compliance)
+-   Tempo médio de resolução
+-   Tickets abertos vs fechados (timeline)
+-   Top agents (mais tickets resolvidos)
+-   Filtros por período (hoje, semana, mês, ano)
 
 **Prioridade:** Média
 **Complexidade:** Média
@@ -181,13 +181,13 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Email ao criar ticket (para requester)
-- Email ao atribuir ticket (para agent)
-- Email em novo comentário público (para requester)
-- Email em SLA breach warning
-- Email ao resolver ticket (para requester)
-- Notificações in-app (database notifications)
-- Configuração de preferências de notificação
+-   Email ao criar ticket (para requester)
+-   Email ao atribuir ticket (para agent)
+-   Email em novo comentário público (para requester)
+-   Email em SLA breach warning
+-   Email ao resolver ticket (para requester)
+-   Notificações in-app (database notifications)
+-   Configuração de preferências de notificação
 
 **Prioridade:** Baixa
 **Complexidade:** Média
@@ -200,13 +200,13 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Log de criação/edição/eliminação de tickets
-- Log de atribuições
-- Log de mudanças de status
-- Log de comentários
-- Armazenar: quem, o quê, quando, antes/depois
-- Interface de visualização de histórico
-- Integração com Spatie Activity Log
+-   Log de criação/edição/eliminação de tickets
+-   Log de atribuições
+-   Log de mudanças de status
+-   Log de comentários
+-   Armazenar: quem, o quê, quando, antes/depois
+-   Interface de visualização de histórico
+-   Integração com Spatie Activity Log
 
 **Prioridade:** Baixa
 **Complexidade:** Baixa
@@ -219,12 +219,12 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Listar utilizadores
-- Criar/editar utilizador
-- Ativar/desativar conta
-- Atribuir roles e permissões
-- Adicionar utilizador a equipas
-- Reset password (Admin)
+-   Listar utilizadores
+-   Criar/editar utilizador
+-   Ativar/desativar conta
+-   Atribuir roles e permissões
+-   Adicionar utilizador a equipas
+-   Reset password (Admin)
 
 **Prioridade:** Baixa
 **Complexidade:** Baixa
@@ -237,11 +237,11 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Pesquisa por ticket_number
-- Pesquisa por título/descrição
-- Pesquisa em artigos da KB
-- Resultados ordenados por relevância
-- Highlighting de termos pesquisados
+-   Pesquisa por ticket_number
+-   Pesquisa por título/descrição
+-   Pesquisa em artigos da KB
+-   Resultados ordenados por relevância
+-   Highlighting de termos pesquisados
 
 **Prioridade:** Baixa
 **Complexidade:** Média
@@ -256,18 +256,18 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Tempo de resposta < 2 segundos em 95% dos requests
-- Tempo de carregamento inicial < 3 segundos
-- Suporte a 100+ utilizadores simultâneos
-- Queries otimizadas (indexes, eager loading)
-- Cache de queries frequentes (Redis, 5-15min TTL)
-- Lazy loading de listas longas
+-   Tempo de resposta < 2 segundos em 95% dos requests
+-   Tempo de carregamento inicial < 3 segundos
+-   Suporte a 100+ utilizadores simultâneos
+-   Queries otimizadas (indexes, eager loading)
+-   Cache de queries frequentes (Redis, 5-15min TTL)
+-   Lazy loading de listas longas
 
 **Métricas:**
 
-- Response time médio: < 500ms
-- Database queries por request: < 15
-- Memory usage: < 512MB por processo PHP
+-   Response time médio: < 500ms
+-   Database queries por request: < 15
+-   Memory usage: < 512MB por processo PHP
 
 ---
 
@@ -277,20 +277,20 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Passwords armazenadas com hash bcrypt
-- CSRF protection em todos os formulários
-- SQL injection prevention (Eloquent ORM)
-- XSS protection (automatic escaping)
-- Rate limiting por IP (60 requests/min)
-- HTTPS obrigatório em produção
-- Validação de inputs (server-side)
-- Autorização granular (Policies)
-- Session security (httpOnly cookies)
+-   Passwords armazenadas com hash bcrypt
+-   CSRF protection em todos os formulários
+-   SQL injection prevention (Eloquent ORM)
+-   XSS protection (automatic escaping)
+-   Rate limiting por IP (60 requests/min)
+-   HTTPS obrigatório em produção
+-   Validação de inputs (server-side)
+-   Autorização granular (Policies)
+-   Session security (httpOnly cookies)
 
 **Compliance:**
 
-- Seguir OWASP Top 10
-- PSR-12 coding standards
+-   Seguir OWASP Top 10
+-   PSR-12 coding standards
 
 ---
 
@@ -300,19 +300,19 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Design responsivo (mobile, tablet, desktop)
-- Compatibilidade com browsers modernos (Chrome, Firefox, Safari, Edge)
-- Acessibilidade WCAG 2.1 AA
-- Feedback visual em ações (loading, success, error)
-- Mensagens de erro claras
-- Navegação intuitiva (max 3 cliques para qualquer ação)
-- Atalhos de teclado para ações comuns
+-   Design responsivo (mobile, tablet, desktop)
+-   Compatibilidade com browsers modernos (Chrome, Firefox, Safari, Edge)
+-   Acessibilidade WCAG 2.1 AA
+-   Feedback visual em ações (loading, success, error)
+-   Mensagens de erro claras
+-   Navegação intuitiva (max 3 cliques para qualquer ação)
+-   Atalhos de teclado para ações comuns
 
 **UX Guidelines:**
 
-- Consistência visual (Tailwind CSS)
-- Ícones claros (Heroicons)
-- Tooltips explicativos
+-   Consistência visual (Tailwind CSS)
+-   Ícones claros (Heroicons)
+-   Tooltips explicativos
 
 ---
 
@@ -322,17 +322,17 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Arquitetura horizontal scaling ready
-- Sessões em Redis (partilhadas entre servidores)
-- Queue jobs assíncronos (emails, reports)
-- Database connection pooling
-- Soft deletes (preservar histórico)
-- Partitioning strategy (futuro: particionar tickets por ano)
+-   Arquitetura horizontal scaling ready
+-   Sessões em Redis (partilhadas entre servidores)
+-   Queue jobs assíncronos (emails, reports)
+-   Database connection pooling
+-   Soft deletes (preservar histórico)
+-   Partitioning strategy (futuro: particionar tickets por ano)
 
 **Capacidade:**
 
-- Suportar 10,000+ tickets sem degradação
-- Suportar 1,000+ utilizadores
+-   Suportar 10,000+ tickets sem degradação
+-   Suportar 1,000+ utilizadores
 
 ---
 
@@ -342,20 +342,20 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Arquitetura MVC + Service Layer
-- Separation of concerns (Controllers thin)
-- Dependency Injection
-- Testes automatizados (Unit + Feature)
-- Coverage mínimo: 70%
-- Documentação técnica (architecture.md, schema.md)
-- Conventional Commits
-- Code review obrigatório
+-   Arquitetura MVC + Service Layer
+-   Separation of concerns (Controllers thin)
+-   Dependency Injection
+-   Testes automatizados (Unit + Feature)
+-   Coverage mínimo: 70%
+-   Documentação técnica (architecture.md, schema.md)
+-   Conventional Commits
+-   Code review obrigatório
 
 **Standards:**
 
-- PSR-12 (PHP)
-- ESLint (JavaScript)
-- Prettier (formatting)
+-   PSR-12 (PHP)
+-   ESLint (JavaScript)
+-   Prettier (formatting)
 
 ---
 
@@ -365,17 +365,17 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Uptime target: 99% (7.2h downtime/mês aceitável)
-- Backups automáticos diários (PostgreSQL)
-- Healthchecks (database, redis, app)
-- Graceful degradation (se Redis falhar, usar database sessions)
-- Error logging (Telescope, Laravel Log)
-- Monitoring (Uptime Kuma / New Relic)
+-   Uptime target: 99% (7.2h downtime/mês aceitável)
+-   Backups automáticos diários (PostgreSQL)
+-   Healthchecks (database, redis, app)
+-   Graceful degradation (se Redis falhar, usar database sessions)
+-   Error logging (Telescope, Laravel Log)
+-   Monitoring (Uptime Kuma / New Relic)
 
 **Recovery:**
 
-- RTO (Recovery Time Objective): < 4h
-- RPO (Recovery Point Objective): < 24h
+-   RTO (Recovery Time Objective): < 4h
+-   RPO (Recovery Point Objective): < 24h
 
 ---
 
@@ -385,17 +385,17 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Docker setup completo (4 containers)
-- Environment variables (.env)
-- Database migrations versionadas
-- Seeders para dados de teste
-- Documentação de deployment
-- CI/CD ready (GitHub Actions)
+-   Docker setup completo (4 containers)
+-   Environment variables (.env)
+-   Database migrations versionadas
+-   Seeders para dados de teste
+-   Documentação de deployment
+-   CI/CD ready (GitHub Actions)
 
 **Ambientes suportados:**
 
-- Local (Laragon, XAMPP, Docker)
-- Produção (VPS, Cloud)
+-   Local (Laragon, XAMPP, Docker)
+-   Produção (VPS, Cloud)
 
 ---
 
@@ -405,38 +405,38 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Versões mínimas:**
 
-- **PHP:** 8.2+
-- **PostgreSQL:** 16+
-- **Redis:** 7+
-- **Node.js:** 20 LTS
-- **Composer:** 2.x
-- **NPM:** 10+
+-   **PHP:** 8.2+
+-   **PostgreSQL:** 16+
+-   **Redis:** 7+
+-   **Node.js:** 20 LTS
+-   **Composer:** 2.x
+-   **NPM:** 10+
 
 **Browsers suportados:**
 
-- Chrome 100+
-- Firefox 100+
-- Safari 15+
-- Edge 100+
+-   Chrome 100+
+-   Firefox 100+
+-   Safari 15+
+-   Edge 100+
 
 ---
 
 ## Matriz de Prioridades
 
-| Requisito | Prioridade | Complexidade | Sprint |
+| Requisito             | Prioridade | Complexidade | Sprint |
 | --------------------- | ---------- | ------------ | ------ |
-| RF01 - Autenticação | Alta | Média | 1 |
-| RF02 - Gestão Tickets | Alta | Alta | 1-2 |
-| RF03 - Comentários | Alta | Média | 2 |
-| RF04 - Equipas | Média | Média | 3 |
-| RF05 - Atribuição | Média | Alta | 3 |
-| RF06 - SLA | Média | Alta | 4 |
-| RF07 - Knowledge Base | Média | Média | 5 |
-| RF08 - Dashboard | Média | Média | 6 |
-| RF09 - Notificações | Baixa | Média | 7 |
-| RF10 - Activity Log | Baixa | Baixa | 8 |
-| RF11 - Gestão Users | Baixa | Baixa | 8 |
-| RF12 - Pesquisa | Baixa | Média | 9 |
+| RF01 - Autenticação   | Alta       | Média        | 1      |
+| RF02 - Gestão Tickets | Alta       | Alta         | 1-2    |
+| RF03 - Comentários    | Alta       | Média        | 2      |
+| RF04 - Equipas        | Média      | Média        | 3      |
+| RF05 - Atribuição     | Média      | Alta         | 3      |
+| RF06 - SLA            | Média      | Alta         | 4      |
+| RF07 - Knowledge Base | Média      | Média        | 5      |
+| RF08 - Dashboard      | Média      | Média        | 6      |
+| RF09 - Notificações   | Baixa      | Média        | 7      |
+| RF10 - Activity Log   | Baixa      | Baixa        | 8      |
+| RF11 - Gestão Users   | Baixa      | Baixa        | 8      |
+| RF12 - Pesquisa       | Baixa      | Média        | 9      |
 
 **Duração estimada MVP:** 10 semanas (2.5 meses)
 
@@ -483,18 +483,18 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 ## Glossário
 
-- **Agent:** Utilizador técnico que resolve tickets
-- **Requester:** Utilizador que criou o ticket
-- **SLA:** Service Level Agreement - acordo de tempo de resposta
-- **Escalation:** Ticket atribuído a nível superior (manager)
-- **Knowledge Base:** Base de conhecimento com artigos de self-service
-- **Soft Delete:** Eliminação lógica (flag deleted_at) sem remover dados
+-   **Agent:** Utilizador técnico que resolve tickets
+-   **Requester:** Utilizador que criou o ticket
+-   **SLA:** Service Level Agreement - acordo de tempo de resposta
+-   **Escalation:** Ticket atribuído a nível superior (manager)
+-   **Knowledge Base:** Base de conhecimento com artigos de self-service
+-   **Soft Delete:** Eliminação lógica (flag deleted_at) sem remover dados
 
 ---
 
 ## Referências
 
-- [Laravel 11 Documentation](https://laravel.com/docs/11.x)
-- [PostgreSQL 16 Documentation](https://www.postgresql.org/docs/16/)
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+-   [Laravel 11 Documentation](https://laravel.com/docs/11.x)
+-   [PostgreSQL 16 Documentation](https://www.postgresql.org/docs/16/)
+-   [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+-   [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
