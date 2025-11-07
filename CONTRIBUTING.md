@@ -79,33 +79,36 @@ git push origin main
 **PSR-12** + Laravel Best Practices
 
 **Regras principais:**
-- Type hints obrigatórios (params e return types)
-- DocBlocks apenas quando adiciona valor
-- Constructor property promotion (PHP 8.2+)
-- Readonly properties quando possível
-- Maximum 120 caracteres por linha
-- 1 classe por ficheiro
+
+-   Type hints obrigatórios (params e return types)
+-   DocBlocks apenas quando adiciona valor
+-   Constructor property promotion (PHP 8.2+)
+-   Readonly properties quando possível
+-   Maximum 120 caracteres por linha
+-   1 classe por ficheiro
 
 ### JavaScript/Vue 3
 
 **ESLint** + Vue 3 Composition API
 
 **Regras principais:**
-- Composition API (não Options API)
-- `<script setup>` syntax
-- Prefer `const` sobre `let`
-- 2 espaços de indentação
-- Single quotes para strings
-- No semicolons (;)
+
+-   Composition API (não Options API)
+-   `<script setup>` syntax
+-   Prefer `const` sobre `let`
+-   2 espaços de indentação
+-   Single quotes para strings
+-   No semicolons (;)
 
 ### Database Migrations
 
 **Regras principais:**
-- UUIDs para primary keys (não auto-increment)
-- Foreign keys com `constrained()`
-- Indexes em colunas frequentemente filtradas
-- `softDeletes()` para tabelas principais
-- Sempre implementar `down()`
+
+-   UUIDs para primary keys (não auto-increment)
+-   Foreign keys com `constrained()`
+-   Indexes em colunas frequentemente filtradas
+-   `softDeletes()` para tabelas principais
+-   Sempre implementar `down()`
 
 ---
 
@@ -222,6 +225,74 @@ Antes de cada commit:
 
 ---
 
+## Comandos Úteis
+
+### Workflow Diário
+
+```bash
+# Iniciar containers
+docker-compose up -d
+
+# Ver logs em tempo real
+docker-compose logs -f
+
+# Parar containers (mantém dados)
+docker-compose stop
+
+# Parar e remover containers (mantém volumes)
+docker-compose down
+```
+
+### Antes de Commit
+
+```bash
+# 1. Code style
+docker-compose exec orionone-app ./vendor/bin/pint
+
+# 2. Análise estática
+docker-compose exec orionone-app ./vendor/bin/phpstan analyse
+
+# 3. Testes
+docker-compose exec orionone-app php artisan test
+```
+
+### Artisan Commands
+
+```bash
+# Migrations
+docker-compose exec orionone-app php artisan migrate
+docker-compose exec orionone-app php artisan migrate:fresh --seed
+
+# Cache
+docker-compose exec orionone-app php artisan config:clear
+docker-compose exec orionone-app php artisan cache:clear
+
+# Tinker (REPL)
+docker-compose exec orionone-app php artisan tinker
+```
+
+### Composer
+
+```bash
+# Instalar dependências
+docker-compose exec orionone-app composer install
+
+# Adicionar package
+docker-compose exec orionone-app composer require package/name
+```
+
+### NPM (Frontend)
+
+```bash
+# Instalar dependências (Linux-compatible)
+docker-compose run --rm orionone-frontend npm install
+
+# Build para produção
+docker-compose run --rm orionone-frontend npm run build
+```
+
+---
+
 ## Dúvidas?
 
 Consultar:
@@ -234,4 +305,3 @@ Consultar:
 **Regra de Ouro:**
 
 > "Se não está testado, não está feito."
-
