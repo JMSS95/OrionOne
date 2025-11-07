@@ -2,10 +2,10 @@
 
 ## ✅ Já Configurado
 
-- [x] Repositório público
-- [x] LICENSE (MIT)
-- [x] Colaborador adicionado (pendente aceitação)
-- [x] Badges no README
+-   [x] Repositório público
+-   [x] LICENSE (MIT)
+-   [x] Colaborador adicionado (pendente aceitação)
+-   [x] Badges no README
 
 ---
 
@@ -16,11 +16,13 @@
 **Localização:** Página principal do repo → ⚙️ (ícone engrenagem ao lado de "About")
 
 **Description:**
+
 ```
 Modern ITSM Platform for IT Support Management - CET Academic Project 2024/2025
 ```
 
 **Topics (adicionar estas tags):**
+
 ```
 laravel
 vue3
@@ -41,14 +43,16 @@ servicedesk
 **Localização:** Settings → General → Features
 
 **Ativar:**
-- ✅ Issues (para tracking de bugs e features)
-- ✅ Preserve this repository (arquivamento)
+
+-   ✅ Issues (para tracking de bugs e features)
+-   ✅ Preserve this repository (arquivamento)
 
 **Desativar:**
-- ❌ Projects (não necessário - tens docs/requirements.md)
-- ❌ Wiki (tens pasta docs/ completa)
-- ❌ Sponsorships
-- ❌ Discussions (opcional - só se quiseres Q&A público)
+
+-   ❌ Projects (não necessário - tens docs/requirements.md)
+-   ❌ Wiki (tens pasta docs/ completa)
+-   ❌ Sponsorships
+-   ❌ Discussions (opcional - só se quiseres Q&A público)
 
 ---
 
@@ -57,11 +61,12 @@ servicedesk
 **Localização:** Settings → General → Pull Requests
 
 **Configurar:**
-- ✅ Allow squash merging (mantém histórico limpo)
-- ❌ Allow merge commits
-- ❌ Allow rebase merging
-- ✅ Automatically delete head branches (limpa branches após merge)
-- ✅ Always suggest updating pull request branches
+
+-   ✅ Allow squash merging (mantém histórico limpo)
+-   ❌ Allow merge commits
+-   ❌ Allow rebase merging
+-   ✅ Automatically delete head branches (limpa branches após merge)
+-   ✅ Always suggest updating pull request branches
 
 ---
 
@@ -70,12 +75,14 @@ servicedesk
 **Localização:** Settings → Security and analysis
 
 **Ativar:**
-- ✅ Dependency graph (mostra dependências)
-- ✅ Dependabot alerts (avisos de segurança)
-- ✅ Dependabot security updates (updates automáticos - CUIDADO: pode criar muitos PRs)
+
+-   ✅ Dependency graph (mostra dependências)
+-   ✅ Dependabot alerts (avisos de segurança)
+-   ✅ Dependabot security updates (updates automáticos - CUIDADO: pode criar muitos PRs)
 
 **Secret scanning:**
-- ✅ Push protection (evita commits com secrets)
+
+-   ✅ Push protection (evita commits com secrets)
 
 ---
 
@@ -86,11 +93,12 @@ servicedesk
 **Branch name pattern:** `main`
 
 **Regras recomendadas para projeto académico:**
-- ✅ Require a pull request before merging
-  - ❌ Require approvals: 0 (és só tu)
-- ❌ Require status checks (não tens CI/CD ainda)
-- ✅ Require conversation resolution before merging
-- ✅ Do not allow bypassing the above settings
+
+-   ✅ Require a pull request before merging
+    -   ❌ Require approvals: 0 (és só tu)
+-   ❌ Require status checks (não tens CI/CD ainda)
+-   ✅ Require conversation resolution before merging
+-   ✅ Do not allow bypassing the above settings
 
 **Benefício:** Obriga-te a trabalhar em branches (git flow profissional)
 
@@ -135,10 +143,11 @@ git push origin feature/RF02-tickets
 **Localização:** Tab "Insights" no repo
 
 **Útil para mostrar:**
-- Pulse (atividade semanal)
-- Contributors (teus commits)
-- Traffic (quem visitou)
-- Network (gráfico de branches)
+
+-   Pulse (atividade semanal)
+-   Contributors (teus commits)
+-   Traffic (quem visitou)
+-   Network (gráfico de branches)
 
 ---
 
@@ -154,12 +163,12 @@ name: Laravel Tests
 on: [push, pull_request]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run PHPUnit
-        run: docker-compose exec -T orionone-app php artisan test
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Run PHPUnit
+              run: docker-compose exec -T orionone-app php artisan test
 ```
 
 ### Issue Templates
@@ -170,13 +179,13 @@ Criar `.github/ISSUE_TEMPLATE/bug_report.md` e `feature_request.md`
 
 ## ✅ Checklist Final
 
-- [ ] About section preenchida
-- [ ] Topics adicionados (10 tags)
-- [ ] Features configuradas (Issues ON, Wiki OFF)
-- [ ] Pull Requests settings (squash merge)
-- [ ] Dependabot ativado
-- [ ] Branch protection (opcional)
-- [ ] Social preview (quando tiveres dashboard)
+-   [ ] About section preenchida
+-   [ ] Topics adicionados (10 tags)
+-   [ ] Features configuradas (Issues ON, Wiki OFF)
+-   [ ] Pull Requests settings (squash merge)
+-   [ ] Dependabot ativado
+-   [ ] Branch protection (opcional)
+-   [ ] Social preview (quando tiveres dashboard)
 
 ---
 
