@@ -2,9 +2,7 @@
 
 **Modern IT Service Management Platform**
 
-Uma plataforma completa de gestão de tickets de suporte técnico, desenvolvida com Laravel 11 e Vue 3, focada em simplicidade, performance e experiência do utilizador.
-
----
+## Uma plataforma completa de gestão de tickets de suporte técnico, desenvolvida com Laravel 11 e Vue 3, focada em simplicidade, performance e experiência do utilizador.
 
 ## Sobre o Projeto
 
@@ -165,212 +163,109 @@ Após executar `php artisan db:seed`:
 
 ---
 
+## Arquitetura
+
+OrionOne segue uma arquitetura **MVC com Service Layer + Actions**, equilibrando simplicidade com boas práticas de Engenharia de Software:
+
+```
+Controllers (thin)  →  Services (business logic)  →  Models (data)
+                    ↓
+                  Actions (atomic operations)
+```
+
+**Camadas principais:**
+
+-   **Presentation:** Controllers, Requests, Views (Inertia/Vue)
+-   **Business Logic:** Services, Actions, Policies
+-   **Data:** Models, Observers, Migrations
+-   **Infrastructure:** PostgreSQL, Redis, Queue Jobs
+
+📖 **Documentação completa:** [docs/architecture.md](docs/architecture.md)
+
+---
+
+## Database Schema
+
+PostgreSQL 16 com 15+ tabelas otimizadas:
+
+-   **Core:** users, teams, tickets, comments
+-   **Knowledge Base:** categories, articles
+-   **Permissions:** roles, permissions (Spatie)
+-   **Auditoria:** activity_log, soft deletes
+
+📖 **Schema completo:** [docs/database-schema.md](docs/database-schema.md)
+
+---
+
 ## Estrutura do Projeto
 
 ```
 OrionOne/
 ├── app/
-│   │
-│   ├── Http/
-│   │   ├── Controllers/           # Request handling (5-20 linhas cada)
-│   │   │   ├── TicketController.php
-│   │   │   ├── CommentController.php
-│   │   │   ├── TeamController.php
-│   │   │   ├── ArticleController.php
-│   │   │   └── DashboardController.php
-│   │   │
-│   │   ├── Requests/              # Validation isolada
-│   │   │   ├── StoreTicketRequest.php
-│   │   │   ├── UpdateTicketRequest.php
-│   │   │   ├── StoreCommentRequest.php
-│   │   │   └── StoreArticleRequest.php
-│   │   │
-│   │   └── Middleware/
-│   │       └── EnsureUserHasTeam.php
-│   │
-│   ├── Services/                  # Business Logic Layer
-│   │   ├── TicketService.php      # CRUD + regras de negócio
-│   │   ├── AssignmentService.php  # Lógica de atribuição
-│   │   ├── SLAService.php         # Cálculo de SLA
-│   │   ├── NotificationService.php # Orquestração de notificações
-│   │   └── SearchService.php      # Lógica de pesquisa
-│   │
-│   ├── Actions/                   # Single Responsibility Operations
-│   │   ├── Tickets/
-│   │   │   ├── CreateTicketAction.php
-│   │   │   ├── AssignTicketAction.php
-│   │   │   ├── ResolveTicketAction.php
-│   │   │   ├── CloseTicketAction.php
-│   │   │   └── EscalateTicketAction.php
-│   │   │
-│   │   ├── Comments/
-│   │   │   └── AddCommentAction.php
-│   │   │
-│   │   └── Articles/
-│   │       ├── PublishArticleAction.php
-│   │       └── IncrementViewsAction.php
-│   │
-│   ├── Models/                    # Eloquent Models
-│   │   ├── Ticket.php
-│   │   ├── Comment.php
-│   │   ├── Team.php
-│   │   ├── User.php
-│   │   ├── Article.php
-│   │   └── Category.php
-│   │
-│   ├── Policies/                  # Authorization
-│   │   ├── TicketPolicy.php
-│   │   ├── CommentPolicy.php
-│   │   └── ArticlePolicy.php
-│   │
-│   ├── Observers/                 # Model Hooks
-│   │   ├── TicketObserver.php     # Auto-generate ticket_number, etc
-│   │   └── CommentObserver.php
-│   │
-│   ├── Notifications/             # Email/Slack/Database
-│   │   ├── TicketCreated.php
-│   │   ├── TicketAssigned.php
-│   │   ├── TicketResolved.php
-│   │   ├── CommentAdded.php
-│   │   └── SLABreachWarning.php
-│   │
-│   ├── Events/                    # Domain Events
-│   │   ├── TicketCreated.php
-│   │   ├── TicketResolved.php
-│   │   └── SLABreached.php
-│   │
-│   ├── Listeners/                 # Event Handlers
-│   │   ├── SendTicketCreatedNotification.php
-│   │   ├── LogTicketActivity.php
-│   │   └── UpdateTeamStatistics.php
-│   │
-│   └── Jobs/                      # Async Tasks
-│       ├── CheckSLADeadlines.php
-│       ├── SendDailyReport.php
-│       └── CleanupOldTickets.php
+│   ├── Http/              # Controllers, Requests, Middleware
+│   ├── Services/          # Business logic (TicketService, SLAService, etc)
+│   ├── Actions/           # Atomic operations (CreateTicketAction, etc)
+│   ├── Models/            # Eloquent models
+│   ├── Policies/          # Authorization
+│   ├── Observers/         # Model hooks
+│   ├── Notifications/     # Email, Slack, Database
+│   ├── Events/            # Domain events
+│   ├── Listeners/         # Event handlers
+│   └── Jobs/              # Async tasks
 │
 ├── database/
-│   ├── migrations/
-│   ├── seeders/
-│   └── factories/
+│   ├── migrations/        # Schema definitions
+│   ├── seeders/           # Test data
+│   └── factories/         # Model factories
 │
 ├── resources/
 │   ├── js/
-│   │   ├── Pages/                 # Inertia Pages
-│   │   │   ├── Dashboard.vue
-│   │   │   ├── Tickets/
-│   │   │   │   ├── Index.vue
-│   │   │   │   ├── Show.vue
-│   │   │   │   ├── Create.vue
-│   │   │   │   └── Edit.vue
-│   │   │   ├── Teams/
-│   │   │   ├── Articles/
-│   │   │   └── Reports/
-│   │   │
-│   │   ├── Components/            # Reusable Vue Components
-│   │   │   ├── Layout/
-│   │   │   │   ├── AppLayout.vue
-│   │   │   │   ├── Sidebar.vue
-│   │   │   │   └── Navbar.vue
-│   │   │   ├── Tickets/
-│   │   │   │   ├── TicketCard.vue
-│   │   │   │   ├── TicketList.vue
-│   │   │   │   ├── StatusBadge.vue
-│   │   │   │   └── PriorityBadge.vue
-│   │   │   ├── Comments/
-│   │   │   │   ├── CommentList.vue
-│   │   │   │   └── CommentForm.vue
-│   │   │   └── Shared/
-│   │   │       ├── Button.vue
-│   │   │       ├── Modal.vue
-│   │   │       ├── Dropdown.vue
-│   │   │       └── SearchBar.vue
-│   │   │
-│   │   ├── Composables/           # Vue 3 Composables
-│   │   │   ├── useTickets.js
-│   │   │   ├── usePermissions.js
-│   │   │   └── useFilters.js
-│   │   │
-│   │   └── Utils/
-│   │       ├── helpers.js
-│   │       └── formatters.js
-│   │
+│   │   ├── Pages/         # Inertia.js pages (Vue 3)
+│   │   ├── Components/    # Reusable Vue components
+│   │   ├── Composables/   # Vue composables
+│   │   └── Utils/         # Helper functions
 │   └── css/
-│       └── app.css
+│       └── app.css        # Tailwind CSS
 │
-└── tests/
-    ├── Feature/
-    │   ├── TicketManagementTest.php
-    │   ├── CommentSystemTest.php
-    │   └── SLATrackingTest.php
-    │
-    └── Unit/
-        ├── Services/
-        │   ├── TicketServiceTest.php
-        │   └── AssignmentServiceTest.php
-        │
-        └── Actions/
-            └── CreateTicketActionTest.php
+├── tests/
+│   ├── Feature/           # HTTP tests
+│   └── Unit/              # Logic tests
+│
+└── docs/                  # Technical documentation
 ```
 
 ---
 
-## Funcionalidades Implementadas
+## Funcionalidades Planeadas
 
-### MVP (Fase 1)
+### MVP (Fase 1) - 2.5 meses
 
--   [x] Autenticação e autorização multi-role
--   [x] CRUD completo de tickets
--   [x] Sistema de comentários
--   [x] Gestão de equipas
--   [x] Atribuição automática de tickets
--   [x] SLA tracking básico
--   [x] Knowledge base com pesquisa
--   [x] Dashboard com métricas
--   [x] Notificações por email
--   [x] Activity log (auditoria)
+-   [ ] Autenticação e autorização multi-role
+-   [ ] CRUD completo de tickets
+-   [ ] Sistema de comentários (públicos e internos)
+-   [ ] Gestão de equipas
+-   [ ] Atribuição automática de tickets
+-   [ ] SLA tracking básico
+-   [ ] Knowledge base com pesquisa
+-   [ ] Dashboard com métricas
+-   [ ] Notificações por email
+-   [ ] Activity log (auditoria)
 
-### Em Desenvolvimento
+### Fase 2 (Futuro)
 
 -   [ ] Real-time updates via WebSockets
 -   [ ] Anexos de ficheiros
--   [ ] Relatórios avançados
--   [ ] Search engine (Meilisearch)
+-   [ ] Relatórios avançados (PDF/Excel)
+-   [ ] Full-text search (PostgreSQL)
 -   [ ] API RESTful
 
-### Roadmap Futuro
+### Roadmap (Longo Prazo)
 
 -   [ ] Multi-tenancy
 -   [ ] Workflows configuráveis
--   [ ] Integração com email
+-   [ ] Integração com email (IMAP)
 -   [ ] Mobile app
 -   [ ] Sistema de aprovações
-
----
-
-## Modelo de Dados
-
-### Entidades Principais
-
-**Users**
-Utilizadores do sistema com roles (Admin, Agent, User)
-
-**Tickets**
-Pedidos de suporte com estados, prioridades e SLA tracking
-
-**Comments**
-Comunicação sobre tickets (pública ou interna)
-
-**Teams**
-Grupos de agents especializados
-
-**Articles**
-Conteúdo da knowledge base
-
-**Categories**
-Organização de artigos
-
-Para diagrama detalhado: [docs/database-schema.md](docs/database-schema.md)
 
 ---
 
@@ -386,6 +281,12 @@ php artisan test --coverage
 # Testes específicos
 php artisan test --filter TicketTest
 ```
+
+**Estratégia de testes:**
+
+-   **Unit Tests:** Services, Actions (mock dependencies)
+-   **Feature Tests:** HTTP requests completos
+-   **Browser Tests:** Dusk (opcional, fluxos críticos)
 
 ---
 
