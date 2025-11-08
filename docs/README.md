@@ -8,9 +8,9 @@
 
 ### Setup & Getting Started
 
-1. **[Commands Reference](COMMANDS-REFERENCE.md)** - Guia completo de todos os comandos (Git, Docker, Laravel, etc)
-2. **[Docker Guide](DOCKER-GUIDE.md)** - Guia Docker para iniciantes
-3. **[Setup Changelog](SETUP-CHANGELOG.md)** - Histórico completo de configuração do projeto
+1. **[Commands Reference](commands-reference.md)** - Guia completo de todos os comandos (Git, Docker, Laravel, etc)
+2. **[Docker Guide](docker-guide.md)** - Guia Docker para iniciantes
+3. **[Setup Changelog](setup-changelog.md)** - Histórico completo de configuração do projeto
 
 ### Arquitetura & Design
 
@@ -26,7 +26,7 @@
 
 ### Componentes UI
 
-10. **[Components Guide](COMPONENTS-GUIDE.md)** - Guia completo dos componentes Shadcn-vue (uso + implementação)
+10. **[Components Guide](components-guide.md)** - Guia completo dos componentes Shadcn-vue (uso + implementação)
 
 ### Business & Requirements
 
@@ -40,16 +40,16 @@
 ```
 docs/
 ├── README.md                      # Este ficheiro (índice)
-├── COMMANDS-REFERENCE.md          # Comandos completos
-├── DOCKER-GUIDE.md                # Docker para iniciantes
-├── SETUP-CHANGELOG.md             # Histórico de setup
+├── commands-reference.md          # Comandos completos
+├── docker-guide.md                # Docker para iniciantes
+├── setup-changelog.md             # Histórico de setup
 ├── architecture.md                # Arquitetura do sistema
 ├── tech-stack.md                  # Stack tecnológica
 ├── database-schema.md             # Schema da BD
 ├── development-guide.md           # Guia de desenvolvimento
 ├── development-planning.md        # Planeamento e sprints
 ├── implementation-checklist.md    # Checklist TDD
-├── COMPONENTS-GUIDE.md            # Componentes UI (completo)
+├── components-guide.md            # Componentes UI (completo)
 ├── business-model.md              # Modelo de negócio
 └── requirements.md                # Requisitos do projeto
 ```
@@ -60,7 +60,7 @@ docs/
 
 ### 1. Setup Inicial
 
-Consultar **[Commands Reference](COMMANDS-REFERENCE.md)** para comandos completos.
+Consultar **[Commands Reference](commands-reference.md)** para comandos completos.
 
 ```bash
 # Clone do repositório
@@ -113,10 +113,10 @@ Usar **[Implementation Checklist](implementation-checklist.md)** para:
 
 **Começar aqui:**
 
-1. [Commands Reference](COMMANDS-REFERENCE.md) - Memorizar comandos essenciais
+1. [Commands Reference](commands-reference.md) - Memorizar comandos essenciais
 2. [Development Guide](development-guide.md) - Entender workflow TDD
 3. [Architecture](architecture.md) - Compreender estrutura do código
-4. [Components Guide](COMPONENTS-GUIDE.md) - Usar componentes UI
+4. [Components Guide](components-guide.md) - Usar componentes UI
 
 **Workflow diário:**
 
@@ -148,8 +148,8 @@ git push origin feature/ticket-filters
 
 **Focar em:**
 
-1. [Docker Guide](DOCKER-GUIDE.md) - Gestão de containers
-2. [Commands Reference](COMMANDS-REFERENCE.md) - Secção Docker e deployment
+1. [Docker Guide](docker-guide.md) - Gestão de containers
+2. [Commands Reference](commands-reference.md) - Secção Docker e deployment
 3. [Tech Stack](tech-stack.md) - Infraestrutura completa
 
 ### Para Product Owners / Stakeholders

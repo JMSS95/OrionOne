@@ -19,8 +19,9 @@ docker-compose exec orionone-app php artisan migrate --seed
 ```
 
 **Aceder:**
-- Laravel: http://localhost:8888
-- Vite HMR: http://localhost:5173
+
+-   Laravel: http://localhost:8888
+-   Vite HMR: http://localhost:5173
 
 ---
 
@@ -28,10 +29,10 @@ docker-compose exec orionone-app php artisan migrate --seed
 
 Para informação detalhada sobre o setup, consultar:
 
-- **[Setup Changelog](docs/SETUP-CHANGELOG.md)** - Histórico completo de instalação, pacotes, configurações
-- **[Commands Reference](docs/COMMANDS-REFERENCE.md)** - Todos os comandos (Git, Docker, Laravel, NPM)
-- **[Docker Guide](docs/DOCKER-GUIDE.md)** - Guia Docker para iniciantes
-- **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
+-   **[Setup Changelog](docs/setup-changelog.md)** - Histórico completo de instalação, pacotes, configurações
+-   **[Commands Reference](docs/commands-reference.md)** - Todos os comandos (Git, Docker, Laravel, NPM)
+-   **[Docker Guide](docs/docker-guide.md)** - Guia Docker para iniciantes
+-   **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
 
 ---
 

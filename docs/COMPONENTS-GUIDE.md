@@ -1,6 +1,6 @@
 # Shadcn-vue Components - Guia Completo
 
-**Última Atualização:** 08 Novembro 2025, 01:05  
+**Última Atualização:** 08 Novembro 2025, 01:05
 **Status:** ✅ COMPLETO - 14 Componentes
 
 ---
@@ -55,10 +55,11 @@ resources/js/
 ### Página de Demo
 
 Criada página de teste em `/components-demo` com:
-- Todos os componentes visíveis
-- Todas as variantes
-- Exemplos de uso
-- Dark mode toggle
+
+-   Todos os componentes visíveis
+-   Todas as variantes
+-   Exemplos de uso
+-   Dark mode toggle
 
 **Aceder:** http://localhost:8888/components-demo
 

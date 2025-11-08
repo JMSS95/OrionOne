@@ -301,7 +301,7 @@ Este projeto segue **boas práticas profissionais** de desenvolvimento:
 5. **API** (1h) - Endpoints opcionais se necessário
 6. **Commit** (15min) - Git commit com mensagem descritiva
 
-**Documentação completa**: Ver [`docs/development-workflow.md`](docs/development-workflow.md)
+**Documentação completa**: Ver [`docs/development-guide.md`](docs/development-guide.md)
 
 ### Scripts de Automação
 
