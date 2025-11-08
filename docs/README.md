@@ -26,13 +26,12 @@
 
 ### Componentes UI
 
-10. **[Components Guide](COMPONENTS-GUIDE.md)** - Guia de uso dos componentes Shadcn-vue
-11. **[Components Summary](COMPONENTS-SUMMARY.md)** - Resumo da implementação dos componentes
+10. **[Components Guide](COMPONENTS-GUIDE.md)** - Guia completo dos componentes Shadcn-vue (uso + implementação)
 
 ### Business & Requirements
 
-12. **[Business Model](business-model.md)** - Modelo de negócio, value proposition, análise SWOT
-13. **[Requirements](requirements.md)** - Requisitos funcionais e não-funcionais
+11. **[Business Model](business-model.md)** - Modelo de negócio, value proposition, análise SWOT
+12. **[Requirements](requirements.md)** - Requisitos funcionais e não-funcionais
 
 ---
 
@@ -50,8 +49,7 @@ docs/
 ├── development-guide.md           # Guia de desenvolvimento
 ├── development-planning.md        # Planeamento e sprints
 ├── implementation-checklist.md    # Checklist TDD
-├── COMPONENTS-GUIDE.md            # Componentes UI (guia de uso)
-├── COMPONENTS-SUMMARY.md          # Componentes UI (resumo)
+├── COMPONENTS-GUIDE.md            # Componentes UI (completo)
 ├── business-model.md              # Modelo de negócio
 └── requirements.md                # Requisitos do projeto
 ```
@@ -90,20 +88,22 @@ http://localhost:8888
 ### 2. Desenvolvimento
 
 Seguir **[Development Guide](development-guide.md)** para:
-- Filosofia TDD (Red-Green-Refactor)
-- Padrões de código
-- Convenções de nomenclatura
-- Git workflow
+
+-   Filosofia TDD (Red-Green-Refactor)
+-   Padrões de código
+-   Convenções de nomenclatura
+-   Git workflow
 
 ### 3. Implementar Features
 
 Usar **[Implementation Checklist](implementation-checklist.md)** para:
-- Sprint 1: Auth & Users
-- Sprint 2: Tickets Core
-- Sprint 3: Colaboração
-- Sprint 4: Knowledge Base
-- Sprint 5: Dashboard & Reports
-- Sprint 6: Polish & Deploy
+
+-   Sprint 1: Auth & Users
+-   Sprint 2: Tickets Core
+-   Sprint 3: Colaboração
+-   Sprint 4: Knowledge Base
+-   Sprint 5: Dashboard & Reports
+-   Sprint 6: Polish & Deploy
 
 ---
 
@@ -112,12 +112,14 @@ Usar **[Implementation Checklist](implementation-checklist.md)** para:
 ### Para Developers
 
 **Começar aqui:**
+
 1. [Commands Reference](COMMANDS-REFERENCE.md) - Memorizar comandos essenciais
 2. [Development Guide](development-guide.md) - Entender workflow TDD
 3. [Architecture](architecture.md) - Compreender estrutura do código
 4. [Components Guide](COMPONENTS-GUIDE.md) - Usar componentes UI
 
 **Workflow diário:**
+
 ```bash
 # 1. Pull latest changes
 git pull origin main
@@ -145,6 +147,7 @@ git push origin feature/ticket-filters
 ### Para DevOps
 
 **Focar em:**
+
 1. [Docker Guide](DOCKER-GUIDE.md) - Gestão de containers
 2. [Commands Reference](COMMANDS-REFERENCE.md) - Secção Docker e deployment
 3. [Tech Stack](tech-stack.md) - Infraestrutura completa
@@ -152,6 +155,7 @@ git push origin feature/ticket-filters
 ### Para Product Owners / Stakeholders
 
 **Ler primeiro:**
+
 1. [Business Model](business-model.md) - Value proposition, mercado
 2. [Requirements](requirements.md) - Features e requisitos
 3. [Development Planning](development-planning.md) - Cronograma e sprints
@@ -162,10 +166,10 @@ git push origin feature/ticket-filters
 
 ### Formato
 
-- **Markdown** (`.md`)
-- UTF-8 encoding
-- Line breaks: Unix (LF)
-- Max line length: 120 caracteres (soft limit)
+-   **Markdown** (`.md`)
+-   UTF-8 encoding
+-   Line breaks: Unix (LF)
+-   Max line length: 120 caracteres (soft limit)
 
 ### Estrutura de Documento
 
@@ -244,12 +248,12 @@ git commit -m "docs: update development guide with new patterns"
 
 ### Checklist para PRs de Documentação
 
-- [ ] Documento segue estrutura padrão
-- [ ] Links internos funcionam
-- [ ] Code blocks têm linguagem especificada
-- [ ] Sem erros ortográficos
-- [ ] Adicionado ao índice (`docs/README.md`)
-- [ ] Data de atualização presente
+-   [ ] Documento segue estrutura padrão
+-   [ ] Links internos funcionam
+-   [ ] Code blocks têm linguagem especificada
+-   [ ] Sem erros ortográficos
+-   [ ] Adicionado ao índice (`docs/README.md`)
+-   [ ] Data de atualização presente
 
 ---
 
@@ -258,14 +262,16 @@ git commit -m "docs: update development guide with new patterns"
 ### Review Periódico
 
 **Mensalmente:**
-- Atualizar `SETUP-CHANGELOG.md` com mudanças
-- Verificar links quebrados
-- Atualizar versões de packages em `tech-stack.md`
+
+-   Atualizar `SETUP-CHANGELOG.md` com mudanças
+-   Verificar links quebrados
+-   Atualizar versões de packages em `tech-stack.md`
 
 **Trimestralmente:**
-- Atualizar `business-model.md` com métricas reais
-- Revisar `requirements.md` com feedback de users
-- Atualizar `development-planning.md` com roadmap
+
+-   Atualizar `business-model.md` com métricas reais
+-   Revisar `requirements.md` com feedback de users
+-   Atualizar `development-planning.md` com roadmap
 
 ---
 
