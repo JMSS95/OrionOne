@@ -439,9 +439,9 @@ test: testes
 -   [Arquitetura da Aplicação](docs/architecture.md)
 -   [Schema da Base de Dados](docs/database-schema.md)
 -   [Guia de Desenvolvimento](docs/development-guide.md)
--   [Planeamento de Desenvolvimento](docs/development-planning.md)
--   [Modelo de Negócio](docs/business-model.md)
--   [Tech Stack Completo](docs/tech-stack.md)
+-   [Planeamento de Desenvolvimento](docs/development-planning.md) 
+-   [Modelo de Negócio](docs/business-model.md) 
+-   [Tech Stack Completo](docs/tech-stack.md) 
 
 ### Guias de Setup
 

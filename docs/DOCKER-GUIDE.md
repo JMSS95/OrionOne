@@ -231,7 +231,7 @@ docker-compose down
 docker-compose down -v
 ```
 
-**CAUTION:** This deletes the database!
+**CUIDADO:** Apaga base de dados!
 
 ---
 
@@ -577,15 +577,15 @@ server: {
 
 ### 1. Nunca Editar Dentro do Container
 
-**WRONG:**
+**Errado:**
 
 ```bash
 docker-compose exec orionone-app bash
-vim app/Models/User.php  # NEVER DO THIS!
+vim app/Models/User.php  # NUNCA FAZER ISTO!
 ```
 
-**CORRECT:**
-Edit on host machine (VSCode, PhpStorm). Changes are automatically synced via volume mount.
+**Correto:**
+Editar no host (VSCode, PhpStorm). Mudanças são automaticamente sincronizadas via volume mount.
 
 ---
 
