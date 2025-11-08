@@ -24,20 +24,20 @@ Este documento estabelece o roadmap, metas, sprints e cronograma de desenvolvime
 
 ---
 
-## Fase 0: Setup & Fundações ✅
+## Fase 0: Setup & Fundações
 
 **Status:** Concluída (01-10 Nov 2025)
 
 ### Objetivos Alcançados
 
--   ✅ Docker Compose setup (5 containers)
--   ✅ Laravel 11 + Vue 3 + Inertia.js configurado
--   ✅ PostgreSQL 16 + Redis integrados
--   ✅ Ferramentas de desenvolvimento (PHPStan, Pint, PHPUnit)
--   ✅ Documentação inicial (architecture, requirements, development-guide)
--   ✅ Scripts de automação (feature.ps1, feature.sh)
--   ✅ Laravel Telescope para debugging
--   ✅ Spatie Permission + Activity Log instalados
+-   Docker Compose setup (5 containers)
+-   Laravel 11 + Vue 3 + Inertia.js configurado
+-   PostgreSQL 16 + Redis integrados
+-   Ferramentas de desenvolvimento (PHPStan, Pint, PHPUnit)
+-   Documentação inicial (architecture, requirements, development-guide)
+-   Scripts de automação (feature.ps1, feature.sh)
+-   Laravel Telescope para debugging
+-   Spatie Permission + Activity Log instalados
 
 ### Entregáveis
 
@@ -49,7 +49,7 @@ Este documento estabelece o roadmap, metas, sprints e cronograma de desenvolvime
 
 ---
 
-## Sprint 1: Auth & Users 🔄
+## Sprint 1: Auth & Users
 
 **Período:** 11-17 Novembro 2025 (1 semana)
 **Status:** EM PROGRESSO
@@ -137,7 +137,7 @@ Implementar sistema completo de autenticação, autorização e gestão de utili
 
 ---
 
-## Sprint 2: Tickets Core 📋
+## Sprint 2: Tickets Core
 
 **Período:** 18 Nov - 01 Dezembro 2025 (2 semanas)
 **Status:** PLANEADA
@@ -275,7 +275,7 @@ Implementar CRUD completo de tickets com estados, prioridades, atribuição e SL
 
 ---
 
-## Sprint 3: Colaboração (Comments + Teams + Notifications) 💬
+## Sprint 3: Colaboração (Comments + Teams + Notifications)
 
 **Período:** 02-15 Dezembro 2025 (2 semanas)
 **Status:** PLANEADA
@@ -382,7 +382,7 @@ Implementar sistema de comentários (públicos/internos), gestão de equipas e n
 
 ---
 
-## Sprint 4: Knowledge Base 📚
+## Sprint 4: Knowledge Base
 
 **Período:** 16-29 Dezembro 2025 (2 semanas)
 **Status:** PLANEADA
@@ -484,7 +484,7 @@ Implementar base de conhecimento pública com artigos, categorias hierárquicas 
 
 ---
 
-## Sprint 5: Dashboard & Reports 📊
+## Sprint 5: Dashboard & Reports
 
 **Período:** 30 Dez 2025 - 12 Janeiro 2026 (2 semanas)
 **Status:** PLANEADA
@@ -583,7 +583,7 @@ Implementar dashboards para Admin e Agent com métricas, gráficos e SLA trackin
 
 ---
 
-## Sprint 6: Polish & Deploy 🚀
+## Sprint 6: Polish & Deploy
 
 **Período:** 13-26 Janeiro 2026 (2 semanas)
 **Status:** PLANEADA

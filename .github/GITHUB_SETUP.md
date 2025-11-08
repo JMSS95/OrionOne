@@ -1,6 +1,6 @@
 # Configuração do GitHub - OrionOne
 
-## ✅ Já Configurado
+## Já Configurado
 
 -   [x] Repositório público
 -   [x] LICENSE (MIT)
@@ -9,7 +9,7 @@
 
 ---
 
-## 📋 Configurações Pendentes
+## Configurações Pendentes
 
 ### 1. About Section (Lado direito do repositório)
 
@@ -44,15 +44,15 @@ servicedesk
 
 **Ativar:**
 
--   ✅ Issues (para tracking de bugs e features)
--   ✅ Preserve this repository (arquivamento)
+-   [x] Issues (para tracking de bugs e features)
+-   [x] Preserve this repository (arquivamento)
 
 **Desativar:**
 
--   ❌ Projects (não necessário - tens docs/requirements.md)
--   ❌ Wiki (tens pasta docs/ completa)
--   ❌ Sponsorships
--   ❌ Discussions (opcional - só se quiseres Q&A público)
+-   [ ] Projects (não necessário - tens docs/requirements.md)
+-   [ ] Wiki (tens pasta docs/ completa)
+-   [ ] Sponsorships
+-   [ ] Discussions (opcional - só se quiseres Q&A público)
 
 ---
 
@@ -62,11 +62,11 @@ servicedesk
 
 **Configurar:**
 
--   ✅ Allow squash merging (mantém histórico limpo)
--   ❌ Allow merge commits
--   ❌ Allow rebase merging
--   ✅ Automatically delete head branches (limpa branches após merge)
--   ✅ Always suggest updating pull request branches
+-   [x] Allow squash merging (mantém histórico limpo)
+-   [ ] Allow merge commits
+-   [ ] Allow rebase merging
+-   [x] Automatically delete head branches (limpa branches após merge)
+-   [x] Always suggest updating pull request branches
 
 ---
 
@@ -76,13 +76,13 @@ servicedesk
 
 **Ativar:**
 
--   ✅ Dependency graph (mostra dependências)
--   ✅ Dependabot alerts (avisos de segurança)
--   ✅ Dependabot security updates (updates automáticos - CUIDADO: pode criar muitos PRs)
+-   [x] Dependency graph (mostra dependências)
+-   [x] Dependabot alerts (avisos de segurança)
+-   [x] Dependabot security updates (updates automáticos - CUIDADO: pode criar muitos PRs)
 
 **Secret scanning:**
 
--   ✅ Push protection (evita commits com secrets)
+-   [x] Push protection (evita commits com secrets)
 
 ---
 
@@ -94,17 +94,17 @@ servicedesk
 
 **Regras recomendadas para projeto académico:**
 
--   ✅ Require a pull request before merging
-    -   ❌ Require approvals: 0 (és só tu)
--   ❌ Require status checks (não tens CI/CD ainda)
--   ✅ Require conversation resolution before merging
--   ✅ Do not allow bypassing the above settings
+-   [x] Require a pull request before merging
+    -   [ ] Require approvals: 0 (és só tu)
+-   [ ] Require status checks (não tens CI/CD ainda)
+-   [x] Require conversation resolution before merging
+-   [x] Do not allow bypassing the above settings
 
 **Benefício:** Obriga-te a trabalhar em branches (git flow profissional)
 
 ---
 
-## 🎨 Social Preview (Opcional)
+## Social Preview (Opcional)
 
 **Localização:** Settings → Social preview → Upload an image
 
@@ -116,7 +116,7 @@ servicedesk
 
 ---
 
-## 🔄 Workflow Recomendado com Branch Protection
+## Workflow Recomendado com Branch Protection
 
 Se ativares branch protection:
 
@@ -138,7 +138,7 @@ git push origin feature/RF02-tickets
 
 ---
 
-## 📊 GitHub Insights (Mostrar ao Instrutor)
+## GitHub Insights (Mostrar ao Instrutor)
 
 **Localização:** Tab "Insights" no repo
 
@@ -151,7 +151,7 @@ git push origin feature/RF02-tickets
 
 ---
 
-## 🎯 Próximos Passos (Semana 2-3)
+## Próximos Passos (Semana 2-3)
 
 ### GitHub Actions (CI/CD)
 
@@ -177,7 +177,7 @@ Criar `.github/ISSUE_TEMPLATE/bug_report.md` e `feature_request.md`
 
 ---
 
-## ✅ Checklist Final
+## Checklist Final
 
 -   [ ] About section preenchida
 -   [ ] Topics adicionados (10 tags)

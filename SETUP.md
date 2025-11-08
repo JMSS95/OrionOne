@@ -1,4 +1,4 @@
-# Setup Completo - OrionOne
+# Setup Rápido - OrionOne
 
 ## Instalado e Configurado
 
@@ -144,7 +144,7 @@ Migrations executadas:
 
 ## Próximos Passos
 
-### 1. Configuração Inicial de Packages ⭐ **IMPORTANTE**
+### 1. Configuração Inicial de Packages  **IMPORTANTE**
 
 ```bash
 # Publicar configs dos packages instalados
@@ -233,10 +233,16 @@ php artisan make:test TicketTest          # Feature
 php artisan make:test TicketServiceTest --unit  # Unit
 ```
 
-### 4. Frontend (Inertia.js + Vue 3)
+# Instalar dependências
+docker-compose exec orionone-app composer install
+docker-compose exec orionone-frontend npm install --legacy-peer-deps
 
-#### Componentes a Criar:
+# Configurar ambiente
+docker-compose exec orionone-app cp .env.example .env
+docker-compose exec orionone-app php artisan key:generate
 
+# Base de dados
+docker-compose exec orionone-app php artisan migrate --seed
 ```
 resources/js/
 ├── Components/
@@ -304,27 +310,21 @@ resources/js/
 
 ## Comandos Rápidos
 
-### Desenvolvimento
+**Aceder:**
 
-```bash
-# Iniciar tudo
-docker-compose up -d
+-   Laravel: http://localhost:8888
+-   Vite HMR: http://localhost:5173
 
-# Ver logs
-docker-compose logs -f orionone-app
+---
 
-# Artisan
-docker-compose exec orionone-app php artisan [comando]
+## Documentação Completa
 
-# Testes
-docker-compose exec orionone-app php artisan test
+Para informação detalhada sobre o setup, consultar:
 
-# Code quality
-docker-compose exec orionone-app ./vendor/bin/pint
-docker-compose exec orionone-app ./vendor/bin/phpstan analyse
-```
-
-### Quando Trocar de PC
+-   **[Setup Changelog](docs/setup-changelog.md)** - Histórico completo de instalação, pacotes, configurações
+-   **[Commands Reference](docs/commands-reference.md)** - Todos os comandos (Git, Docker, Laravel, NPM)
+-   **[Docker Guide](docs/docker-guide.md)** - Guia Docker para iniciantes
+-   **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
 
 ```bash
 # PC novo
@@ -338,35 +338,16 @@ docker-compose exec orionone-app php artisan migrate
 
 ## Documentação de Referência
 
--   `docs/requirements.md` - Requisitos funcionais e não-funcionais
--   `docs/architecture.md` - Arquitetura e decisões técnicas
--   `docs/database-schema.md` - Schema completo do PostgreSQL
--   `docs/docker-deep-dive.md` - Explicação completa de Docker
--   `docs/development-tools.md` - Ferramentas e workflow
--   `docs/scripts.md` - Comandos úteis
+## Próximos Passos
 
 ## Checklist Atual
 
--   [x] Docker configurado (5 containers)
--   [x] Migrations executadas
--   [x] Larastan instalado
--   [x] L5-Swagger instalado
--   [x] Estrutura de pastas criada
--   [x] Documentação completa
--   [ ] Models com relationships
--   [ ] Authentication completo
--   [ ] CRUD de Tickets
--   [ ] CRUD de Comments
--   [ ] Sistema de Teams
--   [ ] Assignment logic
--   [ ] SLA calculation
--   [ ] Knowledge Base
--   [ ] Dashboard
--   [ ] Notifications
--   [ ] Activity Log
--   [ ] Testes (>70% coverage)
--   [ ] API documentation (Swagger)
--   [ ] Deploy
+1. **Sprint 1:** Auth & Users (Roles, Permissions, Seeders)
+2. **Sprint 2:** Tickets Core (CRUD, Status, Priority)
+3. **Sprint 3:** Colaboração (Comments, Teams, Notifications)
+4. **Sprint 4:** Knowledge Base
+5. **Sprint 5:** Dashboard & Reports
+6. **Sprint 6:** Polish & Deploy
 
 ---
 
