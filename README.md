@@ -1,8 +1,6 @@
 <div align="center">
   <img src="public/images/logo.png" alt="OrionOne Logo" width="300">
 
-# OrionOne
-
 **Modern IT Service Management Platform**
 
 [![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
