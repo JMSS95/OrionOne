@@ -24,20 +24,20 @@ Este documento estabelece o roadmap, metas, sprints e cronograma de desenvolvime
 
 ---
 
-## Fase 0: Setup & Fundações
+## Fase 0: Setup & Fundações [COMPLETE]
 
 **Status:** Concluída (01-10 Nov 2025)
 
 ### Objetivos Alcançados
 
--   Docker Compose setup (5 containers)
--   Laravel 11 + Vue 3 + Inertia.js configurado
--   PostgreSQL 16 + Redis integrados
--   Ferramentas de desenvolvimento (PHPStan, Pint, PHPUnit)
--   Documentação inicial (architecture, requirements, development-guide)
--   Scripts de automação (feature.ps1, feature.sh)
--   Laravel Telescope para debugging
--   Spatie Permission + Activity Log instalados
+-   [x] Docker Compose setup (5 containers)
+-   [x] Laravel 11 + Vue 3 + Inertia.js configurado
+-   [x] PostgreSQL 16 + Redis integrados
+-   [x] Ferramentas de desenvolvimento (PHPStan, Pint, PHPUnit)
+-   [x] Documentação inicial (architecture, requirements, development-guide)
+-   [x] Scripts de automação (feature.ps1, feature.sh)
+-   [x] Laravel Telescope para debugging
+-   [x] Spatie Permission + Activity Log instalados
 
 ### Entregáveis
 
@@ -275,7 +275,7 @@ Implementar CRUD completo de tickets com estados, prioridades, atribuição e SL
 
 ---
 
-## Sprint 3: Colaboração (Comments + Teams + Notifications)
+## Sprint 3: Colaboração (Comments + Teams + Notifications) 💬
 
 **Período:** 02-15 Dezembro 2025 (2 semanas)
 **Status:** PLANEADA
@@ -382,7 +382,7 @@ Implementar sistema de comentários (públicos/internos), gestão de equipas e n
 
 ---
 
-## Sprint 4: Knowledge Base
+## Sprint 4: Knowledge Base 📚
 
 **Período:** 16-29 Dezembro 2025 (2 semanas)
 **Status:** PLANEADA
@@ -486,7 +486,7 @@ Implementar base de conhecimento pública com artigos, categorias hierárquicas 
 
 ## Sprint 5: Dashboard & Reports
 
-**Período:** 30 Dez 2025 - 12 Janeiro 2026 (2 semanas)
+**Duração:** 30 Dez - 05 Janeiro (1 semana)
 **Status:** PLANEADA
 
 ### Objetivos
@@ -585,7 +585,7 @@ Implementar dashboards para Admin e Agent com métricas, gráficos e SLA trackin
 
 ## Sprint 6: Polish & Deploy
 
-**Período:** 13-26 Janeiro 2026 (2 semanas)
+**Duração:** 06-12 Janeiro (1 semana)
 **Status:** PLANEADA
 
 ### Objetivos
@@ -663,13 +663,13 @@ Refinamento final, otimização de performance, testes E2E, deployment e prepara
 
 ### KPIs de Projeto
 
-| Métrica                                 | Target          | Status        |
-| --------------------------------------- | --------------- | ------------- |
-| **Requisitos Funcionais Implementados** | 100% (15/15)    | 🟡 13% (2/15) |
-| **Sprints no Prazo**                    | 100% (6/6)      | 🟢 16% (1/6)  |
-| **Features Completas**                  | 6 features core | 🟡 1/6        |
-| **Documentação Atualizada**             | 100%            | 🟢 90%        |
-| **Deploy Successful**                   | 1 produção      | 🔴 0/1        |
+| Métrica                                 | Target          | Status                   |
+| --------------------------------------- | --------------- | ------------------------ |
+| **Requisitos Funcionais Implementados** | 100% (15/15)    | [IN PROGRESS] 13% (2/15) |
+| **Sprints no Prazo**                    | 100% (6/6)      | [ON TRACK] 16% (1/6)     |
+| **Features Completas**                  | 6 features core | [IN PROGRESS] 1/6        |
+| **Documentação Atualizada**             | 100%            | [GOOD] 90%               |
+| **Deploy Successful**                   | 1 produção      | [PENDING] 0/1            |
 
 ---
 

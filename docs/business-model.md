@@ -119,18 +119,18 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 
 #### Diferenciadores vs. Competição:
 
-| Feature                | OrionOne    | Zendesk     | Freshdesk | ServiceNow  |
-| ---------------------- | ----------- | ----------- | --------- | ----------- |
-| **Preço (10 agents)**  | €150/mês    | €890/mês    | €490/mês  | €2500/mês   |
-| **Setup Time**         | <1 hora     | 1 semana    | 2 dias    | 1-3 meses   |
-| **Self-Hosted Option** | ✅          | ❌          | ❌        | ❌          |
-| **Open-Source Core**   | ✅          | ❌          | ❌        | ❌          |
-| **Modern Stack**       | ✅          | ⚠️          | ⚠️        | ❌          |
-| **Knowledge Base**     | ✅ Incluída | ✅ Extra €€ | ✅        | ✅          |
-| **SLA Management**     | ✅ Incluída | ✅          | ✅ Pro    | ✅          |
-| **Customization**      | ✅ Full     | ⚠️ Limitada | ⚠️        | ✅ Complexa |
+| Feature                | OrionOne | Zendesk  | Freshdesk | ServiceNow |
+| ---------------------- | -------- | -------- | --------- | ---------- |
+| **Preço (10 agents)**  | €150/mês | €890/mês | €490/mês  | €2500/mês  |
+| **Setup Time**         | <1 hora  | 1 semana | 2 dias    | 1-3 meses  |
+| **Self-Hosted Option** | Sim      | Não      | Não       | Não        |
+| **Open-Source Core**   | Sim      | Não      | Não       | Não        |
+| **Modern Stack**       | Sim      | Parcial  | Parcial   | Não        |
+| **Knowledge Base**     | Incluída | Extra    | Sim       | Sim        |
+| **SLA Management**     | Incluída | Sim      | Pro       | Sim        |
+| **Customization**      | Full     | Limitada | Parcial   | Complexa   |
 
-### 3. Channels 📢
+### 3. Channels
 
 #### Aquisição de Clientes:
 

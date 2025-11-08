@@ -22,7 +22,18 @@
 | Package                     | Versão | Propósito                            |
 | --------------------------- | ------ | ------------------------------------ |
 | `spatie/laravel-permission` | 6.23   | Gestão de roles e permissions (RBAC) |
-| `laravel/sanctum`           | 4.0    | API authentication tokens            |
+| `laravel/sanctum`           | 4.0    | API authentication tokens (SPA/API)  |
+
+#### API & Integrações
+
+| Package/Feature     | Versão | Propósito                                      |
+| ------------------- | ------ | ---------------------------------------------- |
+| **Laravel API**     | 11.x   | RESTful API nativa (routes/api.php)            |
+| `laravel/sanctum`   | 4.0    | Token authentication para API externa          |
+| **API Resources**   | 11.x   | Transformação de dados (JsonResource)          |
+| **Rate Limiting**   | 11.x   | Throttling de requests (60/min default)        |
+| **CORS**            | 11.x   | Cross-origin requests (frontend/mobile)        |
+| **Swagger/OpenAPI** | -      | Documentação automática API (adicionar Fase 2) |
 
 #### Audit & Monitoring
 
@@ -154,11 +165,9 @@ Como o CLI não funciona com Vite 7, vamos criar estes componentes:
 
 ### 1. Criar Componentes Base
 
-```bash
-# Criar estrutura
-mkdir -p resources/js/components/ui
-mkdir -p resources/js/lib
-```
+Criar estrutura em `resources/js/components/ui/` e `resources/js/lib/`.
+
+Ver [Commands Reference](COMMANDS-REFERENCE.md) para comandos específicos.
 
 ### 2. Setup Vee-Validate
 
@@ -166,15 +175,15 @@ Criar composable global para forms.
 
 ### 3. Configurar Spatie Packages
 
-```bash
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
-php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider"
-php artisan migrate
-```
+Publicar configs e executar migrations.
+
+Ver [Commands Reference](COMMANDS-REFERENCE.md#laravel-artisan-commands) para comandos.
 
 ### 4. Criar Seeder
 
 Roles, permissions, utilizadores teste.
+
+Ver [Implementation Checklist](implementation-checklist.md) para instruções TDD.
 
 ---
 

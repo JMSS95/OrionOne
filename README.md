@@ -213,19 +213,20 @@ Controllers (thin) → Services (business logic) → Models (data)
 
 ### Essencial (Ler Primeiro)
 
--   **[Tech Stack](docs/tech-stack.md)** - Todas as tecnologias instaladas
--   **[Implementation Checklist](docs/implementation-checklist.md)** - Guia passo a passo com código
+-   **[Tech Stack](docs/tech-stack.md)** - Todas as tecnologias instaladas (Backend, Frontend, API)
+-   **[Implementation Checklist](docs/implementation-checklist.md)** - Guia passo a passo com código TDD (Sprints 1-2 completos + API REST + Observers + Events)
 -   **[Development Planning](docs/development-planning.md)** - Sprints e roadmap
 
 ### Arquitetura & Design
 
--   **[Architecture](docs/architecture.md)** - Arquitetura MVC + Services + Actions
+-   **[Architecture](docs/architecture.md)** - Arquitetura MVC + Services + Actions + Observers
 -   **[Database Schema](docs/database-schema.md)** - Schema completo com relacionamentos
 -   **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
 
 ### Desenvolvimento
 
 -   **[Development Guide](docs/development-guide.md)** - Workflow TDD e metodologia
+-   **[Commands Reference](docs/commands-reference.md)** - Todos os comandos Git, Docker, Laravel, Artisan
 -   **[Business Model](docs/business-model.md)** - Modelo de negócio e SWOT
 
 ---
@@ -439,9 +440,9 @@ test: testes
 -   [Arquitetura da Aplicação](docs/architecture.md)
 -   [Schema da Base de Dados](docs/database-schema.md)
 -   [Guia de Desenvolvimento](docs/development-guide.md)
--   [Planeamento de Desenvolvimento](docs/development-planning.md) 
--   [Modelo de Negócio](docs/business-model.md) 
--   [Tech Stack Completo](docs/tech-stack.md) 
+-   [Planeamento de Desenvolvimento](docs/development-planning.md)
+-   [Modelo de Negócio](docs/business-model.md)
+-   [Tech Stack Completo](docs/tech-stack.md)
 
 ### Guias de Setup
 
