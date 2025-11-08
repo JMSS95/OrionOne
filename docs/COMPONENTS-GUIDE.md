@@ -1,6 +1,6 @@
 # Shadcn-vue Components - Guia Completo
 
-**Última Atualização:** 08 Novembro 2025, 01:05  
+**Última Atualização:** 08 Novembro 2025, 01:05
 **Status:** COMPLETO - 14 Componentes---
 
 ## Status da Implementação

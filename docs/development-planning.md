@@ -49,7 +49,7 @@ Este documento estabelece o roadmap, metas, sprints e cronograma de desenvolvime
 
 ---
 
-## Sprint 1: Auth & Users 🔄
+## Sprint 1: Auth & Users
 
 **Período:** 11-17 Novembro 2025 (1 semana)
 **Status:** EM PROGRESSO
@@ -137,7 +137,7 @@ Implementar sistema completo de autenticação, autorização e gestão de utili
 
 ---
 
-## Sprint 2: Tickets Core 📋
+## Sprint 2: Tickets Core
 
 **Período:** 18 Nov - 01 Dezembro 2025 (2 semanas)
 **Status:** PLANEADA
@@ -484,9 +484,9 @@ Implementar base de conhecimento pública com artigos, categorias hierárquicas 
 
 ---
 
-## Sprint 5: Dashboard & Reports 📊
+## Sprint 5: Dashboard & Reports
 
-**Período:** 30 Dez 2025 - 12 Janeiro 2026 (2 semanas)
+**Duração:** 30 Dez - 05 Janeiro (1 semana)
 **Status:** PLANEADA
 
 ### Objetivos
@@ -583,9 +583,9 @@ Implementar dashboards para Admin e Agent com métricas, gráficos e SLA trackin
 
 ---
 
-## Sprint 6: Polish & Deploy 🚀
+## Sprint 6: Polish & Deploy
 
-**Período:** 13-26 Janeiro 2026 (2 semanas)
+**Duração:** 06-12 Janeiro (1 semana)
 **Status:** PLANEADA
 
 ### Objetivos
