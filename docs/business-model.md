@@ -157,7 +157,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   **Customer success team** (Enterprise plans)
 -   **Community forum** (peer-to-peer support)
 
-### 4. Customer Relationships 🤝
+### 4. Customer Relationships
 
 #### Self-Service (Free & Starter)
 
@@ -179,11 +179,11 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   Custom onboarding & training
 -   Slack/Teams integration para suporte
 
-### 5. Revenue Streams 💰
+### 5. Revenue Streams 
 
 #### Modelo de Pricing: SaaS Subscription (mensal/anual)
 
-##### Free Tier - "Starter" 🆓
+##### Free Tier - "Starter" 
 
 **Preço:** €0/mês
 **Limites:**
@@ -195,7 +195,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 
 **Target:** Freelancers, micro-empresas, testes
 
-##### Professional - "Growth" 💼
+##### Professional - "Growth" 
 
 **Preço:** €15/agent/mês (€12/mês se anual)
 **Inclui:**
@@ -211,7 +211,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 
 **Target:** SMEs com 5-50 agents
 
-##### Enterprise - "Scale" 🏢
+##### Enterprise - "Scale" 
 
 **Preço:** €25/agent/mês (€20/mês se anual)
 **Inclui tudo de Professional +**
@@ -244,7 +244,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 
 **Objetivo Ano 1:** 100 clientes pagantes, €15k MRR, €180k ARR
 
-### 6. Key Resources 🔑
+### 6. Key Resources 
 
 #### Tecnológicos:
 
@@ -277,7 +277,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   **Knowledge base content**
 -   **Customer data & insights**
 
-### 7. Key Activities 🛠️
+### 7. Key Activities 
 
 #### Desenvolvimento de Produto (60% tempo)
 
@@ -306,7 +306,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   Billing & invoicing
 -   Legal & compliance
 
-### 8. Key Partnerships 🤝
+### 8. Key Partnerships
 
 #### Tecnológicos:
 
@@ -326,7 +326,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   **Jira/GitHub:** Developer workflow integrations
 -   **Zapier/Make:** Automation platform
 
-### 9. Cost Structure 💸
+### 9. Cost Structure
 
 #### Custos Fixos (Mensais):
 
@@ -358,7 +358,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 
 ## Análise SWOT
 
-### Strengths (Pontos Fortes) 💪
+### Strengths (Pontos Fortes)
 
 #### Técnicos:
 
@@ -380,7 +380,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   **Mobile-first:** Funciona bem em tablets/phones
 -   **Feature-complete:** Não faltam features críticas vs. competição
 
-### Weaknesses (Pontos Fracos) 🚨
+### Weaknesses (Pontos Fracos)
 
 #### Produto:
 
