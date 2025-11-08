@@ -18,6 +18,11 @@
 /public/storage
 /storage/*.key
 /storage/pail
+
+# IDE Helper
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
 /vendor
 Homestead.json
 Homestead.yaml

@@ -57,26 +57,40 @@ OrionOne é um sistema ITSM (IT Service Management) desenvolvido como projeto fi
 
 ### Backend
 
--   **Laravel 11** - Framework PHP moderno
+-   **Laravel 12** - Framework PHP moderno
 -   **PostgreSQL 16** - Base de dados relacional
 -   **Redis 7** - Cache e queue management
--   **Eloquent ORM** - Object-Relational Mapping
+-   **Spatie Laravel Data** - DTOs type-safe + validação
+-   **Laravel Actions** - Lógica reutilizável (Controller/Job/Command)
+-   **Query Builder** - Filtros automáticos via URL
 
 ### Frontend
 
 -   **Vue 3** - Progressive JavaScript framework
 -   **Inertia.js** - Monolith SPA approach
 -   **Tailwind CSS** - Utility-first CSS framework
--   **Vite** - Next generation frontend tooling
+-   **Shadcn-vue** - Componentes UI (Radix + Tailwind)
+-   **Vite 7** - Next generation frontend tooling
 
 ### Packages Principais
 
 ```
-spatie/laravel-permission # Role & Permission management
-spatie/laravel-activitylog # Audit trail
-laravel/breeze # Authentication scaffolding
-laravel/sanctum # API authentication
+# Arquitetura Moderna
+spatie/laravel-data              # DTOs + Validação automática
+lorisleiva/laravel-actions       # Actions reutilizáveis
+spatie/laravel-query-builder     # Filtros URL
+
+# Segurança & Audit
+spatie/laravel-permission        # RBAC (Roles & Permissions)
+spatie/laravel-activitylog       # Audit trail
+laravel/sanctum                  # API authentication
+
+# Developer Experience
+barryvdh/laravel-ide-helper      # Autocomplete IDE
+laravel/telescope                # Debug & monitoring
 ```
+
+**[Stack Completo →](docs/tech-stack.md)**
 
 ---
 
@@ -194,6 +208,27 @@ Controllers (thin) → Services (business logic) → Models (data)
 -   **Infrastructure:** PostgreSQL, Redis, Queue Jobs
 
     **Documentação completa:** [docs/architecture.md](docs/architecture.md)
+
+---
+
+## Documentação
+
+### Essencial (Ler Primeiro)
+
+-   **[Tech Stack](docs/tech-stack.md)** - Todas as tecnologias instaladas
+-   **[Implementation Checklist](docs/implementation-checklist.md)** - Guia passo a passo com código
+-   **[Development Planning](docs/development-planning.md)** - Sprints e roadmap
+
+### Arquitetura & Design
+
+-   **[Architecture](docs/architecture.md)** - Arquitetura MVC + Services + Actions
+-   **[Database Schema](docs/database-schema.md)** - Schema completo com relacionamentos
+-   **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
+
+### Desenvolvimento
+
+-   **[Development Guide](docs/development-guide.md)** - Workflow TDD e metodologia
+-   **[Business Model](docs/business-model.md)** - Modelo de negócio e SWOT
 
 ---
 
@@ -406,6 +441,9 @@ test: testes
 -   [Arquitetura da Aplicação](docs/architecture.md)
 -   [Schema da Base de Dados](docs/database-schema.md)
 -   [Guia de Desenvolvimento](docs/development-guide.md)
+-   [Planeamento de Desenvolvimento](docs/development-planning.md) ⭐
+-   [Modelo de Negócio](docs/business-model.md) ⭐
+-   [Tech Stack Completo](docs/tech-stack.md) ⭐ **NOVO**
 
 ### Guias de Setup
 
