@@ -49,4 +49,4 @@ Seguir **[Implementation Checklist](docs/implementation-checklist.md)** para com
 
 ---
 
-**Status:** ✅ Ambiente 100% configurado, pronto para desenvolvimento!
+**Status:** Ambiente 100% configurado, pronto para desenvolvimento!

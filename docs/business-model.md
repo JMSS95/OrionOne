@@ -69,7 +69,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 
 ## Business Model Canvas
 
-### 1. Customer Segments 🎯
+### 1. Customer Segments
 
 #### Segmento Primário: SMEs Tech-Savvy
 
@@ -99,23 +99,23 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   **Use case:** Service desk para alunos/docentes
 -   **Vantagem:** Licença educacional com desconto (50%)
 
-### 2. Value Propositions 💎
+### 2. Value Propositions
 
 **Slogan:** _"Enterprise ITSM, Startup Price"_
 
 #### Para SMEs:
 
--   ✅ **Acessível:** 70% mais barato que Zendesk/ServiceNow
--   ✅ **Rápido:** Setup em <1 hora, onboarding em <1 dia
--   ✅ **Completo:** Todas as features críticas incluídas (não upsells)
--   ✅ **Escalável:** Cresce com a empresa (10 → 500 users)
--   ✅ **Moderno:** Stack tecnológico atual (Laravel 11, Vue 3)
+-   **Acessível:** 70% mais barato que Zendesk/ServiceNow
+-   **Rápido:** Setup em <1 hora, onboarding em <1 dia
+-   **Completo:** Todas as features críticas incluídas (não upsells)
+-   **Escalável:** Cresce com a empresa (10 → 500 users)
+-   **Moderno:** Stack tecnológico atual (Laravel 11, Vue 3)
 
 #### Para Freelancers:
 
--   ✅ **Free tier generoso:** Até 5 users, unlimited tickets
--   ✅ **Profissional:** Interface polida para impressionar clientes
--   ✅ **Simples:** Sem complexidade desnecessária
+-   **Free tier generoso:** Até 5 users, unlimited tickets
+-   **Profissional:** Interface polida para impressionar clientes
+-   **Simples:** Sem complexidade desnecessária
 
 #### Diferenciadores vs. Competição:
 
@@ -123,11 +123,11 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 | ---------------------- | ----------- | ----------- | --------- | ----------- |
 | **Preço (10 agents)**  | €150/mês    | €890/mês    | €490/mês  | €2500/mês   |
 | **Setup Time**         | <1 hora     | 1 semana    | 2 dias    | 1-3 meses   |
-| **Self-Hosted Option** | ✅          | ❌          | ❌        | ❌          |
-| **Open-Source Core**   | ✅          | ❌          | ❌        | ❌          |
-| **Modern Stack**       | ✅          | ⚠️          | ⚠️        | ❌          |
-| **Knowledge Base**     | ✅ Incluída | ✅ Extra €€ | ✅        | ✅          |
-| **SLA Management**     | ✅ Incluída | ✅          | ✅ Pro    | ✅          |
+| **Self-Hosted Option** | Sim         | Não         | Não       | Não         |
+| **Open-Source Core**   | Sim         | Não         | Não       | Não         |
+| **Modern Stack**       | Sim         | Parcial     | Parcial   | Não         |
+| **Knowledge Base**     | Incluída    | Extra       | Sim       | Sim         |
+| **SLA Management**     | Incluída    | Sim         | Pro       | Sim         |
 | **Customization**      | ✅ Full     | ⚠️ Limitada | ⚠️        | ✅ Complexa |
 
 ### 3. Channels 📢
