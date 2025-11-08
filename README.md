@@ -1,8 +1,6 @@
 <div align="center">
   <img src="public/images/logo.png" alt="OrionOne Logo" width="300">
 
-# OrionOne
-
 **Modern IT Service Management Platform**
 
 [![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
@@ -303,7 +301,7 @@ Este projeto segue **boas práticas profissionais** de desenvolvimento:
 5. **API** (1h) - Endpoints opcionais se necessário
 6. **Commit** (15min) - Git commit com mensagem descritiva
 
-**Documentação completa**: Ver [`docs/development-workflow.md`](docs/development-workflow.md)
+**Documentação completa**: Ver [`docs/development-guide.md`](docs/development-guide.md)
 
 ### Scripts de Automação
 
@@ -441,9 +439,9 @@ test: testes
 -   [Arquitetura da Aplicação](docs/architecture.md)
 -   [Schema da Base de Dados](docs/database-schema.md)
 -   [Guia de Desenvolvimento](docs/development-guide.md)
--   [Planeamento de Desenvolvimento](docs/development-planning.md) ⭐
--   [Modelo de Negócio](docs/business-model.md) ⭐
--   [Tech Stack Completo](docs/tech-stack.md) ⭐ **NOVO**
+-   [Planeamento de Desenvolvimento](docs/development-planning.md)
+-   [Modelo de Negócio](docs/business-model.md)
+-   [Tech Stack Completo](docs/tech-stack.md)
 
 ### Guias de Setup
 

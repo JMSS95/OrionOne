@@ -1,8 +1,65 @@
-# Shadcn-vue Components - Guia de Uso
+# Shadcn-vue Components - Guia Completo
 
-## Componentes Criados
+**Última Atualização:** 08 Novembro 2025, 01:05
+**Status:** COMPLETO - 14 Componentes---
 
-Todos os componentes seguem o design system do Shadcn-vue com suporte para dark mode via CSS variables.
+## Status da Implementação
+
+### Componentes Criados (14 + 1 Index)
+
+1. **Button.vue** - 6 variantes (default, destructive, outline, secondary, ghost, link), 4 tamanhos
+2. **Input.vue** - Text input com suporte para erros e disabled
+3. **Textarea.vue** - Textarea com rows configurável
+4. **Select.vue** - Dropdown select com variantes
+5. **Card.vue** - Container principal
+6. **CardHeader.vue** - Cabeçalho do card
+7. **CardTitle.vue** - Título do card
+8. **CardDescription.vue** - Descrição do card
+9. **CardContent.vue** - Conteúdo principal
+10. **CardFooter.vue** - Rodapé (botões, ações)
+11. **Badge.vue** - 6 variantes (default, secondary, destructive, outline, success, warning)
+12. **Label.vue** - Labels com asterisco para campos obrigatórios
+13. **Avatar.vue** - 4 tamanhos (sm, md, lg, xl) com fallback
+14. **Alert.vue** - 4 variantes (default, destructive, success, warning)
+15. **index.js** - Barrel export para imports convenientes
+
+### Estrutura de Ficheiros
+
+```
+resources/js/
+├── components/
+│   └── ui/
+│       ├── Alert.vue
+│       ├── Avatar.vue
+│       ├── Badge.vue
+│       ├── Button.vue
+│       ├── Card.vue
+│       ├── CardContent.vue
+│       ├── CardDescription.vue
+│       ├── CardFooter.vue
+│       ├── CardHeader.vue
+│       ├── CardTitle.vue
+│       ├── Input.vue
+│       ├── Label.vue
+│       ├── Select.vue
+│       ├── Textarea.vue
+│       └── index.js
+├── lib/
+│   └── utils.js (cn() helper)
+└── Pages/
+    └── ComponentsDemo.vue (página de teste)
+```
+
+### Página de Demo
+
+Criada página de teste em `/components-demo` com:
+
+-   Todos os componentes visíveis
+-   Todas as variantes
+-   Exemplos de uso
+-   Dark mode toggle
+
+**Aceder:** http://localhost:8888/components-demo
 
 ---
 
@@ -603,4 +660,69 @@ const variants = {
 
 ---
 
-**Última Atualização:** 08 Novembro 2025
+## Próximos Componentes (Roadmap)
+
+### Sprint 2 (Tickets)
+
+-   **Dialog.vue** - Modals
+-   **DropdownMenu.vue** - Menus contextuais
+-   **Table.vue** - Data tables
+-   **Pagination.vue** - Navegação de páginas
+-   **Toast.vue** - Notificações temporárias
+
+### Sprint 3 (Colaboração)
+
+-   **Tabs.vue** - Navegação em tabs
+-   **Accordion.vue** - FAQ colapsáveis
+-   **Command.vue** - Search palette (Cmd+K)
+-   **Popover.vue** - Tooltips avançados
+
+### Sprint 4 (Knowledge Base)
+
+-   **Breadcrumb.vue** - Navegação hierárquica
+-   **Separator.vue** - Divisores visuais
+-   **ScrollArea.vue** - Scroll customizado
+
+---
+
+## Features Implementadas
+
+### Design System
+
+-   CSS Variables para cores (light + dark mode)
+-   Tailwind CSS com `cn()` helper (merge classes sem conflitos)
+-   Class Variance Authority (CVA) para variantes type-safe
+-   Responsive design (mobile-first)
+
+### Acessibilidade
+
+-   ARIA attributes
+-   Focus states (ring)
+-   Disabled states
+-   Error states (borda vermelha)
+
+### Developer Experience
+
+-   Props tipados e validados
+-   v-model support
+-   Eventos customizados
+-   Slots para flexibilidade
+-   JSConfig aliases (`@/components/ui`)
+
+---
+
+## Checklist de Implementação
+
+-   14 componentes base criados
+-   Utils helper (`cn()`)
+-   Index.js para barrel exports
+-   Página de demo funcional
+-   Rota `/components-demo` criada
+-   Dark mode suportado
+-   Mobile responsive
+-   Acessibilidade básica
+-   Documentação completa
+
+---
+
+**Última Atualização:** 08 Novembro 2025, 01:05

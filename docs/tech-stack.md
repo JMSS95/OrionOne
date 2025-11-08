@@ -154,11 +154,9 @@ Como o CLI não funciona com Vite 7, vamos criar estes componentes:
 
 ### 1. Criar Componentes Base
 
-```bash
-# Criar estrutura
-mkdir -p resources/js/components/ui
-mkdir -p resources/js/lib
-```
+Criar estrutura em `resources/js/components/ui/` e `resources/js/lib/`.
+
+Ver [Commands Reference](COMMANDS-REFERENCE.md) para comandos específicos.
 
 ### 2. Setup Vee-Validate
 
@@ -166,15 +164,15 @@ Criar composable global para forms.
 
 ### 3. Configurar Spatie Packages
 
-```bash
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
-php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider"
-php artisan migrate
-```
+Publicar configs e executar migrations.
+
+Ver [Commands Reference](COMMANDS-REFERENCE.md#laravel-artisan-commands) para comandos.
 
 ### 4. Criar Seeder
 
 Roles, permissions, utilizadores teste.
+
+Ver [Implementation Checklist](implementation-checklist.md) para instruções TDD.
 
 ---
 

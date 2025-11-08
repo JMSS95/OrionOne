@@ -69,7 +69,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 
 ## Business Model Canvas
 
-### 1. Customer Segments 🎯
+### 1. Customer Segments
 
 #### Segmento Primário: SMEs Tech-Savvy
 
@@ -99,38 +99,38 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   **Use case:** Service desk para alunos/docentes
 -   **Vantagem:** Licença educacional com desconto (50%)
 
-### 2. Value Propositions 💎
+### 2. Value Propositions
 
 **Slogan:** _"Enterprise ITSM, Startup Price"_
 
 #### Para SMEs:
 
--   ✅ **Acessível:** 70% mais barato que Zendesk/ServiceNow
--   ✅ **Rápido:** Setup em <1 hora, onboarding em <1 dia
--   ✅ **Completo:** Todas as features críticas incluídas (não upsells)
--   ✅ **Escalável:** Cresce com a empresa (10 → 500 users)
--   ✅ **Moderno:** Stack tecnológico atual (Laravel 11, Vue 3)
+-   **Acessível:** 70% mais barato que Zendesk/ServiceNow
+-   **Rápido:** Setup em <1 hora, onboarding em <1 dia
+-   **Completo:** Todas as features críticas incluídas (não upsells)
+-   **Escalável:** Cresce com a empresa (10 → 500 users)
+-   **Moderno:** Stack tecnológico atual (Laravel 11, Vue 3)
 
 #### Para Freelancers:
 
--   ✅ **Free tier generoso:** Até 5 users, unlimited tickets
--   ✅ **Profissional:** Interface polida para impressionar clientes
--   ✅ **Simples:** Sem complexidade desnecessária
+-   **Free tier generoso:** Até 5 users, unlimited tickets
+-   **Profissional:** Interface polida para impressionar clientes
+-   **Simples:** Sem complexidade desnecessária
 
 #### Diferenciadores vs. Competição:
 
-| Feature                | OrionOne    | Zendesk     | Freshdesk | ServiceNow  |
-| ---------------------- | ----------- | ----------- | --------- | ----------- |
-| **Preço (10 agents)**  | €150/mês    | €890/mês    | €490/mês  | €2500/mês   |
-| **Setup Time**         | <1 hora     | 1 semana    | 2 dias    | 1-3 meses   |
-| **Self-Hosted Option** | ✅          | ❌          | ❌        | ❌          |
-| **Open-Source Core**   | ✅          | ❌          | ❌        | ❌          |
-| **Modern Stack**       | ✅          | ⚠️          | ⚠️        | ❌          |
-| **Knowledge Base**     | ✅ Incluída | ✅ Extra €€ | ✅        | ✅          |
-| **SLA Management**     | ✅ Incluída | ✅          | ✅ Pro    | ✅          |
-| **Customization**      | ✅ Full     | ⚠️ Limitada | ⚠️        | ✅ Complexa |
+| Feature                | OrionOne | Zendesk  | Freshdesk | ServiceNow |
+| ---------------------- | -------- | -------- | --------- | ---------- |
+| **Preço (10 agents)**  | €150/mês | €890/mês | €490/mês  | €2500/mês  |
+| **Setup Time**         | <1 hora  | 1 semana | 2 dias    | 1-3 meses  |
+| **Self-Hosted Option** | Sim      | Não      | Não       | Não        |
+| **Open-Source Core**   | Sim      | Não      | Não       | Não        |
+| **Modern Stack**       | Sim      | Parcial  | Parcial   | Não        |
+| **Knowledge Base**     | Incluída | Extra    | Sim       | Sim        |
+| **SLA Management**     | Incluída | Sim      | Pro       | Sim        |
+| **Customization**      | Full     | Limitada | Parcial   | Complexa   |
 
-### 3. Channels 📢
+### 3. Channels
 
 #### Aquisição de Clientes:
 
@@ -400,7 +400,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   **Competição forte:** Zendesk, Freshdesk têm 10+ anos de vantagem
 -   **Market education:** SMEs podem não saber que precisam de ITSM
 
-### Opportunities (Oportunidades) 🚀
+### Opportunities (Oportunidades)
 
 #### Mercado:
 
@@ -425,7 +425,7 @@ OrionOne é uma plataforma ITSM (IT Service Management) moderna, desenvolvida co
 -   **Portugal & Brazil:** Mercado lusófono com menos competição
 -   **Eastern Europe:** SMEs em crescimento, preço sensível
 
-### Threats (Ameaças) ⚠️
+### Threats (Ameaças)
 
 #### Competição:
 
@@ -751,10 +751,10 @@ OrionOne tem potencial de se posicionar como **líder no segmento SME de ITSM**,
 
 **Fatores Críticos de Sucesso:**
 
-1. ✅ **Product-Market Fit:** Validar com 50 early adopters até Q2 2026
-2. ✅ **Unit Economics Saudável:** LTV:CAC > 3:1, Churn < 5%
-3. ✅ **Diferenciação Clara:** Self-hosted + Open-source + UX moderna
-4. ✅ **Execução Rápida:** MVP em 2.5 meses, features core completas
+1. **Product-Market Fit:** Validar com 50 early adopters até Q2 2026
+2. **Unit Economics Saudável:** LTV:CAC > 3:1, Churn < 5%
+3. **Diferenciação Clara:** Self-hosted + Open-source + UX moderna
+4. **Execução Rápida:** MVP em 2.5 meses, features core completas
 
 **Next Steps Imediatos:**
 
