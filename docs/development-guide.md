@@ -22,7 +22,7 @@ Desenvolver **por feature completa** (vertical slice), não por camadas (DB → 
 ### Seguir (Iterativo por Feature)
 
 ```
-Feature 1 (Tickets) → Feature 2 (Comments) → Feature 3 (Teams) → ...
+Feature 1 (Tickets) → Feature 2 (Comments) → Feature 3 (Teams) →
 ```
 
 Cada feature passa por **TODAS as camadas** antes de passar para a próxima.
@@ -325,7 +325,7 @@ git push origin main
 
 ---
 
-##  Exemplo de Sprint (1 Semana)
+## Exemplo de Sprint (1 Semana)
 
 ### Segunda-feira: RF02 - Criar Tickets
 
@@ -574,7 +574,6 @@ git commit -m "feat(tickets): criar tickets"
 
 Devo criar o script `feature.sh` e começar com RF02?
 
-
 ---
 
 # Estratégia de Testes
@@ -693,15 +692,15 @@ Este documento define a estratégia de testes do OrionOne, estabelecendo guideli
 
 ### Coverage Mínimo
 
-| Layer           | Coverage Alvo | Obrigatório    |
-| --------------- | ------------- | -------------- |
-| **Services**    | 90-100%       |  Sim         |
-| **Actions**     | 90-100%       |  Sim         |
-| **Controllers** | 80-90%        |  Sim         |
-| **Models**      | 70-80%        |  Recomendado |
-| **Policies**    | 100%          |  Sim         |
-| **Observers**   | 80-90%        |  Sim         |
-| **Geral**       | >80%          |  Sim         |
+| Layer           | Coverage Alvo | Obrigatório |
+| --------------- | ------------- | ----------- |
+| **Services**    | 90-100%       | Sim         |
+| **Actions**     | 90-100%       | Sim         |
+| **Controllers** | 80-90%        | Sim         |
+| **Models**      | 70-80%        | Recomendado |
+| **Policies**    | 100%          | Sim         |
+| **Observers**   | 80-90%        | Sim         |
+| **Geral**       | >80%          | Sim         |
 
 ### Comandos
 
@@ -917,15 +916,15 @@ php artisan test --stop-on-failure
 
 ### Coverage Mínimo
 
-| Layer           | Coverage Alvo | Obrigatório    |
-| --------------- | ------------- | -------------- |
-| **Services**    | 90-100%       |  Sim         |
-| **Actions**     | 90-100%       |  Sim         |
-| **Controllers** | 80-90%        |  Sim         |
-| **Models**      | 70-80%        |  Recomendado |
-| **Policies**    | 100%          |  Sim         |
-| **Observers**   | 80-90%        |  Sim         |
-| **Geral**       | >80%          |  Sim         |
+| Layer           | Coverage Alvo | Obrigatório |
+| --------------- | ------------- | ----------- |
+| **Services**    | 90-100%       | Sim         |
+| **Actions**     | 90-100%       | Sim         |
+| **Controllers** | 80-90%        | Sim         |
+| **Models**      | 70-80%        | Recomendado |
+| **Policies**    | 100%          | Sim         |
+| **Observers**   | 80-90%        | Sim         |
+| **Geral**       | >80%          | Sim         |
 
 ### Comandos
 
@@ -1260,4 +1259,3 @@ dd($ticket->fresh());
 **Regra de Ouro:**
 
 > "Código sem testes é código legado."
-

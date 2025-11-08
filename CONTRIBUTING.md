@@ -76,7 +76,82 @@ git push origin main
 
 ### PHP (Laravel)
 
-**PSR-12** + Laravel Best Practices
+**PSR-12** + Laravel Best Practices + **Modern Architecture**
+
+#### DTOs com Spatie Laravel Data
+
+```php
+<?php
+
+namespace App\Data;
+
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\Max;
+
+class TicketData extends Data
+{
+    public function __construct(
+        #[Required, Max(255)]
+        public string $title,
+
+        #[Required]
+        public string $description,
+
+        public string $priority = 'medium',
+    ) {}
+}
+```
+
+#### Actions com Laravel Actions
+
+```php
+<?php
+
+namespace App\Actions\Tickets;
+
+use App\Models\Ticket;
+use App\Data\TicketData;
+use Lorisleiva\Actions\Concerns\AsAction;
+
+class CreateTicketAction
+{
+    use AsAction;
+
+    public function handle(TicketData $data, User $user): Ticket
+    {
+        $ticket = Ticket::create([
+            'title' => $data->title,
+            'description' => $data->description,
+            'priority' => $data->priority,
+            'requester_id' => $user->id,
+        ]);
+
+        activity()
+            ->performedOn($ticket)
+            ->log('Ticket criado');
+
+        return $ticket;
+    }
+
+    // Funciona como Controller
+    public function asController(): RedirectResponse
+    {
+        $data = TicketData::from(request());
+        $ticket = $this->handle($data, auth()->user());
+
+        return redirect()->route('tickets.show', $ticket);
+    }
+
+    // Funciona como Job
+    public function asJob(TicketData $data, User $user): void
+    {
+        $this->handle($data, $user);
+    }
+}
+```
+
+#### Conventional PHP
 
 **Regras principais:**
 
@@ -89,7 +164,7 @@ git push origin main
 
 ### JavaScript/Vue 3
 
-**ESLint** + Vue 3 Composition API
+**ESLint** + Vue 3 Composition API + **Shadcn-vue**
 
 **Regras principais:**
 
@@ -99,6 +174,32 @@ git push origin main
 -   2 espaços de indentação
 -   Single quotes para strings
 -   No semicolons (;)
+-   Usar componentes Shadcn-vue (Button, Input, Card, etc)
+
+**Exemplo Shadcn-vue:**
+
+```vue
+<script setup>
+import Button from "@/components/ui/Button.vue";
+import Input from "@/components/ui/Input.vue";
+import { Icon } from "@iconify/vue";
+
+const handleSubmit = () => {
+    // ...
+};
+</script>
+
+<template>
+    <form @submit.prevent="handleSubmit">
+        <Input v-model="form.title" placeholder="Título do ticket" />
+
+        <Button type="submit">
+            <Icon icon="lucide:check" class="w-4 h-4 mr-2" />
+            Criar Ticket
+        </Button>
+    </form>
+</template>
+```
 
 ### Database Migrations
 

@@ -1,14 +1,14 @@
 # Setup Completo - OrionOne
 
-##  Instalado e Configurado
+## Instalado e Configurado
 
 ### 1. Docker (5 containers rodando)
 
--    `orionone-app` - Laravel + PHP 8.2-FPM
--    `orionone-frontend` - Vite dev server (porta 5173)
--    `orionone-nginx` - Nginx (porta 8888)
--    `orionone-postgres` - PostgreSQL 16
--    `orionone-redis` - Redis 7
+-   `orionone-app` - Laravel + PHP 8.2-FPM
+-   `orionone-frontend` - Vite dev server (porta 5173)
+-   `orionone-nginx` - Nginx (porta 8888)
+-   `orionone-postgres` - PostgreSQL 16
+-   `orionone-redis` - Redis 7
 
 **Acesso:**
 
@@ -56,7 +56,7 @@ app/
 
 ### 4. Base de Dados
 
- Migrations executadas:
+Migrations executadas:
 
 -   `users` table
 -   `cache` table
@@ -65,107 +65,145 @@ app/
 
 ### 5. Documentação Criada
 
--    `docs/docker-deep-dive.md` - Explicação completa de Docker
--    `docs/development-tools.md` - Ferramentas e boas práticas
--    `docs/scripts.md` - Comandos úteis do dia-a-dia
+-   `docs/architecture.md` - Arquitetura da aplicação (MVC + Services + Actions)
+-   `docs/database-schema.md` - Schema completo da base de dados
+-   `docs/requirements.md` - Requisitos funcionais e não-funcionais
+-   `docs/development-guide.md` - Workflow TDD e ciclo de desenvolvimento
+-   `docs/development-planning.md` - Roadmap, sprints e metas **NOVO**
+-   `docs/business-model.md` - Modelo de negócio, SWOT, financials **NOVO**
+-   `docs/tech-stack.md` - Stack completo de tecnologias (FASE 1) **ATUALIZADO**
+-   `docs/implementation-checklist.md` - Guia passo a passo com código **NOVO**
 
-##  Próximos Passos
+### 6. Bibliotecas Instaladas - FASE 1 COMPLETO
 
-### 1. Começar Desenvolvimento (Prioridade Alta)
+#### Backend (Composer)
 
-#### A. Criar Models Base
+**Arquitetura Moderna:**
+
+-   **Laravel 12** - Framework PHP
+-   **Spatie Laravel Data** - DTOs type-safe + validação automática **NOVO**
+-   **Laravel Actions** - Lógica reutilizável (Controller/Job/Command) **NOVO**
+-   **Query Builder** - Filtros automáticos via URL **NOVO**
+
+**Segurança & Audit:**
+
+-   **Spatie Permission** - Roles & permissions (RBAC)
+-   **Spatie Activity Log** - Audit trail
+-   **Laravel Sanctum** - API authentication
+
+**File Processing:**
+
+-   **Intervention Image** - Processamento de imagens (avatars)
+-   **Laravel DomPDF** - Geração de PDFs (relatórios)
+-   **Maatwebsite Excel** - Exportação Excel/CSV
+-   **AWS S3 Flysystem** - Storage cloud (produção)
+
+**Developer Experience:**
+
+-   **Laravel IDE Helper** - Autocomplete perfeito (VSCode, PHPStorm) **NOVO**
+-   **Laravel Telescope** - Debugging & monitoring
+-   **L5-Swagger** - API documentation
+-   **PHPStan/Larastan** - Static analysis
+-   **Laravel Pint** - Code formatter
+
+#### Frontend (NPM)
+
+**Core:**
+
+-   **Vue 3** - Framework JavaScript
+-   **Inertia.js** - SPA without API
+-   **Tailwind CSS** - Utility-first CSS
+-   **Vite 7** - Build tool
+
+**UI Components (Shadcn-vue):** **NOVO**
+
+-   **Radix Vue** - Primitives acessíveis
+-   **Lucide Icons** - 600+ ícones modernos
+-   **CVA** - Variantes de componentes type-safe
+-   **Tailwind Merge** - Merge classes sem conflitos
+
+**Utilities:**
+
+-   **@iconify/vue** - 150k+ ícones universais **NOVO**
+-   **@vueuse/core** - 200+ composables úteis
+-   **@headlessui/vue** - Componentes acessíveis
+-   **@inertiajs/progress** - Loading bar automático **NOVO**
+-   **Vee-Validate** - Forms complexos **NOVO**
+
+**Charts & Rich Text:**
+
+-   **Heroicons** - Ícones SVG oficiais
+-   **Chart.js + Vue-ChartJS** - Gráficos para dashboards
+-   **Quill Editor** - WYSIWYG editor
+-   **Marked** - Parser Markdown
+-   **DOMPurify** - Sanitização XSS
+
+**[Stack Completo →](docs/tech-stack.md)**
+
+---
+
+## Próximos Passos
+
+### 1. Configuração Inicial de Packages ⭐ **IMPORTANTE**
 
 ```bash
-# Ticket
-php artisan make:model Ticket -mfs
-
-# Comment
-php artisan make:model Comment -mfs
-
-# Team
-php artisan make:model Team -mfs
-
-# Category
-php artisan make:model Category -mfs
-
-# Article (Knowledge Base)
-php artisan make:model Article -mfs
-```
-
-**Flags:**
-
--   `-m` = migration
--   `-f` = factory
--   `-s` = seeder
-
-#### B. Implementar Authentication
-
-```bash
-# Já tem Laravel Breeze instalado, criar views/controllers personalizados
-php artisan breeze:install vue
-
-# Configurar roles e permissions (Spatie)
+# Publicar configs dos packages instalados
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider"
+php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"
+php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"
+
+# Rodar migrations adicionais
 php artisan migrate
 ```
 
-#### C. Criar Controllers
+### 2. Criar Seeder de Roles & Permissions
 
-```bash
-php artisan make:controller TicketController --resource
-php artisan make:controller CommentController --resource
-php artisan make:controller DashboardController
+Criar `database/seeders/RolePermissionSeeder.php`:
+
+```php
+public function run()
+{
+    // Roles
+    Role::create(['name' => 'admin']);
+    Role::create(['name' => 'agent']);
+    Role::create(['name' => 'user']);
+
+    // Permissions
+    Permission::create(['name' => 'view-all-tickets']);
+    Permission::create(['name' => 'create-ticket']);
+    Permission::create(['name' => 'update-ticket']);
+    Permission::create(['name' => 'delete-ticket']);
+    Permission::create(['name' => 'assign-ticket']);
+    Permission::create(['name' => 'manage-teams']);
+
+    // Assign to roles...
+}
 ```
 
-#### D. Criar Form Requests
+### 3. Começar Desenvolvimento (Sprint 1: Auth & Users)
+
+#### A. Melhorar Profile & Avatar Upload
 
 ```bash
-php artisan make:request StoreTicketRequest
-php artisan make:request UpdateTicketRequest
-php artisan make:request StoreCommentRequest
+# UserController já existe (Breeze), adicionar avatar upload
+php artisan make:request UpdateProfileRequest
 ```
 
-### 2. Implementar Funcionalidades Core
+#### B. Criar Tests
 
-#### Ordem Sugerida (seguir requirements.md):
+```bash
+php artisan make:test UserTest
+php artisan make:test UserPolicyTest
+```
 
-1. **RF01 - Authentication** (1-2 dias)
+### 4. Próximos Sprints (Ver development-planning.md)
 
-    - Login/Logout
-    - Roles (Admin, Manager, Agent, User)
-    - Password reset
-
-2. **RF02 - Ticket Creation** (2-3 dias)
-
-    - Form com validação
-    - Upload de anexos
-    - Auto-assignment básico
-
-3. **RF03 - Comments** (1 dia)
-
-    - Adicionar comentários
-    - Notificações
-
-4. **RF04 - Teams** (1-2 dias)
-
-    - CRUD de equipas
-    - Atribuir agents a equipas
-
-5. **RF05 - Assignment** (2 dias)
-
-    - Manual assignment
-    - Auto-assignment (round-robin)
-
-6. **RF06 - SLA** (2-3 dias)
-
-    - Cálculo de deadlines
-    - Alertas de violação
-
-7. **RF07 - Knowledge Base** (2-3 dias)
-
-    - CRUD de artigos
-    - Categorização
-    - Busca
+-   **Sprint 2 (18 Nov):** Tickets Core
+-   **Sprint 3 (02 Dez):** Colaboração (Comments, Teams, Notifications)
+-   **Sprint 4 (16 Dez):** Knowledge Base
+-   **Sprint 5 (30 Dez):** Dashboard & Reports
+-   **Sprint 6 (13 Jan):** Polish & Deploy
 
 8. **RF08 - Dashboard** (2 dias)
 
@@ -227,11 +265,11 @@ resources/js/
     └── GuestLayout.vue
 ```
 
-##  Timeline Sugerida (2.5 meses)
+## Timeline Sugerida (2.5 meses)
 
 ### Semana 1-2: Setup + Authentication + Tickets
 
--    Docker e ambiente (concluído)
+-   Docker e ambiente (concluído)
 -   Models base + migrations
 -   Authentication (Breeze + roles)
 -   CRUD de tickets básico
@@ -264,7 +302,7 @@ resources/js/
 -   Deploy (VPS/Cloud)
 -   Apresentação final
 
-##  Comandos Rápidos
+## Comandos Rápidos
 
 ### Desenvolvimento
 
@@ -298,7 +336,7 @@ docker-compose run --rm orionone-frontend npm install --legacy-peer-deps
 docker-compose exec orionone-app php artisan migrate
 ```
 
-##  Documentação de Referência
+## Documentação de Referência
 
 -   `docs/requirements.md` - Requisitos funcionais e não-funcionais
 -   `docs/architecture.md` - Arquitetura e decisões técnicas
@@ -307,7 +345,7 @@ docker-compose exec orionone-app php artisan migrate
 -   `docs/development-tools.md` - Ferramentas e workflow
 -   `docs/scripts.md` - Comandos úteis
 
-##  Checklist Atual
+## Checklist Atual
 
 -   [x] Docker configurado (5 containers)
 -   [x] Migrations executadas
@@ -332,4 +370,4 @@ docker-compose exec orionone-app php artisan migrate
 
 ---
 
-**Status:** Ambiente 100% configurado, pronto para desenvolvimento! 
+**Status:** Ambiente 100% configurado, pronto para desenvolvimento!
