@@ -14,15 +14,15 @@
 
 ### Arquitetura & Design
 
-4. **[Architecture](architecture.md)** - Arquitetura do sistema (Clean Architecture, CQRS, DDD)
-5. **[Tech Stack](tech-stack.md)** - Stack tecnológica completa (Backend, Frontend, DevOps)
+4. **[Architecture](architecture.md)** - Arquitetura do sistema (MVC + Services + Actions + Observers + Events)
+5. **[Tech Stack](tech-stack.md)** - Stack tecnológica completa (Backend, Frontend, **API REST**, DevOps)
 6. **[Database Schema](database-schema.md)** - Esquema completo da base de dados
 
 ### Desenvolvimento
 
 7. **[Development Guide](development-guide.md)** - Guia de desenvolvimento (TDD, patterns, conventions)
 8. **[Development Planning](development-planning.md)** - Planeamento de desenvolvimento (sprints, cronograma)
-9. **[Implementation Checklist](implementation-checklist.md)** - Checklist TDD sprint-by-sprint
+9. **[Implementation Checklist](implementation-checklist.md)** - Checklist TDD sprint-by-sprint (**Sprints 1-2 completos: Auth, Tickets, API REST, Observers, Events**)
 
 ### Componentes UI
 
@@ -98,12 +98,19 @@ Seguir **[Development Guide](development-guide.md)** para:
 
 Usar **[Implementation Checklist](implementation-checklist.md)** para:
 
--   Sprint 1: Auth & Users
--   Sprint 2: Tickets Core
--   Sprint 3: Colaboração
--   Sprint 4: Knowledge Base
--   Sprint 5: Dashboard & Reports
--   Sprint 6: Polish & Deploy
+-   **Sprint 1: Auth & Users** (Completo - Roles, Permissions, Avatar Upload)
+-   **Sprint 2: Tickets Core** (Completo - CRUD, Filtros, API REST, Observers, Events)
+-   Sprint 3: Colaboração (Comments, Mentions, Notifications)
+-   Sprint 4: Knowledge Base (Articles, Categories, Search)
+-   Sprint 5: Dashboard & Reports (Analytics, KPIs)
+-   Sprint 6: Polish & Deploy (CI/CD, Performance)
+
+**Novidades em Sprint 2:**
+- ✅ API REST completa (`/api/v1/tickets`) com autenticação Sanctum
+- ✅ Observer pattern para auto-generation (ticket_number, timestamps)
+- ✅ Events & Listeners para notificações assíncronas
+- ✅ Policy-based authorization
+- ✅ JSON Resources para transformação de dados API
 
 ---
 
