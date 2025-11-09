@@ -240,9 +240,10 @@ php artisan serve
 npm run dev
 
 # Aceder em: http://orionone.test:8888/
+
 ```
 
-````
+```
 
 ---
 
@@ -259,7 +260,7 @@ docker-compose exec app php artisan key:generate
 docker-compose exec app php artisan migrate --seed
 
 # Aceder em: http://orionone.test:8888/
-````
+```
 
 ---
 
