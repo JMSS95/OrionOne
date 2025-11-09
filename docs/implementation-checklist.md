@@ -1500,9 +1500,9 @@ docker-compose exec orionone-app php artisan test
 
 ---
 
-## Checklist Resumo
+### Feature 5: API REST Endpoints
 
-### Sprint 1
+#### Phase 1: Planning (30 min)
 
 -   Instalar Laravel IDE Helper
 -   Instalar Inertia Progress
@@ -1513,7 +1513,19 @@ docker-compose exec orionone-app php artisan test
 -   Criar UpdateProfileAction
 -   Atualizar profile page com avatar upload
 
-### Sprint 2
+**Critérios de Aceitação:**
+- Endpoints RESTful para tickets (`GET /api/v1/tickets`, `POST /api/v1/tickets`)
+- Autenticação via Bearer token (Sanctum)
+- Rate limiting (60 requests/min)
+- JSON Resources para transformação de dados
+- Documentação OpenAPI (Fase 2)
+
+**API Endpoints necessários:**
+- `GET /api/v1/tickets` - List tickets
+- `GET /api/v1/tickets/{id}` - Show ticket
+- `POST /api/v1/tickets` - Create ticket
+- `PATCH /api/v1/tickets/{id}` - Update ticket
+- `DELETE /api/v1/tickets/{id}` - Delete ticket
 
 -   Migration tickets
 -   Model Ticket com relationships
@@ -1526,6 +1538,9 @@ docker-compose exec orionone-app php artisan test
 
 ---
 
-**Continua nos próximos sprints...**
+**Próximas Adições Planeadas:**
+- Performance optimization checklist
+- Deployment guide (Docker + GitHub Actions)
+- Advanced testing (Dusk browser tests)
 
-**Última Atualização:** 07 Novembro 2025, 23:45
+**Última Atualização:** 08 Novembro 2025, 02:15
