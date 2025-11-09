@@ -6,26 +6,28 @@
 # Iniciar containers
 docker-compose up -d
 
-# Instalar dependências
-docker-compose exec orionone-app composer install
+### Frontend não compila / Vite não inicia
+
+```bash
+# Reinstalar dependências
+docker-compose exec orionone-frontend rm -rf node_modules package-lock.json
 docker-compose exec orionone-frontend npm install --legacy-peer-deps
 
-# Configurar ambiente
-docker-compose exec orionone-app cp .env.example .env
-docker-compose exec orionone-app php artisan key:generate
-
-# Base de dados
-docker-compose exec orionone-app php artisan migrate --seed
+# Verificar portas (5173 deve estar livre)
+docker-compose ps
 ```
 
-**Aceder:**
+### Base de Dados
 
--   Laravel: http://localhost:8888
--   Vite HMR: http://localhost:5173
+-   **Host:** localhost (ou orionone-db dentro do Docker)
+-   **Porta:** 5433 (externa) / 5432 (interna)
+-   **Database:** orionone
+-   **User:** laravel
+-   **Password:** laravel
 
 ---
 
-## Documentação Completa
+## 📚 Documentação Completa
 
 Para informação detalhada sobre o setup, consultar:
 

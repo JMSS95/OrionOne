@@ -92,17 +92,86 @@ laravel/telescope                # Debug & monitoring
 
 ---
 
-## Requisitos
+## 🚀 Quick Start
 
--   PHP 8.2 ou superior
+### PC Novo? Instalar Primeiro:
+
+1. **Git** (2.40+) - [Download](https://git-scm.com/)
+2. **Docker Desktop** (4.25+) - [Download](https://www.docker.com/products/docker-desktop/)
+3. **Node.js** (20.x LTS) - [Download](https://nodejs.org/)
+4. **Composer** (2.6+) - [Download](https://getcomposer.org/)
+
+📖 **[Ver Checklist Completa →](docs/QUICK-START.md)**
+
+### Setup em 5 Minutos (Docker)
+
+```bash
+# 1. Clonar repositório
+git clone https://github.com/JMSS95/OrionOne.git
+cd OrionOne
+
+# 2. Configurar ambiente
+cp .env.example .env
+
+# 3. Iniciar containers
+docker-compose up -d
+
+# 4. Instalar dependências
+docker-compose exec orionone-app composer install
+docker-compose exec orionone-frontend npm install --legacy-peer-deps
+
+# 5. Setup Laravel
+docker-compose exec orionone-app php artisan key:generate
+docker-compose exec orionone-db psql -U laravel -d postgres -c "CREATE DATABASE orionone_test;"
+docker-compose exec orionone-app php artisan migrate:fresh --seed
+
+# 6. Iniciar frontend
+docker-compose exec orionone-frontend npm run dev
+```
+
+**Aceder:** http://localhost:8888
+**Login:** admin@orionone.test / password
+
+📖 **[Setup Completo →](SETUP.md)** | **[Commands Reference →](docs/COMMANDS-REFERENCE.md)**
+
+---
+
+## 📚 Documentação
+
+### Começar Aqui
+
+-   🚀 **[Quick Start](docs/QUICK-START.md)** - Setup rápido em PC novo
+-   ⚙️ **[Setup Completo](SETUP.md)** - Instalação detalhada + troubleshooting
+-   📋 **[Implementation Checklist](docs/implementation-checklist.md)** - Guia de desenvolvimento feature-by-feature
+
+### Referências
+
+-   🏗️ **[Architecture](docs/architecture.md)** - Arquitetura da aplicação
+-   📊 **[Database Schema](docs/database-schema.md)** - Estrutura da base de dados
+-   🔧 **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
+-   💻 **[Commands Reference](docs/COMMANDS-REFERENCE.md)** - Todos os comandos úteis
+-   🐳 **[Docker Guide](docs/DOCKER-GUIDE.md)** - Docker para iniciantes
+
+### Desenvolvimento
+
+-   🎯 **[Development Guide](docs/development-guide.md)** - Convenções, TDD, workflow
+-   📦 **[Components Guide](docs/COMPONENTS-GUIDE.md)** - Shadcn-vue components
+-   📝 **[Development Planning](docs/development-planning.md)** - Planeamento técnico
+
+---
+
+## ⚙️ Configuração (Sem Docker)
+
+<details>
+<summary>Clica para expandir instruções sem Docker</summary>
+
+### Requisitos
+
+-   PHP 8.4 ou superior
 -   Composer 2.x
 -   Node.js 20 LTS
 -   PostgreSQL 16
 -   Redis 7.x
-
----
-
-## Instalação
 
 ### 1. Clonar o Repositório
 
@@ -138,7 +207,7 @@ php artisan db:seed
 
 ```bash
 # Instalar dependências
-npm install
+npm install --legacy-peer-deps
 
 # Build para desenvolvimento
 npm run dev
@@ -152,9 +221,25 @@ php artisan serve
 
 # Terminal 2: Vite
 npm run dev
+```
+
+**Aceder:** http://localhost:8000
+
+</details>
+
+---
+
+## 🔑 Credenciais de Teste
+
+php artisan serve
+
+# Terminal 2: Vite
+
+npm run dev
 
 # Aceder em: http://orionone.test:8888/
-```
+
+````
 
 ---
 
@@ -171,7 +256,7 @@ docker-compose exec app php artisan key:generate
 docker-compose exec app php artisan migrate --seed
 
 # Aceder em: http://orionone.test:8888/
-```
+````
 
 ---
 

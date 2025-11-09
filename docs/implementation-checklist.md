@@ -1,7 +1,8 @@
 # Implementation Checklist - OrionOne
+
 **Sprint-by-Sprint Implementation Guide**
 
-> Segue a filosofia **TDD + Feature-Driven Development** do [development-guide.md](./development-guide.md)  
+> Segue a filosofia **TDD + Feature-Driven Development** do [development-guide.md](./development-guide.md)
 > Cada feature passa por: **Planning → Tests First → Implementation → Frontend**
 
 ---
@@ -15,9 +16,9 @@
 **Já instalado via Composer.** Gerar helpers para melhor autocomplete:
 
 ```bash
-php artisan ide-helper:generate
-php artisan ide-helper:models --write
-php artisan ide-helper:meta
+docker-compose exec orionone-app php artisan ide-helper:generate
+docker-compose exec orionone-app php artisan ide-helper:models --write
+docker-compose exec orionone-app php artisan ide-helper:meta
 ```
 
 Adicionar ao `.gitignore`:
@@ -46,13 +47,13 @@ router.on("finish", () => NProgress.done());
 
 ```bash
 # Permission
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+docker-compose exec orionone-app php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
 
 # Activity Log
-php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
-php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-config"
+docker-compose exec orionone-app php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
+docker-compose exec orionone-app php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-config"
 
-php artisan migrate
+docker-compose exec orionone-app php artisan migrate
 ```
 
 ---
@@ -61,24 +62,26 @@ php artisan migrate
 
 #### Phase 1: Planning (30 min)
 
-**User Story:**  
+**User Story:**
 Como administrador do sistema, preciso de roles e permissões para controlar acessos.
 
 **Critérios de Aceitação:**
-- Sistema deve ter 3 roles: admin, agent, user
-- Admin tem todas as permissões
-- Agent pode gerir tickets e comentários
-- User apenas cria tickets e vê os próprios
+
+-   Sistema deve ter 3 roles: admin, agent, user
+-   Admin tem todas as permissões
+-   Agent pode gerir tickets e comentários
+-   User apenas cria tickets e vê os próprios
 
 **Permissões necessárias:**
-- tickets: create, view, update, delete, assign, close
-- comments: create, delete
-- users: view, manage (admin only)
+
+-   tickets: create, view, update, delete, assign, close
+-   comments: create, delete
+-   users: view, manage (admin only)
 
 #### Phase 2: Tests First (RED)
 
 ```bash
-php artisan make:test RolePermissionTest
+docker-compose exec orionone-app php artisan make:test RolePermissionTest
 ```
 
 **Ficheiro:** `tests/Feature/RolePermissionTest.php`
@@ -111,7 +114,7 @@ class RolePermissionTest extends TestCase
         $this->seed(RolePermissionSeeder::class);
 
         $admin = Role::findByName('admin');
-        
+
         $this->assertTrue($admin->hasPermissionTo('tickets.create'));
         $this->assertTrue($admin->hasPermissionTo('tickets.delete'));
         $this->assertTrue($admin->hasPermissionTo('users.manage'));
@@ -122,7 +125,7 @@ class RolePermissionTest extends TestCase
         $this->seed(RolePermissionSeeder::class);
 
         $agent = Role::findByName('agent');
-        
+
         $this->assertTrue($agent->hasPermissionTo('tickets.create'));
         $this->assertTrue($agent->hasPermissionTo('comments.create'));
         $this->assertFalse($agent->hasPermissionTo('users.manage'));
@@ -133,7 +136,7 @@ class RolePermissionTest extends TestCase
         $this->seed(RolePermissionSeeder::class);
 
         $user = Role::findByName('user');
-        
+
         $this->assertTrue($user->hasPermissionTo('tickets.create'));
         $this->assertFalse($user->hasPermissionTo('tickets.delete'));
         $this->assertFalse($user->hasPermissionTo('users.view'));
@@ -141,11 +144,11 @@ class RolePermissionTest extends TestCase
 }
 ```
 
-**Rodar testes (vai falhar - esperado!):**
+**Rodar testes:**
 
 ```bash
-php artisan test --filter=RolePermissionTest
-# RED: Class RolePermissionSeeder does not exist
+docker-compose exec orionone-app php artisan test --filter=CreateTicketTest
+# RED: Tickets table doesn't exist
 ```
 
 #### Phase 3: Implementation (GREEN)
@@ -153,7 +156,7 @@ php artisan test --filter=RolePermissionTest
 Agora implementar até os testes passarem:
 
 ```bash
-php artisan make:seeder RolePermissionSeeder
+docker-compose exec orionone-app php artisan make:seeder RolePermissionSeeder
 ```
 
 **Ficheiro:** `database/seeders/RolePermissionSeeder.php`
@@ -233,7 +236,7 @@ public function run(): void
 **Rodar testes novamente:**
 
 ```bash
-php artisan test --filter=RolePermissionTest
+docker-compose exec orionone-app php artisan test --filter=RolePermissionTest
 # GREEN: Testes passam!
 ```
 
@@ -242,7 +245,7 @@ php artisan test --filter=RolePermissionTest
 Criar utilizadores para desenvolvimento:
 
 ```bash
-php artisan make:seeder UserSeeder
+docker-compose exec orionone-app php artisan make:seeder UserSeeder
 ```
 
 **Ficheiro:** `database/seeders/UserSeeder.php`
@@ -305,7 +308,7 @@ public function run(): void
 **Seed da base de dados:**
 
 ```bash
-php artisan migrate:fresh --seed
+docker-compose exec orionone-app php artisan migrate:fresh --seed
 ```
 
 ---
@@ -314,20 +317,21 @@ php artisan migrate:fresh --seed
 
 #### Phase 1: Planning (30 min)
 
-**User Story:**  
+**User Story:**
 Como utilizador autenticado, quero adicionar uma foto de perfil para personalizar a minha conta.
 
 **Critérios de Aceitação:**
-- Campo avatar na tabela users
-- Upload de imagem com validação (jpeg, png, max 2MB)
-- Redimensionamento automático para 200x200px
-- Apagar avatar antigo ao fazer upload de novo
-- Usar Laravel Actions para lógica reutilizável
+
+-   Campo avatar na tabela users
+-   Upload de imagem com validação (jpeg, png, max 2MB)
+-   Redimensionamento automático para 200x200px
+-   Apagar avatar antigo ao fazer upload de novo
+-   Usar Laravel Actions para lógica reutilizável
 
 #### Phase 2: Tests First (RED)
 
 ```bash
-php artisan make:test UpdateProfileTest
+docker-compose exec orionone-app php artisan make:test UpdateProfileTest
 ```
 
 **Ficheiro:** `tests/Feature/UpdateProfileTest.php`
@@ -358,10 +362,10 @@ class UpdateProfileTest extends TestCase
         ]);
 
         $response->assertRedirect(route('profile.edit'));
-        
+
         $this->assertEquals('Updated Name', $user->fresh()->name);
         $this->assertNotNull($user->fresh()->avatar);
-        
+
         Storage::disk('public')->assertExists($user->fresh()->avatar);
     }
 
@@ -383,7 +387,7 @@ class UpdateProfileTest extends TestCase
         $user = User::factory()->create([
             'avatar' => 'avatars/old-avatar.jpg',
         ]);
-        
+
         Storage::disk('public')->put('avatars/old-avatar.jpg', 'old content');
 
         $this->actingAs($user)->post(route('profile.update'), [
@@ -400,7 +404,7 @@ class UpdateProfileTest extends TestCase
 **Rodar testes (vai falhar - esperado!):**
 
 ```bash
-php artisan test --filter=UpdateProfileTest
+docker-compose exec orionone-app php artisan test --filter=UpdateProfileTest
 # RED: Column 'avatar' not found
 ```
 
@@ -409,7 +413,7 @@ php artisan test --filter=UpdateProfileTest
 **a) Migration:**
 
 ```bash
-php artisan make:migration add_avatar_to_users_table
+docker-compose exec orionone-app php artisan make:migration add_avatar_to_users_table
 ```
 
 ```php
@@ -422,13 +426,13 @@ public function up(): void
 ```
 
 ```bash
-php artisan migrate
+docker-compose exec orionone-app php artisan migrate
 ```
 
 **b) Criar UpdateProfileAction (Laravel Actions):**
 
 ```bash
-php artisan make:action UpdateProfileAction
+docker-compose exec orionone-app php artisan make:action UpdateProfileAction
 ```
 
 **Ficheiro:** `app/Actions/Users/UpdateProfileAction.php`
@@ -460,10 +464,10 @@ class UpdateProfileAction
             // Processar nova imagem
             $image = Image::read($data['avatar']);
             $image->cover(200, 200);
-            
+
             $path = 'avatars/' . $user->id . '_' . time() . '.jpg';
             Storage::disk('public')->put($path, $image->encode());
-            
+
             $data['avatar'] = $path;
         }
 
@@ -503,7 +507,7 @@ Route::post('/profile', UpdateProfileAction::class)->name('profile.update');
 **Rodar testes novamente:**
 
 ```bash
-php artisan test --filter=UpdateProfileTest
+docker-compose exec orionone-app php artisan test --filter=UpdateProfileTest
 # GREEN: Testes passam!
 ```
 
@@ -524,9 +528,7 @@ const props = defineProps({
 });
 
 const avatarPreview = ref(
-    props.user.avatar
-        ? `/storage/${props.user.avatar}`
-        : null
+    props.user.avatar ? `/storage/${props.user.avatar}` : null
 );
 
 const form = useForm({
@@ -558,7 +560,7 @@ const submit = () => {
                     <label class="block text-sm font-medium mb-2">
                         Foto de Perfil
                     </label>
-                    
+
                     <div class="flex items-center space-x-4">
                         <img
                             v-if="avatarPreview"
@@ -581,8 +583,11 @@ const submit = () => {
                             accept="image/jpeg,image/png,image/jpg"
                         />
                     </div>
-                    
-                    <p v-if="form.errors.avatar" class="mt-2 text-sm text-red-600">
+
+                    <p
+                        v-if="form.errors.avatar"
+                        class="mt-2 text-sm text-red-600"
+                    >
                         {{ form.errors.avatar }}
                     </p>
                 </div>
@@ -591,7 +596,10 @@ const submit = () => {
                 <div>
                     <label class="block text-sm font-medium mb-2">Nome</label>
                     <Input v-model="form.name" required />
-                    <p v-if="form.errors.name" class="mt-2 text-sm text-red-600">
+                    <p
+                        v-if="form.errors.name"
+                        class="mt-2 text-sm text-red-600"
+                    >
                         {{ form.errors.name }}
                     </p>
                 </div>
@@ -609,7 +617,7 @@ const submit = () => {
 **Checkpoint:** Rodar todos os testes de Sprint 1:
 
 ```bash
-php artisan test
+docker-compose exec orionone-app php artisan test
 # Todos os testes devem passar
 ```
 
@@ -621,21 +629,22 @@ php artisan test
 
 #### Phase 1: Planning (30 min)
 
-**User Story:**  
+**User Story:**
 Como utilizador autenticado, quero criar um ticket para reportar um problema ou solicitar suporte.
 
 **Critérios de Aceitação:**
-- Form com campos: título, descrição, prioridade
-- Validação: título obrigatório (max 255), descrição obrigatória
-- Gerar número único do ticket (TK-20251101-0001)
-- Auto-assignment a equipa baseado em carga de trabalho
-- Status inicial: "open"
-- Activity log do evento
+
+-   Form com campos: título, descrição, prioridade
+-   Validação: título obrigatório (max 255), descrição obrigatória
+-   Gerar número único do ticket (TK-20251101-0001)
+-   Auto-assignment a equipa baseado em carga de trabalho
+-   Status inicial: "open"
+-   Activity log do evento
 
 #### Phase 2: Tests First (RED)
 
 ```bash
-php artisan make:test CreateTicketTest
+docker-compose exec orionone-app php artisan make:test CreateTicketTest
 ```
 
 **Ficheiro:** `tests/Feature/CreateTicketTest.php`
@@ -666,7 +675,7 @@ class CreateTicketTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('tickets', [
             'title' => 'Laptop não liga',
             'requester_id' => $user->id,
@@ -686,7 +695,7 @@ class CreateTicketTest extends TestCase
         ]);
 
         $ticket = Ticket::first();
-        
+
         $this->assertMatchesRegularExpression(
             '/^TK-\d{8}-\d{4}$/',
             $ticket->ticket_number
@@ -716,7 +725,7 @@ class CreateTicketTest extends TestCase
         ]);
 
         $ticket = Ticket::first();
-        
+
         $this->assertDatabaseHas('activity_log', [
             'subject_type' => Ticket::class,
             'subject_id' => $ticket->id,
@@ -729,7 +738,7 @@ class CreateTicketTest extends TestCase
 **Rodar testes (vai falhar - esperado!):**
 
 ```bash
-php artisan test --filter=CreateTicketTest
+docker-compose exec orionone-app php artisan test --filter=CreateTicketTest
 # RED: Table 'tickets' doesn't exist
 ```
 
@@ -738,7 +747,7 @@ php artisan test --filter=CreateTicketTest
 **a) Migration:**
 
 ```bash
-php artisan make:migration create_tickets_table
+docker-compose exec orionone-app php artisan make:migration create_tickets_table
 ```
 
 ```php
@@ -767,13 +776,13 @@ public function up(): void
 ```
 
 ```bash
-php artisan migrate
+docker-compose exec orionone-app php artisan migrate
 ```
 
 **b) Model:**
 
 ```bash
-php artisan make:model Ticket
+docker-compose exec orionone-app php artisan make:model Ticket
 ```
 
 **Ficheiro:** `app/Models/Ticket.php`
@@ -838,7 +847,7 @@ class Ticket extends Model
 **c) TicketData (Laravel Data DTO):**
 
 ```bash
-php artisan make:data TicketData
+docker-compose exec orionone-app php artisan make:data TicketData
 ```
 
 **Ficheiro:** `app/Data/TicketData.php`
@@ -873,7 +882,7 @@ class TicketData extends Data
 **d) CreateTicketAction (Laravel Actions):**
 
 ```bash
-php artisan make:action CreateTicketAction
+docker-compose exec orionone-app php artisan make:action CreateTicketAction
 ```
 
 **Ficheiro:** `app/Actions/Tickets/CreateTicketAction.php`
@@ -903,8 +912,8 @@ class CreateTicketAction
                 'priority' => $data->priority,
                 'requester_id' => $requester->id,
                 'team_id' => $data->team_id,
-                'assigned_to' => $data->team_id 
-                    ? $this->findAvailableAgent($data->team_id)?->id 
+                'assigned_to' => $data->team_id
+                    ? $this->findAvailableAgent($data->team_id)?->id
                     : null,
             ]);
 
@@ -969,7 +978,7 @@ public function assignedTickets(): HasMany
 **Rodar testes novamente:**
 
 ```bash
-php artisan test --filter=CreateTicketTest
+docker-compose exec orionone-app php artisan test --filter=CreateTicketTest
 # GREEN: Testes passam!
 ```
 
@@ -1018,7 +1027,10 @@ const submit = () => {
                         placeholder="Descreva brevemente o problema"
                         required
                     />
-                    <p v-if="form.errors.title" class="mt-2 text-sm text-red-600">
+                    <p
+                        v-if="form.errors.title"
+                        class="mt-2 text-sm text-red-600"
+                    >
                         {{ form.errors.title }}
                     </p>
                 </div>
@@ -1034,7 +1046,10 @@ const submit = () => {
                         placeholder="Explique o problema em detalhe"
                         required
                     />
-                    <p v-if="form.errors.description" class="mt-2 text-sm text-red-600">
+                    <p
+                        v-if="form.errors.description"
+                        class="mt-2 text-sm text-red-600"
+                    >
                         {{ form.errors.description }}
                     </p>
                 </div>
@@ -1059,7 +1074,11 @@ const submit = () => {
                     </label>
                     <Select v-model="form.team_id">
                         <option :value="null">Atribuir automaticamente</option>
-                        <option v-for="team in teams" :key="team.id" :value="team.id">
+                        <option
+                            v-for="team in teams"
+                            :key="team.id"
+                            :value="team.id"
+                        >
                             {{ team.name }}
                         </option>
                     </Select>
@@ -1090,21 +1109,22 @@ const submit = () => {
 
 #### Phase 1: Planning (30 min)
 
-**User Story:**  
+**User Story:**
 Como utilizador, quero ver lista de tickets com filtros de status e prioridade.
 
 **Critérios de Aceitação:**
-- Lista paginada (12 por página)
-- Filtro por status via URL: `?filter[status]=open`
-- Filtro por prioridade: `?filter[priority]=high`
-- Search por título: `?filter[search]=laptop`
-- Ordenação: `?sort=-created_at`
-- Usar Spatie Query Builder
+
+-   Lista paginada (12 por página)
+-   Filtro por status via URL: `?filter[status]=open`
+-   Filtro por prioridade: `?filter[priority]=high`
+-   Search por título: `?filter[search]=laptop`
+-   Ordenação: `?sort=-created_at`
+-   Usar Spatie Query Builder
 
 #### Phase 2: Tests First (RED)
 
 ```bash
-php artisan make:test ListTicketsTest
+docker-compose exec orionone-app php artisan make:test ListTicketsTest
 ```
 
 **Ficheiro:** `tests/Feature/ListTicketsTest.php`
@@ -1131,7 +1151,7 @@ class ListTicketsTest extends TestCase
         $response = $this->actingAs($user)->get(route('tickets.index'));
 
         $response->assertOk();
-        $response->assertInertia(fn ($page) => 
+        $response->assertInertia(fn ($page) =>
             $page->component('Tickets/Index')
                  ->has('tickets.data', 5)
         );
@@ -1140,12 +1160,12 @@ class ListTicketsTest extends TestCase
     public function test_can_filter_tickets_by_status(): void
     {
         $user = User::factory()->create();
-        
+
         Ticket::factory()->count(3)->create([
             'requester_id' => $user->id,
             'status' => 'open',
         ]);
-        
+
         Ticket::factory()->count(2)->create([
             'requester_id' => $user->id,
             'status' => 'closed',
@@ -1156,7 +1176,7 @@ class ListTicketsTest extends TestCase
         ]));
 
         $response->assertOk();
-        $response->assertInertia(fn ($page) => 
+        $response->assertInertia(fn ($page) =>
             $page->has('tickets.data', 3)
         );
     }
@@ -1164,12 +1184,12 @@ class ListTicketsTest extends TestCase
     public function test_can_search_tickets_by_title(): void
     {
         $user = User::factory()->create();
-        
+
         Ticket::factory()->create([
             'requester_id' => $user->id,
             'title' => 'Laptop não liga',
         ]);
-        
+
         Ticket::factory()->create([
             'requester_id' => $user->id,
             'title' => 'Impressora com erro',
@@ -1180,7 +1200,7 @@ class ListTicketsTest extends TestCase
         ]));
 
         $response->assertOk();
-        $response->assertInertia(fn ($page) => 
+        $response->assertInertia(fn ($page) =>
             $page->has('tickets.data', 1)
         );
     }
@@ -1188,12 +1208,12 @@ class ListTicketsTest extends TestCase
     public function test_can_sort_tickets_by_created_at(): void
     {
         $user = User::factory()->create();
-        
+
         $old = Ticket::factory()->create([
             'requester_id' => $user->id,
             'created_at' => now()->subDays(5),
         ]);
-        
+
         $new = Ticket::factory()->create([
             'requester_id' => $user->id,
             'created_at' => now(),
@@ -1204,7 +1224,7 @@ class ListTicketsTest extends TestCase
         ]));
 
         $response->assertOk();
-        $response->assertInertia(fn ($page) => 
+        $response->assertInertia(fn ($page) =>
             $page->where('tickets.data.0.id', $new->id)
         );
     }
@@ -1214,7 +1234,7 @@ class ListTicketsTest extends TestCase
 **Rodar testes (vai falhar - esperado!):**
 
 ```bash
-php artisan test --filter=ListTicketsTest
+docker-compose exec orionone-app php artisan test --filter=ListTicketsTest
 # RED: Route tickets.index not defined
 ```
 
@@ -1223,7 +1243,7 @@ php artisan test --filter=ListTicketsTest
 **a) TicketController:**
 
 ```bash
-php artisan make:controller TicketController
+docker-compose exec orionone-app php artisan make:controller TicketController
 ```
 
 **Ficheiro:** `app/Http/Controllers/TicketController.php`
@@ -1273,7 +1293,7 @@ Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index'
 **c) Factory para testes:**
 
 ```bash
-php artisan make:factory TicketFactory
+docker-compose exec orionone-app php artisan make:factory TicketFactory
 ```
 
 **Ficheiro:** `database/factories/TicketFactory.php`
@@ -1305,7 +1325,7 @@ class TicketFactory extends Factory
 **Rodar testes novamente:**
 
 ```bash
-php artisan test --filter=ListTicketsTest
+docker-compose exec orionone-app php artisan test --filter=ListTicketsTest
 # GREEN: Testes passam!
 ```
 
@@ -1433,7 +1453,9 @@ const statusColors = {
                             {{ ticket.description }}
                         </p>
 
-                        <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div
+                            class="flex items-center justify-between text-xs text-gray-500"
+                        >
                             <span>{{ ticket.requester.name }}</span>
                             <span>{{ ticket.created_at_human }}</span>
                         </div>
@@ -1472,7 +1494,7 @@ const statusColors = {
 **Checkpoint:** Rodar todos os testes de Sprint 2:
 
 ```bash
-php artisan test
+docker-compose exec orionone-app php artisan test
 # Todos os testes devem passar
 ```
 
@@ -2392,14 +2414,14 @@ php artisan queue:retry all  # Retry failed jobs
 
 ### Sprint 1
 
-- Instalar Laravel IDE Helper
-- Instalar Inertia Progress
-- Publicar configs Spatie (Permission + Activity Log)
-- Criar RolePermissionSeeder (3 roles: admin, agent, user)
-- Seed utilizadores teste
-- Adicionar campo avatar à tabela users
-- Criar UpdateProfileAction
-- Atualizar profile page com avatar upload
+-   Instalar Laravel IDE Helper
+-   Instalar Inertia Progress
+-   Publicar configs Spatie (Permission + Activity Log)
+-   Criar RolePermissionSeeder (3 roles: admin, agent, user)
+-   Seed utilizadores teste
+-   Adicionar campo avatar à tabela users
+-   Criar UpdateProfileAction
+-   Atualizar profile page com avatar upload
 
 ### Sprint 2
 
