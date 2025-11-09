@@ -92,7 +92,7 @@ laravel/telescope                # Debug & monitoring
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### PC Novo? Instalar Primeiro:
 
@@ -101,7 +101,7 @@ laravel/telescope                # Debug & monitoring
 3. **Node.js** (20.x LTS) - [Download](https://nodejs.org/)
 4. **Composer** (2.6+) - [Download](https://getcomposer.org/)
 
-📖 **[Ver Checklist Completa →](docs/QUICK-START.md)**
+**[Ver Checklist Completa →](docs/QUICK-START.md)**
 
 ### Setup em 5 Minutos (Docker)
 
@@ -132,35 +132,35 @@ docker-compose exec orionone-frontend npm run dev
 **Aceder:** http://localhost:8888
 **Login:** admin@orionone.test / password
 
-📖 **[Setup Completo →](SETUP.md)** | **[Commands Reference →](docs/COMMANDS-REFERENCE.md)**
+**[Setup Completo →](SETUP.md)** | **[Commands Reference →](docs/COMMANDS-REFERENCE.md)**
 
 ---
 
-## 📚 Documentação
+## Documentação
 
 ### Começar Aqui
 
--   🚀 **[Quick Start](docs/QUICK-START.md)** - Setup rápido em PC novo
--   ⚙️ **[Setup Completo](SETUP.md)** - Instalação detalhada + troubleshooting
--   📋 **[Implementation Checklist](docs/implementation-checklist.md)** - Guia de desenvolvimento feature-by-feature
+-   **[Quick Start](docs/QUICK-START.md)** - Setup rápido em PC novo
+-   **[Setup Completo](SETUP.md)** - Instalação detalhada + troubleshooting
+-   **[Implementation Checklist](docs/implementation-checklist.md)** - Guia de desenvolvimento feature-by-feature
 
 ### Referências
 
--   🏗️ **[Architecture](docs/architecture.md)** - Arquitetura da aplicação
--   📊 **[Database Schema](docs/database-schema.md)** - Estrutura da base de dados
--   🔧 **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
--   💻 **[Commands Reference](docs/COMMANDS-REFERENCE.md)** - Todos os comandos úteis
--   🐳 **[Docker Guide](docs/DOCKER-GUIDE.md)** - Docker para iniciantes
+-   **[Architecture](docs/architecture.md)** - Arquitetura da aplicação
+-   **[Database Schema](docs/database-schema.md)** - Estrutura da base de dados
+-   **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
+-   **[Commands Reference](docs/COMMANDS-REFERENCE.md)** - Todos os comandos úteis
+-   **[Docker Guide](docs/DOCKER-GUIDE.md)** - Docker para iniciantes
 
 ### Desenvolvimento
 
--   🎯 **[Development Guide](docs/development-guide.md)** - Convenções, TDD, workflow
--   📦 **[Components Guide](docs/COMPONENTS-GUIDE.md)** - Shadcn-vue components
--   📝 **[Development Planning](docs/development-planning.md)** - Planeamento técnico
+-   **[Development Guide](docs/development-guide.md)** - Convenções, TDD, workflow
+-   **[Components Guide](docs/COMPONENTS-GUIDE.md)** - Shadcn-vue components
+-   **[Development Planning](docs/development-planning.md)** - Planeamento técnico
 
 ---
 
-## ⚙️ Configuração (Sem Docker)
+## Configuração (Sem Docker)
 
 <details>
 <summary>Clica para expandir instruções sem Docker</summary>
@@ -229,7 +229,9 @@ npm run dev
 
 ---
 
-## 🔑 Credenciais de Teste
+---
+
+## Credenciais de Teste
 
 php artisan serve
 
@@ -238,6 +240,7 @@ php artisan serve
 npm run dev
 
 # Aceder em: http://orionone.test:8888/
+```
 
 ````
 

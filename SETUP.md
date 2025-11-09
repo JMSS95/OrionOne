@@ -1,6 +1,6 @@
 # Setup Rápido - OrionOne
 
-## 📋 Pré-requisitos (Instalar num PC Novo)
+## Pré-requisitos (Instalar num PC Novo)
 
 ### Software Obrigatório
 
@@ -36,16 +36,16 @@
 
 ---
 
-## 🚀 Setup Inicial (Primeira Vez)
+## Setup Inicial (Primeira Vez)
 
-### 1️⃣ Clonar Repositório
+### 1. Clonar Repositório
 
 ```bash
 git clone https://github.com/JMSS95/OrionOne.git
 cd OrionOne
 ```
 
-### 2️⃣ Configurar Ambiente
+### 2. Configurar Ambiente
 
 ```bash
 # Copiar ficheiro de ambiente
@@ -54,9 +54,7 @@ cp .env.example .env
 # Editar .env se necessário (portas, credenciais, etc)
 ```
 
-### 3️⃣ Iniciar Docker
-
-### 3️⃣ Iniciar Docker
+### 3. Iniciar Docker
 
 ```bash
 # Iniciar containers (Laravel + PostgreSQL + Redis)
@@ -66,7 +64,7 @@ docker-compose up -d
 docker-compose ps
 ```
 
-### 4️⃣ Instalar Dependências
+### 4. Instalar Dependências
 
 ```bash
 # Backend (PHP/Laravel)
@@ -76,7 +74,7 @@ docker-compose exec orionone-app composer install
 docker-compose exec orionone-frontend npm install --legacy-peer-deps
 ```
 
-### 5️⃣ Configurar Laravel
+### 5. Configurar Laravel
 
 ```bash
 # Gerar chave da aplicação
@@ -89,7 +87,7 @@ docker-compose exec orionone-db psql -U laravel -d postgres -c "CREATE DATABASE 
 docker-compose exec orionone-app php artisan migrate:fresh --seed
 ```
 
-### 6️⃣ Compilar Frontend
+### 6. Compilar Frontend
 
 ```bash
 # Desenvolvimento (HMR - Hot Module Replacement)
@@ -99,9 +97,7 @@ docker-compose exec orionone-frontend npm run dev
 docker-compose exec orionone-frontend npm run build
 ```
 
-### 7️⃣ Verificar Funcionamento
-
-### 7️⃣ Verificar Funcionamento
+### 7. Verificar Funcionamento
 
 ```bash
 # Executar testes
@@ -119,7 +115,7 @@ docker-compose exec orionone-db psql -U laravel -d orionone -c "SELECT * FROM ro
 
 ---
 
-## 🔄 Comandos do Dia-a-Dia
+## Comandos do Dia-a-Dia
 
 ### Iniciar Projeto
 
@@ -143,7 +139,7 @@ docker-compose stop
 # Parar E remover containers (mantém volumes/dados)
 docker-compose down
 
-# Remover TUDO (containers + volumes + dados) ⚠️
+# Remover TUDO (containers + volumes + dados)
 docker-compose down -v
 ```
 
@@ -178,7 +174,7 @@ docker-compose exec orionone-app php artisan test --coverage
 
 ---
 
-## 🐛 Resolução de Problemas
+## Resolução de Problemas
 
 ### Containers não iniciam
 
@@ -234,7 +230,7 @@ docker-compose exec orionone-app php artisan migrate:fresh --seed
 
 ---
 
-## 📦 Estrutura de Containers Docker
+## Estrutura de Containers Docker
 
 | Container           | Serviço              | Porta | Propósito                   |
 | ------------------- | -------------------- | ----- | --------------------------- |
@@ -245,7 +241,7 @@ docker-compose exec orionone-app php artisan migrate:fresh --seed
 
 ---
 
-## 🔐 Credenciais Padrão (Desenvolvimento)
+## Credenciais Padrão (Desenvolvimento)
 
 ### Utilizadores Seedados
 
@@ -265,7 +261,7 @@ docker-compose exec orionone-app php artisan migrate:fresh --seed
 
 ---
 
-## 📚 Documentação Completa
+## Documentação Completa
 
 Para informação detalhada sobre o setup, consultar:
 
