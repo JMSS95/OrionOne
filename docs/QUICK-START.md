@@ -1,6 +1,6 @@
-# 🚀 Quick Start - Setup em PC Novo
+# Quick Start - Setup em PC Novo
 
-## ✅ Checklist Rápida
+## Checklist Rápida
 
 ### Antes de Começar
 
@@ -12,7 +12,7 @@
 
 ---
 
-## 📥 Setup em 5 Minutos
+## Setup em 5 Minutos
 
 ### 1. Clonar Repositório
 
@@ -74,15 +74,15 @@ docker-compose exec orionone-app php artisan test
 
 ---
 
-## 🎯 Tudo OK?
+## Tudo OK?
 
-✅ **Containers a correr:** `docker-compose ps`
-✅ **Testes passam:** `php artisan test` (dentro do container)
-✅ **Login funciona:** admin@orionone.test / password
+**Containers a correr:** `docker-compose ps`
+**Testes passam:** `php artisan test` (dentro do container)
+**Login funciona:** admin@orionone.test / password
 
 ---
 
-## 📚 Próximos Passos
+## Próximos Passos
 
 1. Ler **[SETUP.md](../SETUP.md)** completo
 2. Seguir **[implementation-checklist.md](./implementation-checklist.md)** para desenvolvimento
@@ -90,7 +90,7 @@ docker-compose exec orionone-app php artisan test
 
 ---
 
-## ⚠️ Problemas?
+## Problemas?
 
 ### Container não inicia
 

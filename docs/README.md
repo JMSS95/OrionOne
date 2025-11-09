@@ -106,11 +106,12 @@ Usar **[Implementation Checklist](implementation-checklist.md)** para:
 -   Sprint 6: Polish & Deploy (CI/CD, Performance)
 
 **Novidades em Sprint 2:**
-- ✅ API REST completa (`/api/v1/tickets`) com autenticação Sanctum
-- ✅ Observer pattern para auto-generation (ticket_number, timestamps)
-- ✅ Events & Listeners para notificações assíncronas
-- ✅ Policy-based authorization
-- ✅ JSON Resources para transformação de dados API
+
+-   API REST completa (`/api/v1/tickets`) com autenticação Sanctum
+-   Observer pattern para auto-generation (ticket_number, timestamps)
+-   Events & Listeners para notificações assíncronas
+-   Policy-based authorization
+-   JSON Resources para transformação de dados API
 
 ---
 
