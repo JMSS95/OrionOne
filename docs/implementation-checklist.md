@@ -1500,6 +1500,916 @@ docker-compose exec orionone-app php artisan test
 
 ---
 
+### Feature 5: API REST Endpoints
+
+#### Phase 1: Planning (30 min)
+
+**User Story:**  
+Como developer externo, quero consumir a API REST do OrionOne para integrar com outras aplicações.
+
+**Critérios de Aceitação:**
+- Endpoints RESTful para tickets (`GET /api/v1/tickets`, `POST /api/v1/tickets`)
+- Autenticação via Bearer token (Sanctum)
+- Rate limiting (60 requests/min)
+- JSON Resources para transformação de dados
+- Documentação OpenAPI (Fase 2)
+
+**API Endpoints necessários:**
+- `GET /api/v1/tickets` - List tickets
+- `GET /api/v1/tickets/{id}` - Show ticket
+- `POST /api/v1/tickets` - Create ticket
+- `PATCH /api/v1/tickets/{id}` - Update ticket
+- `DELETE /api/v1/tickets/{id}` - Delete ticket
+
+#### Phase 2: Tests First (RED)
+
+```bash
+php artisan make:test Api/TicketApiTest
+```
+
+**Ficheiro:** `tests/Feature/Api/TicketApiTest.php`
+
+```php
+<?php
+
+namespace Tests\Feature\Api;
+
+use Tests\TestCase;
+use App\Models\User;
+use App\Models\Ticket;
+use Laravel\Sanctum\Sanctum;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class TicketApiTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_unauthenticated_user_cannot_access_api(): void
+    {
+        $response = $this->getJson('/api/v1/tickets');
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_can_list_tickets_via_api(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
+        Ticket::factory()->count(3)->create(['requester_id' => $user->id]);
+
+        $response = $this->getJson('/api/v1/tickets');
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'ticket_number', 'title', 'status', 'created_at']
+                ]
+            ])
+            ->assertJsonCount(3, 'data');
+    }
+
+    public function test_can_create_ticket_via_api(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/tickets', [
+            'title' => 'API Test Ticket',
+            'description' => 'Created via API',
+            'priority' => 'high',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonStructure([
+                'data' => ['id', 'ticket_number', 'title', 'status']
+            ]);
+        
+        $this->assertDatabaseHas('tickets', [
+            'title' => 'API Test Ticket',
+            'requester_id' => $user->id,
+        ]);
+    }
+
+    public function test_can_show_ticket_via_api(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
+        $ticket = Ticket::factory()->create(['requester_id' => $user->id]);
+
+        $response = $this->getJson("/api/v1/tickets/{$ticket->id}");
+
+        $response->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => $ticket->id,
+                    'title' => $ticket->title,
+                ]
+            ]);
+    }
+
+    public function test_api_rate_limiting_works(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        // Fazer 61 requests (limite é 60/min)
+        for ($i = 0; $i < 61; $i++) {
+            $response = $this->getJson('/api/v1/tickets');
+        }
+
+        $response->assertStatus(429); // Too Many Requests
+    }
+
+    public function test_cannot_access_other_users_tickets_via_api(): void
+    {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        
+        Sanctum::actingAs($user1);
+        
+        $ticket = Ticket::factory()->create(['requester_id' => $user2->id]);
+
+        $response = $this->getJson("/api/v1/tickets/{$ticket->id}");
+
+        $response->assertForbidden();
+    }
+}
+```
+
+**Rodar testes (vai falhar - esperado!):**
+
+```bash
+php artisan test --filter=TicketApiTest
+# RED: Route api/v1/tickets not defined
+```
+
+#### Phase 3: Implementation (GREEN)
+
+**a) Criar API Resource:**
+
+```bash
+php artisan make:resource TicketResource
+```
+
+**Ficheiro:** `app/Http/Resources/TicketResource.php`
+
+```php
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class TicketResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'ticket_number' => $this->ticket_number,
+            'title' => $this->title,
+            'description' => $this->description,
+            'status' => $this->status,
+            'priority' => $this->priority,
+            'requester' => [
+                'id' => $this->requester->id,
+                'name' => $this->requester->name,
+                'email' => $this->requester->email,
+            ],
+            'assignee' => $this->assignee ? [
+                'id' => $this->assignee->id,
+                'name' => $this->assignee->name,
+            ] : null,
+            'created_at' => $this->created_at->toIso8601String(),
+            'updated_at' => $this->updated_at->toIso8601String(),
+            'resolved_at' => $this->resolved_at?->toIso8601String(),
+        ];
+    }
+}
+```
+
+**b) Criar API Controller:**
+
+```bash
+php artisan make:controller Api/V1/TicketController --api
+```
+
+**Ficheiro:** `app/Http/Controllers/Api/V1/TicketController.php`
+
+```php
+<?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\TicketResource;
+use App\Actions\Tickets\CreateTicketAction;
+use App\Data\TicketData;
+use App\Models\Ticket;
+use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+
+class TicketController extends Controller
+{
+    public function index()
+    {
+        $this->authorize('viewAny', Ticket::class);
+
+        $tickets = QueryBuilder::for(Ticket::class)
+            ->allowedFilters([
+                AllowedFilter::partial('search', 'title'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('priority'),
+            ])
+            ->allowedSorts(['created_at', 'priority'])
+            ->defaultSort('-created_at')
+            ->where('requester_id', auth()->id())
+            ->paginate(15);
+
+        return TicketResource::collection($tickets);
+    }
+
+    public function store(Request $request, CreateTicketAction $action)
+    {
+        $this->authorize('create', Ticket::class);
+
+        $data = TicketData::from($request);
+        $ticket = $action->handle($data, auth()->user());
+
+        return TicketResource::make($ticket)
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    public function show(Ticket $ticket)
+    {
+        $this->authorize('view', $ticket);
+
+        return TicketResource::make($ticket->load(['requester', 'assignee']));
+    }
+
+    public function update(Request $request, Ticket $ticket)
+    {
+        $this->authorize('update', $ticket);
+
+        $ticket->update($request->only(['title', 'description', 'priority']));
+
+        return TicketResource::make($ticket->fresh());
+    }
+
+    public function destroy(Ticket $ticket)
+    {
+        $this->authorize('delete', $ticket);
+
+        $ticket->delete();
+
+        return response()->json(['message' => 'Ticket deleted successfully'], 204);
+    }
+}
+```
+
+**c) Criar Policy:**
+
+```bash
+php artisan make:policy TicketPolicy --model=Ticket
+```
+
+**Ficheiro:** `app/Policies/TicketPolicy.php`
+
+```php
+<?php
+
+namespace App\Policies;
+
+use App\Models\Ticket;
+use App\Models\User;
+
+class TicketPolicy
+{
+    public function viewAny(User $user): bool
+    {
+        return true;
+    }
+
+    public function view(User $user, Ticket $ticket): bool
+    {
+        return $user->id === $ticket->requester_id 
+            || $user->hasPermissionTo('tickets.view');
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->hasPermissionTo('tickets.create');
+    }
+
+    public function update(User $user, Ticket $ticket): bool
+    {
+        return $user->id === $ticket->requester_id 
+            || $user->hasPermissionTo('tickets.update');
+    }
+
+    public function delete(User $user, Ticket $ticket): bool
+    {
+        return $user->hasPermissionTo('tickets.delete');
+    }
+}
+```
+
+**d) Registar API Routes:**
+
+**Ficheiro:** `routes/api.php`
+
+```php
+<?php
+
+use App\Http\Controllers\Api\V1\TicketController;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+    Route::apiResource('tickets', TicketController::class);
+});
+```
+
+**e) Configurar Sanctum no User Model:**
+
+**Ficheiro:** `app/Models/User.php`
+
+```php
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable; // Adicionar HasApiTokens
+    
+    // ... rest of the model
+}
+```
+
+**Rodar testes novamente:**
+
+```bash
+php artisan test --filter=TicketApiTest
+# GREEN: Testes passam!
+```
+
+#### Phase 4: Gerar API Tokens
+
+**Criar endpoint para gerar tokens:**
+
+```php
+// routes/web.php
+Route::post('/api-tokens', function (Request $request) {
+    $request->validate([
+        'name' => 'required|string|max:255',
+    ]);
+
+    $token = $request->user()->createToken($request->name);
+
+    return response()->json([
+        'token' => $token->plainTextToken,
+    ]);
+})->name('api-tokens.store')->middleware('auth');
+```
+
+**Testar via cURL:**
+
+```bash
+# 1. Gerar token (via web)
+curl -X POST http://orionone.test/api-tokens \
+  -H "Content-Type: application/json" \
+  -H "Cookie: laravel_session=..." \
+  -d '{"name":"My API Token"}'
+
+# 2. Usar token na API
+curl -X GET http://orionone.test/api/v1/tickets \
+  -H "Authorization: Bearer {TOKEN_AQUI}" \
+  -H "Accept: application/json"
+```
+
+---
+
+### Feature 6: Observer Pattern for Auto-Generation
+
+#### Phase 1: Planning (20 min)
+
+**User Story:**  
+Como developer, quero que certas ações sejam automáticas (ticket_number, timestamps) via Observers.
+
+**Critérios de Aceitação:**
+- Auto-gerar `ticket_number` ao criar ticket
+- Auto-atualizar `resolved_at` quando status muda para "resolved"
+- Auto-atualizar `closed_at` quando status muda para "closed"
+- Logging automático de mudanças críticas
+
+#### Phase 2: Tests First (RED)
+
+```bash
+php artisan make:test TicketObserverTest
+```
+
+**Ficheiro:** `tests/Feature/TicketObserverTest.php`
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use App\Models\User;
+use App\Models\Ticket;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class TicketObserverTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_ticket_number_is_auto_generated_on_creation(): void
+    {
+        $user = User::factory()->create();
+
+        $ticket = Ticket::create([
+            'title' => 'Test',
+            'description' => 'Test',
+            'priority' => 'medium',
+            'requester_id' => $user->id,
+        ]);
+
+        $this->assertNotNull($ticket->ticket_number);
+        $this->assertMatchesRegularExpression('/^TK-\d{8}-\d{4}$/', $ticket->ticket_number);
+    }
+
+    public function test_resolved_at_is_set_when_status_changes_to_resolved(): void
+    {
+        $ticket = Ticket::factory()->create(['status' => 'open']);
+
+        $this->assertNull($ticket->resolved_at);
+
+        $ticket->update(['status' => 'resolved']);
+
+        $this->assertNotNull($ticket->fresh()->resolved_at);
+    }
+
+    public function test_closed_at_is_set_when_status_changes_to_closed(): void
+    {
+        $ticket = Ticket::factory()->create(['status' => 'resolved']);
+
+        $this->assertNull($ticket->closed_at);
+
+        $ticket->update(['status' => 'closed']);
+
+        $this->assertNotNull($ticket->fresh()->closed_at);
+    }
+
+    public function test_activity_is_logged_on_status_change(): void
+    {
+        $ticket = Ticket::factory()->create(['status' => 'open']);
+
+        $ticket->update(['status' => 'in_progress']);
+
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Ticket::class,
+            'subject_id' => $ticket->id,
+            'description' => 'status changed',
+        ]);
+    }
+}
+```
+
+**Rodar testes (vai falhar - esperado!):**
+
+```bash
+php artisan test --filter=TicketObserverTest
+# RED: ticket_number is null
+```
+
+#### Phase 3: Implementation (GREEN)
+
+**a) Criar Observer:**
+
+```bash
+php artisan make:observer TicketObserver --model=Ticket
+```
+
+**Ficheiro:** `app/Observers/TicketObserver.php`
+
+```php
+<?php
+
+namespace App\Observers;
+
+use App\Models\Ticket;
+
+class TicketObserver
+{
+    public function creating(Ticket $ticket): void
+    {
+        if (empty($ticket->ticket_number)) {
+            $ticket->ticket_number = $this->generateTicketNumber();
+        }
+    }
+
+    public function updating(Ticket $ticket): void
+    {
+        // Auto-set resolved_at
+        if ($ticket->isDirty('status') && $ticket->status === 'resolved') {
+            $ticket->resolved_at = now();
+        }
+
+        // Auto-set closed_at
+        if ($ticket->isDirty('status') && $ticket->status === 'closed') {
+            $ticket->closed_at = now();
+        }
+    }
+
+    public function updated(Ticket $ticket): void
+    {
+        // Log status changes
+        if ($ticket->isDirty('status')) {
+            activity()
+                ->performedOn($ticket)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'old_status' => $ticket->getOriginal('status'),
+                    'new_status' => $ticket->status,
+                ])
+                ->log('status changed');
+        }
+    }
+
+    protected function generateTicketNumber(): string
+    {
+        $prefix = 'TK';
+        $date = now()->format('Ymd');
+        $count = Ticket::whereDate('created_at', today())->count() + 1;
+
+        return sprintf('%s-%s-%04d', $prefix, $date, $count);
+    }
+}
+```
+
+**b) Registar Observer:**
+
+**Ficheiro:** `app/Providers/AppServiceProvider.php`
+
+```php
+use App\Models\Ticket;
+use App\Observers\TicketObserver;
+
+public function boot(): void
+{
+    Ticket::observe(TicketObserver::class);
+}
+```
+
+**c) Remover lógica duplicada do CreateTicketAction:**
+
+Agora que o Observer gera o ticket_number automaticamente, remover do Action:
+
+```php
+// app/Actions/Tickets/CreateTicketAction.php
+public function handle(TicketData $data, User $requester): Ticket
+{
+    return DB::transaction(function () use ($data, $requester) {
+        $ticket = Ticket::create([
+            // Remover 'ticket_number' - agora é automático via Observer
+            'title' => $data->title,
+            'description' => $data->description,
+            'priority' => $data->priority,
+            'requester_id' => $requester->id,
+            'team_id' => $data->team_id,
+            'assigned_to' => $data->team_id 
+                ? $this->findAvailableAgent($data->team_id)?->id 
+                : null,
+        ]);
+
+        activity()
+            ->performedOn($ticket)
+            ->causedBy($requester)
+            ->log('Ticket criado');
+
+        return $ticket->fresh();
+    });
+}
+```
+
+**Rodar testes novamente:**
+
+```bash
+php artisan test --filter=TicketObserverTest
+# GREEN: Testes passam!
+```
+
+---
+
+### Feature 7: Events & Listeners (Async Notifications)
+
+#### Phase 1: Planning (30 min)
+
+**User Story:**  
+Como system, quero disparar eventos quando tickets são criados para enviar notificações assíncronas.
+
+**Critérios de Aceitação:**
+- Event `TicketCreated` disparado ao criar ticket
+- Listener `SendTicketCreatedNotification` envia email
+- Listener `LogTicketActivity` regista em activity log
+- Listeners executam em queue (assíncrono)
+
+#### Phase 2: Tests First (RED)
+
+```bash
+php artisan make:test TicketEventsTest
+```
+
+**Ficheiro:** `tests/Feature/TicketEventsTest.php`
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use App\Models\User;
+use App\Models\Ticket;
+use App\Events\TicketCreated;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class TicketEventsTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_ticket_created_event_is_dispatched(): void
+    {
+        Event::fake([TicketCreated::class]);
+        
+        $user = User::factory()->create();
+
+        $ticket = Ticket::create([
+            'title' => 'Test',
+            'description' => 'Test',
+            'priority' => 'high',
+            'requester_id' => $user->id,
+        ]);
+
+        Event::assertDispatched(TicketCreated::class, function ($event) use ($ticket) {
+            return $event->ticket->id === $ticket->id;
+        });
+    }
+
+    public function test_ticket_created_notification_is_queued(): void
+    {
+        Queue::fake();
+        
+        $user = User::factory()->create();
+
+        $ticket = Ticket::create([
+            'title' => 'Test',
+            'description' => 'Test',
+            'priority' => 'high',
+            'requester_id' => $user->id,
+        ]);
+
+        // Dispatch event manualmente para testar listeners
+        event(new TicketCreated($ticket));
+
+        Queue::assertPushed(function ($job) {
+            return str_contains(get_class($job), 'SendTicketCreatedNotification');
+        });
+    }
+}
+```
+
+**Rodar testes (vai falhar - esperado!):**
+
+```bash
+php artisan test --filter=TicketEventsTest
+# RED: Class TicketCreated does not exist
+```
+
+#### Phase 3: Implementation (GREEN)
+
+**a) Criar Event:**
+
+```bash
+php artisan make:event TicketCreated
+```
+
+**Ficheiro:** `app/Events/TicketCreated.php`
+
+```php
+<?php
+
+namespace App\Events;
+
+use App\Models\Ticket;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class TicketCreated
+{
+    use Dispatchable, SerializesModels;
+
+    public function __construct(
+        public Ticket $ticket
+    ) {}
+}
+```
+
+**b) Criar Listeners:**
+
+```bash
+php artisan make:listener SendTicketCreatedNotification --event=TicketCreated
+php artisan make:listener LogTicketActivity --event=TicketCreated
+```
+
+**Ficheiro:** `app/Listeners/SendTicketCreatedNotification.php`
+
+```php
+<?php
+
+namespace App\Listeners;
+
+use App\Events\TicketCreated;
+use App\Notifications\TicketCreatedNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+class SendTicketCreatedNotification implements ShouldQueue
+{
+    public function handle(TicketCreated $event): void
+    {
+        // Notificar requester
+        $event->ticket->requester->notify(
+            new TicketCreatedNotification($event->ticket)
+        );
+
+        // Se assignee existe, notificar também
+        if ($event->ticket->assignee) {
+            $event->ticket->assignee->notify(
+                new TicketCreatedNotification($event->ticket)
+            );
+        }
+    }
+}
+```
+
+**Ficheiro:** `app/Listeners/LogTicketActivity.php`
+
+```php
+<?php
+
+namespace App\Listeners;
+
+use App\Events\TicketCreated;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+class LogTicketActivity implements ShouldQueue
+{
+    public function handle(TicketCreated $event): void
+    {
+        activity()
+            ->performedOn($event->ticket)
+            ->causedBy($event->ticket->requester)
+            ->log('Ticket criado via event');
+    }
+}
+```
+
+**c) Criar Notification:**
+
+```bash
+php artisan make:notification TicketCreatedNotification
+```
+
+**Ficheiro:** `app/Notifications/TicketCreatedNotification.php`
+
+```php
+<?php
+
+namespace App\Notifications;
+
+use App\Models\Ticket;
+use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
+
+class TicketCreatedNotification extends Notification
+{
+    use Queueable;
+
+    public function __construct(
+        public Ticket $ticket
+    ) {}
+
+    public function via($notifiable): array
+    {
+        return ['mail', 'database'];
+    }
+
+    public function toMail($notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject('Novo Ticket Criado: ' . $this->ticket->ticket_number)
+            ->line('Um novo ticket foi criado.')
+            ->line('Título: ' . $this->ticket->title)
+            ->line('Prioridade: ' . $this->ticket->priority)
+            ->action('Ver Ticket', url('/tickets/' . $this->ticket->id))
+            ->line('Obrigado por usar OrionOne!');
+    }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'ticket_id' => $this->ticket->id,
+            'ticket_number' => $this->ticket->ticket_number,
+            'title' => $this->ticket->title,
+        ];
+    }
+}
+```
+
+**d) Registar Listeners:**
+
+**Ficheiro:** `app/Providers/EventServiceProvider.php`
+
+```php
+<?php
+
+namespace App\Providers;
+
+use App\Events\TicketCreated;
+use App\Listeners\SendTicketCreatedNotification;
+use App\Listeners\LogTicketActivity;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+
+class EventServiceProvider extends ServiceProvider
+{
+    protected $listen = [
+        TicketCreated::class => [
+            SendTicketCreatedNotification::class,
+            LogTicketActivity::class,
+        ],
+    ];
+}
+```
+
+**e) Disparar Event no Observer:**
+
+**Ficheiro:** `app/Observers/TicketObserver.php`
+
+```php
+use App\Events\TicketCreated;
+
+public function created(Ticket $ticket): void
+{
+    event(new TicketCreated($ticket));
+}
+```
+
+**f) Migration para notifications:**
+
+```bash
+php artisan notifications:table
+php artisan migrate
+```
+
+**Rodar testes novamente:**
+
+```bash
+php artisan test --filter=TicketEventsTest
+# GREEN: Testes passam!
+```
+
+#### Phase 4: Configurar Queue
+
+**a) Configurar Redis queue:**
+
+**Ficheiro:** `.env`
+
+```env
+QUEUE_CONNECTION=redis
+```
+
+**b) Rodar queue worker:**
+
+```bash
+php artisan queue:work
+```
+
+**c) Verificar jobs:**
+
+```bash
+php artisan queue:failed  # Ver jobs falhados
+php artisan queue:retry all  # Retry failed jobs
+```
+
+---
+
 ## Checklist Resumo
 
 ### Sprint 1
@@ -1515,17 +2425,35 @@ docker-compose exec orionone-app php artisan test
 
 ### Sprint 2
 
--   Migration tickets
--   Model Ticket com relationships
--   TicketData DTO
--   CreateTicketAction
--   TicketController com Query Builder
--   Página Tickets/Index (lista + filtros)
--   Página Tickets/Create (form)
--   Testes (>90% coverage)
+- Migration tickets
+- Model Ticket com relationships
+- TicketData DTO
+- CreateTicketAction
+- TicketController com Query Builder
+- Página Tickets/Index (lista + filtros)
+- Página Tickets/Create (form)
+- TicketResource (API transformation)
+- API REST endpoints (/api/v1/tickets)
+- TicketPolicy (autorização)
+- TicketObserver (auto-generation)
+- Events & Listeners (notificações assíncronas)
+- Testes (>90% coverage)
+
+### Sprint 3-6
+
+**A completar nos próximos sprints:**
+- Comments system
+- Team management
+- SLA tracking
+- Dashboard & reports
+- Knowledge Base
+- Deployment & CI/CD
 
 ---
 
-**Continua nos próximos sprints...**
+**Próximas Adições Planeadas:**
+- Performance optimization checklist
+- Deployment guide (Docker + GitHub Actions)
+- Advanced testing (Dusk browser tests)
 
-**Última Atualização:** 07 Novembro 2025, 23:45
+**Última Atualização:** 08 Novembro 2025, 02:15
