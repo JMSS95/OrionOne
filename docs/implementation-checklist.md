@@ -1808,7 +1808,7 @@ class CommentTest extends TestCase
     {
         $user = User::factory()->create();
         $user->assignRole('user');
-        
+
         $ticket = Ticket::factory()->create(['requester_id' => $user->id]);
         Comment::factory()->create([
             'ticket_id' => $ticket->id,
@@ -1955,11 +1955,12 @@ Como admin, quero organizar agents em equipas para distribuir tickets.
 #### Phase 2-4: Implementação
 
 Similar ao padrão anterior:
-- Migration `teams` + pivot `team_user`
-- Model Team com relationships
-- TeamController (Query Builder)
-- Testes de assignments
-- Interface de gestão
+
+-   Migration `teams` + pivot `team_user`
+-   Model Team com relationships
+-   TeamController (Query Builder)
+-   Testes de assignments
+-   Interface de gestão
 
 ---
 
@@ -2015,10 +2016,11 @@ docker-compose exec orionone-app php artisan make:test ArticleTest
 ```
 
 Testes para:
-- Criar artigo
-- Publicar/despublicar
-- Pesquisa
-- Votação útil/não útil
+
+-   Criar artigo
+-   Publicar/despublicar
+-   Pesquisa
+-   Votação útil/não útil
 
 #### Phase 3: Implementation (GREEN)
 
@@ -2031,9 +2033,10 @@ docker-compose exec orionone-app php artisan make:migration create_article_votes
 ```
 
 **Models:**
-- Article (title, slug, body, status, views, helpful_votes)
-- Category (name, slug, parent_id)
-- ArticleVote (user_id, article_id, is_helpful)
+
+-   Article (title, slug, body, status, views, helpful_votes)
+-   Category (name, slug, parent_id)
+-   ArticleVote (user_id, article_id, is_helpful)
 
 **Full-text Search:**
 
@@ -2046,20 +2049,21 @@ $articles = Article::search($query)
 
 #### Phase 4: Frontend
 
-- Lista de categorias com contador
-- Página de artigo com TOC (table of contents)
-- Botões de feedback (útil/não útil)
-- Editor Tiptap para criação
+-   Lista de categorias com contador
+-   Página de artigo com TOC (table of contents)
+-   Botões de feedback (útil/não útil)
+-   Editor Tiptap para criação
 
 ---
 
 ### Feature 9: KB Search & Browse
 
 Interface de pesquisa com:
-- Autocomplete
-- Filtros por categoria
-- Artigos relacionados
-- Artigos mais vistos
+
+-   Autocomplete
+-   Filtros por categoria
+-   Artigos relacionados
+-   Artigos mais vistos
 
 ---
 
@@ -2379,6 +2383,10 @@ Se houver tempo extra após completar todos os 6 sprints:
 
 ---
 
-**Status do Projeto:** Sprint 1 Completo ✅ | Sprint 2 Em Progresso 🟡
+**Status do Projeto:**
 
-**Última Atualização:** 10 Novembro 2025, 01:30
+-   **Sprint 1**: Completo (Feature 1: Roles & Permissions + Feature 2: Avatar Upload)
+-   **Sprint 2**: Em Progresso (Feature 3: Create Ticket + Feature 4: List Tickets + Feature 5: Swagger Setup)
+-   **Sprints 3-6**: Planeamento Completo (Implementação detalhada pronta para execução)
+
+**Última Atualização:** 10 Novembro 2025, 02:00
