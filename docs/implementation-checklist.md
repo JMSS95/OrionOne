@@ -2,7 +2,6 @@
 
 **Sprint-by-Sprint Implementation Guide**
 
-> Segue a filosofia **TDD + Feature-Driven Development** do [development-guide.md](./development-guide.md)
 > Cada feature passa por: **Planning → Tests First (RED) → Implementation (GREEN) → Frontend**
 
 ---

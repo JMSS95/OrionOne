@@ -3,7 +3,7 @@
 **Última Atualização:** 10 Novembro 2025
 **Stack:** PHP 8.4 + Laravel 12 + Vue 3 + PostgreSQL 16
 
-> ⚠️ **IMPORTANTE:** Este projeto usa **Docker exclusivamente**. Não é necessário instalar PHP, PostgreSQL ou Redis localmente.
+> **IMPORTANTE:** Este projeto usa **Docker exclusivamente**. Não é necessário instalar PHP, PostgreSQL ou Redis localmente.
 
 ---
 
@@ -11,22 +11,22 @@
 
 ### Software Necessário
 
--   ✅ **Git** (2.40+) - [Download](https://git-scm.com/)
--   ✅ **Docker Desktop** (4.25+) - [Download](https://www.docker.com/products/docker-desktop/)
--   ✅ **Node.js** (20.x LTS) - [Download](https://nodejs.org/)
--   ✅ **VS Code** (recomendado) - [Download](https://code.visualstudio.com/)
+-   **Git** (2.40+) - [Download](https://git-scm.com/)
+-   **Docker Desktop** (4.25+) - [Download](https://www.docker.com/products/docker-desktop/)
+-   **Node.js** (20.x LTS) - [Download](https://nodejs.org/)
+-   **VS Code** (recomendado) - [Download](https://code.visualstudio.com/)
 
 ### NÃO É NECESSÁRIO Instalar
 
--   ❌ PHP local (usamos Docker com PHP 8.4)
--   ❌ Composer local (incluído no container Docker)
--   ❌ PostgreSQL local (container Docker)
--   ❌ Redis local (container Docker)
--   ❌ Meilisearch local (container Docker)
+-   PHP local (usamos Docker com PHP 8.4)
+-   Composer local (incluído no container Docker)
+-   PostgreSQL local (container Docker)
+-   Redis local (container Docker)
+-   Meilisearch local (container Docker)
 
 ---
 
-## Setup em 10 Minutos ⚡
+## Setup em 10 Minutos
 
 ### 1. Clonar Repositório
 
@@ -62,12 +62,12 @@ docker-compose ps
 
 **Deves ver 6 containers:**
 
--   ✅ orionone-app (PHP 8.4)
--   ✅ orionone-frontend (Node 20)
--   ✅ orionone-db (PostgreSQL 16)
--   ✅ orionone-redis (Redis 7)
--   ✅ orionone-meilisearch (Meilisearch 1.12)
--   ✅ orionone-nginx (Nginx)
+-   orionone-app (PHP 8.4)
+-   orionone-frontend (Node 20)
+-   orionone-db (PostgreSQL 16)
+-   orionone-redis (Redis 7)
+-   orionone-meilisearch (Meilisearch 1.12)
+-   orionone-nginx (Nginx)
 
 ### 4. Instalar Dependências Backend
 
@@ -136,11 +136,11 @@ docker-compose exec orionone-app php artisan test
 
 ### URLs
 
--   🌐 **Frontend:** http://localhost
--   📊 **Laravel Pulse:** http://localhost/pulse (monitoring)
--   📚 **API Docs (Scribe):** http://localhost/docs
--   🔍 **Meilisearch:** http://localhost:7700
--   📡 **Telescope:** http://localhost/telescope (debug)
+-   **Frontend:** http://localhost
+-   **Laravel Pulse:** http://localhost/pulse (monitoring)
+-   **API Docs (Scribe):** http://localhost/docs
+-   **Meilisearch:** http://localhost:7700
+-   **Telescope:** http://localhost/telescope (debug)
 
 ### Utilizadores de Teste
 
@@ -226,19 +226,19 @@ docker-compose exec orionone-frontend npm run type-check
 
 ## Troubleshooting
 
-### ❌ "could not find driver" (PDO PostgreSQL)
+### "could not find driver" (PDO PostgreSQL)
 
 **Solução:** Usar Docker SEMPRE. PHP local não tem extensão pgsql.
 
 ```bash
-# ❌ ERRADO (PHP local)
+# ERRADO (PHP local)
 php artisan migrate
 
-# ✅ CERTO (Docker)
+# CERTO (Docker)
 docker-compose exec orionone-app php artisan migrate
 ```
 
-### ❌ Containers não iniciam
+### Containers não iniciam
 
 ```bash
 # Ver erros específicos
@@ -249,7 +249,7 @@ docker-compose down
 docker-compose up -d --build
 ```
 
-### ❌ Porta 80 já em uso
+### Porta 80 já em uso
 
 **Solução:** Parar Apache/Nginx local ou mudar porta no docker-compose.yml
 
@@ -261,7 +261,7 @@ services:
             - "8080:80" # Usar porta 8080
 ```
 
-### ❌ Frontend não atualiza (HMR não funciona)
+### Frontend não atualiza (HMR não funciona)
 
 ```bash
 # Rebuild frontend container
@@ -275,11 +275,10 @@ docker-compose logs -f orionone-frontend
 
 ## Próximos Passos
 
-1. ✅ **Ler documentação:** [docs/README.md](README.md)
-2. ✅ **Ver roadmap MVP:** [docs/MVP-PRIORITIES.md](MVP-PRIORITIES.md)
-3. ✅ **Verificar estado:** [docs/MVP-READINESS-CHECKLIST.md](MVP-READINESS-CHECKLIST.md)
-4. ✅ **Metodologia TDD:** [docs/development-guide.md](development-guide.md)
-5. ✅ **Implementar Sprint 2:** [docs/implementation-checklist.md](implementation-checklist.md)
+1. **Ler documentação:** [docs/README.md](README.md)
+2. **Ver roadmap MVP:** [docs/MVP.md](MVP.md)
+3. **Metodologia TDD:** [docs/development-guide.md](development-guide.md)
+4. **Implementar Sprint 2:** [docs/implementation-checklist.md](implementation-checklist.md)
 
 ---
 
@@ -301,7 +300,7 @@ docker-compose logs -f orionone-frontend
 ---
 
 **Última Atualização:** 10 Novembro 2025, 06:00
-**Status:** ✅ **DOCKER-FIRST APPROACH - 100% VIA CONTAINERS**
+**Status:** DOCKER-FIRST APPROACH - 100% VIA CONTAINERS
 
 ### Frontend não compila
 

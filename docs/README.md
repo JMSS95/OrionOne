@@ -6,36 +6,34 @@
 
 ## Índice de Documentação
 
-### 🚀 Setup & Getting Started
+### Setup & Getting Started
 
 1. **[Quick Start](QUICK-START.md)** - Setup completo em 10 minutos (Docker-first)
 2. **[Commands Reference](COMMANDS-REFERENCE.md)** - Guia completo de todos os comandos (Git, Docker, Laravel, etc)
 3. **[Docker Guide](DOCKER-GUIDE.md)** - Guia Docker para iniciantes
-4. **[Documentation Cleanup](DOCUMENTATION-CLEANUP.md)** - Análise e remoção de documentação redundante
 
-### 🏗️ Arquitetura & Design
+### Arquitetura & Design
 
-5. **[Architecture](architecture.md)** - Arquitetura do sistema (MVC + Services + Actions + Observers + Events)
-6. **[Tech Stack](tech-stack.md)** - Stack tecnológica completa (Backend, Frontend, **API REST**, DevOps)
-7. **[Database Schema](database-schema.md)** - Esquema completo da base de dados
+4. **[Architecture](architecture.md)** - Arquitetura do sistema (MVC + Services + Actions + Observers + Events)
+5. **[Tech Stack](tech-stack.md)** - Stack tecnológica completa (Backend, Frontend, API REST, DevOps)
+6. **[Database Schema](database-schema.md)** - Esquema completo da base de dados
 
-### 💻 Desenvolvimento
+### Desenvolvimento
 
-8. **[Development Guide](development-guide.md)** - Guia de desenvolvimento (TDD, patterns, conventions)
-9. **[Implementation Checklist](implementation-checklist.md)** - Checklist TDD sprint-by-sprint (**Sprints 1-2 completos: Auth, Tickets, API REST, Observers, Events**)
-10. **[Components Guide](COMPONENTS-GUIDE.md)** - Guia completo dos componentes Shadcn-vue (uso + implementação)
+7. **[Development Guide](development-guide.md)** - Guia de desenvolvimento (TDD, patterns, conventions)
+8. **[Implementation Checklist](implementation-checklist.md)** - Checklist TDD sprint-by-sprint (Sprints 1-2 completos: Auth, Tickets, API REST, Observers, Events)
+9. **[Components Guide](COMPONENTS-GUIDE.md)** - Guia completo dos componentes Shadcn-vue (uso + implementação)
 
-### 📊 Análises & Planeamento
+### Análises & Planeamento
 
-11. **[Stack Analysis 2025](STACK-ANALYSIS-2025.md)** - Análise completa da stack (Score: 8.7/10)
-12. **[ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md)** - Análise do mercado ITSM (Score: 7.2/10)
-13. **[MVP Priorities](MVP-PRIORITIES.md)** - Roadmap Sprint 2-6 e prioridades MVP
-14. **[MVP Readiness Checklist](MVP-READINESS-CHECKLIST.md)** - Estado MVP (95% pronto)
+10. **[Stack Analysis 2025](STACK-ANALYSIS-2025.md)** - Análise completa da stack (Score: 8.7/10)
+11. **[ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md)** - Análise do mercado ITSM (Score: 7.2/10)
+12. **[MVP Roadmap & Status](MVP.md)** - Roadmap Sprint 2-6, status 95% pronto, métricas
 
-### 📝 Business & Requirements
+### Business & Requirements
 
-15. **[Business Model](business-model.md)** - Modelo de negócio, value proposition, análise SWOT
-16. **[Requirements](requirements.md)** - Requisitos funcionais e não-funcionais
+14. **[Business Model](business-model.md)** - Modelo de negócio, value proposition, análise SWOT
+15. **[Requirements](requirements.md)** - Requisitos funcionais e não-funcionais
 
 ---
 
@@ -44,10 +42,9 @@
 ```
 docs/
 ├── README.md                           # Este ficheiro (índice)
-├── QUICK-START.md                      # ⭐ Setup em 10 minutos
+├── QUICK-START.md                      # Setup em 10 minutos
 ├── COMMANDS-REFERENCE.md               # Comandos completos
 ├── DOCKER-GUIDE.md                     # Docker para iniciantes
-├── DOCUMENTATION-CLEANUP.md            # Análise de redundâncias
 ├── architecture.md                     # Arquitetura do sistema
 ├── tech-stack.md                       # Stack tecnológica
 ├── database-schema.md                  # Schema da BD
@@ -56,8 +53,7 @@ docs/
 ├── COMPONENTS-GUIDE.md                 # Componentes UI (completo)
 ├── STACK-ANALYSIS-2025.md              # Análise stack (8.7/10)
 ├── ITSM-STACK-ANALYSIS.md              # Análise ITSM (7.2/10)
-├── MVP-PRIORITIES.md                   # Roadmap Sprint 2-6
-├── MVP-READINESS-CHECKLIST.md          # Estado MVP (95%)
+├── MVP.md                              # Roadmap & Status MVP
 ├── business-model.md                   # Modelo de negócio
 └── requirements.md                     # Requisitos do projeto
 ```
@@ -68,7 +64,7 @@ docs/
 
 ### 1. Setup Inicial (10 minutos)
 
-**👉 Consultar [QUICK-START.md](QUICK-START.md) para guia completo.**
+Consultar [QUICK-START.md](QUICK-START.md) para guia completo.
 
 ```bash
 # Clone do repositório
@@ -94,11 +90,13 @@ docker-compose exec orionone-app php artisan db:seed --class=RolePermissionSeede
 docker-compose exec orionone-frontend npm run dev
 ```
 
+````
+
 **Acesso:**
-- 🌐 Frontend: http://localhost
-- 📊 Pulse: http://localhost/pulse
-- 📚 API Docs: http://localhost/docs
-- 🔍 Meilisearch: http://localhost:7700
+- Frontend: http://localhost
+- Pulse: http://localhost/pulse
+- API Docs: http://localhost/docs
+- Meilisearch: http://localhost:7700
 
 ### 2. Desenvolvimento
 
@@ -162,7 +160,7 @@ docker-compose exec orionone-app php artisan test
 git add .
 git commit -m "feat: add ticket filters"
 git push origin feature/ticket-filters
-```
+````
 
 ### Para DevOps
 
@@ -178,23 +176,22 @@ git push origin feature/ticket-filters
 
 1. [business-model.md](business-model.md) - Value proposition, mercado
 2. [requirements.md](requirements.md) - Features e requisitos
-3. [MVP-PRIORITIES.md](MVP-PRIORITIES.md) - Roadmap Sprint 2-6
-4. [MVP-READINESS-CHECKLIST.md](MVP-READINESS-CHECKLIST.md) - Estado atual (95%)
+3. [MVP.md](MVP.md) - Roadmap Sprint 2-6, status 95% pronto
 
 ---
 
 ## Stack Técnica (8.7/10)
 
-| Componente      | Versão       | Status      |
-| --------------- | ------------ | ----------- |
-| **PHP**         | 8.4          | ✅ Produção |
-| **Laravel**     | 12.x         | ✅ Produção |
-| **Vue**         | 3.4          | ✅ Produção |
-| **Vite**        | 6.4          | ✅ Produção |
-| **PostgreSQL**  | 16           | ✅ Produção |
-| **Redis**       | 7            | ✅ Produção |
-| **Meilisearch** | 1.12         | ✅ Produção |
-| **Pest PHP**    | 3.8          | ✅ Produção |
+| Componente      | Versão | Status   |
+| --------------- | ------ | -------- |
+| **PHP**         | 8.4    | Produção |
+| **Laravel**     | 12.x   | Produção |
+| **Vue**         | 3.4    | Produção |
+| **Vite**        | 6.4    | Produção |
+| **PostgreSQL**  | 16     | Produção |
+| **Redis**       | 7      | Produção |
+| **Meilisearch** | 1.12   | Produção |
+| **Pest PHP**    | 3.8    | Produção |
 
 **Análise completa:** [STACK-ANALYSIS-2025.md](STACK-ANALYSIS-2025.md)
 
@@ -219,7 +216,7 @@ git push origin feature/ticket-filters
 ---
 
 ## Secção 1
-````
+```
 
 ### Para DevOps
 
