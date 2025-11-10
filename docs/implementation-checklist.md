@@ -2297,33 +2297,33 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 
 ## Checklist Resumo Completo
 
-### Sprint 1: Auth & Users
+### Sprint 1: Auth & Users (85% Completo)
 
 -   [x] Laravel IDE Helper
 -   [x] Inertia Progress
 -   [x] Publicar configs Spatie
 -   [x] RolePermissionSeeder (3 roles)
 -   [x] UserSeeder (3 test users)
--   [x] Profile Avatar Upload
+-   [ ] Profile Avatar Upload 
 
-### Sprint 2: Tickets Core
+### Sprint 2: Tickets Core (0% Completo)
 
--   [x] Migration tickets
--   [x] Model Ticket + relationships
--   [x] TicketData DTO
--   [x] CreateTicketAction
--   [x] TicketController + Query Builder
--   [x] Frontend: Index + Create
--   [ ] Factory + Seeders
+-   [ ] Migration tickets (não existe)
+-   [ ] Model Ticket + relationships (não existe)
+-   [ ] TicketData DTO (não existe)
+-   [ ] CreateTicketAction (não existe)
+-   [ ] TicketController + Query Builder (não existe)
+-   [ ] Frontend: Index + Create (não existe)
+-   [ ] Factory + Seeders (não existe)
 
-### Sprint 3: Colaboração
+### Sprint 3: Colaboração (0% Completo)
 
 -   [ ] Comments system (public + internal)
 -   [ ] Teams management
 -   [ ] Email notifications (queued)
 -   [ ] Mention system (@username)
 
-### Sprint 4: Knowledge Base
+### Sprint 4: Knowledge Base (0% Completo)
 
 -   [ ] Articles CRUD
 -   [ ] Categories hierarchy
@@ -2331,7 +2331,7 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 -   [ ] Article voting (helpful/not)
 -   [ ] Version history
 
-### Sprint 5: Dashboard & Reports
+### Sprint 5: Dashboard & Reports (0% Completo)
 
 -   [ ] Admin dashboard (metrics)
 -   [ ] Charts (tickets por dia, SLA)
@@ -2350,6 +2350,22 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 -   [ ] Monitoring (Sentry)
 -   [ ] Documentation completa
 -   [ ] Video demo
+
+---
+
+## Progresso Resumo por Sprint
+
+| Sprint   | Features | Completas | Progresso |
+|----------|----------|-----------|-----------|
+| Sprint 1 | 6        | 5         | 85%       |
+| Sprint 2 | 7        | 0         | 0%        |
+| Sprint 3 | 4        | 0         | 0%        |
+| Sprint 4 | 5        | 0         | 0%        |
+| Sprint 5 | 5        | 0         | 0%        |
+| Sprint 6 | 9        | 0         | 0%        |
+| **TOTAL**| **36**   | **5**     | **14%**   |
+
+**Próximo Objetivo:** Completar Feature 2 (Avatar Upload) para finalizar Sprint 1 a 100%
 
 ---
 
@@ -2505,14 +2521,14 @@ Se houver tempo extra após completar todos os 6 sprints:
 
 ## Status Resumo
 
-| Sprint    | Features | Completas | Em Progresso | Não Iniciadas | Status |
-| --------- | -------- | --------- | ------------ | ------------- | ------ |
-| Sprint 1  | 7        | 6         | 0            | 1             | 85%    |
-| Sprint 2  | 5        | 0         | 0            | 5             | 0%     |
-| Sprint 3  | 4        | 0         | 0            | 4             | 0%     |
-| Sprint 4  | 5        | 0         | 0            | 5             | 0%     |
-| Sprint 5  | 5        | 0         | 0            | 5             | 0%     |
-| Sprint 6  | 9        | 0         | 0            | 9             | 0%     |
+| Sprint    | Features | Completas | Em Progresso | Não Iniciadas | Status  |
+| --------- | -------- | --------- | ------------ | ------------- | ------- |
+| Sprint 1  | 7        | 6         | 0            | 1             | 85%     |
+| Sprint 2  | 5        | 0         | 0            | 5             | 0%      |
+| Sprint 3  | 4        | 0         | 0            | 4             | 0%      |
+| Sprint 4  | 5        | 0         | 0            | 5             | 0%      |
+| Sprint 5  | 5        | 0         | 0            | 5             | 0%      |
+| Sprint 6  | 9        | 0         | 0            | 9             | 0%      |
 | **TOTAL** | **35**   | **6**     | **0**        | **29**        | **17%** |
 
 ---
