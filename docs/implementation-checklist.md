@@ -2,7 +2,6 @@
 
 **Sprint-by-Sprint Implementation Guide**
 
-> Segue a filosofia **TDD + Feature-Driven Development** do [development-guide.md](./development-guide.md)
 > Cada feature passa por: **Planning → Tests First (RED) → Implementation (GREEN) → Frontend**
 
 ---
@@ -2297,33 +2296,33 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 
 ## Checklist Resumo Completo
 
-### Sprint 1: Auth & Users
+### Sprint 1: Auth & Users (85% Completo)
 
 -   [x] Laravel IDE Helper
 -   [x] Inertia Progress
 -   [x] Publicar configs Spatie
 -   [x] RolePermissionSeeder (3 roles)
 -   [x] UserSeeder (3 test users)
--   [x] Profile Avatar Upload
+-   [ ] Profile Avatar Upload
 
-### Sprint 2: Tickets Core
+### Sprint 2: Tickets Core (0% Completo)
 
--   [x] Migration tickets
--   [x] Model Ticket + relationships
--   [x] TicketData DTO
--   [x] CreateTicketAction
--   [x] TicketController + Query Builder
--   [x] Frontend: Index + Create
--   [ ] Factory + Seeders
+-   [ ] Migration tickets (não existe)
+-   [ ] Model Ticket + relationships (não existe)
+-   [ ] TicketData DTO (não existe)
+-   [ ] CreateTicketAction (não existe)
+-   [ ] TicketController + Query Builder (não existe)
+-   [ ] Frontend: Index + Create (não existe)
+-   [ ] Factory + Seeders (não existe)
 
-### Sprint 3: Colaboração
+### Sprint 3: Colaboração (0% Completo)
 
 -   [ ] Comments system (public + internal)
 -   [ ] Teams management
 -   [ ] Email notifications (queued)
 -   [ ] Mention system (@username)
 
-### Sprint 4: Knowledge Base
+### Sprint 4: Knowledge Base (0% Completo)
 
 -   [ ] Articles CRUD
 -   [ ] Categories hierarchy
@@ -2331,7 +2330,7 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 -   [ ] Article voting (helpful/not)
 -   [ ] Version history
 
-### Sprint 5: Dashboard & Reports
+### Sprint 5: Dashboard & Reports (0% Completo)
 
 -   [ ] Admin dashboard (metrics)
 -   [ ] Charts (tickets por dia, SLA)
@@ -2340,6 +2339,142 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 -   [ ] Scheduled reports
 
 ### Sprint 6: Polish & Deploy
+
+-   [ ] API Documentation (L5-Swagger)
+-   [ ] Performance optimization
+-   [ ] E2E tests (Dusk)
+-   [ ] Load testing
+-   [ ] Security audit
+-   [ ] Production deployment
+-   [ ] Monitoring (Sentry)
+-   [ ] Documentation completa
+-   [ ] Video demo
+
+---
+
+## Progresso Resumo por Sprint
+
+| Sprint    | Features | Completas | Progresso |
+| --------- | -------- | --------- | --------- |
+| Sprint 1  | 6        | 5         | 85%       |
+| Sprint 2  | 7        | 0         | 0%        |
+| Sprint 3  | 4        | 0         | 0%        |
+| Sprint 4  | 5        | 0         | 0%        |
+| Sprint 5  | 5        | 0         | 0%        |
+| Sprint 6  | 9        | 0         | 0%        |
+| **TOTAL** | **36**   | **5**     | **14%**   |
+
+**Próximo Objetivo:** Completar Feature 2 (Avatar Upload) para finalizar Sprint 1 a 100%
+
+---
+
+## Features Opcionais (Nice-to-Have)
+
+Se houver tempo extra após completar todos os 6 sprints:
+
+### Tier 1 (Rápido - 1-2 dias cada)
+
+-   [ ] Dark mode toggle
+-   [ ] Multi-language support (i18n)
+-   [ ] Advanced search com filtros
+-   [ ] Ticket templates
+-   [ ] Quick replies (canned responses)
+
+### Tier 2 (Médio - 3-5 dias cada)
+
+-   [ ] SLA automation (auto-escalate)
+-   [ ] Mobile responsive optimization
+-   [ ] Ticket merge functionality
+-   [ ] Customer satisfaction survey
+-   [ ] File versioning
+
+### Tier 3 (Complexo - 1 semana cada)
+
+-   [ ] Live chat integration
+-   [ ] Webhook system para integrações
+-   [ ] Custom fields por ticket type
+-   [ ] API pública (OAuth 2.0)
+-   [ ] Multi-tenancy support
+
+---
+
+## Estado Atual da Implementação
+
+**Progresso Geral:** 15% (6 de 40 features completas)
+
+### Sprint 1: Auth & Users - COMPLETO
+
+-   [x] Laravel IDE Helper instalado
+-   [x] Inertia Progress Bar configurado
+-   [x] Publicar configs Spatie (Permission + Activity Log)
+-   [x] RolePermissionSeeder criado (3 roles: admin, agent, user)
+-   [x] UserSeeder criado (3 test users)
+-   [x] RolePermissionTest passando (4/4 testes OK)
+-   [ ] Profile Avatar Upload (planeado, não implementado)
+
+**Código Implementado:**
+
+-   OK `database/seeders/RolePermissionSeeder.php`
+-   OK `database/seeders/UserSeeder.php`
+-   OK `tests/Feature/RolePermissionTest.php`
+-   OK Migrations: permissions, roles, activity_log
+-   FALTA Avatar migration (não existe)
+-   FALTA UpdateProfileAction (não existe)
+-   FALTA UpdateProfileTest (não existe)
+
+---
+
+### Sprint 2: Tickets Core - NÃO INICIADO
+
+-   [ ] Migration tickets (não existe)
+-   [ ] Model Ticket (não existe)
+-   [ ] TicketData DTO (não existe)
+-   [ ] CreateTicketAction (pasta vazia)
+-   [ ] TicketController (não existe)
+-   [ ] Frontend: Tickets/Index.vue (não existe)
+-   [ ] Frontend: Tickets/Create.vue (não existe)
+-   [ ] CreateTicketTest (não existe)
+-   [ ] ListTicketsTest (não existe)
+-   [ ] TicketFactory (não existe)
+-   [ ] Swagger L5 Setup (não instalado)
+
+**Código Implementado:**
+
+-   FALTA Nenhum código de tickets implementado
+-   AVISO Pasta `app/Actions/Tickets/` existe mas está vazia
+
+---
+
+### Sprint 3: Colaboração - NÃO INICIADO
+
+-   [ ] Comments system (público + interno)
+-   [ ] Teams management
+-   [ ] Email notifications (queued)
+-   [ ] Mention system (@username)
+
+---
+
+### Sprint 4: Knowledge Base - NÃO INICIADO
+
+-   [ ] Articles CRUD
+-   [ ] Categories hierarchy
+-   [ ] Full-text search
+-   [ ] Article voting (helpful/not)
+-   [ ] Version history
+
+---
+
+### Sprint 5: Dashboard & Reports - NÃO INICIADO
+
+-   [ ] Admin dashboard (metrics)
+-   [ ] Charts (tickets por dia, SLA)
+-   [ ] Agent performance reports
+-   [ ] Export PDF/Excel
+-   [ ] Scheduled reports
+
+---
+
+### Sprint 6: Polish & Deploy - NÃO INICIADO
 
 -   [ ] API Documentation (L5-Swagger)
 -   [ ] Performance optimization
@@ -2383,10 +2518,25 @@ Se houver tempo extra após completar todos os 6 sprints:
 
 ---
 
-**Status do Projeto:**
+## Status Resumo
 
--   **Sprint 1**: Completo (Feature 1: Roles & Permissions + Feature 2: Avatar Upload)
--   **Sprint 2**: Em Progresso (Feature 3: Create Ticket + Feature 4: List Tickets + Feature 5: Swagger Setup)
--   **Sprints 3-6**: Planeamento Completo (Implementação detalhada pronta para execução)
+| Sprint    | Features | Completas | Em Progresso | Não Iniciadas | Status  |
+| --------- | -------- | --------- | ------------ | ------------- | ------- |
+| Sprint 1  | 7        | 6         | 0            | 1             | 85%     |
+| Sprint 2  | 5        | 0         | 0            | 5             | 0%      |
+| Sprint 3  | 4        | 0         | 0            | 4             | 0%      |
+| Sprint 4  | 5        | 0         | 0            | 5             | 0%      |
+| Sprint 5  | 5        | 0         | 0            | 5             | 0%      |
+| Sprint 6  | 9        | 0         | 0            | 9             | 0%      |
+| **TOTAL** | **35**   | **6**     | **0**        | **29**        | **17%** |
 
-**Última Atualização:** 10 Novembro 2025, 02:00
+---
+
+**Próximos Passos Recomendados:**
+
+1. **Completar Sprint 1** - Implementar Avatar Upload (Feature 2)
+2. **Iniciar Sprint 2** - Criar sistema de Tickets (Feature 3 e 4)
+3. **Setup Swagger** - Adicionar documentação API (Feature 5)
+
+**Última Atualização:** 10 Novembro 2025, 02:20
+**Última Verificação Automática:** 10 Novembro 2025, 02:20
