@@ -9,22 +9,22 @@
 
 ### Backend (Composer)
 
-| Componente                  | Status | Versão | Nota                            |
-| --------------------------- | ------ | ------ | ------------------------------- |
-| PHP                         | ✅     | 8.4    | Dockerfile atualizado           |
-| Laravel Framework           | ✅     | 12.x   | Latest stable                   |
-| Spatie Permission           | ✅     | 6.23   | RBAC configurado                |
-| Spatie Activity Log         | ✅     | 4.10   | Audit trail                     |
-| Spatie Data                 | ✅     | 4.18   | DTOs type-safe                  |
-| Spatie Query Builder        | ✅     | 6.3    | Filtros URL                     |
-| Laravel Actions             | ✅     | 2.9    | Service layer pattern           |
-| Laravel Sanctum             | ✅     | 4.0    | API authentication              |
-| Laravel Pulse               | ✅     | 1.4    | Real-time monitoring            |
-| Laravel Scout               | ✅     | 10.21  | Search abstraction              |
-| Meilisearch PHP             | ✅     | 1.16   | Search client                   |
-| Scribe                      | ✅     | 5.5    | API documentation               |
-| Pest PHP                    | ✅     | 3.8    | Modern testing                  |
-| Laravel Telescope           | ✅     | 5.15   | Debug tool                      |
+| Componente           | Status | Versão | Nota                  |
+| -------------------- | ------ | ------ | --------------------- |
+| PHP                  | ✅     | 8.4    | Dockerfile atualizado |
+| Laravel Framework    | ✅     | 12.x   | Latest stable         |
+| Spatie Permission    | ✅     | 6.23   | RBAC configurado      |
+| Spatie Activity Log  | ✅     | 4.10   | Audit trail           |
+| Spatie Data          | ✅     | 4.18   | DTOs type-safe        |
+| Spatie Query Builder | ✅     | 6.3    | Filtros URL           |
+| Laravel Actions      | ✅     | 2.9    | Service layer pattern |
+| Laravel Sanctum      | ✅     | 4.0    | API authentication    |
+| Laravel Pulse        | ✅     | 1.4    | Real-time monitoring  |
+| Laravel Scout        | ✅     | 10.21  | Search abstraction    |
+| Meilisearch PHP      | ✅     | 1.16   | Search client         |
+| Scribe               | ✅     | 5.5    | API documentation     |
+| Pest PHP             | ✅     | 3.8    | Modern testing        |
+| Laravel Telescope    | ✅     | 5.15   | Debug tool            |
 
 **Score:** 10/10 - Todas as dependências instaladas e configuradas
 
@@ -32,19 +32,19 @@
 
 ### Frontend (NPM)
 
-| Componente          | Status | Versão | Nota                       |
-| ------------------- | ------ | ------ | -------------------------- |
-| Vue 3               | ✅     | 3.4    | Framework reativo          |
-| Inertia.js          | ✅     | 2.0    | SSR simplificado           |
-| Vite                | ✅     | 6.4    | Build tool (stable)        |
-| Tailwind CSS        | ✅     | 3.x    | Utility-first CSS          |
-| Shadcn-vue (manual) | ✅     | -      | Componentes UI             |
-| Radix-vue           | ✅     | 1.9    | Primitives acessíveis      |
-| Lucide Icons        | ✅     | -      | 600+ ícones modernos       |
-| VueUse              | ✅     | 11.3   | Composables (fixed)        |
-| Vee-Validate        | ✅     | -      | Form validation            |
-| Chart.js            | ✅     | -      | Gráficos dashboard         |
-| Vue Quill           | ✅     | -      | Rich text editor           |
+| Componente          | Status | Versão | Nota                  |
+| ------------------- | ------ | ------ | --------------------- |
+| Vue 3               | ✅     | 3.4    | Framework reativo     |
+| Inertia.js          | ✅     | 2.0    | SSR simplificado      |
+| Vite                | ✅     | 6.4    | Build tool (stable)   |
+| Tailwind CSS        | ✅     | 3.x    | Utility-first CSS     |
+| Shadcn-vue (manual) | ✅     | -      | Componentes UI        |
+| Radix-vue           | ✅     | 1.9    | Primitives acessíveis |
+| Lucide Icons        | ✅     | -      | 600+ ícones modernos  |
+| VueUse              | ✅     | 11.3   | Composables (fixed)   |
+| Vee-Validate        | ✅     | -      | Form validation       |
+| Chart.js            | ✅     | -      | Gráficos dashboard    |
+| Vue Quill           | ✅     | -      | Rich text editor      |
 
 **Score:** 10/10 - Stack frontend completa e moderna
 
@@ -52,14 +52,14 @@
 
 ### Infrastructure (Docker)
 
-| Serviço                | Status | Versão       | Porta | Nota                      |
-| ---------------------- | ------ | ------------ | ----- | ------------------------- |
-| orionone-app           | ✅     | PHP 8.4 FPM  | -     | Laravel application       |
-| orionone-frontend      | ✅     | Node 20      | -     | Vite dev server           |
-| orionone-db            | ✅     | PostgreSQL 16| 5432  | Database                  |
-| orionone-redis         | ✅     | Redis 7      | 6379  | Cache + Queue             |
-| orionone-meilisearch   | ✅     | Meilisearch 1.12| 7700| AI search engine         |
-| orionone-nginx         | ✅     | Nginx alpine | 80    | Web server                |
+| Serviço              | Status | Versão           | Porta | Nota                |
+| -------------------- | ------ | ---------------- | ----- | ------------------- |
+| orionone-app         | ✅     | PHP 8.4 FPM      | -     | Laravel application |
+| orionone-frontend    | ✅     | Node 20          | -     | Vite dev server     |
+| orionone-db          | ✅     | PostgreSQL 16    | 5432  | Database            |
+| orionone-redis       | ✅     | Redis 7          | 6379  | Cache + Queue       |
+| orionone-meilisearch | ✅     | Meilisearch 1.12 | 7700  | AI search engine    |
+| orionone-nginx       | ✅     | Nginx alpine     | 80    | Web server          |
 
 **Score:** 10/10 - Todos os serviços configurados no docker-compose.yml
 
@@ -72,8 +72,9 @@
 **Status:** Migration criada mas NÃO executada
 
 **Ficheiros:**
-- ✅ `database/migrations/2025_11_07_174512_create_permission_tables.php` (existe)
-- ⚠️ Tabelas não criadas no banco (migrate não executado)
+
+-   ✅ `database/migrations/2025_11_07_174512_create_permission_tables.php` (existe)
+-   ⚠️ Tabelas não criadas no banco (migrate não executado)
 
 **Comandos a executar:**
 
@@ -88,9 +89,10 @@ php artisan migrate
 php artisan db:seed --class=RolePermissionSeeder
 ```
 
-**Bloqueador Atual:** 
-- ❌ PHP local sem extensão `pdo_pgsql` (erro: "could not find driver")
-- ✅ Docker resolve este problema (container tem todas as extensões)
+**Bloqueador Atual:**
+
+-   ❌ PHP local sem extensão `pdo_pgsql` (erro: "could not find driver")
+-   ✅ Docker resolve este problema (container tem todas as extensões)
 
 ---
 
@@ -121,6 +123,7 @@ docker-compose exec orionone-app php artisan ide-helper:meta
 ```
 
 **Adicionar ao `.gitignore`:**
+
 ```
 _ide_helper.php
 _ide_helper_models.php
@@ -152,19 +155,21 @@ docker-compose exec orionone-app php artisan scout:import "App\Models\Article"
 **Status:** 5/11 componentes criados
 
 **Componentes Existentes (Sprint 1):**
-- ✅ Button.vue
-- ✅ Input.vue
-- ✅ Card.vue
-- ✅ Badge.vue
-- ✅ Avatar.vue
+
+-   ✅ Button.vue
+-   ✅ Input.vue
+-   ✅ Card.vue
+-   ✅ Badge.vue
+-   ✅ Avatar.vue
 
 **Componentes Necessários (Sprint 2):**
-- ⏳ Dialog.vue - Modal para criar/editar tickets
-- ⏳ Table.vue - DataTable com filtros
-- ⏳ Select.vue - Dropdown status/priority
-- ⏳ Textarea.vue - Descrição tickets
-- ⏳ Toast.vue - Notifications
-- ⏳ Dropdown.vue - Menus de ações
+
+-   ⏳ Dialog.vue - Modal para criar/editar tickets
+-   ⏳ Table.vue - DataTable com filtros
+-   ⏳ Select.vue - Dropdown status/priority
+-   ⏳ Textarea.vue - Descrição tickets
+-   ⏳ Toast.vue - Notifications
+-   ⏳ Dropdown.vue - Menus de ações
 
 **Nota:** Componentes serão criados conforme necessário em cada Sprint
 
@@ -172,14 +177,14 @@ docker-compose exec orionone-app php artisan scout:import "App\Models\Article"
 
 ## ✅ Documentação - 100% COMPLETO
 
-| Documento                  | Status | Última Atualização | Nota                          |
-| -------------------------- | ------ | ------------------ | ----------------------------- |
-| STACK-ANALYSIS-2025.md     | ✅     | 10 Nov 2025        | Score 8.7/10 - EXCELENTE      |
-| ITSM-STACK-ANALYSIS.md     | ✅     | 10 Nov 2025        | Score 8.5/10 para SME         |
-| tech-stack.md              | ✅     | 10 Nov 2025        | Packages atualizados          |
-| MVP-PRIORITIES.md          | ✅     | 10 Nov 2025        | Roadmap Sprint 2-6            |
-| implementation-checklist.md| ✅     | 10 Nov 2025        | TDD steps detalhados          |
-| development-guide.md       | ✅     | 07 Nov 2025        | Metodologia + best practices  |
+| Documento                   | Status | Última Atualização | Nota                         |
+| --------------------------- | ------ | ------------------ | ---------------------------- |
+| STACK-ANALYSIS-2025.md      | ✅     | 10 Nov 2025        | Score 8.7/10 - EXCELENTE     |
+| ITSM-STACK-ANALYSIS.md      | ✅     | 10 Nov 2025        | Score 8.5/10 para SME        |
+| tech-stack.md               | ✅     | 10 Nov 2025        | Packages atualizados         |
+| MVP-PRIORITIES.md           | ✅     | 10 Nov 2025        | Roadmap Sprint 2-6           |
+| implementation-checklist.md | ✅     | 10 Nov 2025        | TDD steps detalhados         |
+| development-guide.md        | ✅     | 07 Nov 2025        | Metodologia + best practices |
 
 **Score:** 10/10 - Documentação completa e sincronizada
 
@@ -190,16 +195,18 @@ docker-compose exec orionone-app php artisan scout:import "App\Models\Article"
 ### Sprint 1: Auth & Roles - 85% COMPLETO
 
 **Implementado:**
-- ✅ Laravel Breeze (auth completo)
-- ✅ Spatie Permission instalado
-- ✅ RolePermissionSeeder criado
-- ✅ Tests criados
+
+-   ✅ Laravel Breeze (auth completo)
+-   ✅ Spatie Permission instalado
+-   ✅ RolePermissionSeeder criado
+-   ✅ Tests criados
 
 **Pendente (15%):**
-- ⏳ Executar migrations Spatie (`php artisan migrate`)
-- ⏳ Executar seeder (`php artisan db:seed --class=RolePermissionSeeder`)
-- ⏳ Publicar config Activity Log
-- ⏳ API endpoints para roles/permissions
+
+-   ⏳ Executar migrations Spatie (`php artisan migrate`)
+-   ⏳ Executar seeder (`php artisan db:seed --class=RolePermissionSeeder`)
+-   ⏳ Publicar config Activity Log
+-   ⏳ API endpoints para roles/permissions
 
 **Bloqueador:** Requer Docker containers ativos
 
@@ -210,14 +217,16 @@ docker-compose exec orionone-app php artisan scout:import "App\Models\Article"
 **Status:** Pronto para iniciar após completar Sprint 1
 
 **Dependências Satisfeitas:**
-- ✅ Laravel Actions (service layer)
-- ✅ Spatie Query Builder (filtros)
-- ✅ Spatie Activity Log (audit)
-- ✅ Laravel Data (DTOs)
-- ✅ Scribe (API docs)
+
+-   ✅ Laravel Actions (service layer)
+-   ✅ Spatie Query Builder (filtros)
+-   ✅ Spatie Activity Log (audit)
+-   ✅ Laravel Data (DTOs)
+-   ✅ Scribe (API docs)
 
 **Componentes a Criar:**
-- Dialog.vue, Table.vue, Select.vue, Textarea.vue, Toast.vue
+
+-   Dialog.vue, Table.vue, Select.vue, Textarea.vue, Toast.vue
 
 **Estimativa:** 2 semanas (11-24 Novembro)
 
@@ -228,10 +237,11 @@ docker-compose exec orionone-app php artisan scout:import "App\Models\Article"
 **Status:** Aguardam Sprint 2
 
 **Todas as dependências instaladas:**
-- ✅ Sprint 3: Laravel Mail + Queues (notificações)
-- ✅ Sprint 4: Meilisearch + Scout (search KB)
-- ✅ Sprint 5: Carbon + Redis (SLA management)
-- ✅ Sprint 6: Eloquent (teams) + Excel export
+
+-   ✅ Sprint 3: Laravel Mail + Queues (notificações)
+-   ✅ Sprint 4: Meilisearch + Scout (search KB)
+-   ✅ Sprint 5: Carbon + Redis (SLA management)
+-   ✅ Sprint 6: Eloquent (teams) + Excel export
 
 ---
 
@@ -244,10 +254,11 @@ docker-compose up -d
 ```
 
 **Verifica:**
-- ✅ PostgreSQL running (porta 5432)
-- ✅ Redis running (porta 6379)
-- ✅ Meilisearch running (porta 7700)
-- ✅ Nginx running (porta 80)
+
+-   ✅ PostgreSQL running (porta 5432)
+-   ✅ Redis running (porta 6379)
+-   ✅ Meilisearch running (porta 7700)
+-   ✅ Nginx running (porta 80)
 
 ---
 
@@ -258,8 +269,9 @@ docker-compose exec orionone-app php artisan migrate
 ```
 
 **Cria tabelas:**
-- users, password_resets, sessions (Laravel)
-- roles, permissions, model_has_roles, etc. (Spatie)
+
+-   users, password_resets, sessions (Laravel)
+-   roles, permissions, model_has_roles, etc. (Spatie)
 
 ---
 
@@ -270,9 +282,10 @@ docker-compose exec orionone-app php artisan db:seed --class=RolePermissionSeede
 ```
 
 **Cria:**
-- 3 roles: admin, agent, user
-- 8 permissions: tickets.*, comments.*, users.*
-- Role-permission assignments
+
+-   3 roles: admin, agent, user
+-   8 permissions: tickets._, comments._, users.\*
+-   Role-permission assignments
 
 ---
 
@@ -314,41 +327,45 @@ docker-compose exec orionone-app php artisan test
 Marque quando concluído:
 
 ### Infrastructure
-- [ ] Docker containers running
-- [ ] PostgreSQL acessível
-- [ ] Redis acessível
-- [ ] Meilisearch acessível
-- [ ] Nginx serving application
+
+-   [ ] Docker containers running
+-   [ ] PostgreSQL acessível
+-   [ ] Redis acessível
+-   [ ] Meilisearch acessível
+-   [ ] Nginx serving application
 
 ### Database
-- [ ] Migrations executadas
-- [ ] Seeders executados
-- [ ] Roles criados (admin, agent, user)
-- [ ] Permissions criados (8 permissions)
+
+-   [ ] Migrations executadas
+-   [ ] Seeders executados
+-   [ ] Roles criados (admin, agent, user)
+-   [ ] Permissions criados (8 permissions)
 
 ### Configs
-- [ ] Spatie Permission config publicado
-- [ ] Spatie Activity Log config publicado
-- [ ] Activity Log migrations executadas
-- [ ] IDE Helper gerado
+
+-   [ ] Spatie Permission config publicado
+-   [ ] Spatie Activity Log config publicado
+-   [ ] Activity Log migrations executadas
+-   [ ] IDE Helper gerado
 
 ### Development
-- [ ] Tests passando (Sprint 1)
-- [ ] IDE autocomplete funcionando
-- [ ] Vite HMR funcionando
-- [ ] Tailwind CSS compilando
+
+-   [ ] Tests passando (Sprint 1)
+-   [ ] IDE autocomplete funcionando
+-   [ ] Vite HMR funcionando
+-   [ ] Tailwind CSS compilando
 
 ---
 
 ## 📊 Score Final
 
-| Categoria              | Score   | Status                    |
-| ---------------------- | ------- | ------------------------- |
-| **Stack Técnica**      | 10/10   | ✅ EXCELENTE              |
-| **Infrastructure**     | 10/10   | ✅ COMPLETO               |
-| **Documentação**       | 10/10   | ✅ COMPLETO               |
-| **Sprint 1 Setup**     | 8.5/10  | ⚠️ Falta executar configs |
-| **MVP Readiness**      | **9.5/10** | ⚠️ **95% PRONTO**      |
+| Categoria          | Score      | Status                    |
+| ------------------ | ---------- | ------------------------- |
+| **Stack Técnica**  | 10/10      | ✅ EXCELENTE              |
+| **Infrastructure** | 10/10      | ✅ COMPLETO               |
+| **Documentação**   | 10/10      | ✅ COMPLETO               |
+| **Sprint 1 Setup** | 8.5/10     | ⚠️ Falta executar configs |
+| **MVP Readiness**  | **9.5/10** | ⚠️ **95% PRONTO**         |
 
 ---
 
@@ -376,6 +393,7 @@ Marque quando concluído:
 **MVP está 95% PRONTO.**
 
 **Próximos passos:**
+
 1. ✅ Executar comandos acima (15 min)
 2. ✅ Sprint 1 fica 100% completo
 3. ✅ Iniciar Sprint 2 (Tickets CRUD)

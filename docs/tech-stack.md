@@ -341,10 +341,10 @@ php artisan scout:import "App\Models\Article"
 
 ## Referências
 
-- [Stack Analysis 2025](STACK-ANALYSIS-2025.md) - Análise completa e score 8.7/10
-- [ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md) - Validação para mercado ITSM (8.5/10)
-- [Implementation Checklist](implementation-checklist.md) - Roadmap detalhado Sprint 1-6
-- [Commands Reference](COMMANDS-REFERENCE.md) - Comandos úteis do projeto
+-   [Stack Analysis 2025](STACK-ANALYSIS-2025.md) - Análise completa e score 8.7/10
+-   [ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md) - Validação para mercado ITSM (8.5/10)
+-   [Implementation Checklist](implementation-checklist.md) - Roadmap detalhado Sprint 1-6
+-   [Commands Reference](COMMANDS-REFERENCE.md) - Comandos úteis do projeto
 
 ---
 
