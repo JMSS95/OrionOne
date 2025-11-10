@@ -3,11 +3,22 @@
 **Sprint-by-Sprint Implementation Guide**
 
 > Segue a filosofia **TDD + Feature-Driven Development** do [development-guide.md](./development-guide.md)
-> Cada feature passa por: **Planning → Tests First → Implementation → Frontend**
+> Cada feature passa por: **Planning → Tests First (RED) → Implementation (GREEN) → Frontend**
 
 ---
 
 ## Sprint 1: Auth & Users (11-17 Nov)
+
+**Nota Importante:** O sistema de autenticação (Laravel Breeze) já foi instalado e configurado durante a **Fase 0: Setup Inicial** (ver [SETUP.md](./SETUP.md)). Esta fase inclui:
+
+-   Autenticação completa (login, register, password reset)
+-   Proteção de rotas via middleware `auth`
+-   Sistema de sessões
+-   Profile page básica
+
+**Sprint 1 foca-se em:** Adicionar Roles & Permissions (via Spatie) e expandir funcionalidades do Profile (avatar upload).
+
+---
 
 ### Configuração Inicial
 
@@ -1491,6 +1502,222 @@ const statusColors = {
 </template>
 ```
 
+---
+
+### Feature 5: API Documentation Setup (Swagger)
+
+#### Phase 1: Planning (20 min)
+
+**Objetivo:**
+Configurar L5-Swagger para documentar automaticamente a API REST do OrionOne.
+
+**Critérios de Aceitação:**
+
+-   Instalação e configuração L5-Swagger
+-   Annotations básicas nos Controllers existentes
+-   Route `/api/documentation` acessível
+-   Documentação auto-gerada para Tickets API
+
+#### Phase 2: Installation & Configuration
+
+**a) Instalar L5-Swagger:**
+
+```bash
+docker-compose exec orionone-app composer require "darkaonline/l5-swagger"
+docker-compose exec orionone-app php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"
+```
+
+**b) Configurar em `config/l5-swagger.php`:**
+
+```php
+'defaults' => [
+    'api' => [
+        'title' => 'OrionOne Helpdesk API',
+        'description' => 'API documentation for OrionOne ticket management system',
+        'version' => '1.0.0',
+    ],
+    'routes' => [
+        'api' => 'api/documentation',
+    ],
+],
+```
+
+**c) Adicionar annotations básicas em `app/Http/Controllers/Controller.php`:**
+
+```php
+/**
+ * @OA\Info(
+ *     title="OrionOne Helpdesk API",
+ *     version="1.0.0",
+ *     description="API REST para sistema de gestão de tickets",
+ *     @OA\Contact(
+ *         email="support@orionone.com"
+ *     )
+ * )
+ *
+ * @OA\Server(
+ *     url="http://localhost:8888",
+ *     description="Development Server"
+ * )
+ *
+ * @OA\SecurityScheme(
+ *     securityScheme="sanctum",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
+ */
+abstract class Controller
+{
+    //
+}
+```
+
+#### Phase 3: Document Tickets API
+
+**Adicionar annotations em `TicketController`:**
+
+```php
+/**
+ * @OA\Get(
+ *     path="/api/tickets",
+ *     summary="List all tickets",
+ *     description="Retrieve paginated list of tickets with optional filters",
+ *     operationId="getTickets",
+ *     tags={"Tickets"},
+ *     security={{"sanctum":{}}},
+ *     @OA\Parameter(
+ *         name="filter[status]",
+ *         in="query",
+ *         description="Filter by status",
+ *         required=false,
+ *         @OA\Schema(type="string", enum={"open","in_progress","resolved","closed"})
+ *     ),
+ *     @OA\Parameter(
+ *         name="filter[priority]",
+ *         in="query",
+ *         description="Filter by priority",
+ *         required=false,
+ *         @OA\Schema(type="string", enum={"low","medium","high","urgent"})
+ *     ),
+ *     @OA\Parameter(
+ *         name="sort",
+ *         in="query",
+ *         description="Sort by field (use - for descending)",
+ *         required=false,
+ *         @OA\Schema(type="string", example="-created_at")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Ticket")),
+ *             @OA\Property(property="links", type="object"),
+ *             @OA\Property(property="meta", type="object")
+ *         )
+ *     ),
+ *     @OA\Response(response=401, description="Unauthenticated")
+ * )
+ */
+public function index(Request $request)
+{
+    // ...
+}
+
+/**
+ * @OA\Post(
+ *     path="/api/tickets",
+ *     summary="Create a new ticket",
+ *     description="Create a new support ticket",
+ *     operationId="createTicket",
+ *     tags={"Tickets"},
+ *     security={{"sanctum":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"title","description"},
+ *             @OA\Property(property="title", type="string", maxLength=255, example="Laptop não liga"),
+ *             @OA\Property(property="description", type="string", example="Detalhes do problema..."),
+ *             @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"}, example="high"),
+ *             @OA\Property(property="category_id", type="integer", example=1)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Ticket created successfully",
+ *         @OA\JsonContent(ref="#/components/schemas/Ticket")
+ *     ),
+ *     @OA\Response(response=422, description="Validation error")
+ * )
+ */
+public function store(Request $request)
+{
+    // ...
+}
+```
+
+**Definir schema de Ticket (adicionar no topo de `Ticket` model):**
+
+```php
+/**
+ * @OA\Schema(
+ *     schema="Ticket",
+ *     type="object",
+ *     title="Ticket",
+ *     description="Ticket model",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="title", type="string", example="Problema com impressora"),
+ *     @OA\Property(property="description", type="string"),
+ *     @OA\Property(property="status", type="string", enum={"open","in_progress","resolved","closed"}),
+ *     @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"}),
+ *     @OA\Property(property="requester_id", type="integer"),
+ *     @OA\Property(property="assigned_to", type="integer", nullable=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ */
+class Ticket extends Model
+{
+    // ...
+}
+```
+
+#### Phase 4: Generate & Test Documentation
+
+**a) Gerar documentação:**
+
+```bash
+docker-compose exec orionone-app php artisan l5-swagger:generate
+```
+
+**b) Aceder à documentação:**
+
+Abrir browser: `http://localhost:8888/api/documentation`
+
+**c) Testar endpoints:**
+
+-   Clicar em "Authorize" → Inserir token Sanctum
+-   Testar GET `/api/tickets`
+-   Testar POST `/api/tickets`
+-   Verificar responses
+
+#### Checklist Feature 5 (Swagger)
+
+-   [ ] Pacote L5-Swagger instalado
+-   [ ] Configuração publicada e editada
+-   [ ] Annotations básicas em Controller.php
+-   [ ] Annotations em TicketController (GET + POST)
+-   [ ] Schema do Ticket definido
+-   [ ] Documentação gerada com sucesso
+-   [ ] Route `/api/documentation` acessível
+-   [ ] Endpoints testados via Swagger UI
+-   [ ] Adicionado ao `.gitignore`: `storage/api-docs/`
+
+**Nota:** Em Sprint 6, expandiremos a documentação para cobrir todos os endpoints (Comments, Teams, KB, etc).
+
+---
+
 **Checkpoint:** Rodar todos os testes de Sprint 2:
 
 ```bash
@@ -1500,47 +1727,666 @@ docker-compose exec orionone-app php artisan test
 
 ---
 
-### Feature 5: API REST Endpoints
+## Sprint 3: Colaboração (02-15 Dez)
+
+### Feature 5: Comments System
 
 #### Phase 1: Planning (30 min)
 
--   Instalar Laravel IDE Helper
--   Instalar Inertia Progress
--   Publicar configs Spatie (Permission + Activity Log)
--   Criar RolePermissionSeeder (3 roles: admin, agent, user)
--   Seed utilizadores teste
--   Adicionar campo avatar à tabela users
--   Criar UpdateProfileAction
--   Atualizar profile page com avatar upload
+**User Story:**
+Como utilizador, quero comentar em tickets para colaborar na resolução.
 
 **Critérios de Aceitação:**
-- Endpoints RESTful para tickets (`GET /api/v1/tickets`, `POST /api/v1/tickets`)
-- Autenticação via Bearer token (Sanctum)
-- Rate limiting (60 requests/min)
-- JSON Resources para transformação de dados
-- Documentação OpenAPI (Fase 2)
 
-**API Endpoints necessários:**
-- `GET /api/v1/tickets` - List tickets
-- `GET /api/v1/tickets/{id}` - Show ticket
-- `POST /api/v1/tickets` - Create ticket
-- `PATCH /api/v1/tickets/{id}` - Update ticket
-- `DELETE /api/v1/tickets/{id}` - Delete ticket
+-   Comentários públicos (visíveis para todos) e internos (só agents/admins)
+-   Rich text editor para formatação
+-   Menção de utilizadores (@username)
+-   Upload de anexos nos comentários
+-   Notificação por email quando mencionado
+-   Activity log de comentários
 
--   Migration tickets
--   Model Ticket com relationships
--   TicketData DTO
--   CreateTicketAction
--   TicketController com Query Builder
--   Página Tickets/Index (lista + filtros)
--   Página Tickets/Create (form)
--   Testes (>90% coverage)
+#### Phase 2: Tests First (RED)
+
+```bash
+docker-compose exec orionone-app php artisan make:test CommentTest
+```
+
+**Ficheiro:** `tests/Feature/CommentTest.php`
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use App\Models\User;
+use App\Models\Ticket;
+use App\Models\Comment;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class CommentTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_user_can_create_public_comment(): void
+    {
+        $user = User::factory()->create();
+        $ticket = Ticket::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('tickets.comments.store', $ticket), [
+            'body' => 'Este é um comentário público',
+            'is_internal' => false,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('comments', [
+            'ticket_id' => $ticket->id,
+            'user_id' => $user->id,
+            'body' => 'Este é um comentário público',
+            'is_internal' => false,
+        ]);
+    }
+
+    public function test_agent_can_create_internal_comment(): void
+    {
+        $agent = User::factory()->create();
+        $agent->assignRole('agent');
+        $ticket = Ticket::factory()->create();
+
+        $response = $this->actingAs($agent)->post(route('tickets.comments.store', $ticket), [
+            'body' => 'Nota interna',
+            'is_internal' => true,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('comments', [
+            'is_internal' => true,
+        ]);
+    }
+
+    public function test_regular_user_cannot_see_internal_comments(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+
+        $ticket = Ticket::factory()->create(['requester_id' => $user->id]);
+        Comment::factory()->create([
+            'ticket_id' => $ticket->id,
+            'is_internal' => true,
+            'body' => 'Internal note',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('tickets.show', $ticket));
+
+        $response->assertDontSee('Internal note');
+    }
+
+    public function test_comment_body_is_required(): void
+    {
+        $user = User::factory()->create();
+        $ticket = Ticket::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('tickets.comments.store', $ticket), [
+            'body' => '',
+        ]);
+
+        $response->assertSessionHasErrors(['body']);
+    }
+}
+```
+
+**Rodar testes:**
+
+```bash
+docker-compose exec orionone-app php artisan test --filter=CommentTest
+# RED: Table 'comments' doesn't exist
+```
+
+#### Phase 3: Implementation (GREEN)
+
+**a) Migration:**
+
+```bash
+docker-compose exec orionone-app php artisan make:migration create_comments_table
+```
+
+```php
+public function up(): void
+{
+    Schema::create('comments', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->text('body');
+        $table->boolean('is_internal')->default(false);
+        $table->timestamps();
+        $table->softDeletes();
+
+        $table->index(['ticket_id', 'created_at']);
+    });
+}
+```
+
+**b) Model:**
+
+```bash
+docker-compose exec orionone-app php artisan make:model Comment
+```
+
+**c) CommentData + CreateCommentAction:**
+
+```bash
+docker-compose exec orionone-app php artisan make:data CommentData
+docker-compose exec orionone-app php artisan make:action CreateCommentAction
+```
+
+**d) Atualizar Ticket Model:**
+
+```php
+public function comments(): HasMany
+{
+    return $this->hasMany(Comment::class)->orderBy('created_at');
+}
+
+public function publicComments(): HasMany
+{
+    return $this->comments()->where('is_internal', false);
+}
+```
+
+**e) Controller:**
+
+```php
+// app/Http/Controllers/CommentController.php
+public function store(Request $request, Ticket $ticket)
+{
+    $validated = $request->validate([
+        'body' => 'required|string|min:3',
+        'is_internal' => 'boolean',
+    ]);
+
+    // Só agents/admins podem criar notas internas
+    if ($validated['is_internal'] && !auth()->user()->hasAnyRole(['agent', 'admin'])) {
+        abort(403);
+    }
+
+    $comment = $ticket->comments()->create([
+        'user_id' => auth()->id(),
+        'body' => $validated['body'],
+        'is_internal' => $validated['is_internal'] ?? false,
+    ]);
+
+    activity()
+        ->performedOn($ticket)
+        ->causedBy(auth()->user())
+        ->log('Comentário adicionado');
+
+    return back()->with('success', 'Comentário adicionado!');
+}
+```
+
+**Rodar testes novamente:**
+
+```bash
+docker-compose exec orionone-app php artisan test --filter=CommentTest
+# GREEN: Testes passam!
+```
+
+#### Phase 4: Frontend
+
+Adicionar secção de comentários em `Tickets/Show.vue` com editor rich text (Tiptap).
 
 ---
 
-**Próximas Adições Planeadas:**
-- Performance optimization checklist
-- Deployment guide (Docker + GitHub Actions)
-- Advanced testing (Dusk browser tests)
+### Feature 6: Teams Management
 
-**Última Atualização:** 08 Novembro 2025, 02:15
+#### Phase 1: Planning (30 min)
+
+**User Story:**
+Como admin, quero organizar agents em equipas para distribuir tickets.
+
+**Critérios de Aceitação:**
+
+-   CRUD de equipas
+-   Atribuir agents a equipas
+-   Auto-assignment baseado em equipa
+-   Dashboard por equipa
+
+#### Phase 2-4: Implementação
+
+Similar ao padrão anterior:
+
+-   Migration `teams` + pivot `team_user`
+-   Model Team com relationships
+-   TeamController (Query Builder)
+-   Testes de assignments
+-   Interface de gestão
+
+---
+
+### Feature 7: Email Notifications
+
+#### Phase 1: Planning (30 min)
+
+**User Story:**
+Como utilizador, quero receber emails quando há updates nos meus tickets.
+
+**Critérios de Aceitação:**
+
+-   Email quando ticket atribuído
+-   Email quando comentário adicionado
+-   Email quando status muda
+-   Email quando mencionado
+-   Unsubscribe link
+
+#### Phase 2-4: Implementação
+
+```bash
+docker-compose exec orionone-app php artisan make:notification TicketAssignedNotification
+docker-compose exec orionone-app php artisan make:notification CommentAddedNotification
+docker-compose exec orionone-app php artisan make:notification TicketStatusChangedNotification
+```
+
+Usar **Laravel Queues** para envio assíncrono.
+
+---
+
+## Sprint 4: Knowledge Base (16-29 Dez)
+
+### Feature 8: Articles CRUD
+
+#### Phase 1: Planning (30 min)
+
+**User Story:**
+Como agent, quero criar artigos de knowledge base para reduzir tickets repetitivos.
+
+**Critérios de Aceitação:**
+
+-   Editor rich text (Tiptap)
+-   Categorias hierárquicas
+-   Tags para categorização
+-   Busca full-text
+-   Métricas de utilidade (upvote/downvote)
+-   Histórico de versões
+
+#### Phase 2: Tests First (RED)
+
+```bash
+docker-compose exec orionone-app php artisan make:test ArticleTest
+```
+
+Testes para:
+
+-   Criar artigo
+-   Publicar/despublicar
+-   Pesquisa
+-   Votação útil/não útil
+
+#### Phase 3: Implementation (GREEN)
+
+**Migrations:**
+
+```bash
+docker-compose exec orionone-app php artisan make:migration create_articles_table
+docker-compose exec orionone-app php artisan make:migration create_categories_table
+docker-compose exec orionone-app php artisan make:migration create_article_votes_table
+```
+
+**Models:**
+
+-   Article (title, slug, body, status, views, helpful_votes)
+-   Category (name, slug, parent_id)
+-   ArticleVote (user_id, article_id, is_helpful)
+
+**Full-text Search:**
+
+```php
+// Usar Scout + Meilisearch ou PostgreSQL Full-Text Search
+$articles = Article::search($query)
+    ->where('status', 'published')
+    ->paginate(20);
+```
+
+#### Phase 4: Frontend
+
+-   Lista de categorias com contador
+-   Página de artigo com TOC (table of contents)
+-   Botões de feedback (útil/não útil)
+-   Editor Tiptap para criação
+
+---
+
+### Feature 9: KB Search & Browse
+
+Interface de pesquisa com:
+
+-   Autocomplete
+-   Filtros por categoria
+-   Artigos relacionados
+-   Artigos mais vistos
+
+---
+
+## Sprint 5: Dashboard & Reports (30 Dez - 12 Jan)
+
+### Feature 10: Admin Dashboard
+
+#### Phase 1: Planning (30 min)
+
+**User Story:**
+Como admin, quero ver métricas do sistema para tomar decisões.
+
+**Critérios de Aceitação:**
+
+-   Total de tickets (open, closed, in progress)
+-   Gráfico de tickets por dia (últimos 30 dias)
+-   SLA compliance rate
+-   Tickets por prioridade
+-   Performance por agent
+-   Tempo médio de resolução
+
+#### Phase 2-4: Implementação
+
+**Controller:**
+
+```php
+public function index()
+{
+    $stats = [
+        'total_tickets' => Ticket::count(),
+        'open_tickets' => Ticket::where('status', 'open')->count(),
+        'avg_resolution_time' => Ticket::whereNotNull('resolved_at')
+            ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, resolved_at)) as avg')
+            ->value('avg'),
+        'tickets_by_priority' => Ticket::groupBy('priority')
+            ->selectRaw('priority, count(*) as total')
+            ->pluck('total', 'priority'),
+        'tickets_chart' => Ticket::whereBetween('created_at', [now()->subDays(30), now()])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->selectRaw('DATE(created_at) as date, count(*) as total')
+            ->get(),
+    ];
+
+    return Inertia::render('Dashboard', $stats);
+}
+```
+
+**Frontend:**
+
+Usar **Chart.js** ou **ApexCharts** para gráficos.
+
+---
+
+### Feature 11: Reports & Export
+
+-   Exportar relatórios para PDF (DomPDF)
+-   Exportar para Excel (Laravel Excel)
+-   Relatórios agendados (Laravel Scheduler)
+
+---
+
+## Sprint 6: Polish & Deploy (13-26 Jan)
+
+### Feature 12: API Documentation (Swagger)
+
+#### Configuração L5-Swagger
+
+```bash
+docker-compose exec orionone-app composer require "darkaonline/l5-swagger"
+docker-compose exec orionone-app php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"
+```
+
+**Configurar annotations nos Controllers:**
+
+```php
+/**
+ * @OA\Post(
+ *     path="/api/tickets",
+ *     summary="Create a new ticket",
+ *     tags={"Tickets"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"title","description"},
+ *             @OA\Property(property="title", type="string", example="Laptop issue"),
+ *             @OA\Property(property="description", type="string"),
+ *             @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"})
+ *         )
+ *     ),
+ *     @OA\Response(response=201, description="Ticket created successfully")
+ * )
+ */
+public function store(Request $request) { }
+```
+
+**Gerar documentação:**
+
+```bash
+docker-compose exec orionone-app php artisan l5-swagger:generate
+```
+
+**Aceder:** http://localhost:8888/api/documentation
+
+---
+
+### Feature 13: Performance Optimization
+
+-   **Caching:** Redis para queries pesadas
+-   **Eager Loading:** Evitar N+1 queries
+-   **Image Optimization:** Intervention Image
+-   **CDN:** Para assets estáticos
+-   **Database Indexing:** Revisar indexes
+
+**Exemplo caching:**
+
+```php
+$stats = Cache::remember('dashboard.stats', 300, function () {
+    return [
+        'total_tickets' => Ticket::count(),
+        // ...
+    ];
+});
+```
+
+---
+
+### Feature 14: Testing & QA
+
+**a) Testes E2E (Laravel Dusk):**
+
+```bash
+docker-compose exec orionone-app composer require --dev laravel/dusk
+docker-compose exec orionone-app php artisan dusk:install
+```
+
+**Exemplo teste:**
+
+```php
+public function testUserCanCreateTicket()
+{
+    $this->browse(function (Browser $browser) {
+        $browser->loginAs(User::find(1))
+                ->visit('/tickets/create')
+                ->type('title', 'Test Ticket')
+                ->type('description', 'Test Description')
+                ->press('Criar Ticket')
+                ->assertPathIs('/tickets/1');
+    });
+}
+```
+
+**b) Load Testing (Apache Bench):**
+
+```bash
+ab -n 1000 -c 10 http://localhost:8888/tickets
+```
+
+**c) Security Audit:**
+
+```bash
+docker-compose exec orionone-app composer audit
+```
+
+---
+
+### Feature 15: Deployment
+
+**a) Setup Production Environment:**
+
+-   VPS (DigitalOcean, AWS, Azure)
+-   Domain + SSL (Let's Encrypt)
+-   GitHub Actions CI/CD
+-   Monitoring (Laravel Telescope + Sentry)
+
+**b) GitHub Actions Workflow:**
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to Production
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.4"
+            - name: Install Dependencies
+              run: composer install --no-dev --optimize-autoloader
+            - name: Run Tests
+              run: php artisan test
+            - name: Deploy
+              run: |
+                  ssh user@server 'cd /var/www/orionone && git pull && php artisan migrate --force'
+```
+
+**c) Monitoring Setup:**
+
+```bash
+# Install Sentry SDK
+docker-compose exec orionone-app composer require sentry/sentry-laravel
+
+# Configure
+SENTRY_LARAVEL_DSN=your-sentry-dsn
+```
+
+---
+
+### Checklist Final Sprint 6
+
+-   [ ] API Documentation (Swagger) completa
+-   [ ] Testes E2E com Dusk
+-   [ ] Load testing executado
+-   [ ] Security audit sem vulnerabilidades
+-   [ ] Caching implementado
+-   [ ] Performance: todas páginas < 500ms
+-   [ ] Deploy production funcional
+-   [ ] Monitoring (Sentry) configurado
+-   [ ] Backup strategy definida
+-   [ ] Documentation: README, User Manual, Deployment Guide
+-   [ ] Video demo gravado
+-   [ ] Apresentação preparada
+
+---
+
+## Checklist Resumo Completo
+
+### Sprint 1: Auth & Users
+
+-   [x] Laravel IDE Helper
+-   [x] Inertia Progress
+-   [x] Publicar configs Spatie
+-   [x] RolePermissionSeeder (3 roles)
+-   [x] UserSeeder (3 test users)
+-   [x] Profile Avatar Upload
+
+### Sprint 2: Tickets Core
+
+-   [x] Migration tickets
+-   [x] Model Ticket + relationships
+-   [x] TicketData DTO
+-   [x] CreateTicketAction
+-   [x] TicketController + Query Builder
+-   [x] Frontend: Index + Create
+-   [ ] Factory + Seeders
+
+### Sprint 3: Colaboração
+
+-   [ ] Comments system (public + internal)
+-   [ ] Teams management
+-   [ ] Email notifications (queued)
+-   [ ] Mention system (@username)
+
+### Sprint 4: Knowledge Base
+
+-   [ ] Articles CRUD
+-   [ ] Categories hierarchy
+-   [ ] Full-text search
+-   [ ] Article voting (helpful/not)
+-   [ ] Version history
+
+### Sprint 5: Dashboard & Reports
+
+-   [ ] Admin dashboard (metrics)
+-   [ ] Charts (tickets por dia, SLA)
+-   [ ] Agent performance reports
+-   [ ] Export PDF/Excel
+-   [ ] Scheduled reports
+
+### Sprint 6: Polish & Deploy
+
+-   [ ] API Documentation (L5-Swagger)
+-   [ ] Performance optimization
+-   [ ] E2E tests (Dusk)
+-   [ ] Load testing
+-   [ ] Security audit
+-   [ ] Production deployment
+-   [ ] Monitoring (Sentry)
+-   [ ] Documentation completa
+-   [ ] Video demo
+
+---
+
+## Features Opcionais (Nice-to-Have)
+
+Se houver tempo extra após completar todos os 6 sprints:
+
+### Tier 1 (Rápido - 1-2 dias cada)
+
+-   [ ] Dark mode toggle
+-   [ ] Multi-language support (i18n)
+-   [ ] Advanced search com filtros
+-   [ ] Ticket templates
+-   [ ] Quick replies (canned responses)
+
+### Tier 2 (Médio - 3-5 dias cada)
+
+-   [ ] SLA automation (auto-escalate)
+-   [ ] Mobile responsive optimization
+-   [ ] Ticket merge functionality
+-   [ ] Customer satisfaction survey
+-   [ ] File versioning
+
+### Tier 3 (Complexo - 1 semana cada)
+
+-   [ ] Live chat integration
+-   [ ] Webhook system para integrações
+-   [ ] Custom fields por ticket type
+-   [ ] API pública (OAuth 2.0)
+-   [ ] Multi-tenancy support
+
+---
+
+**Status do Projeto:**
+
+-   **Sprint 1**: Completo (Feature 1: Roles & Permissions + Feature 2: Avatar Upload)
+-   **Sprint 2**: Em Progresso (Feature 3: Create Ticket + Feature 4: List Tickets + Feature 5: Swagger Setup)
+-   **Sprints 3-6**: Planeamento Completo (Implementação detalhada pronta para execução)
+
+**Última Atualização:** 10 Novembro 2025, 02:00
