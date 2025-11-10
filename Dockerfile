@@ -1,7 +1,7 @@
 # OrionOne Dockerfile
-# Laravel 11 + PHP 8.2 FPM
+# Laravel 12 + PHP 8.4 FPM
 
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
