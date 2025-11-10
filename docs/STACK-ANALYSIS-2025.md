@@ -1,7 +1,7 @@
 # Análise Profunda da Stack Tecnológica - OrionOne 2025
 
-**Data da Análise:** 10 Novembro 2025  
-**Analista:** GitHub Copilot  
+**Data da Análise:** 10 Novembro 2025
+**Analista:** GitHub Copilot
 **Status:** CRÍTICO - Requer Atenção Imediata
 
 ---
@@ -11,18 +11,20 @@
 ### Pontuação Geral: 7.5/10
 
 **Pontos Fortes:**
-- Laravel 12 (última versão estável) ✅
-- PHP 8.2 (moderno mas não cutting-edge) ⚠️
-- Stack moderna Vue 3 + Inertia ✅
-- Excelentes pacotes Spatie ✅
-- Tailwind CSS 3 com Shadcn-vue ✅
+
+-   Laravel 12 (última versão estável) ✅
+-   PHP 8.2 (moderno mas não cutting-edge) ⚠️
+-   Stack moderna Vue 3 + Inertia ✅
+-   Excelentes pacotes Spatie ✅
+-   Tailwind CSS 3 com Shadcn-vue ✅
 
 **Pontos Críticos:**
-- PHP 8.2 em vez de 8.3/8.4 🔴
-- Vite 7 (beta) em produção 🔴
-- Falta Pest PHP (melhor experiência de testes) 🟡
-- Sem full-text search moderno (Meilisearch/Algolia) 🟡
-- Swagger com versão instável (*) 🔴
+
+-   PHP 8.2 em vez de 8.3/8.4 🔴
+-   Vite 7 (beta) em produção 🔴
+-   Falta Pest PHP (melhor experiência de testes) 🟡
+-   Sem full-text search moderno (Meilisearch/Algolia) 🟡
+-   Swagger com versão instável (\*) 🔴
 
 ---
 
@@ -32,23 +34,25 @@
 
 #### ✅ **EXCELENTE: Framework & Versões Core**
 
-| Tecnologia | Versão Atual | Última Disponível | Status | Nota |
-|------------|--------------|-------------------|--------|------|
-| Laravel Framework | 12.37.0 | 12.37.0 | ✅ PERFEITO | Versão mais recente |
-| PHP | 8.2.29 | 8.4.1 | 🔴 DESATUALIZADO | Perder features 8.3/8.4 |
-| Composer | 2.x | 2.8.4 | ✅ OK | Funcional |
+| Tecnologia        | Versão Atual | Última Disponível | Status           | Nota                    |
+| ----------------- | ------------ | ----------------- | ---------------- | ----------------------- |
+| Laravel Framework | 12.37.0      | 12.37.0           | ✅ PERFEITO      | Versão mais recente     |
+| PHP               | 8.2.29       | 8.4.1             | 🔴 DESATUALIZADO | Perder features 8.3/8.4 |
+| Composer          | 2.x          | 2.8.4             | ✅ OK            | Funcional               |
 
 **Recomendação:**
+
 ```dockerfile
 # Dockerfile - ATUALIZAR PARA PHP 8.4
 FROM php:8.4-fpm-alpine
 ```
 
 **Benefícios PHP 8.4:**
-- Property hooks (getters/setters automáticos)
-- Array find/any/all methods
-- Performance +5-8%
-- Deprecations do 8.2 resolvidas
+
+-   Property hooks (getters/setters automáticos)
+-   Array find/any/all methods
+-   Performance +5-8%
+-   Deprecations do 8.2 resolvidas
 
 ---
 
@@ -56,15 +60,16 @@ FROM php:8.4-fpm-alpine
 
 Todos os pacotes Spatie estão atualizados e são **best-in-class**:
 
-| Package | Versão | Status | Uso no Projeto |
-|---------|--------|--------|----------------|
-| laravel-permission | 6.23 | ✅ ATUAL | RBAC (roles: admin, agent, user) |
-| laravel-data | 4.18 | ✅ ATUAL | DTOs type-safe (TicketData, CommentData) |
-| laravel-activitylog | 4.10 | ✅ ATUAL | Audit trail (quem criou/editou tickets) |
-| laravel-query-builder | 6.3 | ✅ ATUAL | Filtros URL (?filter[status]=open) |
+| Package               | Versão | Status   | Uso no Projeto                           |
+| --------------------- | ------ | -------- | ---------------------------------------- |
+| laravel-permission    | 6.23   | ✅ ATUAL | RBAC (roles: admin, agent, user)         |
+| laravel-data          | 4.18   | ✅ ATUAL | DTOs type-safe (TicketData, CommentData) |
+| laravel-activitylog   | 4.10   | ✅ ATUAL | Audit trail (quem criou/editou tickets)  |
+| laravel-query-builder | 6.3    | ✅ ATUAL | Filtros URL (?filter[status]=open)       |
 
 **Alternativas Consideradas:**
-- Nenhuma. Spatie é o gold standard da comunidade Laravel.
+
+-   Nenhuma. Spatie é o gold standard da comunidade Laravel.
 
 ---
 
@@ -75,16 +80,19 @@ Todos os pacotes Spatie estão atualizados e são **best-in-class**:
 ```
 
 **Problemas:**
+
 1. Versão `*` = instala qualquer versão (imprevisível)
 2. Pode quebrar em production
 3. Sem lockfile garantido
 
 **Correção Imediata:**
+
 ```json
 "darkaonline/l5-swagger": "^8.8"  // Pin to stable
 ```
 
 **Alternativa Moderna (2025):**
+
 ```bash
 # Scribe - Documentação automática melhor que Swagger
 composer require knuckleswtf/scribe
@@ -92,14 +100,14 @@ composer require knuckleswtf/scribe
 
 **Comparação:**
 
-| Feature | L5-Swagger | Scribe |
-|---------|------------|--------|
-| Auto-discovery | ❌ Manual | ✅ Automático |
-| Type inference | ❌ Não | ✅ Sim (PHPDoc) |
-| Example generation | ❌ Manual | ✅ Automático |
-| Postman export | ❌ Não | ✅ Sim |
-| API versioning | 🟡 Complexo | ✅ Simples |
-| Maintenance | 🟡 Médio | ✅ Baixo |
+| Feature            | L5-Swagger  | Scribe          |
+| ------------------ | ----------- | --------------- |
+| Auto-discovery     | ❌ Manual   | ✅ Automático   |
+| Type inference     | ❌ Não      | ✅ Sim (PHPDoc) |
+| Example generation | ❌ Manual   | ✅ Automático   |
+| Postman export     | ❌ Não      | ✅ Sim          |
+| API versioning     | 🟡 Complexo | ✅ Simples      |
+| Maintenance        | 🟡 Médio    | ✅ Baixo        |
 
 **Recomendação:** Trocar para **Scribe** em Sprint 2.
 
@@ -108,6 +116,7 @@ composer require knuckleswtf/scribe
 #### 🟡 **MELHORÁVEL: Testing Stack**
 
 **Atual:**
+
 ```json
 "phpunit/phpunit": "^11.5.3"
 ```
@@ -115,6 +124,7 @@ composer require knuckleswtf/scribe
 **Problema:** PHPUnit é funcional mas verboso.
 
 **Alternativa Moderna:**
+
 ```bash
 composer require pestphp/pest --dev --with-all-dependencies
 ```
@@ -134,24 +144,26 @@ public function test_user_can_create_ticket(): void
 // Pest (moderno)
 test('user can create ticket', function () {
     $user = User::factory()->create();
-    
+
     actingAs($user)
         ->post('/tickets', [...])
         ->assertRedirect();
-    
+
     expect('tickets')->toHaveRecord([...]);
 });
 ```
 
 **Benefícios Pest:**
-- 40% menos código
-- Sintaxe mais legível
-- Datasets (test same code with multiple inputs)
-- Parallel testing (3x faster)
+
+-   40% menos código
+-   Sintaxe mais legível
+-   Datasets (test same code with multiple inputs)
+-   Parallel testing (3x faster)
 
 **Problema:** Requer PHP 8.3+ (tens PHP 8.2)
 
 **Solução:**
+
 1. Upgrade para PHP 8.4 primeiro
 2. Depois adicionar Pest
 
@@ -167,25 +179,25 @@ test('user can create ticket', function () {
 
 **Alternativas Modernas:**
 
-| Solução | Prós | Contras | Custo |
-|---------|------|---------|-------|
-| **Meilisearch** ✅ | - Typo-tolerant<br>- Ranking inteligente<br>- 50ms latency<br>- Self-hosted | Setup Docker | Grátis |
-| **Algolia** | - Melhor UX<br>- Geo-search<br>- Analytics | Vendor lock-in | $1/1k searches |
-| **Typesense** | - Open-source<br>- Fast<br>- Simples | Comunidade menor | Grátis |
-| **PG FTS** | - Nativo<br>- Zero setup | - Básico<br>- Lento (>10k docs) | Grátis |
+| Solução            | Prós                                                                        | Contras                         | Custo          |
+| ------------------ | --------------------------------------------------------------------------- | ------------------------------- | -------------- |
+| **Meilisearch** ✅ | - Typo-tolerant<br>- Ranking inteligente<br>- 50ms latency<br>- Self-hosted | Setup Docker                    | Grátis         |
+| **Algolia**        | - Melhor UX<br>- Geo-search<br>- Analytics                                  | Vendor lock-in                  | $1/1k searches |
+| **Typesense**      | - Open-source<br>- Fast<br>- Simples                                        | Comunidade menor                | Grátis         |
+| **PG FTS**         | - Nativo<br>- Zero setup                                                    | - Básico<br>- Lento (>10k docs) | Grátis         |
 
 **Recomendação para 2025:** **Meilisearch**
 
 ```yaml
 # docker-compose.yml
 meilisearch:
-  image: getmeili/meilisearch:v1.12
-  ports:
-    - "7700:7700"
-  environment:
-    MEILI_ENV: development
-  volumes:
-    - meilisearch-data:/meili_data
+    image: getmeili/meilisearch:v1.12
+    ports:
+        - "7700:7700"
+    environment:
+        MEILI_ENV: development
+    volumes:
+        - meilisearch-data:/meili_data
 ```
 
 ```bash
@@ -195,6 +207,7 @@ php artisan vendor:publish --provider="Laravel\Scout\ScoutServiceProvider"
 ```
 
 **Uso:**
+
 ```php
 // Search articles
 Article::search('laptop problema')
@@ -216,19 +229,23 @@ Article::search('laptop problema')
 **Problema:** Vite 7 está em **Release Candidate** (não estável).
 
 **Riscos:**
-- Breaking changes podem acontecer
-- Bugs de produção
-- Plugins podem não funcionar
+
+-   Breaking changes podem acontecer
+-   Bugs de produção
+-   Plugins podem não funcionar
 
 **Correção Imediata:**
+
 ```json
 "vite": "^6.0.3"  // Última versão estável
 ```
 
 **Ou aguardar:**
-- Vite 7 stable: Dezembro 2025 (previsto)
 
-**Recomendação:** 
+-   Vite 7 stable: Dezembro 2025 (previsto)
+
+**Recomendação:**
+
 1. **Downgrade para Vite 6** hoje
 2. Upgrade para Vite 7 em Janeiro 2026
 
@@ -236,22 +253,24 @@ Article::search('laptop problema')
 
 #### ✅ **EXCELENTE: Vue 3 Ecosystem**
 
-| Package | Versão | Status | Propósito |
-|---------|--------|--------|-----------|
-| vue | 3.4.0 | ✅ ATUAL | Framework base |
-| @inertiajs/vue3 | 2.0.0 | ✅ ATUAL | SSR sem API |
-| @vueuse/core | 14.0.0 | 🔴 DESATUALIZADO | Composables |
-| radix-vue | 1.9.17 | 🟡 OK | Primitives UI |
+| Package         | Versão | Status           | Propósito      |
+| --------------- | ------ | ---------------- | -------------- |
+| vue             | 3.4.0  | ✅ ATUAL         | Framework base |
+| @inertiajs/vue3 | 2.0.0  | ✅ ATUAL         | SSR sem API    |
+| @vueuse/core    | 14.0.0 | 🔴 DESATUALIZADO | Composables    |
+| radix-vue       | 1.9.17 | 🟡 OK            | Primitives UI  |
 
 **VueUse Atualização:**
+
 ```bash
 npm install @vueuse/core@latest  # 11.3.0 (Nov 2025)
 ```
 
 **Benefícios:**
-- 20+ novos composables
-- TypeScript improvements
-- Tree-shaking melhorado
+
+-   20+ novos composables
+-   TypeScript improvements
+-   Tree-shaking melhorado
 
 ---
 
@@ -264,6 +283,7 @@ Stack moderna e recomendada para 2025.
 **Solução:** Componentes manuais (já planeado).
 
 **Alternativa:** Se quiser CLI automático:
+
 ```bash
 # Usar Nuxt 4 (tem Shadcn-vue CLI)
 # MAS: Inertia não funciona bem com Nuxt
@@ -275,6 +295,7 @@ Stack moderna e recomendada para 2025.
 #### 🟡 **MELHORÁVEL: Form Validation**
 
 **Atual:**
+
 ```json
 "vee-validate": "^4.15.1"
 ```
@@ -282,27 +303,30 @@ Stack moderna e recomendada para 2025.
 **Status:** OK, mas há alternativa melhor para 2025.
 
 **Zod + Vee-Validate:**
+
 ```bash
 npm install zod @vee-validate/zod
 ```
 
 **Benefícios:**
-- Type-safe schemas
-- Reutilizar validação backend/frontend
-- Melhor DX
+
+-   Type-safe schemas
+-   Reutilizar validação backend/frontend
+-   Melhor DX
 
 **Exemplo:**
+
 ```typescript
 // shared/schemas/ticket.ts
 export const ticketSchema = z.object({
-  title: z.string().min(3).max(255),
-  description: z.string().min(10),
-  priority: z.enum(['low', 'medium', 'high', 'urgent']),
+    title: z.string().min(3).max(255),
+    description: z.string().min(10),
+    priority: z.enum(["low", "medium", "high", "urgent"]),
 });
 
 // Frontend (Vue)
 const { errors } = useForm({
-  validationSchema: toTypedSchema(ticketSchema),
+    validationSchema: toTypedSchema(ticketSchema),
 });
 
 // Backend (Laravel) - usar FormRequest normal
@@ -318,17 +342,18 @@ const { errors } = useForm({
 
 ```yaml
 services:
-  orionone-app:      # Laravel 12 + PHP 8.2 ✅
-  orionone-db:       # PostgreSQL 16 ✅
-  orionone-frontend: # Node 20 + Vite ✅
-  orionone-redis:    # Redis 7 ✅
+    orionone-app: # Laravel 12 + PHP 8.2 ✅
+    orionone-db: # PostgreSQL 16 ✅
+    orionone-frontend: # Node 20 + Vite ✅
+    orionone-redis: # Redis 7 ✅
 ```
 
 **Tudo atualizado!** Nenhuma mudança necessária.
 
 **Adição Recomendada (Sprint 4):**
+
 ```yaml
-  meilisearch:
+meilisearch:
     image: getmeili/meilisearch:v1.12
     # ... (ver acima)
 ```
@@ -338,18 +363,20 @@ services:
 #### 🟡 **MELHORÁVEL: Monitoring**
 
 **Atual:**
-- Laravel Telescope (dev only) ✅
-- Nenhum monitoring de produção ❌
+
+-   Laravel Telescope (dev only) ✅
+-   Nenhum monitoring de produção ❌
 
 **Recomendações para Sprint 6:**
 
-| Ferramenta | Propósito | Custo | Setup |
-|------------|-----------|-------|-------|
-| **Laravel Pulse** ✅ | Métricas real-time | Grátis | 15 min |
-| **Sentry** | Error tracking | Grátis (5k events) | 10 min |
-| **Logflare** | Logs agregados | Grátis (1GB) | 20 min |
+| Ferramenta           | Propósito          | Custo              | Setup  |
+| -------------------- | ------------------ | ------------------ | ------ |
+| **Laravel Pulse** ✅ | Métricas real-time | Grátis             | 15 min |
+| **Sentry**           | Error tracking     | Grátis (5k events) | 10 min |
+| **Logflare**         | Logs agregados     | Grátis (1GB)       | 20 min |
 
 **Pulse (MUST-HAVE):**
+
 ```bash
 composer require laravel/pulse
 php artisan pulse:install
@@ -367,14 +394,16 @@ Dashboard: `/pulse` (requests, queues, cache, slow queries)
 **Problema:** Laravel rate limiting padrão é básico.
 
 **Solução (Sprint 3):**
+
 ```bash
 composer require spatie/laravel-rate-limiting
 ```
 
 **Uso:**
+
 ```php
 // Prevenir spam de comentários
-RateLimiter::for('comments', fn($user) => 
+RateLimiter::for('comments', fn($user) =>
     Limit::perMinute(5)->by($user->id)
 );
 ```
@@ -386,12 +415,14 @@ RateLimiter::for('comments', fn($user) =>
 **Problema:** Sem visibilidade de jobs em background.
 
 **Solução (Sprint 3):**
+
 ```bash
 composer require laravel/horizon
 php artisan horizon:install
 ```
 
 **Alternativa leve:**
+
 ```bash
 # Queue UI (built-in Laravel 11+)
 php artisan queue:monitor redis
@@ -404,12 +435,14 @@ php artisan queue:monitor redis
 **Problema:** Nenhum sistema de backup configurado.
 
 **Solução (Sprint 6):**
+
 ```bash
 composer require spatie/laravel-backup
 php artisan vendor:publish --provider="Spatie\Backup\BackupServiceProvider"
 ```
 
 **Config:**
+
 ```php
 // config/backup.php
 'destination' => [
@@ -426,16 +459,16 @@ php artisan vendor:publish --provider="Spatie\Backup\BackupServiceProvider"
 
 ### Stack Atual vs. Alternativas
 
-| Critério | OrionOne (Atual) | TALL Stack | VILT Stack | MEAN Stack |
-|----------|------------------|------------|------------|------------|
-| Backend | Laravel 12 ✅ | Laravel 12 ✅ | Laravel 12 ✅ | Express ❌ |
-| Frontend | Vue 3 + Inertia ✅ | Livewire 🟡 | Vue 3 + Inertia ✅ | Angular ❌ |
-| CSS | Tailwind ✅ | Tailwind ✅ | Tailwind ✅ | Bootstrap 🟡 |
-| DB | PostgreSQL ✅ | MySQL 🟡 | PostgreSQL ✅ | MongoDB ❌ |
-| Type Safety | ⚠️ Parcial | ❌ Não | ⚠️ Parcial | ✅ TypeScript |
-| DX (Dev Experience) | 9/10 | 7/10 | 9/10 | 6/10 |
-| Performance | 8/10 | 6/10 | 8/10 | 7/10 |
-| Hiring Pool | 9/10 | 8/10 | 9/10 | 7/10 |
+| Critério            | OrionOne (Atual)   | TALL Stack    | VILT Stack         | MEAN Stack    |
+| ------------------- | ------------------ | ------------- | ------------------ | ------------- |
+| Backend             | Laravel 12 ✅      | Laravel 12 ✅ | Laravel 12 ✅      | Express ❌    |
+| Frontend            | Vue 3 + Inertia ✅ | Livewire 🟡   | Vue 3 + Inertia ✅ | Angular ❌    |
+| CSS                 | Tailwind ✅        | Tailwind ✅   | Tailwind ✅        | Bootstrap 🟡  |
+| DB                  | PostgreSQL ✅      | MySQL 🟡      | PostgreSQL ✅      | MongoDB ❌    |
+| Type Safety         | ⚠️ Parcial         | ❌ Não        | ⚠️ Parcial         | ✅ TypeScript |
+| DX (Dev Experience) | 9/10               | 7/10          | 9/10               | 6/10          |
+| Performance         | 8/10               | 6/10          | 8/10               | 7/10          |
+| Hiring Pool         | 9/10               | 8/10          | 9/10               | 7/10          |
 
 **Conclusão:** Stack atual é **excelente** para 2025. Manter.
 
@@ -446,61 +479,68 @@ php artisan vendor:publish --provider="Spatie\Backup\BackupServiceProvider"
 ### 🔴 URGENTE (Fazer HOJE)
 
 1. **Pin Swagger version:**
-   ```bash
-   composer require darkaonline/l5-swagger:^8.8
-   ```
+
+    ```bash
+    composer require darkaonline/l5-swagger:^8.8
+    ```
 
 2. **Downgrade Vite 7 → 6:**
-   ```bash
-   npm install vite@^6.0.3
-   ```
+
+    ```bash
+    npm install vite@^6.0.3
+    ```
 
 3. **Atualizar VueUse:**
-   ```bash
-   npm install @vueuse/core@latest
-   ```
+    ```bash
+    npm install @vueuse/core@latest
+    ```
 
 ---
 
 ### 🟡 IMPORTANTE (Sprint 2)
 
 4. **Trocar L5-Swagger por Scribe:**
-   ```bash
-   composer remove darkaonline/l5-swagger
-   composer require knuckleswtf/scribe
-   php artisan scribe:generate
-   ```
+
+    ```bash
+    composer remove darkaonline/l5-swagger
+    composer require knuckleswtf/scribe
+    php artisan scribe:generate
+    ```
 
 5. **Adicionar Meilisearch (Search):**
-   ```bash
-   composer require meilisearch/meilisearch-php laravel/scout
-   # Adicionar ao docker-compose.yml
-   ```
+    ```bash
+    composer require meilisearch/meilisearch-php laravel/scout
+    # Adicionar ao docker-compose.yml
+    ```
 
 ---
 
 ### 🟢 DESEJÁVEL (Sprint 3-6)
 
 6. **Upgrade PHP 8.2 → 8.4:**
-   ```dockerfile
-   FROM php:8.4-fpm-alpine
-   ```
+
+    ```dockerfile
+    FROM php:8.4-fpm-alpine
+    ```
 
 7. **Adicionar Pest PHP:**
-   ```bash
-   composer require pestphp/pest --dev --with-all-dependencies
-   php artisan pest:install
-   ```
+
+    ```bash
+    composer require pestphp/pest --dev --with-all-dependencies
+    php artisan pest:install
+    ```
 
 8. **Adicionar Laravel Pulse:**
-   ```bash
-   composer require laravel/pulse
-   ```
+
+    ```bash
+    composer require laravel/pulse
+    ```
 
 9. **Adicionar Horizon (Queues):**
-   ```bash
-   composer require laravel/horizon
-   ```
+
+    ```bash
+    composer require laravel/horizon
+    ```
 
 10. **Adicionar Backup:**
     ```bash
@@ -513,45 +553,45 @@ php artisan vendor:publish --provider="Spatie\Backup\BackupServiceProvider"
 
 ```json
 {
-  "backend": {
-    "php": "8.4",
-    "laravel": "12.x",
-    "packages": {
-      "spatie/laravel-permission": "^6.23",
-      "spatie/laravel-data": "^4.18",
-      "spatie/laravel-activitylog": "^4.10",
-      "spatie/laravel-query-builder": "^6.3",
-      "lorisleiva/laravel-actions": "^2.9",
-      "knuckleswtf/scribe": "^4.40",
-      "laravel/sanctum": "^4.0",
-      "laravel/pulse": "^1.3",
-      "laravel/horizon": "^5.15",
-      "meilisearch/meilisearch-php": "^1.11",
-      "laravel/scout": "^11.1"
+    "backend": {
+        "php": "8.4",
+        "laravel": "12.x",
+        "packages": {
+            "spatie/laravel-permission": "^6.23",
+            "spatie/laravel-data": "^4.18",
+            "spatie/laravel-activitylog": "^4.10",
+            "spatie/laravel-query-builder": "^6.3",
+            "lorisleiva/laravel-actions": "^2.9",
+            "knuckleswtf/scribe": "^4.40",
+            "laravel/sanctum": "^4.0",
+            "laravel/pulse": "^1.3",
+            "laravel/horizon": "^5.15",
+            "meilisearch/meilisearch-php": "^1.11",
+            "laravel/scout": "^11.1"
+        }
+    },
+    "frontend": {
+        "node": "20.x LTS",
+        "packages": {
+            "vue": "^3.5",
+            "vite": "^6.0",
+            "@inertiajs/vue3": "^2.0",
+            "@vueuse/core": "^11.3",
+            "tailwindcss": "^3.4",
+            "radix-vue": "^1.9",
+            "lucide-vue-next": "^0.553",
+            "chart.js": "^4.5",
+            "vee-validate": "^4.15",
+            "zod": "^3.24"
+        }
+    },
+    "infrastructure": {
+        "database": "PostgreSQL 16",
+        "cache": "Redis 7",
+        "search": "Meilisearch 1.12",
+        "queue": "Redis + Horizon",
+        "storage": "S3 (AWS/DO Spaces)"
     }
-  },
-  "frontend": {
-    "node": "20.x LTS",
-    "packages": {
-      "vue": "^3.5",
-      "vite": "^6.0",
-      "@inertiajs/vue3": "^2.0",
-      "@vueuse/core": "^11.3",
-      "tailwindcss": "^3.4",
-      "radix-vue": "^1.9",
-      "lucide-vue-next": "^0.553",
-      "chart.js": "^4.5",
-      "vee-validate": "^4.15",
-      "zod": "^3.24"
-    }
-  },
-  "infrastructure": {
-    "database": "PostgreSQL 16",
-    "cache": "Redis 7",
-    "search": "Meilisearch 1.12",
-    "queue": "Redis + Horizon",
-    "storage": "S3 (AWS/DO Spaces)"
-  }
 }
 ```
 
@@ -559,19 +599,19 @@ php artisan vendor:publish --provider="Spatie\Backup\BackupServiceProvider"
 
 ## Pontuação Final por Categoria
 
-| Categoria | Score | Status |
-|-----------|-------|--------|
-| Backend Core | 9/10 | ✅ Excelente |
-| Backend Packages | 8.5/10 | ✅ Muito Bom |
-| Frontend Core | 8/10 | 🟡 Bom (Vite 7 issue) |
-| Frontend Packages | 8.5/10 | ✅ Muito Bom |
-| Infrastructure | 9/10 | ✅ Excelente |
-| Testing | 7/10 | 🟡 OK (melhorar com Pest) |
-| Monitoring | 5/10 | 🔴 Fraco (adicionar Pulse) |
-| Security | 8/10 | ✅ Bom |
-| Performance | 8/10 | ✅ Bom |
-| DX (Dev Exp) | 9/10 | ✅ Excelente |
-| **MÉDIA GERAL** | **8.0/10** | ✅ **MUITO BOM** |
+| Categoria         | Score      | Status                     |
+| ----------------- | ---------- | -------------------------- |
+| Backend Core      | 9/10       | ✅ Excelente               |
+| Backend Packages  | 8.5/10     | ✅ Muito Bom               |
+| Frontend Core     | 8/10       | 🟡 Bom (Vite 7 issue)      |
+| Frontend Packages | 8.5/10     | ✅ Muito Bom               |
+| Infrastructure    | 9/10       | ✅ Excelente               |
+| Testing           | 7/10       | 🟡 OK (melhorar com Pest)  |
+| Monitoring        | 5/10       | 🔴 Fraco (adicionar Pulse) |
+| Security          | 8/10       | ✅ Bom                     |
+| Performance       | 8/10       | ✅ Bom                     |
+| DX (Dev Exp)      | 9/10       | ✅ Excelente               |
+| **MÉDIA GERAL**   | **8.0/10** | ✅ **MUITO BOM**           |
 
 ---
 
@@ -580,26 +620,29 @@ php artisan vendor:publish --provider="Spatie\Backup\BackupServiceProvider"
 A stack do OrionOne está **bem posicionada para 2025**, mas com alguns **ajustes críticos necessários**:
 
 ### ✅ Manter Como Está:
-- Laravel 12 + PostgreSQL 16
-- Vue 3 + Inertia.js
-- Tailwind CSS + Shadcn-vue
-- Todos os pacotes Spatie
-- Docker setup
+
+-   Laravel 12 + PostgreSQL 16
+-   Vue 3 + Inertia.js
+-   Tailwind CSS + Shadcn-vue
+-   Todos os pacotes Spatie
+-   Docker setup
 
 ### 🔴 Corrigir Urgentemente:
-- Pin Swagger version ou trocar por Scribe
-- Downgrade Vite 7 → 6
-- Atualizar VueUse
+
+-   Pin Swagger version ou trocar por Scribe
+-   Downgrade Vite 7 → 6
+-   Atualizar VueUse
 
 ### 🟡 Adicionar em Sprints Futuros:
-- Laravel Pulse (monitoring)
-- Meilisearch (search)
-- Pest PHP (depois de upgrade para PHP 8.4)
-- Laravel Horizon (queues)
+
+-   Laravel Pulse (monitoring)
+-   Meilisearch (search)
+-   Pest PHP (depois de upgrade para PHP 8.4)
+-   Laravel Horizon (queues)
 
 **Score Final: 8.0/10** - Stack sólida e moderna, pronta para produção com pequenos ajustes.
 
 ---
 
-**Próxima Revisão:** Janeiro 2026 (após Vite 7 stable)  
+**Próxima Revisão:** Janeiro 2026 (após Vite 7 stable)
 **Última Atualização:** 10 Novembro 2025, 02:30

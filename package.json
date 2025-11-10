@@ -7,8 +7,6 @@
         "dev": "vite"
     },
     "devDependencies": {
-        "@headlessui/vue": "^1.7.23",
-        "@heroicons/vue": "^2.2.0",
         "@inertiajs/vue3": "^2.0.0",
         "@tailwindcss/forms": "^0.5.3",
         "@tailwindcss/vite": "^4.0.0",
@@ -29,7 +27,6 @@
         "vue-chartjs": "^5.3.3"
     },
     "dependencies": {
-        "@iconify/vue": "^5.0.0",
         "@inertiajs/progress": "^0.2.7",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",

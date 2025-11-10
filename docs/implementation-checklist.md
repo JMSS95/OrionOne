@@ -2304,7 +2304,7 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 -   [x] Publicar configs Spatie
 -   [x] RolePermissionSeeder (3 roles)
 -   [x] UserSeeder (3 test users)
--   [ ] Profile Avatar Upload 
+-   [ ] Profile Avatar Upload
 
 ### Sprint 2: Tickets Core (0% Completo)
 
@@ -2355,15 +2355,15 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 
 ## Progresso Resumo por Sprint
 
-| Sprint   | Features | Completas | Progresso |
-|----------|----------|-----------|-----------|
-| Sprint 1 | 6        | 5         | 85%       |
-| Sprint 2 | 7        | 0         | 0%        |
-| Sprint 3 | 4        | 0         | 0%        |
-| Sprint 4 | 5        | 0         | 0%        |
-| Sprint 5 | 5        | 0         | 0%        |
-| Sprint 6 | 9        | 0         | 0%        |
-| **TOTAL**| **36**   | **5**     | **14%**   |
+| Sprint    | Features | Completas | Progresso |
+| --------- | -------- | --------- | --------- |
+| Sprint 1  | 6        | 5         | 85%       |
+| Sprint 2  | 7        | 0         | 0%        |
+| Sprint 3  | 4        | 0         | 0%        |
+| Sprint 4  | 5        | 0         | 0%        |
+| Sprint 5  | 5        | 0         | 0%        |
+| Sprint 6  | 9        | 0         | 0%        |
+| **TOTAL** | **36**   | **5**     | **14%**   |
 
 **Próximo Objetivo:** Completar Feature 2 (Avatar Upload) para finalizar Sprint 1 a 100%
 
