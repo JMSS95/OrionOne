@@ -15,19 +15,20 @@
 -   Sistema de sessões
 -   Profile page básica
 
-**Sprint 1 foca-se em:** 
-- Adicionar Roles & Permissions (via Spatie) 
-- Expandir funcionalidades do Profile (avatar upload)
-- **Database Advanced Features** (Views, Triggers, Stored Procedures, Constraints)
+**Sprint 1 foca-se em:**
+
+-   Adicionar Roles & Permissions (via Spatie)
+-   Expandir funcionalidades do Profile (avatar upload)
+-   **Database Advanced Features** (Views, Triggers, Stored Procedures, Constraints)
 
 **Database Enterprise Fundamentals (PostgreSQL 16):**
 
-| Component | Quantity | Purpose | Status |
-|-----------|----------|---------|--------|
-| **Database Views** | 3 views | Dashboard, SLA, Agent Performance (queries pré-computadas) | ✅ Documented |
-| **Triggers** | 2 triggers | Auto-generation (ticket_number), Auto-calculation (SLA deadlines) | ✅ Documented |
-| **Check Constraints** | 4 constraints | Data validation em DB (status, priority, email, dates) | ✅ Documented |
-| **Advanced Indexes** | - | Partial, Composite, Expression (performance optimization) | ⏳ Sprint 2 |
+| Component             | Quantity      | Purpose                                                           | Status        |
+| --------------------- | ------------- | ----------------------------------------------------------------- | ------------- |
+| **Database Views**    | 3 views       | Dashboard, SLA, Agent Performance (queries pré-computadas)        | ✅ Documented |
+| **Triggers**          | 2 triggers    | Auto-generation (ticket_number), Auto-calculation (SLA deadlines) | ✅ Documented |
+| **Check Constraints** | 4 constraints | Data validation em DB (status, priority, email, dates)            | ✅ Documented |
+| **Advanced Indexes**  | -             | Partial, Composite, Expression (performance optimization)         | ⏳ Sprint 2   |
 
 ---
 
@@ -977,6 +978,109 @@ docker-compose exec orionone-app php artisan tinker
 
 ---
 
+### Preparação Frontend: VueUse Composables (2h - 15-17 Nov)
+
+**Objetivo:** Documentar VueUse composables para uso nos próximos Sprints.
+
+**Contexto:** VueUse (`@vueuse/core: ^11.3.0`) **JÁ ESTÁ INSTALADO!** Apenas falta documentar uso.
+
+#### Composables Críticos para OrionOne:
+
+**1. useDark() - Dark Mode (Sprint 6)**
+
+```javascript
+// composables/useTheme.js
+import { useDark, useToggle } from '@vueuse/core'
+
+export function useTheme() {
+  const isDark = useDark()
+  const toggleDark = useToggle(isDark)
+
+  return { isDark, toggleDark }
+}
+
+// Usar em componente:
+const { isDark, toggleDark } = useTheme()
+
+// Template:
+<Button @click="toggleDark" variant="ghost" size="icon">
+  <SunIcon v-if="isDark" />
+  <MoonIcon v-else />
+</Button>
+```
+
+**2. useStorage() - Persist Filters (Sprint 2)**
+
+```javascript
+// Persist ticket filters em localStorage
+import { useStorage } from "@vueuse/core";
+
+const filters = useStorage("ticket-filters", {
+    status: "",
+    priority: "",
+    team_id: null,
+});
+
+// Reativo! Persiste automaticamente quando muda
+filters.value.status = "open";
+```
+
+**3. useDebounceFn() - Search Performance (Sprint 2/4)**
+
+```javascript
+// Debounce search input (evita 50 API calls, faz apenas 1)
+import { useDebounceFn } from "@vueuse/core";
+
+const searchTickets = useDebounceFn((query) => {
+    router.reload({
+        data: { search: query },
+        only: ["tickets"],
+    });
+}, 300); // 300ms delay
+```
+
+**4. useClipboard() - Copy Ticket Number (Sprint 2)**
+
+```javascript
+// Copy ticket number to clipboard
+import { useClipboard } from "@vueuse/core";
+
+const { copy, copied } = useClipboard();
+
+const copyTicketNumber = (ticketNumber) => {
+    copy(ticketNumber);
+    toast.success("Número do ticket copiado!");
+};
+```
+
+**5. useWindowSize() - Responsive Logic (Sprint 5)**
+
+```javascript
+// Responsive dashboard layout
+import { useWindowSize } from '@vueuse/core'
+
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value < 768)
+
+// Mostrar tabela simplificada no mobile
+<DataTable v-if="!isMobile" />
+<TicketCardList v-else />
+```
+
+#### Checklist VueUse Documentation
+
+-   [ ] Criar `docs/VUEUSE-GUIDE.md` com exemplos práticos
+-   [ ] Documentar `useDark()` para dark mode
+-   [ ] Documentar `useStorage()` para persist filters
+-   [ ] Documentar `useDebounceFn()` para search
+-   [ ] Documentar `useClipboard()` para copy actions
+-   [ ] Documentar `useWindowSize()` para responsive
+-   [ ] Adicionar link em `TECH-DEEP-DIVE-FRONTEND.md` secção 7
+
+**Referência completa:** [VueUse Docs](https://vueuse.org/) - 50+ composables disponíveis!
+
+---
+
 ## Sprint 2: Tickets Core (18 Nov - 01 Dez)
 
 ### Feature 3: Create Ticket
@@ -1459,7 +1563,599 @@ const submit = () => {
 
 ---
 
-### Feature 4: List Tickets with Filtering
+### 📚 Forms Avançadas: VeeValidate + Multi-file Upload + Shadcn Advanced (6h - 15-17 Nov)
+
+**Objetivo:** Documentar patterns avançados para forms complexas no Create Ticket.
+
+**Contexto:**
+
+-   ✅ VeeValidate (`vee-validate: ^4.15.1`) **JÁ INSTALADO**
+-   ✅ Shadcn-vue base (15 components) **JÁ CRIADOS**
+-   ⏳ Falta adicionar: Dialog, DataTable, Toast, Combobox
+
+---
+
+#### 1. VeeValidate - Form Validation (1.5h)
+
+**Setup Global (`resources/js/app.js`):**
+
+```javascript
+import { configure, defineRule } from "vee-validate";
+import { required, email, min, max } from "@vee-validate/rules";
+import { localize } from "@vee-validate/i18n";
+
+// Registar regras básicas
+defineRule("required", required);
+defineRule("email", email);
+defineRule("min", min);
+defineRule("max", max);
+
+// Custom rule: unique email (API call)
+defineRule("unique_email", async (value) => {
+    const response = await axios.get(`/api/check-email?email=${value}`);
+    return response.data.available || "Email já existe";
+});
+
+// Mensagens em português
+configure({
+    generateMessage: localize("pt", {
+        messages: {
+            required: "Campo obrigatório",
+            email: "Email inválido",
+            min: "Mínimo {length} caracteres",
+            max: "Máximo {length} caracteres",
+        },
+    }),
+});
+```
+
+**Criar Field Component com VeeValidate:**
+
+```vue
+<!-- resources/js/components/ui/FormField.vue -->
+<script setup>
+import { Field, ErrorMessage } from "vee-validate";
+import Label from "./Label.vue";
+
+const props = defineProps({
+    name: String,
+    label: String,
+    rules: [String, Object],
+    type: { type: String, default: "text" },
+    placeholder: String,
+});
+</script>
+
+<template>
+    <div class="space-y-2">
+        <Label :for="name">{{ label }}</Label>
+
+        <Field
+            :id="name"
+            :name="name"
+            :rules="rules"
+            :type="type"
+            :placeholder="placeholder"
+            v-slot="{ field, errors }"
+        >
+            <input
+                v-bind="field"
+                :class="[
+                    'w-full rounded-md border px-3 py-2',
+                    errors.length ? 'border-red-500' : 'border-gray-300',
+                ]"
+            />
+        </Field>
+
+        <ErrorMessage :name="name" class="text-sm text-red-600" />
+    </div>
+</template>
+```
+
+**Usar em Create Ticket Form:**
+
+```vue
+<script setup>
+import { Form } from "vee-validate";
+import FormField from "@/components/ui/FormField.vue";
+
+const onSubmit = (values) => {
+    router.post(route("tickets.store"), values);
+};
+</script>
+
+<template>
+    <Form @submit="onSubmit" class="space-y-6">
+        <FormField
+            name="title"
+            label="Título"
+            rules="required|max:255"
+            placeholder="Laptop não liga"
+        />
+
+        <FormField
+            name="description"
+            label="Descrição"
+            rules="required|min:10"
+            type="textarea"
+        />
+
+        <Button type="submit">Criar Ticket</Button>
+    </Form>
+</template>
+```
+
+---
+
+#### 2. Multi-file Upload with Preview (1h)
+
+**Criar Attachment Upload Component:**
+
+```vue
+<!-- resources/js/components/ui/FileUpload.vue -->
+<script setup>
+import { ref } from "vue";
+import { X } from "lucide-vue-next";
+import Button from "./Button.vue";
+
+const props = defineProps({
+    maxFiles: { type: Number, default: 5 },
+    maxSize: { type: Number, default: 10 }, // MB
+    accept: {
+        type: Array,
+        default: () => ["pdf", "png", "jpg", "jpeg", "docx"],
+    },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const files = ref([]);
+const error = ref("");
+
+const handleFiles = (event) => {
+    const newFiles = Array.from(event.target.files);
+
+    // Validações
+    if (files.value.length + newFiles.length > props.maxFiles) {
+        error.value = `Máximo ${props.maxFiles} ficheiros`;
+        return;
+    }
+
+    for (const file of newFiles) {
+        // Check size
+        if (file.size > props.maxSize * 1024 * 1024) {
+            error.value = `Ficheiro ${file.name} excede ${props.maxSize}MB`;
+            continue;
+        }
+
+        // Check type
+        const ext = file.name.split(".").pop().toLowerCase();
+        if (!props.accept.includes(ext)) {
+            error.value = `Tipo ${ext} não permitido`;
+            continue;
+        }
+
+        // Add preview
+        files.value.push({
+            file,
+            name: file.name,
+            size: (file.size / 1024).toFixed(2) + " KB",
+            preview: file.type.startsWith("image/")
+                ? URL.createObjectURL(file)
+                : null,
+        });
+    }
+
+    emit(
+        "update:modelValue",
+        files.value.map((f) => f.file)
+    );
+    error.value = "";
+};
+
+const removeFile = (index) => {
+    files.value.splice(index, 1);
+    emit(
+        "update:modelValue",
+        files.value.map((f) => f.file)
+    );
+};
+</script>
+
+<template>
+    <div class="space-y-4">
+        <div class="flex items-center gap-4">
+            <input
+                type="file"
+                multiple
+                :accept="accept.map((ext) => `.${ext}`).join(',')"
+                @change="handleFiles"
+                class="hidden"
+                id="file-upload"
+            />
+            <label for="file-upload">
+                <Button as="span" variant="outline" type="button">
+                    Adicionar Ficheiros ({{ files.length }}/{{ maxFiles }})
+                </Button>
+            </label>
+
+            <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+        </div>
+
+        <!-- File List -->
+        <div v-if="files.length" class="space-y-2">
+            <div
+                v-for="(file, index) in files"
+                :key="index"
+                class="flex items-center gap-4 p-3 border rounded-md"
+            >
+                <!-- Preview (se imagem) -->
+                <img
+                    v-if="file.preview"
+                    :src="file.preview"
+                    class="w-12 h-12 object-cover rounded"
+                />
+
+                <!-- Info -->
+                <div class="flex-1">
+                    <p class="text-sm font-medium">{{ file.name }}</p>
+                    <p class="text-xs text-gray-500">{{ file.size }}</p>
+                </div>
+
+                <!-- Remove -->
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    @click="removeFile(index)"
+                >
+                    <X class="w-4 h-4" />
+                </Button>
+            </div>
+        </div>
+    </div>
+</template>
+```
+
+**Integrar no Create Ticket Form:**
+
+```vue
+<script setup>
+import FileUpload from "@/components/ui/FileUpload.vue";
+import { useForm } from "@inertiajs/vue3";
+
+const form = useForm({
+    title: "",
+    description: "",
+    priority: "medium",
+    attachments: [], // Array de Files
+});
+
+const submit = () => {
+    // Inertia suporta multipart/form-data automaticamente!
+    form.post(route("tickets.store"));
+};
+</script>
+
+<template>
+    <form @submit.prevent="submit">
+        <!-- ... outros campos ... -->
+
+        <FileUpload
+            v-model="form.attachments"
+            :max-files="5"
+            :max-size="10"
+            :accept="['pdf', 'png', 'jpg', 'docx']"
+        />
+
+        <Button type="submit" :disabled="form.processing">
+            Criar Ticket
+        </Button>
+    </form>
+</template>
+```
+
+**Backend - Handle Upload (CreateTicketAction):**
+
+```php
+use Illuminate\Http\UploadedFile;
+
+public function handle(TicketData $data, User $requester, ?array $attachments = null): Ticket
+{
+    return DB::transaction(function () use ($data, $requester, $attachments) {
+        $ticket = Ticket::create([
+            'title' => $data->title,
+            'description' => $data->description,
+            'priority' => $data->priority,
+            'requester_id' => $requester->id,
+        ]);
+
+        // Upload attachments
+        if ($attachments) {
+            foreach ($attachments as $file) {
+                /** @var UploadedFile $file */
+
+                // Validar mime type (prevenir spoofing)
+                if (!in_array($file->getMimeType(), [
+                    'application/pdf',
+                    'image/png',
+                    'image/jpeg',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                ])) {
+                    throw new \Exception("Tipo de ficheiro inválido: {$file->getMimeType()}");
+                }
+
+                // Upload com nome único
+                $path = $file->store('attachments', 'public');
+
+                // Criar registo na tabela attachments
+                $ticket->attachments()->create([
+                    'filename' => $file->getClientOriginalName(),
+                    'path' => $path,
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'uploaded_by' => $requester->id,
+                ]);
+            }
+        }
+
+        return $ticket->fresh(['attachments']);
+    });
+}
+```
+
+---
+
+#### 3. Shadcn Advanced Components (1.5h)
+
+**Adicionar components avançados via CLI:**
+
+```bash
+# Dialog (Modal)
+npx shadcn-vue@latest add dialog
+
+# Toast (Notifications)
+npx shadcn-vue@latest add toast
+
+# Combobox (Searchable Select)
+npx shadcn-vue@latest add combobox
+
+# DropdownMenu (Actions menu)
+npx shadcn-vue@latest add dropdown-menu
+
+# Tabs
+npx shadcn-vue@latest add tabs
+
+# Accordion
+npx shadcn-vue@latest add accordion
+
+# Command Palette (Ctrl+K)
+npx shadcn-vue@latest add command
+```
+
+**3.1 Dialog - Create Ticket Modal:**
+
+```vue
+<script setup>
+import { ref } from "vue";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import Button from "@/components/ui/Button.vue";
+import CreateTicketForm from "./CreateTicketForm.vue";
+
+const isOpen = ref(false);
+
+const onSuccess = () => {
+    isOpen.value = false;
+    // Recarregar lista
+    router.reload({ only: ["tickets"] });
+};
+</script>
+
+<template>
+    <div>
+        <Button @click="isOpen = true">Criar Ticket</Button>
+
+        <Dialog v-model:open="isOpen">
+            <DialogContent class="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Criar Novo Ticket</DialogTitle>
+                </DialogHeader>
+
+                <CreateTicketForm @success="onSuccess" />
+            </DialogContent>
+        </Dialog>
+    </div>
+</template>
+```
+
+**3.2 Toast - Success/Error Feedback:**
+
+```javascript
+// Setup global toast (resources/js/app.js)
+import { Toaster } from '@/components/ui/toast'
+
+// Mount Toaster
+createApp({ render: () => h(App) })
+  .component('Toaster', Toaster)
+  .mount('#app')
+
+// Add to App.vue
+<template>
+  <Toaster />
+  <router-view />
+</template>
+```
+
+```vue
+<!-- Usar em components -->
+<script setup>
+import { useToast } from "@/components/ui/toast";
+
+const { toast } = useToast();
+
+const createTicket = () => {
+    form.post(route("tickets.store"), {
+        onSuccess: () => {
+            toast({
+                title: "Sucesso!",
+                description: "Ticket criado com sucesso.",
+            });
+        },
+        onError: () => {
+            toast({
+                title: "Erro",
+                description: "Erro ao criar ticket.",
+                variant: "destructive",
+            });
+        },
+    });
+};
+</script>
+```
+
+**3.3 Combobox - Assign Agent (Searchable Select):**
+
+```vue
+<script setup>
+import { ref, computed } from "vue";
+import {
+    Combobox,
+    ComboboxInput,
+    ComboboxOption,
+    ComboboxOptions,
+} from "@/components/ui/combobox";
+import { useDebounceFn } from "@vueuse/core";
+
+const props = defineProps({
+    teamId: Number,
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const agents = ref([]);
+const search = ref("");
+
+const searchAgents = useDebounceFn(async (query) => {
+    const response = await axios.get(`/api/agents`, {
+        params: { team_id: props.teamId, search: query },
+    });
+    agents.value = response.data;
+}, 300);
+
+const filteredAgents = computed(() => {
+    if (!search.value) return agents.value;
+    return agents.value.filter((agent) =>
+        agent.name.toLowerCase().includes(search.value.toLowerCase())
+    );
+});
+</script>
+
+<template>
+    <Combobox @update:modelValue="emit('update:modelValue', $event)">
+        <ComboboxInput
+            v-model="search"
+            @input="searchAgents(search)"
+            placeholder="Buscar agent..."
+        />
+
+        <ComboboxOptions>
+            <ComboboxOption
+                v-for="agent in filteredAgents"
+                :key="agent.id"
+                :value="agent.id"
+            >
+                {{ agent.name }} ({{ agent.open_tickets_count }} tickets
+                abertos)
+            </ComboboxOption>
+        </ComboboxOptions>
+    </Combobox>
+</template>
+```
+
+**3.4 DropdownMenu - Ticket Actions:**
+
+```vue
+<script setup>
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical, Edit, Trash, UserPlus } from "lucide-vue-next";
+import Button from "./Button.vue";
+
+const props = defineProps({
+    ticket: Object,
+});
+
+const editTicket = () => {
+    router.visit(route("tickets.edit", props.ticket.id));
+};
+
+const deleteTicket = () => {
+    if (confirm("Tem certeza?")) {
+        router.delete(route("tickets.destroy", props.ticket.id));
+    }
+};
+
+const assignTicket = () => {
+    // Abrir modal de assign
+};
+</script>
+
+<template>
+    <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+            <Button variant="ghost" size="icon">
+                <MoreVertical class="w-4 h-4" />
+            </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end">
+            <DropdownMenuItem @click="editTicket">
+                <Edit class="w-4 h-4 mr-2" />
+                Editar
+            </DropdownMenuItem>
+
+            <DropdownMenuItem @click="assignTicket">
+                <UserPlus class="w-4 h-4 mr-2" />
+                Atribuir
+            </DropdownMenuItem>
+
+            <DropdownMenuItem @click="deleteTicket" class="text-red-600">
+                <Trash class="w-4 h-4 mr-2" />
+                Apagar
+            </DropdownMenuItem>
+        </DropdownMenuContent>
+    </DropdownMenu>
+</template>
+```
+
+#### Checklist Forms Avançadas
+
+-   [ ] VeeValidate configurado globalmente com mensagens PT
+-   [ ] FormField component criado com ErrorMessage
+-   [ ] FileUpload component criado (preview, validação, remove)
+-   [ ] Backend handle multi-file upload com mime validation
+-   [ ] Shadcn Dialog adicionado (npx shadcn-vue add dialog)
+-   [ ] Shadcn Toast adicionado e configurado globalmente
+-   [ ] Shadcn Combobox adicionado (searchable select)
+-   [ ] Shadcn DropdownMenu adicionado (actions menu)
+-   [ ] Criar ticket form usa VeeValidate + FileUpload
+-   [ ] Testado: Upload 5 ficheiros (PDF, PNG, DOCX)
+-   [ ] Testado: Validação VeeValidate mostra erros
+-   [ ] Testado: Toast aparece após sucesso/erro
+-   [ ] Documentado em `docs/FORMS-GUIDE.md`
+
+**Tempo estimado:** ~6h (VeeValidate 1.5h + FileUpload 1h + Shadcn 1.5h + Integration 2h)
+
+---
 
 #### Phase 1: Planning (30 min)
 
@@ -1981,44 +2677,44 @@ class TicketController extends Controller
 /\*\*
 
 -   @OA\Get(
--         path="/api/tickets",
--         summary="List all tickets",
--         description="Retrieve paginated list of tickets with optional filters",
--         operationId="getTickets",
--         tags={"Tickets"},
--         security={{"sanctum":{}}},
--         @OA\Parameter(
--             name="filter[status]",
--             in="query",
--             description="Filter by status",
--             required=false,
--             @OA\Schema(type="string", enum={"open","in_progress","resolved","closed"})
--         ),
--         @OA\Parameter(
--             name="filter[priority]",
--             in="query",
--             description="Filter by priority",
--             required=false,
--             @OA\Schema(type="string", enum={"low","medium","high","urgent"})
--         ),
--         @OA\Parameter(
--             name="sort",
--             in="query",
--             description="Sort by field (use - for descending)",
--             required=false,
--             @OA\Schema(type="string", example="-created_at")
--         ),
--         @OA\Response(
--             response=200,
--             description="Successful operation",
--             @OA\JsonContent(
--                 type="object",
--                 @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Ticket")),
--                 @OA\Property(property="links", type="object"),
--                 @OA\Property(property="meta", type="object")
--             )
--         ),
--         @OA\Response(response=401, description="Unauthenticated")
+-               path="/api/tickets",
+-               summary="List all tickets",
+-               description="Retrieve paginated list of tickets with optional filters",
+-               operationId="getTickets",
+-               tags={"Tickets"},
+-               security={{"sanctum":{}}},
+-               @OA\Parameter(
+-                   name="filter[status]",
+-                   in="query",
+-                   description="Filter by status",
+-                   required=false,
+-                   @OA\Schema(type="string", enum={"open","in_progress","resolved","closed"})
+-               ),
+-               @OA\Parameter(
+-                   name="filter[priority]",
+-                   in="query",
+-                   description="Filter by priority",
+-                   required=false,
+-                   @OA\Schema(type="string", enum={"low","medium","high","urgent"})
+-               ),
+-               @OA\Parameter(
+-                   name="sort",
+-                   in="query",
+-                   description="Sort by field (use - for descending)",
+-                   required=false,
+-                   @OA\Schema(type="string", example="-created_at")
+-               ),
+-               @OA\Response(
+-                   response=200,
+-                   description="Successful operation",
+-                   @OA\JsonContent(
+-                       type="object",
+-                       @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Ticket")),
+-                       @OA\Property(property="links", type="object"),
+-                       @OA\Property(property="meta", type="object")
+-                   )
+-               ),
+-               @OA\Response(response=401, description="Unauthenticated")
 -   )
     \*/
     public function index(Request $request)
@@ -2029,28 +2725,28 @@ class TicketController extends Controller
 /\*\*
 
 -   @OA\Post(
--         path="/api/tickets",
--         summary="Create a new ticket",
--         description="Create a new support ticket",
--         operationId="createTicket",
--         tags={"Tickets"},
--         security={{"sanctum":{}}},
--         @OA\RequestBody(
--             required=true,
--             @OA\JsonContent(
--                 required={"title","description"},
--                 @OA\Property(property="title", type="string", maxLength=255, example="Laptop não liga"),
--                 @OA\Property(property="description", type="string", example="Detalhes do problema..."),
--                 @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"}, example="high"),
--                 @OA\Property(property="category_id", type="integer", example=1)
--             )
--         ),
--         @OA\Response(
--             response=201,
--             description="Ticket created successfully",
--             @OA\JsonContent(ref="#/components/schemas/Ticket")
--         ),
--         @OA\Response(response=422, description="Validation error")
+-               path="/api/tickets",
+-               summary="Create a new ticket",
+-               description="Create a new support ticket",
+-               operationId="createTicket",
+-               tags={"Tickets"},
+-               security={{"sanctum":{}}},
+-               @OA\RequestBody(
+-                   required=true,
+-                   @OA\JsonContent(
+-                       required={"title","description"},
+-                       @OA\Property(property="title", type="string", maxLength=255, example="Laptop não liga"),
+-                       @OA\Property(property="description", type="string", example="Detalhes do problema..."),
+-                       @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"}, example="high"),
+-                       @OA\Property(property="category_id", type="integer", example=1)
+-                   )
+-               ),
+-               @OA\Response(
+-                   response=201,
+-                   description="Ticket created successfully",
+-                   @OA\JsonContent(ref="#/components/schemas/Ticket")
+-               ),
+-               @OA\Response(response=422, description="Validation error")
 -   )
     \*/
     public function store(Request $request)
@@ -2149,6 +2845,499 @@ docker-compose exec orionone-app php artisan test
 ---
 
 ## Sprint 3: Colaboração (02-15 Dez)
+
+### 📚 Rich Text & Notifications Setup (5h - 1-2 Dez)
+
+**Objetivo:** Documentar Vue Quill rich text editor e Laravel Notifications antes de implementar Comments.
+
+**Contexto:**
+
+-   ✅ Vue Quill (`@vueup/vue-quill: ^1.2.0`) **JÁ INSTALADO**
+-   ✅ Marked (`marked: ^17.0.0`) + DOMPurify (`dompurify: ^3.3.0`) **JÁ INSTALADOS**
+-   ✅ Laravel Notifications (built-in) - apenas falta documentar
+
+---
+
+#### 1. Vue Quill - Rich Text Editor (1h)
+
+**Setup Global Quill (`resources/js/app.js`):**
+
+```javascript
+import { QuillEditor } from "@vueup/vue-quill";
+import "@vueup/vue-quill/dist/vue-quill.snow.css"; // Theme Snow (toolbar visível)
+
+// Registar globalmente
+app.component("QuillEditor", QuillEditor);
+```
+
+**Criar RichTextEditor Component:**
+
+```vue
+<!-- resources/js/components/ui/RichTextEditor.vue -->
+<script setup>
+import { ref, watch } from "vue";
+import { QuillEditor } from "@vueup/vue-quill";
+
+const props = defineProps({
+    modelValue: String,
+    placeholder: { type: String, default: "Escrever comentário..." },
+    minHeight: { type: String, default: "150px" },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const content = ref(props.modelValue);
+
+watch(content, (value) => {
+    emit("update:modelValue", value);
+});
+
+// Toolbar customizada (remover opções desnecessárias)
+const toolbar = [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link", "image", "code-block"],
+    ["clean"], // Remove formatting
+];
+</script>
+
+<template>
+    <div class="quill-container">
+        <QuillEditor
+            v-model:content="content"
+            :placeholder="placeholder"
+            :toolbar="toolbar"
+            theme="snow"
+            content-type="html"
+            :style="{ minHeight }"
+        />
+    </div>
+</template>
+
+<style>
+.quill-container {
+    @apply border rounded-md;
+}
+
+.ql-toolbar {
+    @apply border-b bg-gray-50 rounded-t-md;
+}
+
+.ql-container {
+    @apply rounded-b-md;
+}
+
+.ql-editor {
+    @apply min-h-[150px] p-4;
+}
+
+/* Dark mode support */
+.dark .ql-toolbar {
+    @apply bg-gray-800 border-gray-700;
+}
+
+.dark .ql-container {
+    @apply bg-gray-900 border-gray-700;
+}
+
+.dark .ql-editor {
+    @apply text-gray-200;
+}
+</style>
+```
+
+**Usar no Comment Form:**
+
+```vue
+<script setup>
+import RichTextEditor from "@/components/ui/RichTextEditor.vue";
+import { useForm } from "@inertiajs/vue3";
+
+const form = useForm({
+    body: "",
+    is_internal: false,
+});
+
+const submit = () => {
+    form.post(route("tickets.comments.store", ticket.id), {
+        onSuccess: () => {
+            form.reset();
+            toast.success("Comentário adicionado!");
+        },
+    });
+};
+</script>
+
+<template>
+    <form @submit.prevent="submit" class="space-y-4">
+        <RichTextEditor
+            v-model="form.body"
+            placeholder="Adicionar comentário..."
+            :min-height="'200px'"
+        />
+
+        <div class="flex items-center gap-4">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" v-model="form.is_internal" />
+                <span class="text-sm">Comentário interno (só agents)</span>
+            </label>
+
+            <Button type="submit" :disabled="form.processing">
+                Adicionar Comentário
+            </Button>
+        </div>
+    </form>
+</template>
+```
+
+**Backend - Sanitize HTML:**
+
+```php
+use Illuminate\Support\Str;
+
+// No CreateCommentAction
+public function handle(CommentData $data, Ticket $ticket, User $user): Comment
+{
+    // Sanitize HTML (prevenir XSS)
+    $cleanBody = Str::of($data->body)
+        ->stripTags('<p><br><strong><em><u><ol><ul><li><a><h1><h2><h3><code><pre>')
+        ->trim();
+
+    return Comment::create([
+        'ticket_id' => $ticket->id,
+        'user_id' => $user->id,
+        'body' => $cleanBody,
+        'is_internal' => $data->is_internal,
+    ]);
+}
+```
+
+---
+
+#### 2. Marked + DOMPurify - Markdown Parser (0.5h)
+
+**Contexto:** KB Articles (Sprint 4) podem usar Markdown como alternativa ao Quill.
+
+**Criar MarkdownRenderer Component:**
+
+```vue
+<!-- resources/js/components/ui/MarkdownRenderer.vue -->
+<script setup>
+import { computed } from "vue";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
+
+const props = defineProps({
+    content: String,
+});
+
+// Configure marked (GitHub Flavored Markdown)
+marked.setOptions({
+    gfm: true,
+    breaks: true,
+});
+
+const html = computed(() => {
+    if (!props.content) return "";
+
+    // Parse Markdown → HTML
+    const rawHtml = marked.parse(props.content);
+
+    // Sanitize (XSS prevention)
+    return DOMPurify.sanitize(rawHtml, {
+        ALLOWED_TAGS: [
+            "p",
+            "br",
+            "strong",
+            "em",
+            "u",
+            "h1",
+            "h2",
+            "h3",
+            "ul",
+            "ol",
+            "li",
+            "a",
+            "code",
+            "pre",
+            "blockquote",
+        ],
+        ALLOWED_ATTR: ["href", "title"],
+    });
+});
+</script>
+
+<template>
+    <div class="prose dark:prose-invert max-w-none" v-html="html" />
+</template>
+
+<style>
+/* Tailwind Typography plugin já instalado (@tailwindcss/typography) */
+.prose {
+    @apply text-gray-900;
+}
+
+.prose a {
+    @apply text-blue-600 hover:underline;
+}
+
+.prose code {
+    @apply bg-gray-100 px-1 py-0.5 rounded text-sm;
+}
+
+.prose pre {
+    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto;
+}
+</style>
+```
+
+**Usar para renderizar KB Articles:**
+
+```vue
+<script setup>
+import MarkdownRenderer from "@/components/ui/MarkdownRenderer.vue";
+
+const article = defineProps({
+    article: Object, // KB Article com campo 'content' em Markdown
+});
+</script>
+
+<template>
+    <div class="max-w-4xl mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-4">{{ article.title }}</h1>
+
+        <!-- Render Markdown content -->
+        <MarkdownRenderer :content="article.content" />
+    </div>
+</template>
+```
+
+---
+
+#### 3. Laravel Notifications Multi-Channel (1.5h)
+
+**Criar Notification: CommentAddedNotification**
+
+```bash
+docker-compose exec orionone-app php artisan make:notification CommentAddedNotification
+```
+
+**Ficheiro:** `app/Notifications/CommentAddedNotification.php`
+
+```php
+<?php
+
+namespace App\Notifications;
+
+use App\Models\Comment;
+use App\Models\Ticket;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+
+class CommentAddedNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(
+        public Comment $comment,
+        public Ticket $ticket,
+    ) {}
+
+    /**
+     * Canais de notificação
+     */
+    public function via(object $notifiable): array
+    {
+        // Multi-channel: Email + Database (bell icon)
+        return ['mail', 'database'];
+    }
+
+    /**
+     * Email notification
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject("Novo comentário no ticket #{$this->ticket->ticket_number}")
+            ->greeting("Olá {$notifiable->name}!")
+            ->line("Foi adicionado um novo comentário ao ticket **{$this->ticket->title}**.")
+            ->line("**Comentário:**")
+            ->line(strip_tags($this->comment->body)) // Remove HTML do email
+            ->action('Ver Ticket', url("/tickets/{$this->ticket->id}"))
+            ->line('Obrigado por usar o OrionOne!');
+    }
+
+    /**
+     * Database notification (bell icon)
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'ticket_id' => $this->ticket->id,
+            'ticket_number' => $this->ticket->ticket_number,
+            'comment_id' => $this->comment->id,
+            'commenter_name' => $this->comment->user->name,
+            'message' => "Novo comentário no ticket #{$this->ticket->ticket_number}",
+        ];
+    }
+}
+```
+
+**Disparar Notification no CreateCommentAction:**
+
+```php
+use App\Notifications\CommentAddedNotification;
+
+public function handle(CommentData $data, Ticket $ticket, User $user): Comment
+{
+    $comment = Comment::create([
+        'ticket_id' => $ticket->id,
+        'user_id' => $user->id,
+        'body' => $data->body,
+        'is_internal' => $data->is_internal,
+    ]);
+
+    // Notificar assigned agent (se existir)
+    if ($ticket->assignee && $ticket->assignee->id !== $user->id) {
+        $ticket->assignee->notify(new CommentAddedNotification($comment, $ticket));
+    }
+
+    // Notificar requester (se não for ele que comentou)
+    if ($ticket->requester->id !== $user->id) {
+        $ticket->requester->notify(new CommentAddedNotification($comment, $ticket));
+    }
+
+    return $comment;
+}
+```
+
+**Database Notifications - Bell Icon Counter:**
+
+```vue
+<!-- resources/js/Layouts/AuthenticatedLayout.vue -->
+<script setup>
+import { computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { Bell } from "lucide-vue-next";
+
+const page = usePage();
+
+const unreadCount = computed(
+    () => page.props.auth?.user?.unread_notifications_count || 0
+);
+</script>
+
+<template>
+    <nav class="border-b bg-white">
+        <div class="flex items-center justify-between px-6 py-4">
+            <!-- ... logo ... -->
+
+            <div class="flex items-center gap-4">
+                <!-- Notifications Bell -->
+                <Link :href="route('notifications.index')" class="relative">
+                    <Bell class="w-5 h-5" />
+
+                    <!-- Badge (unread count) -->
+                    <span
+                        v-if="unreadCount > 0"
+                        class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                    >
+                        {{ unreadCount > 9 ? "9+" : unreadCount }}
+                    </span>
+                </Link>
+
+                <!-- ... user menu ... -->
+            </div>
+        </div>
+    </nav>
+</template>
+```
+
+**Share unread count no Inertia (Middleware):**
+
+```php
+// app/Http/Middleware/HandleInertiaRequests.php
+public function share(Request $request): array
+{
+    return [
+        ...parent::share($request),
+        'auth' => [
+            'user' => $request->user() ? [
+                'id' => $request->user()->id,
+                'name' => $request->user()->name,
+                'email' => $request->user()->email,
+                'avatar' => $request->user()->avatar,
+                'unread_notifications_count' => $request->user()->unreadNotifications()->count(),
+            ] : null,
+        ],
+    ];
+}
+```
+
+**Mark notification as read:**
+
+```php
+// routes/web.php
+Route::post('/notifications/{notification}/read', function (DatabaseNotification $notification) {
+    $notification->markAsRead();
+    return back();
+})->name('notifications.read');
+```
+
+**Email Configuration (local testing com Mailpit):**
+
+```env
+# .env (já configurado em SETUP.md)
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="no-reply@orionone.test"
+MAIL_FROM_NAME="OrionOne"
+```
+
+**Testar emails localmente:**
+
+```bash
+# Abrir Mailpit (já rodando via docker-compose)
+# URL: http://localhost:8025
+
+# Disparar notificação em Tinker
+docker-compose exec orionone-app php artisan tinker
+>>> $user = User::first();
+>>> $ticket = Ticket::first();
+>>> $comment = Comment::first();
+>>> $user->notify(new \App\Notifications\CommentAddedNotification($comment, $ticket));
+>>> exit
+
+# Ver email em http://localhost:8025 (Mailpit)
+```
+
+#### Checklist Rich Text & Notifications
+
+-   [ ] Vue Quill configurado globalmente
+-   [ ] RichTextEditor component criado com toolbar customizada
+-   [ ] Backend sanitiza HTML (strip_tags com whitelist)
+-   [ ] MarkdownRenderer component criado (Marked + DOMPurify)
+-   [ ] Tailwind Typography plugin configurado (@tailwindcss/typography)
+-   [ ] CommentAddedNotification criada (email + database channels)
+-   [ ] Notification disparada no CreateCommentAction
+-   [ ] Bell icon com badge de unread count no header
+-   [ ] Middleware share unread_notifications_count
+-   [ ] Route para mark notification as read
+-   [ ] Testado: Email aparece no Mailpit (http://localhost:8025)
+-   [ ] Testado: Database notification cria registo
+-   [ ] Testado: Bell icon mostra contador correto
+-   [ ] Documentado em `docs/NOTIFICATIONS-GUIDE.md`
+
+**Tempo estimado:** ~5h (Quill 1h + Marked 0.5h + Notifications backend 1.5h + Frontend 1h + Testing 1h)
+
+---
 
 ### Feature 5: Comments System
 
@@ -2489,6 +3678,427 @@ Interface de pesquisa com:
 ---
 
 ## Sprint 5: Dashboard & Reports (30 Dez - 12 Jan)
+
+### 📊 Charts & Data Visualization Setup (2h - 29 Dez)
+
+**Objetivo:** Documentar Chart.js integration para Dashboard analytics.
+
+**Contexto:** 
+- ✅ Chart.js (`chart.js: ^4.5.1`) + vue-chartjs (`^5.3.3`) **JÁ INSTALADOS!**
+- ⏳ Apenas falta documentar uso e criar wrapper components
+
+---
+
+#### 1. Chart.js Setup (30 min)
+
+**Registar Chart.js components (`resources/js/app.js`):**
+
+```javascript
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js'
+
+// Registar components necessários (tree-shaking)
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
+
+// Configuração global
+ChartJS.defaults.responsive = true
+ChartJS.defaults.maintainAspectRatio = false
+ChartJS.defaults.color = '#6b7280' // text-gray-500
+ChartJS.defaults.font.family = "'Inter', sans-serif"
+```
+
+---
+
+#### 2. Create Chart Components (1h)
+
+**2.1 LineChart - Tickets Trend:**
+
+```vue
+<!-- resources/js/components/charts/LineChart.vue -->
+<script setup>
+import { Line } from 'vue-chartjs'
+import { computed } from 'vue'
+
+const props = defineProps({
+  data: Object, // { labels: [], datasets: [] }
+  title: String,
+  height: { type: Number, default: 300 },
+})
+
+const options = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    title: {
+      display: !!props.title,
+      text: props.title,
+      font: { size: 16, weight: 'bold' },
+    },
+    legend: {
+      display: true,
+      position: 'bottom',
+    },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        precision: 0, // Inteiros apenas
+      },
+    },
+  },
+}))
+</script>
+
+<template>
+  <div :style="{ height: `${height}px` }">
+    <Line :data="data" :options="options" />
+  </div>
+</template>
+```
+
+**Usar no Dashboard:**
+
+```vue
+<script setup>
+import LineChart from '@/components/charts/LineChart.vue'
+
+const props = defineProps({
+  ticketsTrend: Object, // Backend retorna: { labels: ['1 Nov', '2 Nov'], datasets: [{ data: [10, 15] }] }
+})
+
+// Transform backend data to Chart.js format
+const chartData = {
+  labels: props.ticketsTrend.labels,
+  datasets: [
+    {
+      label: 'Tickets Criados',
+      data: props.ticketsTrend.data,
+      borderColor: 'rgb(59, 130, 246)', // blue-500
+      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+      fill: true,
+      tension: 0.3, // Smooth curve
+    },
+  ],
+}
+</script>
+
+<template>
+  <Card>
+    <CardHeader>
+      <CardTitle>Tickets Criados (Últimos 30 Dias)</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <LineChart
+        :data="chartData"
+        title="Tendência de Tickets"
+        :height="300"
+      />
+    </CardContent>
+  </Card>
+</template>
+```
+
+**Backend - Generate Trend Data:**
+
+```php
+// app/Http/Controllers/DashboardController.php
+public function index()
+{
+    // Tickets criados por dia (últimos 30 dias)
+    $ticketsTrend = Ticket::whereBetween('created_at', [now()->subDays(30), now()])
+        ->groupBy(DB::raw('DATE(created_at)'))
+        ->selectRaw('DATE(created_at) as date, count(*) as total')
+        ->orderBy('date')
+        ->get();
+    
+    // Format para Chart.js
+    $chartData = [
+        'labels' => $ticketsTrend->pluck('date')->map(fn($date) => Carbon::parse($date)->format('d M')),
+        'data' => $ticketsTrend->pluck('total'),
+    ];
+    
+    return Inertia::render('Dashboard', [
+        'ticketsTrend' => $chartData,
+    ]);
+}
+```
+
+---
+
+**2.2 PieChart - Tickets por Status:**
+
+```vue
+<!-- resources/js/components/charts/PieChart.vue -->
+<script setup>
+import { Pie } from 'vue-chartjs'
+import { computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+  title: String,
+  height: { type: Number, default: 300 },
+})
+
+const options = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    title: {
+      display: !!props.title,
+      text: props.title,
+      font: { size: 16, weight: 'bold' },
+    },
+    legend: {
+      position: 'right',
+    },
+  },
+}))
+</script>
+
+<template>
+  <div :style="{ height: `${height}px` }">
+    <Pie :data="data" :options="options" />
+  </div>
+</template>
+```
+
+**Usar no Dashboard:**
+
+```vue
+<script setup>
+const statusData = {
+  labels: ['Aberto', 'Em Progresso', 'Resolvido', 'Fechado'],
+  datasets: [
+    {
+      data: [45, 32, 78, 123], // Backend retorna contadores
+      backgroundColor: [
+        'rgb(59, 130, 246)',  // blue - open
+        'rgb(234, 179, 8)',   // yellow - in_progress
+        'rgb(34, 197, 94)',   // green - resolved
+        'rgb(156, 163, 175)', // gray - closed
+      ],
+    },
+  ],
+}
+</script>
+
+<template>
+  <Card>
+    <CardHeader>
+      <CardTitle>Tickets por Status</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <PieChart
+        :data="statusData"
+        :height="300"
+      />
+    </CardContent>
+  </Card>
+</template>
+```
+
+---
+
+**2.3 BarChart - Agent Performance:**
+
+```vue
+<!-- resources/js/components/charts/BarChart.vue -->
+<script setup>
+import { Bar } from 'vue-chartjs'
+import { computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+  title: String,
+  height: { type: Number, default: 300 },
+})
+
+const options = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    title: {
+      display: !!props.title,
+      text: props.title,
+      font: { size: 16, weight: 'bold' },
+    },
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        precision: 0,
+      },
+    },
+  },
+}))
+</script>
+
+<template>
+  <div :style="{ height: `${height}px` }">
+    <Bar :data="data" :options="options" />
+  </div>
+</template>
+```
+
+**Backend - Agent Performance Data:**
+
+```php
+// Dashboard controller
+$agentPerformance = User::role('agent')
+    ->withCount([
+        'assignedTickets as total_tickets',
+        'assignedTickets as resolved_tickets' => fn($q) => $q->where('status', 'resolved'),
+    ])
+    ->orderBy('resolved_tickets', 'desc')
+    ->limit(10)
+    ->get();
+
+$performanceData = [
+    'labels' => $agentPerformance->pluck('name'),
+    'data' => $agentPerformance->pluck('resolved_tickets'),
+];
+
+return Inertia::render('Dashboard', [
+    'agentPerformance' => $performanceData,
+]);
+```
+
+---
+
+#### 3. Advanced Features (30 min)
+
+**3.1 Export Chart as PNG:**
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import Button from '@/components/ui/Button.vue'
+
+const chartRef = ref(null)
+
+const exportChart = () => {
+  const chart = chartRef.value?.chart // Aceder ao ChartJS instance
+  if (!chart) return
+  
+  // Gerar PNG base64
+  const url = chart.toBase64Image()
+  
+  // Download
+  const link = document.createElement('a')
+  link.download = 'tickets-trend.png'
+  link.href = url
+  link.click()
+}
+</script>
+
+<template>
+  <div>
+    <LineChart ref="chartRef" :data="data" />
+    
+    <Button @click="exportChart" variant="outline" class="mt-4">
+      Exportar PNG
+    </Button>
+  </div>
+</template>
+```
+
+**3.2 Real-time Chart Updates:**
+
+```vue
+<script setup>
+import { ref, onMounted } from 'vue'
+import { router } from '@inertiajs/vue3'
+
+const chartData = ref(props.ticketsTrend)
+
+// Poll backend a cada 30 segundos
+onMounted(() => {
+  setInterval(() => {
+    router.reload({
+      only: ['ticketsTrend'],
+      onSuccess: (page) => {
+        chartData.value = page.props.ticketsTrend
+      },
+    })
+  }, 30000) // 30 seconds
+})
+</script>
+
+<template>
+  <LineChart :data="chartData" />
+</template>
+```
+
+**3.3 Dark Mode Support:**
+
+```javascript
+// Auto-detect dark mode e ajustar cores
+import { useDark } from '@vueuse/core'
+
+const isDark = useDark()
+
+const chartColors = computed(() => ({
+  borderColor: isDark.value ? 'rgb(147, 197, 253)' : 'rgb(59, 130, 246)',
+  backgroundColor: isDark.value ? 'rgba(147, 197, 253, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+  gridColor: isDark.value ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+}))
+```
+
+---
+
+#### Checklist Chart.js Integration
+
+- [ ] Chart.js components registados globalmente (tree-shaking)
+- [ ] LineChart component criado (tickets trend)
+- [ ] PieChart component criado (tickets por status)
+- [ ] BarChart component criado (agent performance)
+- [ ] DoughnutChart component criado (tickets por prioridade)
+- [ ] Backend gera dados no formato Chart.js (labels + datasets)
+- [ ] Export PNG funcional (toBase64Image)
+- [ ] Real-time updates (polling a cada 30s)
+- [ ] Dark mode support (cores adaptativas)
+- [ ] Responsive (funciona em mobile)
+- [ ] Testado: Charts renderizam corretamente
+- [ ] Testado: Tooltips mostram dados corretos
+- [ ] Testado: Legend funcional (hide/show datasets)
+- [ ] Documentado em `docs/CHARTS-GUIDE.md`
+
+**Tempo estimado:** ~2h (Setup 30min + Components 1h + Advanced 30min)
+
+**Referência:** [Chart.js Docs](https://www.chartjs.org/docs/latest/) | [Vue-ChartJS Docs](https://vue-chartjs.org/)
+
+---
 
 ### Feature 10: Admin Dashboard
 
