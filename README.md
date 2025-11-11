@@ -3,8 +3,9 @@
 
 **Modern IT Service Management Platform**
 
-[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
-[![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
+[![Status](https://img.shields.io/badge/Status-In%20Development-yellow?style=flat)](https://github.com/JMSS95/OrionOne)
+[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?style=flat&logo=vue.js&logoColor=white)](https://vuejs.org/)
 [![Inertia](https://img.shields.io/badge/Inertia.js-1.0-9553E9?style=flat&logo=inertia&logoColor=white)](https://inertiajs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
@@ -13,41 +14,96 @@
 
 </div>
 
-> Uma plataforma completa de gestão de tickets de suporte técnico, desenvolvida com Laravel 11 e Vue 3, focada em simplicidade, performance e experiência do utilizador.
+---
 
 ## Sobre o Projeto
 
-OrionOne é um sistema ITSM (IT Service Management) desenvolvido como projeto final do CET - Técnico especialista em tecnologias e programação de sistemas de informação. inspirado em soluções enterprise como ServiceNow e Jira Service Desk, o OrionOne oferece uma alternativa moderna, ágil e intuitiva para gestão de suporte técnico.
+**OrionOne** é um sistema ITSM (IT Service Management) desenvolvido como **projeto final de Engenharia de Software** (TCC). Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, demonstra arquitetura moderna, boas práticas de desenvolvimento, e stack tecnológica atual.
 
-### Principais Características
+> **Projeto Académico** • CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação
+> Centro de Formação Profissional de Évora • 2024/2026
 
-**Gestão de Tickets**
+---
 
--   Sistema completo de criação, atribuição e acompanhamento de tickets
--   Estados configuráveis (Open, In Progress, Resolved, Closed)
--   Priorização automática e manual
--   SLA tracking com alertas de violação
+## Status de Implementação
 
-**Equipas & Colaboração**
+### Implementado (Sprint 1 - Completo)
 
--   Organização por equipas especializadas
+#### **Autenticação Completa**
+
+-   Login/Register/Logout (Laravel Breeze)
+-   Password Reset via email (tokens temporários)
+-   Email Verification (link de confirmação)
+-   Proteção CSRF em todos os formulários
+
+#### **Gestão de Perfil**
+
+-   Atualizar dados pessoais (nome, email)
+-   Upload de avatar com validação (Intervention Image v3)
+    -   Formatos suportados: JPG, PNG, GIF, WEBP
+    -   Resize automático para 300x300px
+    -   Eliminação de avatar antigo ao fazer upload
+-   Delete account com confirmação
+
+#### **Infraestrutura DevOps**
+
+-   Docker Compose completo (6 containers):
+    -   `orionone-app` - Laravel PHP-FPM
+    -   `orionone-nginx` - Web server
+    -   `orionone-postgres` - Database
+    -   `orionone-redis` - Cache + Queue backend
+    -   `orionone-queue` - Worker para jobs assíncronos
+    -   `orionone-scheduler` - Cron jobs
+-   PostgreSQL 16 configurado com extensions
+-   Redis 7 para cache e queues
+-   Frontend Vue 3 + Inertia.js + Tailwind CSS
+-   Vite com Hot Module Replacement (HMR)
+
+#### **Testes Automatizados**
+
+-   Feature tests implementados:
+    -   `UpdateProfileTest` - 3 testes (todos passam)
+        -   Atualização de perfil com sucesso
+        -   Validação de dados inválidos
+        -   Upload e eliminação de avatar
+
+### Em Desenvolvimento (Sprint 2 - Próximo)
+
+#### **Sistema de Tickets**
+
+-   CRUD completo de tickets
+-   Estados (Open, In Progress, Resolved, Closed)
+-   Priorização (Low, Medium, High, Urgent)
+-   Atribuição a utilizadores/equipas
+-   Números automáticos (TKT-000001, TKT-000002...)
+
+### Roadmap (Sprints 3-6)
+
+#### **Sprint 3: Comentários**
+
 -   Sistema de comentários públicos e internos
--   Atribuição automática baseada em regras
--   Notificações por email em tempo real
+-   Menções de utilizadores (@username)
+-   Notificações em tempo real
 
-**Knowledge Base**
+#### **Sprint 4: Knowledge Base**
 
--   Base de conhecimento para self-service
--   Sistema de categorias e pesquisa
--   Métricas de utilidade dos artigos
--   Interface de criação simples para agents
+-   Artigos com categorias
+-   Full-text search (PostgreSQL)
+-   Sistema de votação (útil/não útil)
 
-**Dashboard & Métricas**
+#### **Sprint 5: Dashboard & SLA**
 
--   Visão geral de tickets por estado
--   Análise de performance de SLA
--   Estatísticas por equipa e agent
--   Tracking de tendências
+-   Métricas de tickets por estado
+-   SLA tracking com alertas
+-   Estatísticas por equipa
+
+#### **Sprint 6: Relatórios**
+
+-   Geração de relatórios (PDF/Excel)
+-   Analytics avançadas
+-   Export de dados
+
+**Roadmap completo:** [docs/MVP.md](docs/MVP.md)
 
 ---
 
@@ -94,16 +150,24 @@ laravel/telescope                # Debug & monitoring
 
 ## Quick Start
 
-### PC Novo? Instalar Primeiro:
+### Pré-requisitos
+
+> **IMPORTANTE:** Este projeto usa **Docker exclusivamente**. Não é necessário instalar PHP, PostgreSQL ou Redis localmente.
+
+**Software Necessário:**
 
 1. **Git** (2.40+) - [Download](https://git-scm.com/)
 2. **Docker Desktop** (4.25+) - [Download](https://www.docker.com/products/docker-desktop/)
-3. **Node.js** (20.x LTS) - [Download](https://nodejs.org/)
-4. **Composer** (2.6+) - [Download](https://getcomposer.org/)
+3. **Node.js** (20.x LTS) - [Download](https://nodejs.org/) _(apenas para npm local, opcional)_
 
-**[Ver Checklist Completa →](docs/QUICK-START.md)**
+**NÃO é necessário instalar:**
 
-### Setup em 5 Minutos (Docker)
+-   ❌ PHP local (usamos Docker com PHP 8.3)
+-   ❌ Composer local (incluído no container Docker)
+-   ❌ PostgreSQL local (container Docker)
+-   ❌ Redis local (container Docker)
+
+### Setup em 10 Minutos
 
 ```bash
 # 1. Clonar repositório
@@ -112,27 +176,71 @@ cd OrionOne
 
 # 2. Configurar ambiente
 cp .env.example .env
+# Defaults funcionam sem alterações
 
-# 3. Iniciar containers
+# 3. Iniciar todos os containers Docker
 docker-compose up -d
 
-# 4. Instalar dependências
+# 4. Verificar que containers estão a correr
+docker-compose ps
+# Deves ver: orionone-app, orionone-nginx, orionone-db, orionone-redis
+
+# 5. Instalar dependências backend
 docker-compose exec orionone-app composer install
-docker-compose exec orionone-frontend npm install --legacy-peer-deps
 
-# 5. Setup Laravel
+# 6. Configurar Laravel
 docker-compose exec orionone-app php artisan key:generate
-docker-compose exec orionone-db psql -U laravel -d postgres -c "CREATE DATABASE orionone_test;"
-docker-compose exec orionone-app php artisan migrate:fresh --seed
+docker-compose exec orionone-app php artisan migrate
+docker-compose exec orionone-app php artisan db:seed
 
-# 6. Iniciar frontend
-docker-compose exec orionone-frontend npm run dev
+# 7. Instalar dependências frontend
+docker-compose exec orionone-app npm install
+
+# 8. Build assets (ou dev mode com hot reload)
+docker-compose exec orionone-app npm run build
+# OU para desenvolvimento:
+docker-compose exec orionone-app npm run dev
+
+# 9. Verificar setup
+docker-compose exec orionone-app php artisan test
 ```
 
-**Aceder:** http://localhost:8888
-**Login:** admin@orionone.test / password
+### Acesso à Aplicação
 
-**[Setup Completo →](SETUP.md)** | **[Commands Reference →](docs/COMMANDS-REFERENCE.md)**
+**URLs:**
+
+-   **Frontend:** http://localhost
+-   **Laravel Pulse:** http://localhost/pulse (monitoring)
+-   **API Docs:** http://localhost/docs
+-   **Telescope:** http://localhost/telescope (debug)
+
+**Credenciais Teste:**
+
+```
+Admin:  admin@orionone.test / password
+Agent:  agent@orionone.test / password
+User:   user@orionone.test / password
+```
+
+### Comandos Úteis
+
+```bash
+# Ver logs
+docker-compose logs -f orionone-app
+
+# Parar containers
+docker-compose down
+
+# Rebuild após mudanças no Dockerfile
+docker-compose up -d --build
+
+# Migrations e cache
+docker-compose exec orionone-app php artisan migrate:fresh --seed
+docker-compose exec orionone-app php artisan config:clear
+docker-compose exec orionone-app php artisan cache:clear
+```
+
+**[Commands Reference Completa →](docs/COMMANDS-REFERENCE.md)** | **[Development Guide →](docs/development-guide.md)**
 
 ---
 
@@ -260,7 +368,7 @@ docker-compose exec app php artisan key:generate
 docker-compose exec app php artisan migrate --seed
 
 # Aceder em: http://orionone.test:8888/
-````
+```
 
 ---
 

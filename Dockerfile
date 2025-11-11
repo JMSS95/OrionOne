@@ -8,6 +8,9 @@ RUN apk add --no-cache \
     git \
     curl \
     libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    freetype-dev \
     libzip-dev \
     oniguruma-dev \
     postgresql-dev \
@@ -18,6 +21,12 @@ RUN apk add --no-cache \
     autoconf \
     g++ \
     make
+
+# Configure GD with JPEG, PNG, WebP and FreeType support
+RUN docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg \
+    --with-webp
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -41,8 +50,8 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . /var/www/html
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Create storage directories
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs storage/app/public bootstrap/cache
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
