@@ -84,6 +84,67 @@ php artisan make:factory TicketFactory
 php artisan make:seeder TicketSeeder
 ```
 
+#### 2.5. Database Features Avançadas (Opcional - Enterprise)
+
+**Views (Queries Pré-Computadas):**
+
+```sql
+-- Criar View para Dashboard (queries complexas repetidas)
+CREATE OR REPLACE VIEW v_ticket_dashboard AS
+SELECT t.id, t.ticket_number, t.status,
+       u.name AS requester_name,
+       (SELECT COUNT(*) FROM comments WHERE ticket_id = t.id) AS comment_count
+FROM tickets t
+LEFT JOIN users u ON t.requester_id = u.id;
+```
+
+**Uso em Laravel:**
+
+```php
+// Simples: View já tem JOINs pré-computados
+$tickets = DB::table('v_ticket_dashboard')->where('status', 'open')->get();
+```
+
+**Triggers (Automação):**
+
+```sql
+-- Auto-gerar ticket_number (TKT-20251111-0001)
+CREATE TRIGGER trg_generate_ticket_number
+BEFORE INSERT ON tickets
+FOR EACH ROW
+EXECUTE FUNCTION generate_ticket_number();
+```
+
+**Benefício:** Zero código PHP para gerar ticket_number!
+
+**Stored Procedures (Lógica Complexa Reutilizável):**
+
+```sql
+-- Auto-assign ticket ao agent menos ocupado
+CREATE FUNCTION assign_ticket_auto(p_ticket_id BIGINT, p_team_id BIGINT)
+RETURNS BIGINT AS $$
+  -- Lógica de assignment...
+$$ LANGUAGE plpgsql;
+```
+
+**Uso em Laravel:**
+
+```php
+$agentId = DB::selectOne('SELECT assign_ticket_auto(?, ?)', [$ticketId, $teamId]);
+```
+
+**Quando usar Database Features Avançadas:**
+
+-   **Views:** Queries repetidas em múltiplos lugares (Dashboard, Reports)
+-   **Triggers:** Automação crítica (ticket_number, SLA deadlines, audit log)
+-   **Stored Procedures:** Lógica complexa com múltiplas queries (auto-assignment, reports)
+-   **Check Constraints:** Validação em DB (enum values, data integrity)
+
+**Ver detalhes completos:**
+
+-   `docs/database-schema.md` - Todas as Views, Triggers, Procedures documentadas
+-   `docs/TECH-DEEP-DIVE-DATABASE.md` - Exemplos práticos com Laravel
+
 **Checkpoint:**
 
 ```bash
