@@ -1504,158 +1504,218 @@ const statusColors = {
 
 ---
 
-### Feature 5: API Documentation Setup (Swagger)
+### Feature 5: API Documentation Setup (Scribe)
 
 #### Phase 1: Planning (20 min)
 
 **Objetivo:**
-Configurar L5-Swagger para documentar automaticamente a API REST do OrionOne.
+Configurar Scribe para documentar automaticamente a API REST do OrionOne (já instalado: knuckleswtf/scribe 5.5).
 
 **Critérios de Aceitação:**
 
--   Instalação e configuração L5-Swagger
--   Annotations básicas nos Controllers existentes
--   Route `/api/documentation` acessível
+-   Scribe já instalado e configurado
+-   Annotations simples nos Controllers usando PHP DocBlock
+-   Route `/docs` acessível com documentação interativa
+-   OpenAPI 3.0 spec disponível em `/docs.openapi`
+-   Try It Out funcional (testar endpoints no browser)
 -   Documentação auto-gerada para Tickets API
 
-#### Phase 2: Installation & Configuration
+#### Phase 2: Verificar Configuração Existente
 
-**a) Instalar L5-Swagger:**
+**a) Verificar rotas Scribe:**
 
 ```bash
-docker-compose exec orionone-app composer require "darkaonline/l5-swagger"
-docker-compose exec orionone-app php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"
+# Scribe já está instalado no projeto
+docker-compose exec orionone-app php artisan route:list | grep docs
+# GET /docs ............ scribe (HTML documentation)
+# GET /docs.openapi ... scribe.openapi (OpenAPI 3.0 spec)
+# GET /docs.postman ... scribe.postman (Postman collection)
 ```
 
-**b) Configurar em `config/l5-swagger.php`:**
+**b) Configuração atual em `config/scribe.php` (já configurado):**
 
 ```php
-'defaults' => [
-    'api' => [
-        'title' => 'OrionOne Helpdesk API',
-        'description' => 'API documentation for OrionOne ticket management system',
-        'version' => '1.0.0',
+'title' => 'OrionOne API Documentation',
+'description' => 'API REST para sistema de gestão de tickets ITSM',
+'base_url' => config('app.url'), // http://orionone.test:8888
+
+'routes' => [
+    [
+        'match' => ['prefixes' => ['api/*']], // Apenas rotas /api/*
     ],
-    'routes' => [
-        'api' => 'api/documentation',
-    ],
+],
+
+'type' => 'laravel', // Blade view com possibilidade de autenticação
+
+'try_it_out' => [
+    'enabled' => true, // Testar endpoints diretamente no browser!
+],
+
+'auth' => [
+    'enabled' => false, // Mudar para true quando API Sanctum estiver pronta
+    'in' => 'bearer',   // Bearer token
 ],
 ```
 
-**c) Adicionar annotations básicas em `app/Http/Controllers/Controller.php`:**
+**c) Adicionar annotations Scribe nos Controllers:**
+
+Scribe usa **PHP DocBlock simples** (não precisa @OA\ ou bibliotecas extras):
 
 ```php
+// app/Http/Controllers/Api/TicketController.php
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\TicketResource;
+use App\Models\Ticket;
+
 /**
- * @OA\Info(
- *     title="OrionOne Helpdesk API",
- *     version="1.0.0",
- *     description="API REST para sistema de gestão de tickets",
- *     @OA\Contact(
- *         email="support@orionone.com"
- *     )
- * )
+ * @group Tickets
  *
- * @OA\Server(
- *     url="http://localhost:8888",
- *     description="Development Server"
- * )
- *
- * @OA\SecurityScheme(
- *     securityScheme="sanctum",
- *     type="http",
- *     scheme="bearer",
- *     bearerFormat="JWT"
- * )
+ * APIs para gerenciar tickets de suporte (CRUD completo).
  */
-abstract class Controller
+class TicketController extends Controller
 {
-    //
+    /**
+     * List all tickets
+     *
+     * Retorna lista paginada de tickets com filtros opcionais.
+     *
+     * @queryParam status string Filter by status. Example: open
+     * @queryParam priority string Filter by priority. Example: high
+     * @queryParam sort string Sort field (prefix with - for desc). Example: -created_at
+     *
+     * @response 200 {
+     *   "data": [
+     *     {
+     *       "id": 1,
+     *       "ticket_number": "TK-20241110-0001",
+     *       "title": "Laptop não liga",
+     *       "status": "open",
+     *       "priority": "high"
+     *     }
+     *   ],
+     *   "links": {"first": "...", "last": "...", "next": null},
+     *   "meta": {"current_page": 1, "total": 15}
+     * }
+     */
+    public function index(Request $request)
+    {
+        // ...
+    }
+
+    /**
+     * Create a new ticket
+     *
+     * Cria um novo ticket de suporte.
+     *
+     * @bodyParam title string required The ticket title. Example: Laptop issue
+     * @bodyParam description string required Detailed description.
+     * @bodyParam priority string Priority level. Example: high
+     * @bodyParam category_id int optional Category ID. Example: 1
+     *
+     * @response 201 {
+     *   "data": {
+     *     "id": 1,
+     *     "ticket_number": "TK-20241110-0001",
+     *     "title": "Laptop issue",
+     *     "status": "open"
+     *   }
+     * }
+     *
+     * @response 422 {
+     *   "message": "Validation failed",
+     *   "errors": {"title": ["The title field is required."]}
+     * }
+     */
+    public function store(StoreTicketRequest $request)
+    {
+        // ...
+    }
 }
 ```
 
-#### Phase 3: Document Tickets API
+/\*\*
 
-**Adicionar annotations em `TicketController`:**
-
-```php
-/**
- * @OA\Get(
- *     path="/api/tickets",
- *     summary="List all tickets",
- *     description="Retrieve paginated list of tickets with optional filters",
- *     operationId="getTickets",
- *     tags={"Tickets"},
- *     security={{"sanctum":{}}},
- *     @OA\Parameter(
- *         name="filter[status]",
- *         in="query",
- *         description="Filter by status",
- *         required=false,
- *         @OA\Schema(type="string", enum={"open","in_progress","resolved","closed"})
- *     ),
- *     @OA\Parameter(
- *         name="filter[priority]",
- *         in="query",
- *         description="Filter by priority",
- *         required=false,
- *         @OA\Schema(type="string", enum={"low","medium","high","urgent"})
- *     ),
- *     @OA\Parameter(
- *         name="sort",
- *         in="query",
- *         description="Sort by field (use - for descending)",
- *         required=false,
- *         @OA\Schema(type="string", example="-created_at")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Successful operation",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Ticket")),
- *             @OA\Property(property="links", type="object"),
- *             @OA\Property(property="meta", type="object")
- *         )
- *     ),
- *     @OA\Response(response=401, description="Unauthenticated")
- * )
- */
-public function index(Request $request)
-{
+-   @OA\Get(
+-       path="/api/tickets",
+-       summary="List all tickets",
+-       description="Retrieve paginated list of tickets with optional filters",
+-       operationId="getTickets",
+-       tags={"Tickets"},
+-       security={{"sanctum":{}}},
+-       @OA\Parameter(
+-           name="filter[status]",
+-           in="query",
+-           description="Filter by status",
+-           required=false,
+-           @OA\Schema(type="string", enum={"open","in_progress","resolved","closed"})
+-       ),
+-       @OA\Parameter(
+-           name="filter[priority]",
+-           in="query",
+-           description="Filter by priority",
+-           required=false,
+-           @OA\Schema(type="string", enum={"low","medium","high","urgent"})
+-       ),
+-       @OA\Parameter(
+-           name="sort",
+-           in="query",
+-           description="Sort by field (use - for descending)",
+-           required=false,
+-           @OA\Schema(type="string", example="-created_at")
+-       ),
+-       @OA\Response(
+-           response=200,
+-           description="Successful operation",
+-           @OA\JsonContent(
+-               type="object",
+-               @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Ticket")),
+-               @OA\Property(property="links", type="object"),
+-               @OA\Property(property="meta", type="object")
+-           )
+-       ),
+-       @OA\Response(response=401, description="Unauthenticated")
+-   )
+    \*/
+    public function index(Request $request)
+    {
     // ...
-}
+    }
 
-/**
- * @OA\Post(
- *     path="/api/tickets",
- *     summary="Create a new ticket",
- *     description="Create a new support ticket",
- *     operationId="createTicket",
- *     tags={"Tickets"},
- *     security={{"sanctum":{}}},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"title","description"},
- *             @OA\Property(property="title", type="string", maxLength=255, example="Laptop não liga"),
- *             @OA\Property(property="description", type="string", example="Detalhes do problema..."),
- *             @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"}, example="high"),
- *             @OA\Property(property="category_id", type="integer", example=1)
- *         )
- *     ),
- *     @OA\Response(
- *         response=201,
- *         description="Ticket created successfully",
- *         @OA\JsonContent(ref="#/components/schemas/Ticket")
- *     ),
- *     @OA\Response(response=422, description="Validation error")
- * )
- */
-public function store(Request $request)
-{
+/\*\*
+
+-   @OA\Post(
+-       path="/api/tickets",
+-       summary="Create a new ticket",
+-       description="Create a new support ticket",
+-       operationId="createTicket",
+-       tags={"Tickets"},
+-       security={{"sanctum":{}}},
+-       @OA\RequestBody(
+-           required=true,
+-           @OA\JsonContent(
+-               required={"title","description"},
+-               @OA\Property(property="title", type="string", maxLength=255, example="Laptop não liga"),
+-               @OA\Property(property="description", type="string", example="Detalhes do problema..."),
+-               @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"}, example="high"),
+-               @OA\Property(property="category_id", type="integer", example=1)
+-           )
+-       ),
+-       @OA\Response(
+-           response=201,
+-           description="Ticket created successfully",
+-           @OA\JsonContent(ref="#/components/schemas/Ticket")
+-       ),
+-       @OA\Response(response=422, description="Validation error")
+-   )
+    \*/
+    public function store(Request $request)
+    {
     // ...
-}
-```
+    }
+
+````
 
 **Definir schema de Ticket (adicionar no topo de `Ticket` model):**
 
@@ -1681,37 +1741,55 @@ class Ticket extends Model
 {
     // ...
 }
-```
+````
 
-#### Phase 4: Generate & Test Documentation
+#### Phase 3: Generate & Test Documentation
 
-**a) Gerar documentação:**
+**a) Gerar documentação Scribe:**
 
 ```bash
-docker-compose exec orionone-app php artisan l5-swagger:generate
+# Gerar documentação HTML + OpenAPI spec
+docker-compose exec orionone-app php artisan scribe:generate
 ```
 
 **b) Aceder à documentação:**
 
-Abrir browser: `http://localhost:8888/api/documentation`
+Abrir browser: `http://localhost:8888/docs`
 
-**c) Testar endpoints:**
+Documentação inclui:
 
--   Clicar em "Authorize" → Inserir token Sanctum
--   Testar GET `/api/tickets`
--   Testar POST `/api/tickets`
--   Verificar responses
+-   HTML interativo com Try It Out
+-   OpenAPI 3.0 spec: `http://localhost:8888/docs.openapi`
+-   Postman collection: `http://localhost:8888/docs.postman`
 
-#### Checklist Feature 5 (Swagger)
+**c) Testar endpoints com Try It Out:**
 
--   [ ] Pacote L5-Swagger instalado
--   [ ] Configuração publicada e editada
--   [ ] Annotations básicas em Controller.php
--   [ ] Annotations em TicketController (GET + POST)
--   [ ] Schema do Ticket definido
+1. Clicar em qualquer endpoint (ex: POST `/api/tickets`)
+2. Clicar botão "Try It Out"
+3. Preencher parâmetros no formulário
+4. Clicar "Execute"
+5. Ver resposta JSON em tempo real
+
+**d) Autenticação Sanctum (quando estiver pronta):**
+
+1. Mudar `'auth' => ['enabled' => true]` em `config/scribe.php`
+2. Clicar "Authorize" → Inserir Bearer token
+3. Token será incluído automaticamente em todos os requests
+
+#### Checklist Feature 5 (Scribe API Documentation)
+
+-   [ ] Scribe instalado e verificado (knuckleswtf/scribe 5.5)
+-   [ ] Configuração verificada em `config/scribe.php`
+-   [ ] Annotations PHP DocBlock adicionadas em TicketController
+-   [ ] Documentação gerada: `php artisan scribe:generate`
+-   [ ] Rota `/docs` acessível e documentação HTML renderizada
+-   [ ] OpenAPI spec disponível em `/docs.openapi`
+-   [ ] Try It Out testado com sucesso nos endpoints
+-   [ ] Postman collection exportada de `/docs.postman`
+-   [ ] Autenticação configurada quando Sanctum estiver pronto
 -   [ ] Documentação gerada com sucesso
 -   [ ] Route `/api/documentation` acessível
--   [ ] Endpoints testados via Swagger UI
+-   [ ] Endpoints testados via Scribe Try It Out (http://localhost:8888/docs)
 -   [ ] Adicionado ao `.gitignore`: `storage/api-docs/`
 
 **Nota:** Em Sprint 6, expandiremos a documentação para cobrir todos os endpoints (Comments, Teams, KB, etc).
@@ -2127,45 +2205,109 @@ Usar **Chart.js** ou **ApexCharts** para gráficos.
 
 ## Sprint 6: Polish & Deploy (13-26 Jan)
 
-### Feature 12: API Documentation (Swagger)
+### Feature 12: API Documentation (Scribe) - Final Review
 
-#### Configuração L5-Swagger
+#### Completar Documentação de Todas as APIs
 
-```bash
-docker-compose exec orionone-app composer require "darkaonline/l5-swagger"
-docker-compose exec orionone-app php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"
-```
-
-**Configurar annotations nos Controllers:**
+**a) Documentar Comments API:**
 
 ```php
+// app/Http/Controllers/Api/CommentController.php
+
 /**
- * @OA\Post(
- *     path="/api/tickets",
- *     summary="Create a new ticket",
- *     tags={"Tickets"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"title","description"},
- *             @OA\Property(property="title", type="string", example="Laptop issue"),
- *             @OA\Property(property="description", type="string"),
- *             @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"})
- *         )
- *     ),
- *     @OA\Response(response=201, description="Ticket created successfully")
- * )
+ * @group Comments
+ *
+ * Gerenciar comentários em tickets.
  */
-public function store(Request $request) { }
+class CommentController extends Controller
+{
+    /**
+     * List comments for a ticket
+     *
+     * @urlParam ticket_id int required Ticket ID. Example: 1
+     *
+     * @response 200 {
+     *   "data": [
+     *     {"id": 1, "body": "Comentário exemplo", "user": {"name": "João"}}
+     *   ]
+     * }
+     */
+    public function index(Ticket $ticket) { }
+
+    /**
+     * Add comment to ticket
+     *
+     * @urlParam ticket_id int required Ticket ID. Example: 1
+     * @bodyParam body string required Comment text. Example: Problema resolvido
+     *
+     * @response 201 {"data": {"id": 2, "body": "Problema resolvido"}}
+     */
+    public function store(Request $request, Ticket $ticket) { }
+}
 ```
 
-**Gerar documentação:**
+**b) Documentar Knowledge Base API:**
+
+```php
+// app/Http/Controllers/Api/KnowledgeBaseController.php
+
+/**
+ * @group Knowledge Base
+ *
+ * Artigos da base de conhecimento.
+ */
+class KnowledgeBaseController extends Controller
+{
+    /**
+     * Search knowledge base articles
+     *
+     * @queryParam q string Search query. Example: reset password
+     * @queryParam category_id int Filter by category. Example: 2
+     *
+     * @response 200 {
+     *   "data": [
+     *     {"id": 1, "title": "Como resetar senha", "slug": "como-resetar-senha"}
+     *   ]
+     * }
+     */
+    public function search(Request $request) { }
+}
+```
+
+**c) Ativar autenticação Sanctum:**
+
+```php
+// config/scribe.php
+'auth' => [
+    'enabled' => true,  // Ativar autenticação
+    'in' => 'bearer',
+    'name' => 'Authorization',
+    'placeholder' => 'YOUR_SANCTUM_TOKEN_HERE',
+    'extra_info' => 'Obtenha seu token via POST /api/login com email e password.',
+],
+```
+
+**d) Regenerar documentação final:**
 
 ```bash
-docker-compose exec orionone-app php artisan l5-swagger:generate
+# Gerar documentação com todas as APIs documentadas
+docker-compose exec orionone-app php artisan scribe:generate
+
+# Verificar:
+# - /docs → HTML completo
+# - /docs.openapi → OpenAPI 3.0 spec
+# - /docs.postman → Postman collection
 ```
 
-**Aceder:** http://localhost:8888/api/documentation
+**e) Adicionar exemplo de autenticação:**
+
+```bash
+# Criar token Sanctum para testes
+docker-compose exec orionone-app php artisan tinker
+>>> $user = User::first();
+>>> $token = $user->createToken('api-docs-test')->plainTextToken;
+>>> echo $token; // Copiar token para testar no /docs
+```
 
 ---
 
@@ -2280,7 +2422,7 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 
 ### Checklist Final Sprint 6
 
--   [ ] API Documentation (Swagger) completa
+-   [ ] API Documentation (Scribe) completa
 -   [ ] Testes E2E com Dusk
 -   [ ] Load testing executado
 -   [ ] Security audit sem vulnerabilidades
@@ -2341,7 +2483,7 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 
 ### Sprint 6: Polish & Deploy
 
--   [ ] API Documentation (L5-Swagger)
+-   [ ] API Documentation (Scribe 5.5) - Final review
 -   [ ] Performance optimization
 -   [ ] E2E tests (Dusk)
 -   [ ] Load testing
@@ -2437,7 +2579,7 @@ Se houver tempo extra após completar todos os 6 sprints:
 -   [ ] CreateTicketTest (não existe)
 -   [ ] ListTicketsTest (não existe)
 -   [ ] TicketFactory (não existe)
--   [ ] Swagger L5 Setup (não instalado)
+-   [ ] Scribe 5.5 configurado (knuckleswtf/scribe já instalado)
 
 **Código Implementado:**
 
@@ -2477,7 +2619,7 @@ Se houver tempo extra após completar todos os 6 sprints:
 
 ### Sprint 6: Polish & Deploy - NÃO INICIADO
 
--   [ ] API Documentation (L5-Swagger)
+-   [ ] API Documentation (Scribe 5.5) - Final review
 -   [ ] Performance optimization
 -   [ ] E2E tests (Dusk)
 -   [ ] Load testing
@@ -2537,7 +2679,7 @@ Se houver tempo extra após completar todos os 6 sprints:
 
 1. **Completar Sprint 1** - Implementar Avatar Upload (Feature 2)
 2. **Iniciar Sprint 2** - Criar sistema de Tickets (Feature 3 e 4)
-3. **Setup Swagger** - Adicionar documentação API (Feature 5)
+3. **Setup Scribe** - Adicionar documentação API (Feature 5)
 
 **Última Atualização:** 10 Novembro 2025, 02:20
 **Última Verificação Automática:** 10 Novembro 2025, 02:20
