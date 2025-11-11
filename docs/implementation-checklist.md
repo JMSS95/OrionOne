@@ -172,6 +172,7 @@ docker-compose exec orionone-app php artisan make:seeder RolePermissionSeeder
 **Ficheiro:** `database/seeders/RolePermissionSeeder.php`
 
 ```php
+
 <?php
 
 namespace Database\Seeders;

@@ -1,56 +1,96 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import DeleteUserForm from './Partials/DeleteUserForm.vue';
-import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
-import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
-import { Head } from '@inertiajs/vue3';
+import { ref } from "vue";
+import { useForm } from "@inertiajs/vue3";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Button from "@/components/ui/Button.vue";
+import Input from "@/components/ui/Input.vue";
 
-defineProps({
-    mustVerifyEmail: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
+const props = defineProps({
+    user: Object,
 });
+
+const avatarPreview = ref(
+    props.user.avatar ? `/storage/${props.user.avatar}` : null
+);
+
+const form = useForm({
+    name: props.user.name,
+    avatar: null,
+});
+
+const handleAvatarChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        form.avatar = file;
+        avatarPreview.value = URL.createObjectURL(file);
+    }
+};
+
+const submit = () => {
+    form.post(route("profile.update"));
+};
 </script>
 
 <template>
-    <Head title="Profile" />
-
     <AuthenticatedLayout>
-        <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800"
-            >
-                Profile
-            </h2>
-        </template>
+        <div class="max-w-2xl mx-auto p-6">
+            <h1 class="text-2xl font-bold mb-6">Editar Perfil</h1>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
-                    <UpdateProfileInformationForm
-                        :must-verify-email="mustVerifyEmail"
-                        :status="status"
-                        class="max-w-xl"
-                    />
+            <form @submit.prevent="submit" class="space-y-6">
+                <!-- Avatar -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">
+                        Foto de Perfil
+                    </label>
+
+                    <div class="flex items-center space-x-4">
+                        <img
+                            v-if="avatarPreview"
+                            :src="avatarPreview"
+                            alt="Avatar"
+                            class="w-24 h-24 rounded-full object-cover"
+                        />
+                        <div
+                            v-else
+                            class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center"
+                        >
+                            <span class="text-gray-500 text-2xl">
+                                {{ user.name.charAt(0).toUpperCase() }}
+                            </span>
+                        </div>
+
+                        <Input
+                            type="file"
+                            @change="handleAvatarChange"
+                            accept="image/jpeg,image/png,image/jpg"
+                        />
+                    </div>
+
+                    <p
+                        v-if="form.errors.avatar"
+                        class="mt-2 text-sm text-red-600"
+                    >
+                        {{ form.errors.avatar }}
+                    </p>
                 </div>
 
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
-                    <UpdatePasswordForm class="max-w-xl" />
+                <!-- Name -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">Nome</label>
+                    <Input v-model="form.name" required />
+                    <p
+                        v-if="form.errors.name"
+                        class="mt-2 text-sm text-red-600"
+                    >
+                        {{ form.errors.name }}
+                    </p>
                 </div>
 
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
-                    <DeleteUserForm class="max-w-xl" />
-                </div>
-            </div>
+                <!-- Submit -->
+                <Button type="submit" :disabled="form.processing">
+                    Guardar Alterações
+                </Button>
+            </form>
         </div>
     </AuthenticatedLayout>
 </template>
