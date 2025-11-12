@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/images/logo.png" alt="OrionOne Logo" width="300">
+ <img src="public/images/logo.png" alt="OrionOne Logo" width="300">
 
 **Modern IT Service Management Platform**
 
@@ -18,7 +18,9 @@
 
 ## Sobre o Projeto
 
-**OrionOne** é um sistema ITSM (IT Service Management) desenvolvido como **projeto final de Engenharia de Software** (TCC). Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, demonstra arquitetura moderna, boas práticas de desenvolvimento, e stack tecnológica atual.
+**OrionOne** é uma **plataforma ITSM (IT Service Management) completa** desenvolvida como **projeto final de Engenharia de Software** (TCC). Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, OrionOne vai além de um Helpdesk moderno para oferecer **gestão profissional de IT Service Management**, incluindo **Asset Management (CMDB)**, Knowledge Base com AI Search, SLA Management, e reporting avançado.
+
+Demonstra arquitetura moderna, boas práticas de desenvolvimento (TDD, SOLID, Clean Architecture), e stack tecnológica atual.
 
 > **Projeto Académico** • CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação
 > Centro de Formação Profissional de Évora • 2024/2026
@@ -31,77 +33,93 @@
 
 #### **Autenticação Completa**
 
--   Login/Register/Logout (Laravel Breeze)
--   Password Reset via email (tokens temporários)
--   Email Verification (link de confirmação)
--   Proteção CSRF em todos os formulários
+- Login/Register/Logout (Laravel Breeze)
+- Password Reset via email (tokens temporários)
+- Email Verification (link de confirmação)
+- Proteção CSRF em todos os formulários
 
 #### **Gestão de Perfil**
 
--   Atualizar dados pessoais (nome, email)
--   Upload de avatar com validação (Intervention Image v3)
-    -   Formatos suportados: JPG, PNG, GIF, WEBP
-    -   Resize automático para 300x300px
-    -   Eliminação de avatar antigo ao fazer upload
--   Delete account com confirmação
+- Atualizar dados pessoais (nome, email)
+- Upload de avatar com validação (Intervention Image v3)
+ - Formatos suportados: JPG, PNG, GIF, WEBP
+ - Resize automático para 300x300px
+ - Eliminação de avatar antigo ao fazer upload
+- Delete account com confirmação
 
 #### **Infraestrutura DevOps**
 
--   Docker Compose completo (6 containers):
-    -   `orionone-app` - Laravel PHP-FPM
-    -   `orionone-nginx` - Web server
-    -   `orionone-postgres` - Database
-    -   `orionone-redis` - Cache + Queue backend
-    -   `orionone-queue` - Worker para jobs assíncronos
-    -   `orionone-scheduler` - Cron jobs
--   PostgreSQL 16 configurado com extensions
--   Redis 7 para cache e queues
--   Frontend Vue 3 + Inertia.js + Tailwind CSS
--   Vite com Hot Module Replacement (HMR)
+- Docker Compose completo (6 containers):
+ - `orionone-app` - Laravel PHP-FPM
+ - `orionone-nginx` - Web server
+ - `orionone-postgres` - Database
+ - `orionone-redis` - Cache + Queue backend
+ - `orionone-queue` - Worker para jobs assíncronos
+ - `orionone-scheduler` - Cron jobs
+- PostgreSQL 16 configurado com extensions
+- Redis 7 para cache e queues
+- Frontend Vue 3 + Inertia.js + Tailwind CSS
+- Vite com Hot Module Replacement (HMR)
 
 #### **Testes Automatizados**
 
--   Feature tests implementados:
-    -   `UpdateProfileTest` - 3 testes (todos passam)
-        -   Atualização de perfil com sucesso
-        -   Validação de dados inválidos
-        -   Upload e eliminação de avatar
+- Feature tests implementados:
+ - `UpdateProfileTest` - 3 testes (todos passam)
+ - Atualização de perfil com sucesso
+ - Validação de dados inválidos
+ - Upload e eliminação de avatar
 
 ### Em Desenvolvimento (Sprint 2 - Próximo)
 
 #### **Sistema de Tickets**
 
--   CRUD completo de tickets
--   Estados (Open, In Progress, Resolved, Closed)
--   Priorização (Low, Medium, High, Urgent)
--   Atribuição a utilizadores/equipas
--   Números automáticos (TKT-000001, TKT-000002...)
+- CRUD completo de tickets
+- Estados (Open, In Progress, Resolved, Closed)
+- Priorização (Low, Medium, High, Urgent)
+- Atribuição a utilizadores/equipas
 
-### Roadmap (Sprints 3-6)
+### Roadmap (Sprints 2-7)
 
-#### **Sprint 3: Comentários**
+#### **Sprint 2: Tickets CRUD** (6 semanas)
 
--   Sistema de comentários públicos e internos
--   Menções de utilizadores (@username)
--   Notificações em tempo real
+- Gestão completa de tickets (CRUD)
+- Campos: título, descrição, prioridade, status, assigned_to
+- Números automáticos (TKT-000001, TKT-000002...)
 
-#### **Sprint 4: Knowledge Base**
+#### **Sprint 3: Comentários** (6 semanas)
 
--   Artigos com categorias
--   Full-text search (PostgreSQL)
--   Sistema de votação (útil/não útil)
+- Sistema de comentários públicos e internos
+- Menções de utilizadores (@username)
+- Notificações em tempo real
 
-#### **Sprint 5: Dashboard & SLA**
+#### **Sprint 4: Knowledge Base** (6 semanas)
 
--   Métricas de tickets por estado
--   SLA tracking com alertas
--   Estatísticas por equipa
+- Artigos com categorias
+- Full-text search (PostgreSQL)
+- Sistema de votação (útil/não útil)
 
-#### **Sprint 6: Relatórios**
+#### **Sprint 5: Dashboard & SLA** (6 semanas)
 
--   Geração de relatórios (PDF/Excel)
--   Analytics avançadas
--   Export de dados
+- Métricas de tickets por estado
+- SLA tracking com alertas
+- Estatísticas por equipa
+
+#### **Sprint 6: Teams & Automation** (4 semanas)
+
+- Teams management
+- Auto-assignment rules
+- Scheduled reports
+
+#### **Sprint 7: Asset Management (CMDB)** (4 semanas) ← **NOVO**
+
+- **Assets CRUD** (6 types: Laptop, Desktop, Server, License, Mobile, Network)
+- **Asset→Ticket linking** (affected_asset_id)
+- **CSV Import/Export** (bulk operations)
+- **Asset Reports** (status, warranty alerts, cost summary)
+
+**MVP Launch:** Fevereiro 2026 (32 semanas ~ 8 meses)
+**ITSM Score:** 8.5/10 (ITSM Profissional - inclui Asset Management)
+**Target Market:** 10-500 funcionários
 
 **Roadmap completo:** [docs/MVP.md](docs/MVP.md)
 
@@ -111,37 +129,37 @@
 
 ### Backend
 
--   **Laravel 12** - Framework PHP moderno
--   **PostgreSQL 16** - Base de dados relacional
--   **Redis 7** - Cache e queue management
--   **Spatie Laravel Data** - DTOs type-safe + validação
--   **Laravel Actions** - Lógica reutilizável (Controller/Job/Command)
--   **Query Builder** - Filtros automáticos via URL
+- **Laravel 12** - Framework PHP moderno
+- **PostgreSQL 16** - Base de dados relacional
+- **Redis 7** - Cache e queue management
+- **Spatie Laravel Data** - DTOs type-safe + validação
+- **Laravel Actions** - Lógica reutilizável (Controller/Job/Command)
+- **Query Builder** - Filtros automáticos via URL
 
 ### Frontend
 
--   **Vue 3** - Progressive JavaScript framework
--   **Inertia.js** - Monolith SPA approach
--   **Tailwind CSS** - Utility-first CSS framework
--   **Shadcn-vue** - Componentes UI (Radix + Tailwind)
--   **Vite 7** - Next generation frontend tooling
+- **Vue 3** - Progressive JavaScript framework
+- **Inertia.js** - Monolith SPA approach
+- **Tailwind CSS** - Utility-first CSS framework
+- **Shadcn-vue** - Componentes UI (Radix + Tailwind)
+- **Vite 7** - Next generation frontend tooling
 
 ### Packages Principais
 
 ```
 # Arquitetura Moderna
-spatie/laravel-data              # DTOs + Validação automática
-lorisleiva/laravel-actions       # Actions reutilizáveis
-spatie/laravel-query-builder     # Filtros URL
+spatie/laravel-data # DTOs + Validação automática
+lorisleiva/laravel-actions # Actions reutilizáveis
+spatie/laravel-query-builder # Filtros URL
 
 # Segurança & Audit
-spatie/laravel-permission        # RBAC (Roles & Permissions)
-spatie/laravel-activitylog       # Audit trail
-laravel/sanctum                  # API authentication
+spatie/laravel-permission # RBAC (Roles & Permissions)
+spatie/laravel-activitylog # Audit trail
+laravel/sanctum # API authentication
 
 # Developer Experience
-barryvdh/laravel-ide-helper      # Autocomplete IDE
-laravel/telescope                # Debug & monitoring
+barryvdh/laravel-ide-helper # Autocomplete IDE
+laravel/telescope # Debug & monitoring
 ```
 
 **[Stack Completo →](docs/tech-stack.md)**
@@ -162,10 +180,10 @@ laravel/telescope                # Debug & monitoring
 
 **NÃO é necessário instalar:**
 
--   ❌ PHP local (usamos Docker com PHP 8.3)
--   ❌ Composer local (incluído no container Docker)
--   ❌ PostgreSQL local (container Docker)
--   ❌ Redis local (container Docker)
+- PHP local (usamos Docker com PHP 8.3)
+- Composer local (incluído no container Docker)
+- PostgreSQL local (container Docker)
+- Redis local (container Docker)
 
 ### Setup em 10 Minutos
 
@@ -209,17 +227,17 @@ docker-compose exec orionone-app php artisan test
 
 **URLs:**
 
--   **Frontend:** http://localhost
--   **Laravel Pulse:** http://localhost/pulse (monitoring)
--   **API Docs:** http://localhost/docs
--   **Telescope:** http://localhost/telescope (debug)
+- **Frontend:** http://localhost
+- **Laravel Pulse:** http://localhost/pulse (monitoring)
+- **API Docs:** http://localhost/docs
+- **Telescope:** http://localhost/telescope (debug)
 
 **Credenciais Teste:**
 
 ```
-Admin:  admin@orionone.test / password
-Agent:  agent@orionone.test / password
-User:   user@orionone.test / password
+Admin: admin@orionone.test / password
+Agent: agent@orionone.test / password
+User: user@orionone.test / password
 ```
 
 ### Comandos Úteis
@@ -248,23 +266,23 @@ docker-compose exec orionone-app php artisan cache:clear
 
 ### Começar Aqui
 
--   **[Quick Start](docs/QUICK-START.md)** - Setup rápido em PC novo
--   **[Setup Completo](SETUP.md)** - Instalação detalhada + troubleshooting
--   **[Implementation Checklist](docs/implementation-checklist.md)** - Guia de desenvolvimento feature-by-feature
+- **[Quick Start](docs/QUICK-START.md)** - Setup rápido em PC novo
+- **[Setup Completo](SETUP.md)** - Instalação detalhada + troubleshooting
+- **[Implementation Checklist](docs/implementation-checklist.md)** - Guia de desenvolvimento feature-by-feature
 
 ### Referências
 
--   **[Architecture](docs/architecture.md)** - Arquitetura da aplicação
--   **[Database Schema](docs/database-schema.md)** - Estrutura da base de dados
--   **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
--   **[Commands Reference](docs/COMMANDS-REFERENCE.md)** - Todos os comandos úteis
--   **[Docker Guide](docs/DOCKER-GUIDE.md)** - Docker para iniciantes
+- **[Architecture](docs/architecture.md)** - Arquitetura da aplicação
+- **[Database Schema](docs/database-schema.md)** - Estrutura da base de dados
+- **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
+- **[Commands Reference](docs/COMMANDS-REFERENCE.md)** - Todos os comandos úteis
+- **[Docker Guide](docs/DOCKER-GUIDE.md)** - Docker para iniciantes
 
 ### Desenvolvimento
 
--   **[Development Guide](docs/development-guide.md)** - Convenções, TDD, workflow
--   **[Components Guide](docs/COMPONENTS-GUIDE.md)** - Shadcn-vue components
--   **[Development Planning](docs/development-planning.md)** - Planeamento técnico
+- **[Development Guide](docs/development-guide.md)** - Convenções, TDD, workflow
+- **[Components Guide](docs/COMPONENTS-GUIDE.md)** - Shadcn-vue components
+- **[Development Planning](docs/development-planning.md)** - Planeamento técnico
 
 ---
 
@@ -275,11 +293,11 @@ docker-compose exec orionone-app php artisan cache:clear
 
 ### Requisitos
 
--   PHP 8.4 ou superior
--   Composer 2.x
--   Node.js 20 LTS
--   PostgreSQL 16
--   Redis 7.x
+- PHP 8.4 ou superior
+- Composer 2.x
+- Node.js 20 LTS
+- PostgreSQL 16
+- Redis 7.x
 
 ### 1. Clonar o Repositório
 
@@ -376,12 +394,12 @@ docker-compose exec app php artisan migrate --seed
 
 Após executar `php artisan db:seed`:
 
-| Role  | Email               | Password |
+| Role | Email | Password |
 | ----- | ------------------- | -------- |
 | Admin | admin@orionone.test | password |
-| Agent | john@orionone.test  | password |
-| Agent | jane@orionone.test  | password |
-| User  | user1@orionone.test | password |
+| Agent | john@orionone.test | password |
+| Agent | jane@orionone.test | password |
+| User | user1@orionone.test | password |
 
 ---
 
@@ -397,12 +415,12 @@ Controllers (thin) → Services (business logic) → Models (data)
 
 **Camadas principais:**
 
--   **Presentation:** Controllers, Requests, Views (Inertia/Vue)
--   **Business Logic:** Services, Actions, Policies
--   **Data:** Models, Observers, Migrations
--   **Infrastructure:** PostgreSQL, Redis, Queue Jobs
+- **Presentation:** Controllers, Requests, Views (Inertia/Vue)
+- **Business Logic:** Services, Actions, Policies
+- **Data:** Models, Observers, Migrations
+- **Infrastructure:** PostgreSQL, Redis, Queue Jobs
 
-    **Documentação completa:** [docs/architecture.md](docs/architecture.md)
+ **Documentação completa:** [docs/architecture.md](docs/architecture.md)
 
 ---
 
@@ -410,21 +428,21 @@ Controllers (thin) → Services (business logic) → Models (data)
 
 ### Essencial (Ler Primeiro)
 
--   **[Tech Stack](docs/tech-stack.md)** - Todas as tecnologias instaladas (Backend, Frontend, API)
--   **[Implementation Checklist](docs/implementation-checklist.md)** - Guia passo a passo com código TDD (Sprints 1-2 completos + API REST + Observers + Events)
--   **[Development Planning](docs/development-planning.md)** - Sprints e roadmap
+- **[Tech Stack](docs/tech-stack.md)** - Todas as tecnologias instaladas (Backend, Frontend, API)
+- **[Implementation Checklist](docs/implementation-checklist.md)** - Guia passo a passo com código TDD (Sprints 1-2 completos + API REST + Observers + Events)
+- **[Development Planning](docs/development-planning.md)** - Sprints e roadmap
 
 ### Arquitetura & Design
 
--   **[Architecture](docs/architecture.md)** - Arquitetura MVC + Services + Actions + Observers
--   **[Database Schema](docs/database-schema.md)** - Schema completo com relacionamentos
--   **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
+- **[Architecture](docs/architecture.md)** - Arquitetura MVC + Services + Actions + Observers
+- **[Database Schema](docs/database-schema.md)** - Schema completo com relacionamentos
+- **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
 
 ### Desenvolvimento
 
--   **[Development Guide](docs/development-guide.md)** - Workflow TDD e metodologia
--   **[Commands Reference](docs/commands-reference.md)** - Todos os comandos Git, Docker, Laravel, Artisan
--   **[Business Model](docs/business-model.md)** - Modelo de negócio e SWOT
+- **[Development Guide](docs/development-guide.md)** - Workflow TDD e metodologia
+- **[Commands Reference](docs/commands-reference.md)** - Todos os comandos Git, Docker, Laravel, Artisan
+- **[Business Model](docs/business-model.md)** - Modelo de negócio e SWOT
 
 ---
 
@@ -432,12 +450,12 @@ Controllers (thin) → Services (business logic) → Models (data)
 
 PostgreSQL 16 com 15+ tabelas otimizadas:
 
--   **Core:** users, teams, tickets, comments
--   **Knowledge Base:** categories, articles
--   **Permissions:** roles, permissions (Spatie)
--   **Auditoria:** activity_log, soft deletes
+- **Core:** users, teams, tickets, comments
+- **Knowledge Base:** categories, articles
+- **Permissions:** roles, permissions (Spatie)
+- **Auditoria:** activity_log, soft deletes
 
-    **Schema completo:** [docs/database-schema.md](docs/database-schema.md)
+ **Schema completo:** [docs/database-schema.md](docs/database-schema.md)
 
 ---
 
@@ -486,9 +504,9 @@ Este projeto segue **boas práticas profissionais** de desenvolvimento:
 
 ### Feature-Driven Development + TDD
 
--   **Desenvolvimento iterativo**: Uma feature completa de cada vez (não todas as camadas de uma vez)
--   **Test-Driven Development**: Testes escritos **antes** do código (RED → GREEN → REFACTOR)
--   **Qualidade contínua**: PHPStan level 5, Laravel Pint, >80% code coverage
+- **Desenvolvimento iterativo**: Uma feature completa de cada vez (não todas as camadas de uma vez)
+- **Test-Driven Development**: Testes escritos **antes** do código (RED → GREEN → REFACTOR)
+- **Qualidade contínua**: PHPStan level 5, Laravel Pint, >80% code coverage
 
 ### 6-Phase Workflow por Feature
 
@@ -512,34 +530,48 @@ Este projeto segue **boas práticas profissionais** de desenvolvimento:
 
 ## Funcionalidades Planeadas
 
-### MVP (Fase 1) - 2.5 meses
+### MVP (Fase 1) - 8 meses (Fevereiro 2026)
 
--   [ ] Autenticação e autorização multi-role
--   [ ] CRUD completo de tickets
--   [ ] Sistema de comentários (públicos e internos)
--   [ ] Gestão de equipas
--   [ ] Atribuição automática de tickets
--   [ ] SLA tracking básico
--   [ ] Knowledge base com pesquisa
--   [ ] Dashboard com métricas
--   [ ] Notificações por email
--   [ ] Activity log (auditoria)
+**ITSM Core:**
 
-### Fase 2 (Futuro)
+- [x] Autenticação e autorização multi-role (RBAC - Spatie Permission)
+- [ ] CRUD completo de tickets (TKT-000001 auto-generated)
+- [ ] Sistema de comentários (públicos e internos)
+- [ ] Gestão de equipas (Teams + Assignment)
+- [ ] Atribuição automática de tickets
+- [ ] SLA tracking + alertas de breach
+- [ ] Knowledge base com AI Search (Meilisearch)
+- [ ] Dashboard com métricas (Chart.js)
+- [ ] Notificações por email (queues)
+- [x] Activity log (auditoria - Spatie Activity Log)
 
--   [ ] Real-time updates via WebSockets
--   [ ] Anexos de ficheiros
--   [ ] Relatórios avançados (PDF/Excel)
--   [ ] Full-text search (PostgreSQL)
--   [ ] API RESTful
+**Asset Management (CMDB):** ← **NOVO Sprint 7**
+
+- [ ] Assets CRUD (6 types: Laptop, Desktop, Server, License, Mobile, Network)
+- [ ] Asset→Ticket linking (affected_asset_id)
+- [ ] CSV Import/Export (Maatwebsite Excel)
+- [ ] Asset relationships (Asset→User, Asset→Ticket, Asset→Asset)
+- [ ] Asset reports (status, warranty alerts, cost summary)
+
+**ITSM Score:** 8.5/10 (ITSM Profissional - inclui Asset Management)
+
+### Fase 2 (Post-MVP)
+
+- [ ] Real-time updates via WebSockets
+- [ ] Anexos de ficheiros (Intervention Image)
+- [ ] Relatórios avançados (PDF/Excel export)
+- [ ] Full-text search PostgreSQL
+- [ ] API RESTful pública (OAuth 2.0)
 
 ### Roadmap (Longo Prazo)
 
--   [ ] Multi-tenancy
--   [ ] Workflows configuráveis
--   [ ] Integração com email (IMAP)
--   [ ] Mobile app
--   [ ] Sistema de aprovações
+- [ ] Change Management (ITIL)
+- [ ] Problem Management (ITIL)
+- [ ] Multi-tenancy support
+- [ ] Workflows configuráveis (drag-and-drop)
+- [ ] Integração com email (IMAP)
+- [ ] Mobile app (PWA + native)
+- [ ] Sistema de aprovações (multi-stage)
 
 ---
 
@@ -558,9 +590,9 @@ php artisan test --filter TicketTest
 
 **Estratégia de testes:**
 
--   **Unit Tests:** Services, Actions (mock dependencies)
--   **Feature Tests:** HTTP requests completos
--   **Browser Tests:** Dusk (opcional, fluxos críticos)
+- **Unit Tests:** Services, Actions (mock dependencies)
+- **Feature Tests:** HTTP requests completos
+- **Browser Tests:** Dusk (opcional, fluxos críticos)
 
 ---
 
@@ -583,23 +615,23 @@ php artisan migrate --force
 
 ### Ambiente Recomendado
 
--   PHP 8.2 FPM
--   Nginx
--   PostgreSQL 16
--   Redis
--   Supervisor (para queues)
+- PHP 8.2 FPM
+- Nginx
+- PostgreSQL 16
+- Redis
+- Supervisor (para queues)
 
 ---
 
 ## Segurança
 
--   Autenticação via Laravel Sanctum
--   CSRF protection em todos os forms
--   Password hashing com Bcrypt
--   SQL injection protection via Eloquent
--   XSS protection automático
--   Rate limiting por IP
--   Autorização granular via Policies
+- Autenticação via Laravel Sanctum
+- CSRF protection em todos os forms
+- Password hashing com Bcrypt
+- SQL injection protection via Eloquent
+- XSS protection automático
+- Rate limiting por IP
+- Autorização granular via Policies
 
 ---
 
@@ -633,18 +665,18 @@ test: testes
 
 ### Documentação do Projeto
 
--   [Requisitos Funcionais e Não-Funcionais](docs/requirements.md)
--   [Arquitetura da Aplicação](docs/architecture.md)
--   [Schema da Base de Dados](docs/database-schema.md)
--   [Guia de Desenvolvimento](docs/development-guide.md)
--   [Planeamento de Desenvolvimento](docs/development-planning.md)
--   [Modelo de Negócio](docs/business-model.md)
--   [Tech Stack Completo](docs/tech-stack.md)
+- [Requisitos Funcionais e Não-Funcionais](docs/requirements.md)
+- [Arquitetura da Aplicação](docs/architecture.md)
+- [Schema da Base de Dados](docs/database-schema.md)
+- [Guia de Desenvolvimento](docs/development-guide.md)
+- [Planeamento de Desenvolvimento](docs/development-planning.md)
+- [Modelo de Negócio](docs/business-model.md)
+- [Tech Stack Completo](docs/tech-stack.md)
 
 ### Guias de Setup
 
--   [Setup Completo](SETUP.md)
--   [Como Contribuir](CONTRIBUTING.md)
+- [Setup Completo](SETUP.md)
+- [Como Contribuir](CONTRIBUTING.md)
 
 ---
 
@@ -670,11 +702,11 @@ Desenvolvido com Laravel, Vue.js, e
 
 Stack construída sobre os ombros de gigantes:
 
--   Laravel Framework
--   Vue.js Team
--   Spatie packages
--   Tailwind Labs
--   Open Source Community
+- Laravel Framework
+- Vue.js Team
+- Spatie packages
+- Tailwind Labs
+- Open Source Community
 
 ---
 
