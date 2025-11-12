@@ -7,707 +7,488 @@
 [![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?style=flat&logo=vue.js&logoColor=white)](https://vuejs.org/)
-[![Inertia](https://img.shields.io/badge/Inertia.js-1.0-9553E9?style=flat&logo=inertia&logoColor=white)](https://inertiajs.com/)
+[![Inertia](https://img.shields.io/badge/Inertia.js-2.0-9553E9?style=flat&logo=inertia&logoColor=white)](https://inertiajs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+Uma plataforma ITSM completa para gestão profissional de IT Service Management, incluindo Asset Management (CMDB), Knowledge Base com AI Search, SLA Management e reporting avançado.
+
+[Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](CONTRIBUTING.md)
 
 </div>
 
 ---
 
-## Sobre o Projeto
+## Table of Contents
 
-**OrionOne** é uma **plataforma ITSM (IT Service Management) completa** desenvolvida como **projeto final de Engenharia de Software** (TCC). Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, OrionOne vai além de um Helpdesk moderno para oferecer **gestão profissional de IT Service Management**, incluindo **Asset Management (CMDB)**, Knowledge Base com AI Search, SLA Management, e reporting avançado.
-
-Demonstra arquitetura moderna, boas práticas de desenvolvimento (TDD, SOLID, Clean Architecture), e stack tecnológica atual.
-
-> **Projeto Académico** • CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação
-> Centro de Formação Profissional de Évora • 2024/2026
+- [About](#about)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Development](#development)
+- [Documentation](#documentation)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
-## Status de Implementação
+## About
 
-### Implementado (Sprint 1 - Completo)
+**OrionOne** é uma **plataforma ITSM (IT Service Management) completa** desenvolvida como projeto final de Engenharia de Software (TCC). Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, OrionOne oferece gestão profissional de IT Service Management para empresas de 10-500 funcionários.
 
-#### **Autenticação Completa**
+**Diferenciais:**
+- Arquitetura moderna (Laravel 12 + Vue 3 + PostgreSQL 16)
+- Desenvolvimento guiado por testes (TDD, >80% coverage)
+- Asset Management (CMDB) incluído no MVP
+- Documentação técnica completa
+- Stack enterprise open-source
 
-- Login/Register/Logout (Laravel Breeze)
-- Password Reset via email (tokens temporários)
-- Email Verification (link de confirmação)
-- Proteção CSRF em todos os formulários
+> **Projeto Académico** • CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação  
+> Centro de Formação Profissional de Évora • 2024/2026
 
-#### **Gestão de Perfil**
+**ITSM Score:** 8.5/10 | **Target Market:** 10-500 funcionários | **MVP Launch:** Fevereiro 2026
 
-- Atualizar dados pessoais (nome, email)
-- Upload de avatar com validação (Intervention Image v3)
- - Formatos suportados: JPG, PNG, GIF, WEBP
- - Resize automático para 300x300px
- - Eliminação de avatar antigo ao fazer upload
-- Delete account com confirmação
+---
 
-#### **Infraestrutura DevOps**
+## Features
 
-- Docker Compose completo (6 containers):
- - `orionone-app` - Laravel PHP-FPM
- - `orionone-nginx` - Web server
- - `orionone-postgres` - Database
- - `orionone-redis` - Cache + Queue backend
- - `orionone-queue` - Worker para jobs assíncronos
- - `orionone-scheduler` - Cron jobs
-- PostgreSQL 16 configurado com extensions
-- Redis 7 para cache e queues
-- Frontend Vue 3 + Inertia.js + Tailwind CSS
-- Vite com Hot Module Replacement (HMR)
+### Implemented (Sprint 1 - Complete)
 
-#### **Testes Automatizados**
+#### Authentication & Authorization
+- Multi-role authentication (Admin, Agent, User) via Laravel Breeze
+- Password reset with email verification
+- CSRF protection on all forms
+- Role-Based Access Control (RBAC) via Spatie Permission
 
-- Feature tests implementados:
- - `UpdateProfileTest` - 3 testes (todos passam)
- - Atualização de perfil com sucesso
- - Validação de dados inválidos
- - Upload e eliminação de avatar
+#### User Profile Management
+- Profile updates (name, email)
+- Avatar upload with validation (JPG, PNG, GIF, WEBP)
+- Auto-resize to 300x300px (Intervention Image v3)
+- Account deletion with confirmation
 
-### Em Desenvolvimento (Sprint 2 - Próximo)
+#### Infrastructure
+- Docker Compose with 6 containers (app, nginx, postgres, redis, queue, scheduler)
+- PostgreSQL 16 with advanced features (Views, Triggers, Stored Procedures)
+- Redis 7 for cache and queue management
+- Vue 3 + Inertia.js frontend with HMR
+- Automated testing (Feature + Unit tests)
 
-#### **Sistema de Tickets**
+### In Development (Sprint 2-7)
 
-- CRUD completo de tickets
-- Estados (Open, In Progress, Resolved, Closed)
-- Priorização (Low, Medium, High, Urgent)
-- Atribuição a utilizadores/equipas
+**Sprint 2: Tickets CRUD** (6 weeks)
+- Complete ticket management (Create, Read, Update, Delete)
+- Auto-generated ticket numbers (TKT-000001, TKT-000002...)
+- Priority levels (Low, Medium, High, Urgent)
+- Status tracking (Open, In Progress, Resolved, Closed)
 
-### Roadmap (Sprints 2-7)
+**Sprint 3: Comments & Collaboration** (6 weeks)
+- Public and internal comments
+- User mentions (@username)
+- Real-time notifications
 
-#### **Sprint 2: Tickets CRUD** (6 semanas)
+**Sprint 4: Knowledge Base** (6 weeks)
+- Articles with categories
+- Full-text search (PostgreSQL + Meilisearch)
+- Voting system (helpful/not helpful)
 
-- Gestão completa de tickets (CRUD)
-- Campos: título, descrição, prioridade, status, assigned_to
-- Números automáticos (TKT-000001, TKT-000002...)
+**Sprint 5: Dashboard & SLA** (6 weeks)
+- Ticket metrics by status
+- SLA tracking with breach alerts
+- Team statistics
+- Chart.js visualizations
 
-#### **Sprint 3: Comentários** (6 semanas)
-
-- Sistema de comentários públicos e internos
-- Menções de utilizadores (@username)
-- Notificações em tempo real
-
-#### **Sprint 4: Knowledge Base** (6 semanas)
-
-- Artigos com categorias
-- Full-text search (PostgreSQL)
-- Sistema de votação (útil/não útil)
-
-#### **Sprint 5: Dashboard & SLA** (6 semanas)
-
-- Métricas de tickets por estado
-- SLA tracking com alertas
-- Estatísticas por equipa
-
-#### **Sprint 6: Teams & Automation** (4 semanas)
-
-- Teams management
+**Sprint 6: Teams & Automation** (4 weeks)
+- Team management
 - Auto-assignment rules
 - Scheduled reports
 
-#### **Sprint 7: Asset Management (CMDB)** (4 semanas) ← **NOVO**
+**Sprint 7: Asset Management (CMDB)** (4 weeks) ← **NEW**
+- Assets CRUD (6 types: Laptop, Desktop, Server, License, Mobile, Network)
+- Asset-Ticket linking (affected_asset_id)
+- CSV Import/Export (bulk operations via Maatwebsite Excel)
+- Asset reports (status, warranty alerts, cost summary)
 
-- **Assets CRUD** (6 types: Laptop, Desktop, Server, License, Mobile, Network)
-- **Asset→Ticket linking** (affected_asset_id)
-- **CSV Import/Export** (bulk operations)
-- **Asset Reports** (status, warranty alerts, cost summary)
-
-**MVP Launch:** Fevereiro 2026 (32 semanas ~ 8 meses)
-**ITSM Score:** 8.5/10 (ITSM Profissional - inclui Asset Management)
-**Target Market:** 10-500 funcionários
-
-**Roadmap completo:** [docs/MVP.md](docs/MVP.md)
+**[Complete Roadmap →](docs/MVP.md)**
 
 ---
 
-## Stack Tecnológica
+## Tech Stack
 
 ### Backend
-
-- **Laravel 12** - Framework PHP moderno
-- **PostgreSQL 16** - Base de dados relacional
-- **Redis 7** - Cache e queue management
-- **Spatie Laravel Data** - DTOs type-safe + validação
-- **Laravel Actions** - Lógica reutilizável (Controller/Job/Command)
-- **Query Builder** - Filtros automáticos via URL
+- **Laravel 12** - Modern PHP framework
+- **PostgreSQL 16** - Enterprise-grade database with Views, Triggers, Stored Procedures
+- **Redis 7** - Cache and queue management
+- **Spatie Packages** - Data DTOs, Permissions, Activity Log, Query Builder
+- **Laravel Actions** - Reusable business logic (Controller/Job/Command)
 
 ### Frontend
-
 - **Vue 3** - Progressive JavaScript framework
-- **Inertia.js** - Monolith SPA approach
+- **Inertia.js 2.0** - Modern monolith SPA approach
 - **Tailwind CSS** - Utility-first CSS framework
-- **Shadcn-vue** - Componentes UI (Radix + Tailwind)
-- **Vite 7** - Next generation frontend tooling
+- **Shadcn-vue** - High-quality UI components (Radix + Tailwind)
+- **Vite 6** - Next generation frontend tooling
+- **Chart.js** - Data visualizations
 
-### Packages Principais
+### Developer Experience
+- **Docker Compose** - Consistent development environment
+- **Laravel Telescope** - Debugging and monitoring
+- **Laravel Pulse** - Real-time performance insights
+- **Pest PHP** - Modern testing framework
+- **PHPStan** - Static analysis (Level 5)
+- **Laravel Pint** - Code style formatter
 
-```
-# Arquitetura Moderna
-spatie/laravel-data # DTOs + Validação automática
-lorisleiva/laravel-actions # Actions reutilizáveis
-spatie/laravel-query-builder # Filtros URL
-
-# Segurança & Audit
-spatie/laravel-permission # RBAC (Roles & Permissions)
-spatie/laravel-activitylog # Audit trail
-laravel/sanctum # API authentication
-
-# Developer Experience
-barryvdh/laravel-ide-helper # Autocomplete IDE
-laravel/telescope # Debug & monitoring
-```
-
-**[Stack Completo →](docs/tech-stack.md)**
+**[Complete Tech Stack →](docs/tech-stack.md)**
 
 ---
 
 ## Quick Start
 
-### Pré-requisitos
+### Prerequisites
 
-> **IMPORTANTE:** Este projeto usa **Docker exclusivamente**. Não é necessário instalar PHP, PostgreSQL ou Redis localmente.
+This project uses **Docker exclusively**. No need to install PHP, PostgreSQL or Redis locally.
 
-**Software Necessário:**
+**Required:**
+- [Git](https://git-scm.com/) (2.40+)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (4.25+)
+- [Node.js](https://nodejs.org/) (20.x LTS) - Optional, for local npm
 
-1. **Git** (2.40+) - [Download](https://git-scm.com/)
-2. **Docker Desktop** (4.25+) - [Download](https://www.docker.com/products/docker-desktop/)
-3. **Node.js** (20.x LTS) - [Download](https://nodejs.org/) _(apenas para npm local, opcional)_
-
-**NÃO é necessário instalar:**
-
-- PHP local (usamos Docker com PHP 8.3)
-- Composer local (incluído no container Docker)
-- PostgreSQL local (container Docker)
-- Redis local (container Docker)
-
-### Setup em 10 Minutos
+### Setup (10 minutes)
 
 ```bash
-# 1. Clonar repositório
+# 1. Clone repository
 git clone https://github.com/JMSS95/OrionOne.git
 cd OrionOne
 
-# 2. Configurar ambiente
+# 2. Configure environment
 cp .env.example .env
-# Defaults funcionam sem alterações
+# Defaults work without changes
 
-# 3. Iniciar todos os containers Docker
+# 3. Start all Docker containers
 docker-compose up -d
 
-# 4. Verificar que containers estão a correr
+# 4. Verify containers are running
 docker-compose ps
-# Deves ver: orionone-app, orionone-nginx, orionone-db, orionone-redis
+# Should see: orionone-app, orionone-nginx, orionone-postgres, orionone-redis
 
-# 5. Instalar dependências backend
+# 5. Install backend dependencies
 docker-compose exec orionone-app composer install
 
-# 6. Configurar Laravel
+# 6. Setup Laravel
 docker-compose exec orionone-app php artisan key:generate
 docker-compose exec orionone-app php artisan migrate
 docker-compose exec orionone-app php artisan db:seed
 
-# 7. Instalar dependências frontend
+# 7. Install frontend dependencies
 docker-compose exec orionone-app npm install
 
-# 8. Build assets (ou dev mode com hot reload)
+# 8. Build assets (or dev mode with hot reload)
 docker-compose exec orionone-app npm run build
-# OU para desenvolvimento:
+# OR for development with HMR:
 docker-compose exec orionone-app npm run dev
-
-# 9. Verificar setup
-docker-compose exec orionone-app php artisan test
 ```
 
-### Acesso à Aplicação
+### Access Application
 
 **URLs:**
-
 - **Frontend:** http://localhost
+- **Laravel Telescope:** http://localhost/telescope (debugging)
 - **Laravel Pulse:** http://localhost/pulse (monitoring)
-- **API Docs:** http://localhost/docs
-- **Telescope:** http://localhost/telescope (debug)
+- **API Docs:** http://localhost/docs (Scribe)
 
-**Credenciais Teste:**
-
+**Test Credentials:**
 ```
 Admin: admin@orionone.test / password
 Agent: agent@orionone.test / password
 User: user@orionone.test / password
 ```
 
-### Comandos Úteis
+### Common Commands
 
 ```bash
-# Ver logs
+# View logs
 docker-compose logs -f orionone-app
 
-# Parar containers
+# Stop containers
 docker-compose down
 
-# Rebuild após mudanças no Dockerfile
+# Rebuild after Dockerfile changes
 docker-compose up -d --build
 
-# Migrations e cache
-docker-compose exec orionone-app php artisan migrate:fresh --seed
+# Run tests
+docker-compose exec orionone-app php artisan test
+
+# Clear cache
 docker-compose exec orionone-app php artisan config:clear
 docker-compose exec orionone-app php artisan cache:clear
 ```
 
-**[Commands Reference Completa →](docs/COMMANDS-REFERENCE.md)** | **[Development Guide →](docs/development-guide.md)**
+**[Complete Setup Guide →](SETUP.md)** | **[Commands Reference →](docs/COMMANDS-REFERENCE.md)**
 
 ---
 
-## Documentação
+## Development
 
-### Começar Aqui
+### Development Workflow
 
-- **[Quick Start](docs/QUICK-START.md)** - Setup rápido em PC novo
-- **[Setup Completo](SETUP.md)** - Instalação detalhada + troubleshooting
-- **[Implementation Checklist](docs/implementation-checklist.md)** - Guia de desenvolvimento feature-by-feature
+OrionOne follows **Feature-Driven Development + TDD**:
 
-### Referências
+**6-Phase Workflow per Feature:**
+1. **Planning** (30min) - User stories and acceptance criteria
+2. **Database** (45min) - Migration, Model, Factory, Seeder
+3. **Backend TDD** (2-3h) - Tests first, then implementation (RED → GREEN → REFACTOR)
+4. **Frontend** (1-2h) - Vue 3 components + Inertia.js pages
+5. **API** (1h) - Optional REST endpoints
+6. **Commit** (15min) - Conventional commits
 
-- **[Architecture](docs/architecture.md)** - Arquitetura da aplicação
-- **[Database Schema](docs/database-schema.md)** - Estrutura da base de dados
-- **[Tech Stack](docs/tech-stack.md)** - Stack tecnológica completa
-- **[Commands Reference](docs/COMMANDS-REFERENCE.md)** - Todos os comandos úteis
-- **[Docker Guide](docs/DOCKER-GUIDE.md)** - Docker para iniciantes
+**Code Quality:**
+- PHPStan Level 5 (static analysis)
+- Laravel Pint (PSR-12 code style)
+- >80% test coverage
+- Pest PHP for testing
 
-### Desenvolvimento
-
-- **[Development Guide](docs/development-guide.md)** - Convenções, TDD, workflow
-- **[Components Guide](docs/COMPONENTS-GUIDE.md)** - Shadcn-vue components
-- **[Development Planning](docs/development-planning.md)** - Planeamento técnico
-
----
-
-## Configuração (Sem Docker)
-
-<details>
-<summary>Clica para expandir instruções sem Docker</summary>
-
-### Requisitos
-
-- PHP 8.4 ou superior
-- Composer 2.x
-- Node.js 20 LTS
-- PostgreSQL 16
-- Redis 7.x
-
-### 1. Clonar o Repositório
-
-```bash
-git clone https://github.com/JMSS95/OrionOne.git
-cd OrionOne
-```
-
-### 2. Backend Setup
-
-```bash
-# Instalar dependências
-composer install
-
-# Configurar ambiente
-cp .env.example .env
-php artisan key:generate
-
-# Configurar base de dados no .env
-# DB_CONNECTION=pgsql
-# DB_DATABASE=orionone
-# DB_USERNAME=laravel
-# DB_PASSWORD=secret
-
-# Executar migrations
-php artisan migrate
-
-# Popular com dados de teste
-php artisan db:seed
-```
-
-### 3. Frontend Setup
-
-```bash
-# Instalar dependências
-npm install --legacy-peer-deps
-
-# Build para desenvolvimento
-npm run dev
-```
-
-### 4. Iniciar Aplicação
-
-```bash
-# Terminal 1: Laravel
-php artisan serve
-
-# Terminal 2: Vite
-npm run dev
-```
-
-**Aceder:** http://localhost:8000
-
-</details>
-
----
-
----
-
-## Credenciais de Teste
-
-php artisan serve
-
-# Terminal 2: Vite
-
-npm run dev
-
-# Aceder em: http://orionone.test:8888/
-
-```
-
-```
-
----
-
-## Docker Setup (Alternativa)
-
-```bash
-# Iniciar containers
-docker-compose up -d
-
-# Setup inicial
-docker-compose exec app composer install
-docker-compose exec app cp .env.example .env
-docker-compose exec app php artisan key:generate
-docker-compose exec app php artisan migrate --seed
-
-# Aceder em: http://orionone.test:8888/
-```
-
----
-
-## Utilizadores de Teste
-
-Após executar `php artisan db:seed`:
-
-| Role | Email | Password |
-| ----- | ------------------- | -------- |
-| Admin | admin@orionone.test | password |
-| Agent | john@orionone.test | password |
-| Agent | jane@orionone.test | password |
-| User | user1@orionone.test | password |
-
----
-
-## Arquitetura
-
-OrionOne segue uma arquitetura **MVC com Service Layer + Actions**, equilibrando simplicidade com boas práticas de Engenharia de Software:
+### Architecture
 
 ```
 Controllers (thin) → Services (business logic) → Models (data)
  ↓
  Actions (atomic operations)
+ ↓
+ Events → Listeners
+ ↓
+ Observers (model hooks)
 ```
 
-**Camadas principais:**
-
-- **Presentation:** Controllers, Requests, Views (Inertia/Vue)
+**Layers:**
+- **Presentation:** Controllers, Form Requests, Inertia Pages (Vue)
 - **Business Logic:** Services, Actions, Policies
 - **Data:** Models, Observers, Migrations
 - **Infrastructure:** PostgreSQL, Redis, Queue Jobs
 
- **Documentação completa:** [docs/architecture.md](docs/architecture.md)
+**[Complete Development Guide →](docs/development-guide.md)** | **[Architecture →](docs/architecture.md)**
 
----
-
-## Documentação
-
-### Essencial (Ler Primeiro)
-
-- **[Tech Stack](docs/tech-stack.md)** - Todas as tecnologias instaladas (Backend, Frontend, API)
-- **[Implementation Checklist](docs/implementation-checklist.md)** - Guia passo a passo com código TDD (Sprints 1-2 completos + API REST + Observers + Events)
-- **[Development Planning](docs/development-planning.md)** - Sprints e roadmap
-
-### Arquitetura & Design
-
-- **[Architecture](docs/architecture.md)** - Arquitetura MVC + Services + Actions + Observers
-- **[Database Schema](docs/database-schema.md)** - Schema completo com relacionamentos
-- **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
-
-### Desenvolvimento
-
-- **[Development Guide](docs/development-guide.md)** - Workflow TDD e metodologia
-- **[Commands Reference](docs/commands-reference.md)** - Todos os comandos Git, Docker, Laravel, Artisan
-- **[Business Model](docs/business-model.md)** - Modelo de negócio e SWOT
-
----
-
-## Database Schema
-
-PostgreSQL 16 com 15+ tabelas otimizadas:
-
-- **Core:** users, teams, tickets, comments
-- **Knowledge Base:** categories, articles
-- **Permissions:** roles, permissions (Spatie)
-- **Auditoria:** activity_log, soft deletes
-
- **Schema completo:** [docs/database-schema.md](docs/database-schema.md)
-
----
-
-## Estrutura do Projeto
+### Project Structure
 
 ```
 OrionOne/
- app/
- Http/ # Controllers, Requests, Middleware
- Services/ # Business logic (TicketService, SLAService, etc)
- Actions/ # Atomic operations (CreateTicketAction, etc)
- Models/ # Eloquent models
- Policies/ # Authorization
- Observers/ # Model hooks
- Notifications/ # Email, Slack, Database
- Events/ # Domain events
- Listeners/ # Event handlers
- Jobs/ # Async tasks
-
- database/
- migrations/ # Schema definitions
- seeders/ # Test data
- factories/ # Model factories
-
- resources/
- js/
- Pages/ # Inertia.js pages (Vue 3)
- Components/ # Reusable Vue components
- Composables/ # Vue composables
- Utils/ # Helper functions
- css/
- app.css # Tailwind CSS
-
- tests/
- Feature/ # HTTP tests
- Unit/ # Logic tests
-
- docs/ # Technical documentation
+├─ app/
+│  ├─ Http/          # Controllers, Requests, Middleware
+│  ├─ Services/      # Business logic (TicketService, SLAService)
+│  ├─ Actions/       # Atomic operations (CreateTicketAction)
+│  ├─ Models/        # Eloquent models
+│  ├─ Policies/      # Authorization
+│  ├─ Observers/     # Model hooks
+│  └─ Events/        # Domain events
+├─ database/
+│  ├─ migrations/    # Schema definitions
+│  ├─ seeders/       # Test data
+│  └─ factories/     # Model factories
+├─ resources/
+│  └─ js/
+│     ├─ Pages/      # Inertia.js pages (Vue 3)
+│     ├─ Components/ # Reusable Vue components
+│     └─ Composables/# Vue composables
+├─ tests/
+│  ├─ Feature/       # HTTP integration tests
+│  └─ Unit/          # Unit tests
+└─ docs/             # Technical documentation
 ```
+
+### Testing
+
+```bash
+# Run all tests
+docker-compose exec orionone-app php artisan test
+
+# With coverage
+docker-compose exec orionone-app php artisan test --coverage
+
+# Specific test
+docker-compose exec orionone-app php artisan test --filter=UpdateProfileTest
+
+# Continuous testing
+docker-compose exec orionone-app php artisan test --watch
+```
+
+**Test Strategy:**
+- **Unit Tests:** Services, Actions (mock dependencies)
+- **Feature Tests:** Complete HTTP requests with database
+- **Browser Tests:** Dusk (optional, for critical flows)
 
 ---
 
-## Metodologia de Desenvolvimento
+## Documentation
 
-Este projeto segue **boas práticas profissionais** de desenvolvimento:
+### Essential
+- **[Quick Start](SETUP.md)** - Complete setup guide
+- **[Implementation Checklist](docs/implementation-checklist.md)** - Feature-by-feature TDD guide
+- **[Tech Stack](docs/tech-stack.md)** - All technologies used
+- **[Commands Reference](docs/COMMANDS-REFERENCE.md)** - All useful commands
 
-### Feature-Driven Development + TDD
+### Architecture & Design
+- **[Architecture](docs/architecture.md)** - Application architecture
+- **[Database Schema](docs/database-schema.md)** - Complete schema with relationships
+- **[Requirements](docs/requirements.md)** - Functional and non-functional requirements
+- **[MVP Roadmap](docs/MVP.md)** - Complete roadmap and timeline
 
-- **Desenvolvimento iterativo**: Uma feature completa de cada vez (não todas as camadas de uma vez)
-- **Test-Driven Development**: Testes escritos **antes** do código (RED → GREEN → REFACTOR)
-- **Qualidade contínua**: PHPStan level 5, Laravel Pint, >80% code coverage
+### Deep Dives
+- **[Backend Deep Dive](docs/TECH-DEEP-DIVE-BACKEND.md)** - Laravel, Spatie, Actions
+- **[Frontend Deep Dive](docs/TECH-DEEP-DIVE-FRONTEND.md)** - Vue 3, Inertia, Shadcn
+- **[Database Deep Dive](docs/TECH-DEEP-DIVE-DATABASE.md)** - PostgreSQL, Redis, Views, Triggers
+- **[DevOps Deep Dive](docs/TECH-DEEP-DIVE-DEVOPS.md)** - Docker, Nginx, Deployment
 
-### 6-Phase Workflow por Feature
+### Development
+- **[Development Guide](docs/development-guide.md)** - TDD workflow and conventions
+- **[Components Guide](docs/COMPONENTS-GUIDE.md)** - Shadcn-vue components usage
+- **[Deployment Guide](DEPLOYMENT.md)** - Production deployment
 
-1. **Planning** (30min) - User stories e critérios de aceitação
-2. **Database** (45min) - Migration, Model, Factory, Seeder
-3. **Backend TDD** (2-3h) - Tests primeiro, depois implementação
-4. **Frontend** (1-2h) - Componentes Vue 3 + Inertia.js
-5. **API** (1h) - Endpoints opcionais se necessário
-6. **Commit** (15min) - Git commit com mensagem descritiva
-
-**Documentação completa**: Ver [`docs/development-guide.md`](docs/development-guide.md)
-
-### Scripts de Automação
-
-```powershell
-# Scaffold completo de uma feature (migration, model, controller, tests, etc)
-.\scripts\feature.ps1 Ticket
-```
+### Business
+- **[Business Model](docs/business-model.md)** - Business model and SWOT analysis
+- **[ITSM Stack Analysis](docs/ITSM-STACK-ANALYSIS.md)** - Comparison with ServiceNow
 
 ---
 
-## Funcionalidades Planeadas
+## Roadmap
 
-### MVP (Fase 1) - 8 meses (Fevereiro 2026)
+### Phase 1: MVP (8 months - February 2026)
 
-**ITSM Core:**
+**Completed:**
+- [x] Authentication & Authorization (RBAC)
+- [x] User Profile Management
+- [x] Docker Infrastructure
+- [x] Testing Setup
 
-- [x] Autenticação e autorização multi-role (RBAC - Spatie Permission)
-- [ ] CRUD completo de tickets (TKT-000001 auto-generated)
-- [ ] Sistema de comentários (públicos e internos)
-- [ ] Gestão de equipas (Teams + Assignment)
-- [ ] Atribuição automática de tickets
-- [ ] SLA tracking + alertas de breach
-- [ ] Knowledge base com AI Search (Meilisearch)
-- [ ] Dashboard com métricas (Chart.js)
-- [ ] Notificações por email (queues)
-- [x] Activity log (auditoria - Spatie Activity Log)
+**In Progress:**
+- [ ] Tickets CRUD (Sprint 2)
+- [ ] Comments System (Sprint 3)
+- [ ] Knowledge Base (Sprint 4)
+- [ ] Dashboard & SLA (Sprint 5)
+- [ ] Teams & Automation (Sprint 6)
+- [ ] Asset Management (Sprint 7)
 
-**Asset Management (CMDB):** ← **NOVO Sprint 7**
+**ITSM Score:** 8.5/10 (ITSM Professional)
 
-- [ ] Assets CRUD (6 types: Laptop, Desktop, Server, License, Mobile, Network)
-- [ ] Asset→Ticket linking (affected_asset_id)
-- [ ] CSV Import/Export (Maatwebsite Excel)
-- [ ] Asset relationships (Asset→User, Asset→Ticket, Asset→Asset)
-- [ ] Asset reports (status, warranty alerts, cost summary)
+### Phase 2: Post-MVP
 
-**ITSM Score:** 8.5/10 (ITSM Profissional - inclui Asset Management)
+- [ ] Real-time updates (WebSockets/Reverb)
+- [ ] File attachments
+- [ ] Advanced reports (PDF/Excel export)
+- [ ] Public REST API (OAuth 2.0)
+- [ ] Mobile PWA
 
-### Fase 2 (Post-MVP)
-
-- [ ] Real-time updates via WebSockets
-- [ ] Anexos de ficheiros (Intervention Image)
-- [ ] Relatórios avançados (PDF/Excel export)
-- [ ] Full-text search PostgreSQL
-- [ ] API RESTful pública (OAuth 2.0)
-
-### Roadmap (Longo Prazo)
+### Phase 3: Enterprise
 
 - [ ] Change Management (ITIL)
 - [ ] Problem Management (ITIL)
 - [ ] Multi-tenancy support
-- [ ] Workflows configuráveis (drag-and-drop)
-- [ ] Integração com email (IMAP)
-- [ ] Mobile app (PWA + native)
-- [ ] Sistema de aprovações (multi-stage)
+- [ ] Configurable workflows
+- [ ] Email integration (IMAP)
+- [ ] Native mobile apps
+
+**[Complete Roadmap →](docs/MVP.md)**
 
 ---
 
-## Testes
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+### Contribution Workflow
 
 ```bash
-# Executar suite de testes
+# 1. Fork the repository
+# 2. Create a feature branch
+git checkout -b feature/your-feature-name
+
+# 3. Make your changes following our conventions
+# 4. Run tests
 php artisan test
 
-# Com cobertura
-php artisan test --coverage
+# 5. Commit using Conventional Commits
+git commit -m "feat: add new feature X"
 
-# Testes específicos
-php artisan test --filter TicketTest
+# 6. Push and create Pull Request
+git push origin feature/your-feature-name
 ```
 
-**Estratégia de testes:**
+### Commit Conventions
 
-- **Unit Tests:** Services, Actions (mock dependencies)
-- **Feature Tests:** HTTP requests completos
-- **Browser Tests:** Dusk (opcional, fluxos críticos)
+We use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: new feature
+fix: bug fix
+docs: documentation
+refactor: code refactoring
+test: adding tests
+chore: maintenance
+```
+
+### Code Style
+
+- **PHP**: PSR-12 (enforced by Laravel Pint)
+- **JavaScript**: ESLint + Prettier
+- **Vue**: Vue 3 Composition API style guide
 
 ---
 
-## Deployment
+## Security
 
-### Produção
+OrionOne implements enterprise-grade security:
 
-```bash
-# Build assets
-npm run build
-
-# Optimize Laravel
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Migrations em produção
-php artisan migrate --force
-```
-
-### Ambiente Recomendado
-
-- PHP 8.2 FPM
-- Nginx
-- PostgreSQL 16
-- Redis
-- Supervisor (para queues)
-
----
-
-## Segurança
-
-- Autenticação via Laravel Sanctum
-- CSRF protection em todos os forms
-- Password hashing com Bcrypt
+- Authentication via Laravel Sanctum
+- CSRF protection on all forms
+- Password hashing with Bcrypt (cost 12)
 - SQL injection protection via Eloquent
-- XSS protection automático
-- Rate limiting por IP
-- Autorização granular via Policies
+- XSS protection (automatic escaping)
+- Rate limiting per IP
+- Granular authorization via Policies
+- Activity logging (audit trail)
+- Soft deletes for data recovery
+
+**Found a security issue?** Please email JMSS1995@hotmail.com instead of opening a public issue.
 
 ---
 
-## Contribuir
+## License
 
-```bash
-# Fork o repositório
-git checkout -b feature/nova-funcionalidade
-git commit -m "feat: adiciona funcionalidade X"
-git push origin feature/nova-funcionalidade
-# Abrir Pull Request
-```
+This is an academic project developed for CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação.
 
-### Convenções
+**Institution:** Centro de Formação Profissional de Évora  
+**Academic Year:** 2024/2026  
+**License:** MIT
 
-**Commits**: Conventional Commits
-
-```
-feat: nova funcionalidade
-fix: correção de bug
-docs: documentação
-refactor: refatoração
-test: testes
-```
-
-**Code Style**: PSR-12 (PHP), ESLint (JavaScript)
+See [LICENSE](LICENSE) for more information.
 
 ---
 
-## Documentação
+## Author
 
-### Documentação do Projeto
-
-- [Requisitos Funcionais e Não-Funcionais](docs/requirements.md)
-- [Arquitetura da Aplicação](docs/architecture.md)
-- [Schema da Base de Dados](docs/database-schema.md)
-- [Guia de Desenvolvimento](docs/development-guide.md)
-- [Planeamento de Desenvolvimento](docs/development-planning.md)
-- [Modelo de Negócio](docs/business-model.md)
-- [Tech Stack Completo](docs/tech-stack.md)
-
-### Guias de Setup
-
-- [Setup Completo](SETUP.md)
-- [Como Contribuir](CONTRIBUTING.md)
+**João Santos**  
+[GitHub](https://github.com/JMSS95) • [Email](mailto:JMSS1995@hotmail.com)
 
 ---
 
-## Licença
+## Acknowledgments
 
-Projeto académico desenvolvido para o CET - Técnico especialista em tecnologias e programação de sistemas de informação.
+Built with amazing open-source technologies:
 
-**Instituição**: Centro de Formação Profissional de Évora
-**Ano Letivo**: 2024/2026
-
----
-
-## Autor
-
-**João Santos**
-[Email](JMSS1995@hotmail.com) • [GitHub](https://github.com/JMSS95)
-
----
-
-## Agradecimentos
-
-Desenvolvido com Laravel, Vue.js, e
-
-Stack construída sobre os ombros de gigantes:
-
-- Laravel Framework
-- Vue.js Team
-- Spatie packages
-- Tailwind Labs
+- [Laravel](https://laravel.com) - PHP Framework
+- [Vue.js](https://vuejs.org) - Progressive JavaScript Framework
+- [Inertia.js](https://inertiajs.com) - Modern Monolith Approach
+- [Spatie](https://spatie.be/open-source) - Laravel Packages
+- [Tailwind CSS](https://tailwindcss.com) - Utility-First CSS
+- [Shadcn](https://ui.shadcn.com) - UI Components
+- [PostgreSQL](https://www.postgresql.org) - Advanced Database
 - Open Source Community
 
 ---
 
+<div align="center">
+
 **OrionOne** • Modern ITSM Platform • 2025
+
+[Documentation](docs/README.md) • [Report Bug](https://github.com/JMSS95/OrionOne/issues) • [Request Feature](https://github.com/JMSS95/OrionOne/issues)
+
+</div>
