@@ -1,10 +1,10 @@
-# 🐳 Tech Deep Dive - DevOps (Docker/Nginx/Deploy)
+# Tech Deep Dive - DevOps (Docker/Nginx/Deploy)
 
 > **Guia Completo**: Como funciona a infraestrutura do OrionOne - Docker, Docker Compose, Nginx, Deployment
 
 ---
 
-## 🐋 1. DOCKER (Containerização)
+## 1. DOCKER (Containerização)
 
 ### O que é?
 
@@ -200,7 +200,7 @@ docker-compose up -d --build
 
 ---
 
-## 🏗️ 3. DOCKERFILE (Imagem Laravel)
+## 3. DOCKERFILE (Imagem Laravel)
 
 ### O que é?
 
@@ -327,7 +327,7 @@ COPY --from=node-builder /app/public/build /var/www/public/build
 
 ---
 
-## 🌐 4. NGINX (Web Server)
+## 4. NGINX (Web Server)
 
 ### O que é?
 

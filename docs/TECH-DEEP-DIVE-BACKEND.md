@@ -1170,7 +1170,7 @@ Queue::failing(function (JobFailed $event) {
 
 ---
 
-## 🔐 2. ILLUMINATE (Componentes Core do Laravel)
+## 2. ILLUMINATE (Componentes Core do Laravel)
 
 ### O que é?
 
@@ -1336,7 +1336,7 @@ Route::middleware(['permission:tickets.delete'])->group(function() {
 // Controller retorna array (não sabemos a estrutura!)
 public function store(Request $request)
 {
-    $data = $request->all(); // Array genérico 😱
+    $data = $request->all(); // Array genérico
 
     // Que campos tem? Que tipos? Não sabemos!
     $ticket = Ticket::create($data);
@@ -1520,7 +1520,7 @@ public function index()
 
 ---
 
-## 🛠️ 4. LORISLEIVA LARAVEL ACTIONS
+## 4. LORISLEIVA LARAVEL ACTIONS
 
 ### O que faz?
 
@@ -1677,7 +1677,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
 ---
 
-## 📝 6. LARAVEL TELESCOPE (Debug & Monitoring)
+## 6. LARAVEL TELESCOPE (Debug & Monitoring)
 
 ### O que faz?
 
@@ -1755,11 +1755,11 @@ php artisan ide-helper:models --write
 class User extends Model { }
 ```
 
-Agora IDE tem **autocomplete perfeito**! 🎉
+Agora IDE tem **autocomplete perfeito**!
 
 ---
 
-## 🧪 8. PESTPHP (Testing Framework)
+## 8. PESTPHP (Testing Framework)
 
 ### O que faz?
 
@@ -1872,7 +1872,7 @@ $image->toPng();                  // Converter para PNG
 
 ---
 
-## 📧 10. LARAVEL NOTIFICATIONS (Multi-Channel)
+## 10. LARAVEL NOTIFICATIONS (Multi-Channel)
 
 ### O que faz?
 

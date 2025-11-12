@@ -592,7 +592,7 @@ $encrypted = Crypt::encryptString($sensitive);
 
 ---
 
-### 2. Cost Efficiency (OrionOne Wins) 💰
+### 2. Cost Efficiency (OrionOne Wins)
 
 **Total Cost of Ownership (10 agents, 3 years):**
 

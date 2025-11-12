@@ -1563,7 +1563,7 @@ const submit = () => {
 
 ---
 
-### 📚 Forms Avançadas: VeeValidate + Multi-file Upload + Shadcn Advanced (6h - 15-17 Nov)
+### Forms Avançadas: VeeValidate + Multi-file Upload + Shadcn Advanced (6h - 15-17 Nov)
 
 **Objetivo:** Documentar patterns avançados para forms complexas no Create Ticket.
 
@@ -2846,7 +2846,7 @@ docker-compose exec orionone-app php artisan test
 
 ## Sprint 3: Colaboração (02-15 Dez)
 
-### 📚 Rich Text & Notifications Setup (5h - 1-2 Dez)
+### Rich Text & Notifications Setup (5h - 1-2 Dez)
 
 **Objetivo:** Documentar Vue Quill rich text editor e Laravel Notifications antes de implementar Comments.
 
@@ -3679,7 +3679,7 @@ Interface de pesquisa com:
 
 ## Sprint 5: Dashboard & Reports (30 Dez - 12 Jan)
 
-### 📊 Charts & Data Visualization Setup (2h - 29 Dez)
+### Charts & Data Visualization Setup (2h - 29 Dez)
 
 **Objetivo:** Documentar Chart.js integration para Dashboard analytics.
 

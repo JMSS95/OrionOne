@@ -1,10 +1,10 @@
-# 🗄️ Tech Deep Dive - Base de Dados (PostgreSQL/Redis)
+# Tech Deep Dive - Base de Dados (PostgreSQL/Redis)
 
 > **Guia Completo**: Como funciona a camada de dados do OrionOne - PostgreSQL 16, Redis 7, Queues, Cache
 
 ---
 
-## 🐘 1. POSTGRESQL 16 (Base de Dados Relacional)
+## 1. POSTGRESQL 16 (Base de Dados Relacional)
 
 ### O que é?
 
@@ -772,10 +772,10 @@ Ticket::chunk(1000, function ($tickets) {
 
 ### Porque usar Views?
 
-- **Performance**: Query complexa executada uma vez, reutilizada sempre
-- **DRY**: Não repetir SQL complexo em múltiplos lugares
-- **Segurança**: Expor apenas colunas necessárias
-- **Simplicidade**: Query de 50 linhas viram `SELECT * FROM v_dashboard`
+-   **Performance**: Query complexa executada uma vez, reutilizada sempre
+-   **DRY**: Não repetir SQL complexo em múltiplos lugares
+-   **Segurança**: Expor apenas colunas necessárias
+-   **Simplicidade**: Query de 50 linhas viram `SELECT * FROM v_dashboard`
 
 ### VIEW 1: v_ticket_dashboard (Dashboard Principal)
 
@@ -785,7 +785,7 @@ Ticket::chunk(1000, function ($tickets) {
 
 ```sql
 CREATE OR REPLACE VIEW v_ticket_dashboard AS
-SELECT 
+SELECT
     t.id,
     t.ticket_number,
     t.title,
@@ -794,10 +794,10 @@ SELECT
     u_req.name AS requester_name,
     u_ag.name AS assigned_agent_name,
     tm.name AS team_name,
-    CASE 
+    CASE
         WHEN t.resolution_deadline < NOW() AND t.status IN ('open', 'in_progress')
-        THEN true 
-        ELSE false 
+        THEN true
+        ELSE false
     END AS is_overdue,
     (SELECT COUNT(*) FROM comments WHERE ticket_id = t.id) AS comment_count
 FROM tickets t
@@ -816,7 +816,7 @@ $tickets = Ticket::with(['requester', 'assignedAgent', 'team'])
     ->where('team_id', $teamId)
     ->get()
     ->map(function($ticket) {
-        $ticket->is_overdue = $ticket->resolution_deadline < now() 
+        $ticket->is_overdue = $ticket->resolution_deadline < now()
             && in_array($ticket->status, ['open', 'in_progress']);
         return $ticket;
     });
@@ -837,17 +837,17 @@ $tickets = DB::table('v_ticket_dashboard')
 
 ```sql
 CREATE OR REPLACE VIEW v_sla_compliance AS
-SELECT 
+SELECT
     t.id,
     t.ticket_number,
     t.priority,
-    CASE 
+    CASE
         WHEN t.first_response_at <= t.first_response_deadline THEN 'MET'
         WHEN t.first_response_at > t.first_response_deadline THEN 'BREACHED'
         WHEN t.first_response_at IS NULL AND NOW() > t.first_response_deadline THEN 'BREACHED'
         ELSE 'PENDING'
     END AS first_response_sla_status,
-    CASE 
+    CASE
         WHEN t.resolved_at <= t.resolution_deadline THEN 'MET'
         WHEN t.resolved_at > t.resolution_deadline THEN 'BREACHED'
         WHEN t.resolved_at IS NULL AND NOW() > t.resolution_deadline THEN 'BREACHED'
@@ -887,7 +887,7 @@ $slaReport = DB::table('v_sla_compliance')
 
 ```sql
 CREATE OR REPLACE VIEW v_agent_performance AS
-SELECT 
+SELECT
     u.id AS agent_id,
     u.name AS agent_name,
     COUNT(DISTINCT t.id) AS total_tickets,
@@ -912,8 +912,9 @@ $topAgents = DB::table('v_agent_performance')
 ```
 
 **Performance Tip:**
-- Views são queries "ao vivo" (sempre dados atuais)
-- Se View demorar >2s, considerar **Materialized View** (cache pré-computado)
+
+-   Views são queries "ao vivo" (sempre dados atuais)
+-   Se View demorar >2s, considerar **Materialized View** (cache pré-computado)
 
 ---
 
@@ -927,10 +928,10 @@ $topAgents = DB::table('v_agent_performance')
 
 ### Porque usar Triggers?
 
-- **Automação**: Zero código PHP para lógica repetitiva
-- **Performance**: Executa no DB (sem round-trip PHP ↔ PostgreSQL)
-- **Data Integrity**: Garantir regras mesmo se bypass Laravel
-- **Auditoria**: Log automático de mudanças
+-   **Automação**: Zero código PHP para lógica repetitiva
+-   **Performance**: Executa no DB (sem round-trip PHP ↔ PostgreSQL)
+-   **Data Integrity**: Garantir regras mesmo se bypass Laravel
+-   **Auditoria**: Log automático de mudanças
 
 ### TRIGGER 1: Auto-gerar ticket_number
 
@@ -964,14 +965,14 @@ BEGIN
     IF NEW.ticket_number IS NOT NULL THEN
         RETURN NEW; -- Já definido
     END IF;
-    
+
     date_prefix := TO_CHAR(NOW(), 'YYYYMMDD');
-    
+
     SELECT COALESCE(MAX(CAST(SUBSTRING(ticket_number FROM 13) AS INTEGER)), 0) + 1
     INTO seq_num
     FROM tickets
     WHERE ticket_number LIKE 'TKT-' || date_prefix || '-%';
-    
+
     NEW.ticket_number := 'TKT-' || date_prefix || '-' || LPAD(seq_num::TEXT, 4, '0');
     RETURN NEW;
 END;
@@ -1027,22 +1028,22 @@ $resolutionDeadline = match($priority) {
 CREATE OR REPLACE FUNCTION set_sla_deadlines()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.first_response_deadline := NEW.created_at + 
+    NEW.first_response_deadline := NEW.created_at +
         CASE NEW.priority
             WHEN 'urgent' THEN INTERVAL '2 hours'
             WHEN 'high' THEN INTERVAL '4 hours'
             WHEN 'medium' THEN INTERVAL '8 hours'
             WHEN 'low' THEN INTERVAL '24 hours'
         END;
-    
-    NEW.resolution_deadline := NEW.created_at + 
+
+    NEW.resolution_deadline := NEW.created_at +
         CASE NEW.priority
             WHEN 'urgent' THEN INTERVAL '8 hours'
             WHEN 'high' THEN INTERVAL '2 days'
             WHEN 'medium' THEN INTERVAL '5 days'
             WHEN 'low' THEN INTERVAL '10 days'
         END;
-    
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -1106,14 +1107,14 @@ BEGIN
     IF NEW.assigned_to IS NULL THEN
         RETURN NEW;
     END IF;
-    
+
     IF NOT EXISTS (
-        SELECT 1 FROM team_user 
+        SELECT 1 FROM team_user
         WHERE user_id = NEW.assigned_to AND team_id = NEW.team_id
     ) THEN
         RAISE EXCEPTION 'User % não pertence ao Team %', NEW.assigned_to, NEW.team_id;
     END IF;
-    
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -1126,11 +1127,12 @@ EXECUTE FUNCTION validate_ticket_assignment();
 ```
 
 **Benefício:**
-- Data integrity **GARANTIDA** mesmo em:
-  - Tinker/Console
-  - Seeds
-  - Direct SQL
-  - APIs sem validation
+
+-   Data integrity **GARANTIDA** mesmo em:
+    -   Tinker/Console
+    -   Seeds
+    -   Direct SQL
+    -   APIs sem validation
 
 ### TRIGGER 4: Log automático de status changes
 
@@ -1204,10 +1206,10 @@ $statusHistory = Activity::forSubject($ticket)
 
 ### Porque usar Stored Procedures?
 
-- **Performance**: Lógica executada no DB (menos round-trips)
-- **Reutilização**: Chamado de Laravel, Python, Java, etc.
-- **Transações**: ACID garantido
-- **Segurança**: Expor apenas procedures (não tabelas diretas)
+-   **Performance**: Lógica executada no DB (menos round-trips)
+-   **Reutilização**: Chamado de Laravel, Python, Java, etc.
+-   **Transações**: ACID garantido
+-   **Segurança**: Expor apenas procedures (não tabelas diretas)
 
 ### PROCEDURE 1: assign_ticket_auto()
 
@@ -1219,7 +1221,7 @@ $statusHistory = Activity::forSubject($ticket)
 // Service
 $agent = User::role('agent')
     ->whereHas('teams', fn($q) => $q->where('teams.id', $teamId))
-    ->withCount(['assignedTickets' => fn($q) => 
+    ->withCount(['assignedTickets' => fn($q) =>
         $q->whereIn('status', ['open', 'in_progress'])
     ])
     ->orderBy('assigned_tickets_count')
@@ -1244,20 +1246,20 @@ BEGIN
     SELECT u.id INTO v_agent_id
     FROM users u
     JOIN team_user tu ON u.id = tu.user_id
-    LEFT JOIN tickets t ON t.assigned_to = u.id 
+    LEFT JOIN tickets t ON t.assigned_to = u.id
                         AND t.status IN ('open', 'in_progress')
     WHERE tu.team_id = p_team_id
       AND u.is_active = true
     GROUP BY u.id
     ORDER BY COUNT(t.id) ASC, RANDOM()
     LIMIT 1;
-    
+
     IF v_agent_id IS NOT NULL THEN
-        UPDATE tickets 
+        UPDATE tickets
         SET assigned_to = v_agent_id, team_id = p_team_id
         WHERE id = p_ticket_id;
     END IF;
-    
+
     RETURN v_agent_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -1311,7 +1313,7 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         t.priority,
         COUNT(*)::BIGINT,
         COUNT(CASE WHEN t.first_response_at <= t.first_response_deadline THEN 1 END)::BIGINT,
@@ -1351,20 +1353,20 @@ return view('reports.sla', compact('slaReport'));
 
 ### Porque usar Check Constraints?
 
-- **Dupla proteção**: Laravel valida + PostgreSQL valida
-- **Data integrity**: Impossível inserir dados inválidos (mesmo via SQL direto)
-- **Performance**: Validação no DB é instantânea
-- **Documentação**: Schema autodocumentado (constraints explícitos)
+-   **Dupla proteção**: Laravel valida + PostgreSQL valida
+-   **Data integrity**: Impossível inserir dados inválidos (mesmo via SQL direto)
+-   **Performance**: Validação no DB é instantânea
+-   **Documentação**: Schema autodocumentado (constraints explícitos)
 
 ### Exemplo 1: Validar ENUM values
 
 ```sql
 -- Status deve ser um dos valores permitidos
-ALTER TABLE tickets ADD CONSTRAINT chk_tickets_status 
+ALTER TABLE tickets ADD CONSTRAINT chk_tickets_status
     CHECK (status IN ('open', 'in_progress', 'on_hold', 'resolved', 'closed'));
 
 -- Priority deve ser válido
-ALTER TABLE tickets ADD CONSTRAINT chk_tickets_priority 
+ALTER TABLE tickets ADD CONSTRAINT chk_tickets_priority
     CHECK (priority IN ('low', 'medium', 'high', 'urgent'));
 ```
 
@@ -1383,11 +1385,11 @@ Ticket::create([
 
 ```sql
 -- resolved_at deve ser posterior a created_at
-ALTER TABLE tickets ADD CONSTRAINT chk_tickets_resolved_date 
+ALTER TABLE tickets ADD CONSTRAINT chk_tickets_resolved_date
     CHECK (resolved_at IS NULL OR resolved_at >= created_at);
 
 -- closed_at deve ser posterior a resolved_at
-ALTER TABLE tickets ADD CONSTRAINT chk_tickets_closed_date 
+ALTER TABLE tickets ADD CONSTRAINT chk_tickets_closed_date
     CHECK (closed_at IS NULL OR closed_at >= resolved_at);
 ```
 
@@ -1395,10 +1397,10 @@ ALTER TABLE tickets ADD CONSTRAINT chk_tickets_closed_date
 
 ```sql
 -- Views, helpful_count não podem ser negativos
-ALTER TABLE articles ADD CONSTRAINT chk_articles_views 
+ALTER TABLE articles ADD CONSTRAINT chk_articles_views
     CHECK (views >= 0);
 
-ALTER TABLE articles ADD CONSTRAINT chk_articles_helpful 
+ALTER TABLE articles ADD CONSTRAINT chk_articles_helpful
     CHECK (helpful_count >= 0 AND not_helpful_count >= 0);
 ```
 
@@ -1406,22 +1408,23 @@ ALTER TABLE articles ADD CONSTRAINT chk_articles_helpful
 
 ```sql
 -- Email deve ter formato válido
-ALTER TABLE users ADD CONSTRAINT chk_users_email_format 
+ALTER TABLE users ADD CONSTRAINT chk_users_email_format
     CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 ```
 
 **Comparação:**
 
-| Validação | Laravel Form Request | PostgreSQL Check Constraint |
-|-----------|---------------------|----------------------------|
-| **Quando** | HTTP requests | INSERT/UPDATE sempre |
-| **Bypass?** | Console, Tinker, Seeds | ❌ NUNCA |
-| **Performance** | ~5ms | ~0.01ms (instantâneo) |
-| **Mensagens** | Customizáveis | Generic SQL error |
+| Validação       | Laravel Form Request   | PostgreSQL Check Constraint |
+| --------------- | ---------------------- | --------------------------- |
+| **Quando**      | HTTP requests          | INSERT/UPDATE sempre        |
+| **Bypass?**     | Console, Tinker, Seeds | ❌ NUNCA                    |
+| **Performance** | ~5ms                   | ~0.01ms (instantâneo)       |
+| **Mensagens**   | Customizáveis          | Generic SQL error           |
 
 **Best Practice:** Usar **AMBOS**!
-- Laravel: User-friendly error messages
-- PostgreSQL: Ultimate protection
+
+-   Laravel: User-friendly error messages
+-   PostgreSQL: Ultimate protection
 
 ---
 
@@ -1437,13 +1440,14 @@ ALTER TABLE users ADD CONSTRAINT chk_users_email_format
 
 ```sql
 -- Index apenas tickets ativos (não fechados)
-CREATE INDEX idx_tickets_active_status ON tickets(status, priority) 
+CREATE INDEX idx_tickets_active_status ON tickets(status, priority)
     WHERE deleted_at IS NULL AND status NOT IN ('closed');
 ```
 
 **Benefício:**
-- Index 50% mais pequeno (tickets fechados excluídos)
-- Queries em tickets ativos 2x mais rápidas
+
+-   Index 50% mais pequeno (tickets fechados excluídos)
+-   Queries em tickets ativos 2x mais rápidas
 
 ### Composite Indexes (Multi-Column)
 
@@ -1451,14 +1455,14 @@ CREATE INDEX idx_tickets_active_status ON tickets(status, priority)
 
 ```sql
 -- Dashboard: Filtrar por team + status + ordenar por created_at
-CREATE INDEX idx_tickets_team_status_created ON tickets(team_id, status, created_at DESC) 
+CREATE INDEX idx_tickets_team_status_created ON tickets(team_id, status, created_at DESC)
     WHERE deleted_at IS NULL;
 ```
 
 **Query otimizada:**
 
 ```sql
-SELECT * FROM tickets 
+SELECT * FROM tickets
 WHERE team_id = 5 AND status = 'open' AND deleted_at IS NULL
 ORDER BY created_at DESC;
 -- ✅ Usa idx_tickets_team_status_created (super rápido!)
@@ -1471,10 +1475,10 @@ ORDER BY created_at DESC;
 ```sql
 -- Buscar artigos por helpfulness percentage (calculado)
 CREATE INDEX idx_articles_helpfulness ON articles((
-    CASE 
-        WHEN (helpful_count + not_helpful_count) > 0 
+    CASE
+        WHEN (helpful_count + not_helpful_count) > 0
         THEN helpful_count::NUMERIC / (helpful_count + not_helpful_count)
-        ELSE 0 
+        ELSE 0
     END
 )) WHERE is_published = true;
 ```
@@ -1482,7 +1486,7 @@ CREATE INDEX idx_articles_helpfulness ON articles((
 **Query otimizada:**
 
 ```sql
-SELECT * FROM articles 
+SELECT * FROM articles
 WHERE (helpful_count::NUMERIC / (helpful_count + not_helpful_count)) > 0.8
   AND is_published = true;
 -- ✅ Usa idx_articles_helpfulness
@@ -1527,23 +1531,23 @@ save 60 10000   # Salva se 10k keys mudaram em 1min
 
 ## RESUMO: Stack Base de Dados (Enterprise-Grade)
 
-| Tecnologia              | Propósito                     | Exemplo de Uso                           |
-| ----------------------- | ----------------------------- | ---------------------------------------- |
-| **PostgreSQL 16**       | Base de dados relacional      | Tickets, Users, Teams                    |
-| **JSONB**               | Dados flexíveis indexáveis    | Metadata, Custom Fields                  |
-| **Full-Text Search**    | Pesquisa inteligente          | Buscar tickets/artigos (português)       |
-| **Arrays**              | Listas nativas                | Tags, Permissions                        |
-| **Window Functions**    | Analytics avançadas           | Rankings, Comparações                    |
-| **Database Views**      | Queries pré-computadas        | Dashboard, SLA Reports, Agent Performance |
-| **Triggers**            | Automação (ticket_number, SLA)| Auto-gerar, Auto-calcular, Auto-validar  |
-| **Stored Procedures**   | Lógica complexa reutilizável  | assign_ticket_auto(), SLA reports        |
-| **Check Constraints**   | Validação em DB               | Status enum, datas lógicas, email format |
-| **Partial Indexes**     | Indexes condicionais          | Apenas tickets ativos (performance)      |
-| **Composite Indexes**   | Multi-column indexes          | team_id + status + created_at            |
-| **Expression Indexes**  | Indexes em cálculos           | Helpfulness percentage                   |
-| **Redis 7**             | Cache + Queues                | Cache de queries, Jobs assíncronos       |
-| **Laravel Cache**       | Abstração Redis               | Cache::remember()                        |
-| **Laravel Queue**       | Jobs assíncronos              | Emails, Notifications                    |
+| Tecnologia             | Propósito                      | Exemplo de Uso                            |
+| ---------------------- | ------------------------------ | ----------------------------------------- |
+| **PostgreSQL 16**      | Base de dados relacional       | Tickets, Users, Teams                     |
+| **JSONB**              | Dados flexíveis indexáveis     | Metadata, Custom Fields                   |
+| **Full-Text Search**   | Pesquisa inteligente           | Buscar tickets/artigos (português)        |
+| **Arrays**             | Listas nativas                 | Tags, Permissions                         |
+| **Window Functions**   | Analytics avançadas            | Rankings, Comparações                     |
+| **Database Views**     | Queries pré-computadas         | Dashboard, SLA Reports, Agent Performance |
+| **Triggers**           | Automação (ticket_number, SLA) | Auto-gerar, Auto-calcular, Auto-validar   |
+| **Stored Procedures**  | Lógica complexa reutilizável   | assign_ticket_auto(), SLA reports         |
+| **Check Constraints**  | Validação em DB                | Status enum, datas lógicas, email format  |
+| **Partial Indexes**    | Indexes condicionais           | Apenas tickets ativos (performance)       |
+| **Composite Indexes**  | Multi-column indexes           | team_id + status + created_at             |
+| **Expression Indexes** | Indexes em cálculos            | Helpfulness percentage                    |
+| **Redis 7**            | Cache + Queues                 | Cache de queries, Jobs assíncronos        |
+| **Laravel Cache**      | Abstração Redis                | Cache::remember()                         |
+| **Laravel Queue**      | Jobs assíncronos               | Emails, Notifications                     |
 
 ---
 
@@ -1573,6 +1577,7 @@ save 60 10000   # Salva se 10k keys mudaram em 1min
 ## Performance Checklist (Sempre Seguir!)
 
 ✅ **Indexes:**
+
 1. Foreign keys sempre indexadas
 2. Status/Priority (queries frequentes)
 3. Timestamps (ordenação)
@@ -1582,6 +1587,7 @@ save 60 10000   # Salva se 10k keys mudaram em 1min
 7. Composite indexes (múltiplas colunas em WHERE/JOIN)
 
 ✅ **Queries:**
+
 1. Eager load relationships (`with()`) - evita N+1
 2. Select apenas colunas necessárias (não `SELECT *`)
 3. Cache queries lentas (`Cache::remember()`)
@@ -1589,16 +1595,19 @@ save 60 10000   # Salva se 10k keys mudaram em 1min
 5. Use Views para queries complexas repetidas
 
 ✅ **Automação:**
+
 1. Triggers para lógica repetitiva (ticket_number, SLA)
 2. Stored Procedures para lógica complexa reutilizável
 3. Check Constraints para validação crítica
 
 ✅ **Cache:**
+
 1. Redis para cache de queries (`ttl: 3600`)
 2. Tags para invalidação seletiva
 3. Queues para operações assíncronas (emails)
 
 ✅ **Monitoring:**
+
 1. `DB::enableQueryLog()` em desenvolvimento
 2. Laravel Telescope para queries lentas
 3. PostgreSQL `EXPLAIN ANALYZE` para optimization
