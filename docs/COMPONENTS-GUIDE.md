@@ -623,7 +623,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Button @click="toggleTheme"> {{ isDark ? "☀️" : "🌙" }} Tema </Button>
+    <Button @click="toggleTheme"> {{ isDark ? "☀" : "🌙" }} Tema </Button>
 </template>
 ```
 

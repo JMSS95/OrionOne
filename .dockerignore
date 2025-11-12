@@ -1,0 +1,49 @@
+# Dependencies
+
+node_modules/
+vendor/
+
+# Environment
+
+.env
+.env.\*
+
+# Build artifacts
+
+public/build/
+public/hot
+storage/
+
+# IDE
+
+.idea/
+.vscode/
+_.swp
+_.swo
+
+# Git
+
+.git/
+.gitignore
+.gitattributes
+
+# Testing
+
+coverage/
+.phpunit.result.cache
+
+# Documentation
+
+docs/
+\*.md
+!README.md
+
+# Docker
+
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Logs
+
+\*.log

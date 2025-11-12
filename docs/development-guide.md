@@ -94,9 +94,9 @@ php artisan tinker
 
 ---
 
-### Fase 3: Backend (TDD) (2-3h)
+### Fase 3: Tests First (RED) → Implementation (GREEN) (2-3h)
 
-#### 3.1. **PRIMEIRO: Escrever Testes**
+#### 3.1. **Tests First: Escrever Testes (RED)**
 
 ```bash
 # Feature Test (HTTP)
@@ -134,7 +134,7 @@ docker-compose exec orionone-app php artisan test --filter=TicketTest
 # RED: Route not found
 ```
 
-#### 3.2. Implementar até Testes Passarem (RED → GREEN)
+#### 3.2. Implementation: Código até Testes Passarem (GREEN)
 
 **a) Route:**
 
