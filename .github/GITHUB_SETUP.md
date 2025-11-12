@@ -2,10 +2,10 @@
 
 ## Já Configurado
 
--   [x] Repositório público
--   [x] LICENSE (MIT)
--   [x] Colaborador adicionado (pendente aceitação)
--   [x] Badges no README
+- [x] Repositório público
+- [x] LICENSE (MIT)
+- [x] Colaborador adicionado (pendente aceitação)
+- [x] Badges no README
 
 ---
 
@@ -44,15 +44,15 @@ servicedesk
 
 **Ativar:**
 
--   [x] Issues (para tracking de bugs e features)
--   [x] Preserve this repository (arquivamento)
+- [x] Issues (para tracking de bugs e features)
+- [x] Preserve this repository (arquivamento)
 
 **Desativar:**
 
--   [ ] Projects (não necessário - tens docs/requirements.md)
--   [ ] Wiki (tens pasta docs/ completa)
--   [ ] Sponsorships
--   [ ] Discussions (opcional - só se quiseres Q&A público)
+- [ ] Projects (não necessário - tens docs/requirements.md)
+- [ ] Wiki (tens pasta docs/ completa)
+- [ ] Sponsorships
+- [ ] Discussions (opcional - só se quiseres Q&A público)
 
 ---
 
@@ -62,11 +62,11 @@ servicedesk
 
 **Configurar:**
 
--   [x] Allow squash merging (mantém histórico limpo)
--   [ ] Allow merge commits
--   [ ] Allow rebase merging
--   [x] Automatically delete head branches (limpa branches após merge)
--   [x] Always suggest updating pull request branches
+- [x] Allow squash merging (mantém histórico limpo)
+- [ ] Allow merge commits
+- [ ] Allow rebase merging
+- [x] Automatically delete head branches (limpa branches após merge)
+- [x] Always suggest updating pull request branches
 
 ---
 
@@ -76,13 +76,13 @@ servicedesk
 
 **Ativar:**
 
--   [x] Dependency graph (mostra dependências)
--   [x] Dependabot alerts (avisos de segurança)
--   [x] Dependabot security updates (updates automáticos - CUIDADO: pode criar muitos PRs)
+- [x] Dependency graph (mostra dependências)
+- [x] Dependabot alerts (avisos de segurança)
+- [x] Dependabot security updates (updates automáticos - CUIDADO: pode criar muitos PRs)
 
 **Secret scanning:**
 
--   [x] Push protection (evita commits com secrets)
+- [x] Push protection (evita commits com secrets)
 
 ---
 
@@ -94,11 +94,11 @@ servicedesk
 
 **Regras recomendadas para projeto académico:**
 
--   [x] Require a pull request before merging
-    -   [ ] Require approvals: 0 (és só tu)
--   [ ] Require status checks (não tens CI/CD ainda)
--   [x] Require conversation resolution before merging
--   [x] Do not allow bypassing the above settings
+- [x] Require a pull request before merging
+ - [ ] Require approvals: 0 (és só tu)
+- [ ] Require status checks (não tens CI/CD ainda)
+- [x] Require conversation resolution before merging
+- [x] Do not allow bypassing the above settings
 
 **Benefício:** Obriga-te a trabalhar em branches (git flow profissional)
 
@@ -144,10 +144,10 @@ git push origin feature/RF02-tickets
 
 **Útil para mostrar:**
 
--   Pulse (atividade semanal)
--   Contributors (teus commits)
--   Traffic (quem visitou)
--   Network (gráfico de branches)
+- Pulse (atividade semanal)
+- Contributors (teus commits)
+- Traffic (quem visitou)
+- Network (gráfico de branches)
 
 ---
 
@@ -163,12 +163,12 @@ name: Laravel Tests
 on: [push, pull_request]
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
-            - name: Run PHPUnit
-              run: docker-compose exec -T orionone-app php artisan test
+ test:
+ runs-on: ubuntu-latest
+ steps:
+ - uses: actions/checkout@v3
+ - name: Run PHPUnit
+ run: docker-compose exec -T orionone-app php artisan test
 ```
 
 ### Issue Templates
@@ -179,13 +179,13 @@ Criar `.github/ISSUE_TEMPLATE/bug_report.md` e `feature_request.md`
 
 ## Checklist Final
 
--   [ ] About section preenchida
--   [ ] Topics adicionados (10 tags)
--   [ ] Features configuradas (Issues ON, Wiki OFF)
--   [ ] Pull Requests settings (squash merge)
--   [ ] Dependabot ativado
--   [ ] Branch protection (opcional)
--   [ ] Social preview (quando tiveres dashboard)
+- [ ] About section preenchida
+- [ ] Topics adicionados (10 tags)
+- [ ] Features configuradas (Issues ON, Wiki OFF)
+- [ ] Pull Requests settings (squash merge)
+- [ ] Dependabot ativado
+- [ ] Branch protection (opcional)
+- [ ] Social preview (quando tiveres dashboard)
 
 ---
 

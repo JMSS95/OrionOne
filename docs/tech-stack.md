@@ -11,72 +11,72 @@
 
 #### Arquitetura Moderna
 
-| Package                        | Versão | Status    | Propósito                                                           |
+| Package | Versão | Status | Propósito |
 | ------------------------------ | ------ | --------- | ------------------------------------------------------------------- |
-| `spatie/laravel-data`          | 4.18   | INSTALADO | **DTOs type-safe** + validação automática                           |
-| `lorisleiva/laravel-actions`   | 2.9    | INSTALADO | **Actions reutilizáveis** (Controller/Job/Command/Listener)         |
-| `spatie/laravel-query-builder` | 6.3    | INSTALADO | **Filtros URL automáticos** (?filter[status]=open&sort=-created_at) |
+| `spatie/laravel-data` | 4.18 | INSTALADO | **DTOs type-safe** + validação automática |
+| `lorisleiva/laravel-actions` | 2.9 | INSTALADO | **Actions reutilizáveis** (Controller/Job/Command/Listener) |
+| `spatie/laravel-query-builder` | 6.3 | INSTALADO | **Filtros URL automáticos** (?filter[status]=open&sort=-created_at) |
 
 #### Autenticação & Segurança
 
-| Package                     | Versão | Status    | Propósito                            |
+| Package | Versão | Status | Propósito |
 | --------------------------- | ------ | --------- | ------------------------------------ |
-| `spatie/laravel-permission` | 6.23   | INSTALADO | Gestão de roles e permissions (RBAC) |
-| `laravel/sanctum`           | 4.0    | INSTALADO | API authentication tokens (SPA/API)  |
+| `spatie/laravel-permission` | 6.23 | INSTALADO | Gestão de roles e permissions (RBAC) |
+| `laravel/sanctum` | 4.0 | INSTALADO | API authentication tokens (SPA/API) |
 
 #### API & Integrações
 
-| Package/Feature        | Versão | Status    | Propósito                               |
+| Package/Feature | Versão | Status | Propósito |
 | ---------------------- | ------ | --------- | --------------------------------------- |
-| **Laravel API**        | 12.x   | INSTALADO | RESTful API nativa (routes/api.php)     |
-| `laravel/sanctum`      | 4.0    | INSTALADO | Token authentication para API externa   |
-| **API Resources**      | 12.x   | INSTALADO | Transformação de dados (JsonResource)   |
-| **Rate Limiting**      | 12.x   | INSTALADO | Throttling de requests (60/min default) |
-| **CORS**               | 12.x   | INSTALADO | Cross-origin requests (frontend/mobile) |
-| `knuckleswtf/scribe`   | 5.5    | INSTALADO | Documentação automática API (OpenAPI)   |
-| **Swagger/L5-Swagger** | -      | REMOVIDO  | **REMOVIDO** (substituído por Scribe)   |
+| **Laravel API** | 12.x | INSTALADO | RESTful API nativa (routes/api.php) |
+| `laravel/sanctum` | 4.0 | INSTALADO | Token authentication para API externa |
+| **API Resources** | 12.x | INSTALADO | Transformação de dados (JsonResource) |
+| **Rate Limiting** | 12.x | INSTALADO | Throttling de requests (60/min default) |
+| **CORS** | 12.x | INSTALADO | Cross-origin requests (frontend/mobile) |
+| `knuckleswtf/scribe` | 5.5 | INSTALADO | Documentação automática API (OpenAPI) |
+| **Swagger/L5-Swagger** | - | REMOVIDO | **REMOVIDO** (substituído por Scribe) |
 
 #### Audit & Monitoring
 
-| Package                      | Versão | Status    | Propósito                                   |
+| Package | Versão | Status | Propósito |
 | ---------------------------- | ------ | --------- | ------------------------------------------- |
-| `spatie/laravel-activitylog` | 4.10   | INSTALADO | Audit trail (quem fez o quê, quando)        |
-| `laravel/telescope`          | 5.15   | INSTALADO | Debug tool (dev/staging)                    |
-| `laravel/pulse`              | 1.4    | INSTALADO | **Real-time monitoring** (dashboard /pulse) |
+| `spatie/laravel-activitylog` | 4.10 | INSTALADO | Audit trail (quem fez o quê, quando) |
+| `laravel/telescope` | 5.15 | INSTALADO | Debug tool (dev/staging) |
+| `laravel/pulse` | 1.4 | INSTALADO | **Real-time monitoring** (dashboard /pulse) |
 
 #### Search & Indexing
 
-| Package                        | Versão | Status    | Propósito                     |
+| Package | Versão | Status | Propósito |
 | ------------------------------ | ------ | --------- | ----------------------------- |
-| `laravel/scout`                | 10.21  | INSTALADO | Search abstraction layer      |
-| `meilisearch/meilisearch-php`  | 1.16   | INSTALADO | AI-powered search client (KB) |
-| **Meilisearch Docker Service** | 1.12   | INSTALADO | Search engine (porta 7700)    |
+| `laravel/scout` | 10.21 | INSTALADO | Search abstraction layer |
+| `meilisearch/meilisearch-php` | 1.16 | INSTALADO | AI-powered search client (KB) |
+| **Meilisearch Docker Service** | 1.12 | INSTALADO | Search engine (porta 7700) |
 
 #### File Processing
 
-| Package                      | Versão | Status   | Propósito                               |
+| Package | Versão | Status | Propósito |
 | ---------------------------- | ------ | -------- | --------------------------------------- |
-| `intervention/image`         | -      | REMOVIDO | **REMOVIDO** (não usado)                |
-| `league/flysystem-aws-s3-v3` | 3.30   | MANTIDO  | Storage AWS S3 (manter para futuro)     |
-| `barryvdh/laravel-dompdf`    | -      | REMOVIDO | **REMOVIDO** (não usado)                |
-| `maatwebsite/excel`          | 1.1    | MANTIDO  | Exportação Excel (manter para Sprint 6) |
+| `intervention/image` | - | REMOVIDO | **REMOVIDO** (não usado) |
+| `league/flysystem-aws-s3-v3` | 3.30 | MANTIDO | Storage AWS S3 (manter para futuro) |
+| `barryvdh/laravel-dompdf` | - | REMOVIDO | **REMOVIDO** (não usado) |
+| `maatwebsite/excel` | 1.1 | MANTIDO | Exportação Excel (manter para Sprint 6) |
 
 #### Testing
 
-| Package                       | Versão | Status    | Propósito                      |
+| Package | Versão | Status | Propósito |
 | ----------------------------- | ------ | --------- | ------------------------------ |
-| `pestphp/pest`                | 3.8    | INSTALADO | **Modern testing framework**   |
-| `pestphp/pest-plugin-laravel` | 3.2    | INSTALADO | Laravel integration for Pest   |
-| `phpunit/phpunit`             | 11.5   | INSTALADO | Base testing (usado pelo Pest) |
+| `pestphp/pest` | 3.8 | INSTALADO | **Modern testing framework** |
+| `pestphp/pest-plugin-laravel` | 3.2 | INSTALADO | Laravel integration for Pest |
+| `phpunit/phpunit` | 11.5 | INSTALADO | Base testing (usado pelo Pest) |
 
 #### Developer Experience
 
-| Package                       | Versão | Status    | Propósito                                |
+| Package | Versão | Status | Propósito |
 | ----------------------------- | ------ | --------- | ---------------------------------------- |
-| `barryvdh/laravel-ide-helper` | 3.6    | INSTALADO | Autocomplete perfeito (PHPStorm, VSCode) |
-| `barryvdh/laravel-debugbar`   | 3.16   | INSTALADO | Debug toolbar (dev)                      |
-| `laravel/pint`                | 1.24   | INSTALADO | Code style fixer                         |
-| `larastan/larastan`           | 3.8    | INSTALADO | PHPStan for Laravel (static analysis)    |
+| `barryvdh/laravel-ide-helper` | 3.6 | INSTALADO | Autocomplete perfeito (PHPStorm, VSCode) |
+| `barryvdh/laravel-debugbar` | 3.16 | INSTALADO | Debug toolbar (dev) |
+| `laravel/pint` | 1.24 | INSTALADO | Code style fixer |
+| `larastan/larastan` | 3.8 | INSTALADO | PHPStan for Laravel (static analysis) |
 
 ---
 
@@ -84,56 +84,56 @@
 
 #### Core Framework
 
-| Package              | Versão | Status    | Propósito                        |
+| Package | Versão | Status | Propósito |
 | -------------------- | ------ | --------- | -------------------------------- |
-| `vue`                | 3.4    | INSTALADO | Framework reativo                |
-| `@inertiajs/vue3`    | 2.0    | INSTALADO | SSR simplificado (sem API REST)  |
-| `vite`               | 6.4    | INSTALADO | Build tool (downgrade do 7.0 RC) |
-| `@vitejs/plugin-vue` | 5.x    | INSTALADO | Plugin Vite para Vue 3           |
+| `vue` | 3.4 | INSTALADO | Framework reativo |
+| `@inertiajs/vue3` | 2.0 | INSTALADO | SSR simplificado (sem API REST) |
+| `vite` | 6.4 | INSTALADO | Build tool (downgrade do 7.0 RC) |
+| `@vitejs/plugin-vue` | 5.x | INSTALADO | Plugin Vite para Vue 3 |
 
 #### UI Components (Shadcn-vue)
 
-| Package                    | Versão | Status    | Propósito                                  |
+| Package | Versão | Status | Propósito |
 | -------------------------- | ------ | --------- | ------------------------------------------ |
-| `clsx`                     | \*     | INSTALADO | Utility para className condicionais        |
-| `tailwind-merge`           | \*     | INSTALADO | Merge classes Tailwind sem conflitos       |
-| `tailwindcss-animate`      | \*     | INSTALADO | Animações Tailwind CSS                     |
-| `class-variance-authority` | \*     | INSTALADO | Variantes de componentes type-safe (CVA)   |
-| `lucide-vue-next`          | \*     | INSTALADO | Ícones Lucide (600+ ícones modernos)       |
-| `radix-vue`                | \*     | INSTALADO | Componentes acessíveis Radix UI para Vue 3 |
+| `clsx` | \* | INSTALADO | Utility para className condicionais |
+| `tailwind-merge` | \* | INSTALADO | Merge classes Tailwind sem conflitos |
+| `tailwindcss-animate` | \* | INSTALADO | Animações Tailwind CSS |
+| `class-variance-authority` | \* | INSTALADO | Variantes de componentes type-safe (CVA) |
+| `lucide-vue-next` | \* | INSTALADO | Ícones Lucide (600+ ícones modernos) |
+| `radix-vue` | \* | INSTALADO | Componentes acessíveis Radix UI para Vue 3 |
 
 #### Ícones
 
-| Package           | Versão | Status    | Propósito                             |
+| Package | Versão | Status | Propósito |
 | ----------------- | ------ | --------- | ------------------------------------- |
-| `lucide-vue-next` | \*     | INSTALADO | Ícones principais (600+ modernos)     |
-| `@iconify/vue`    | -      | REMOVIDO  | **REMOVIDO** (não usado)              |
-| `@heroicons/vue`  | -      | REMOVIDO  | **REMOVIDO** (substituído por Lucide) |
+| `lucide-vue-next` | \* | INSTALADO | Ícones principais (600+ modernos) |
+| `@iconify/vue` | - | REMOVIDO | **REMOVIDO** (não usado) |
+| `@heroicons/vue` | - | REMOVIDO | **REMOVIDO** (substituído por Lucide) |
 
 #### Forms & Validation
 
-| Package        | Versão | Status    | Propósito                     |
+| Package | Versão | Status | Propósito |
 | -------------- | ------ | --------- | ----------------------------- |
-| `vee-validate` | \*     | INSTALADO | Forms complexos com validação |
-| `zod`          | \*     | INSTALADO | Schema validation (frontend)  |
+| `vee-validate` | \* | INSTALADO | Forms complexos com validação |
+| `zod` | \* | INSTALADO | Schema validation (frontend) |
 
 #### Utilities
 
-| Package               | Versão | Status    | Propósito                                 |
+| Package | Versão | Status | Propósito |
 | --------------------- | ------ | --------- | ----------------------------------------- |
-| `@vueuse/core`        | 11.3   | INSTALADO | 200+ composables úteis (versão corrigida) |
-| `@headlessui/vue`     | -      | REMOVIDO  | **REMOVIDO** (usando Radix-vue)           |
-| `@inertiajs/progress` | \*     | INSTALADO | Loading bar automático entre páginas      |
+| `@vueuse/core` | 11.3 | INSTALADO | 200+ composables úteis (versão corrigida) |
+| `@headlessui/vue` | - | REMOVIDO | **REMOVIDO** (usando Radix-vue) |
+| `@inertiajs/progress` | \* | INSTALADO | Loading bar automático entre páginas |
 
 #### Charts & Rich Text
 
-| Package            | Versão | Status    | Propósito                       |
+| Package | Versão | Status | Propósito |
 | ------------------ | ------ | --------- | ------------------------------- |
-| `chart.js`         | \*     | INSTALADO | Gráficos para dashboard         |
-| `vue-chartjs`      | \*     | INSTALADO | Wrapper Vue para Chart.js       |
-| `@vueup/vue-quill` | \*     | INSTALADO | Editor WYSIWYG (comentários KB) |
-| `marked`           | \*     | INSTALADO | Parser Markdown → HTML          |
-| `dompurify`        | \*     | INSTALADO | Sanitização XSS                 |
+| `chart.js` | \* | INSTALADO | Gráficos para dashboard |
+| `vue-chartjs` | \* | INSTALADO | Wrapper Vue para Chart.js |
+| `@vueup/vue-quill` | \* | INSTALADO | Editor WYSIWYG (comentários KB) |
+| `marked` | \* | INSTALADO | Parser Markdown → HTML |
+| `dompurify` | \* | INSTALADO | Sanitização XSS |
 
 ---
 
@@ -141,20 +141,20 @@
 
 ### Serviços Docker Configurados
 
-| Serviço                | Imagem             | Porta | Status    | Propósito                     |
+| Serviço | Imagem | Porta | Status | Propósito |
 | ---------------------- | ------------------ | ----- | --------- | ----------------------------- |
-| `orionone-app`         | php:8.4-fpm-alpine | -     | INSTALADO | Laravel application (PHP 8.4) |
-| `orionone-frontend`    | node:20-alpine     | -     | INSTALADO | Vite dev server (HMR)         |
-| `orionone-db`          | postgres:16-alpine | 5432  | INSTALADO | PostgreSQL database           |
-| `orionone-redis`       | redis:7-alpine     | 6379  | INSTALADO | Cache + Queue backend         |
-| `orionone-meilisearch` | meilisearch:1.12   | 7700  | INSTALADO | AI-powered search engine      |
-| `orionone-nginx`       | nginx:alpine       | 80    | INSTALADO | Web server + reverse proxy    |
+| `orionone-app` | php:8.4-fpm-alpine | - | INSTALADO | Laravel application (PHP 8.4) |
+| `orionone-frontend` | node:20-alpine | - | INSTALADO | Vite dev server (HMR) |
+| `orionone-db` | postgres:16-alpine | 5432 | INSTALADO | PostgreSQL database |
+| `orionone-redis` | redis:7-alpine | 6379 | INSTALADO | Cache + Queue backend |
+| `orionone-meilisearch` | meilisearch:1.12 | 7700 | INSTALADO | AI-powered search engine |
+| `orionone-nginx` | nginx:alpine | 80 | INSTALADO | Web server + reverse proxy |
 
 ### Volumes Persistentes
 
--   `orionone_pgdata` - Dados PostgreSQL
--   `orionone_redisdata` - Dados Redis
--   `orionone_meilisearch` - Índices Meilisearch
+- `orionone_pgdata` - Dados PostgreSQL
+- `orionone_redisdata` - Dados Redis
+- `orionone_meilisearch` - Índices Meilisearch
 
 ---
 
@@ -206,8 +206,8 @@
 
 **Alternativa:**
 
--   Backend: `spatie/laravel-data` + Laravel FormRequests
--   Frontend: Zod + Vee-Validate (já instalado)
+- Backend: `spatie/laravel-data` + Laravel FormRequests
+- Frontend: Zod + Vee-Validate (já instalado)
 
 ### Pest PHP (Inicialmente)
 
@@ -243,19 +243,19 @@
 
 Após implementação completa das melhorias do Stack Analysis 2025:
 
-| Categoria         | Score      | Status                    |
+| Categoria | Score | Status |
 | ----------------- | ---------- | ------------------------- |
-| Backend Core      | 9/10       | Excelente (PHP 8.4)       |
-| Backend Packages  | 9/10       | Excelente (Scribe+Pulse)  |
-| Frontend Core     | 9/10       | Excelente (Vite 6 stable) |
-| Frontend Packages | 8.5/10     | Muito Bom                 |
-| Infrastructure    | 9/10       | Excelente (+Meilisearch)  |
-| Testing           | 9/10       | Excelente (Pest PHP)      |
-| Monitoring        | 9/10       | Excelente (Pulse)         |
-| Security          | 8/10       | Bom                       |
-| Performance       | 9/10       | Excelente (PHP 8.4)       |
-| DX (Dev Exp)      | 9/10       | Excelente                 |
-| **MÉDIA GERAL**   | **8.7/10** | **EXCELENTE**             |
+| Backend Core | 9/10 | Excelente (PHP 8.4) |
+| Backend Packages | 9/10 | Excelente (Scribe+Pulse) |
+| Frontend Core | 9/10 | Excelente (Vite 6 stable) |
+| Frontend Packages | 8.5/10 | Muito Bom |
+| Infrastructure | 9/10 | Excelente (+Meilisearch) |
+| Testing | 9/10 | Excelente (Pest PHP) |
+| Monitoring | 9/10 | Excelente (Pulse) |
+| Security | 8/10 | Bom |
+| Performance | 9/10 | Excelente (PHP 8.4) |
+| DX (Dev Exp) | 9/10 | Excelente |
+| **MÉDIA GERAL** | **8.7/10** | **EXCELENTE** |
 
 ---
 
@@ -274,11 +274,11 @@ Após implementação completa das melhorias do Stack Analysis 2025:
 
 ### Opcional (Post-MVP)
 
--   **Laravel Horizon** - Queue monitoring (apenas produção Linux)
--   **Spatie Backup** - Backups automáticos
--   **Laravel Socialite** - SSO (Google, Microsoft)
--   **Intervention/Image** - Quando adicionar uploads
--   **DomPDF** - Quando necessário gerar PDFs
+- **Laravel Horizon** - Queue monitoring (apenas produção Linux)
+- **Spatie Backup** - Backups automáticos
+- **Laravel Socialite** - SSO (Google, Microsoft)
+- **Intervention/Image** - Quando adicionar uploads
+- **DomPDF** - Quando necessário gerar PDFs
 
 ---
 
@@ -286,26 +286,26 @@ Após implementação completa das melhorias do Stack Analysis 2025:
 
 ### Essenciais (Sprint 1-2)
 
--   COMPLETO `Button.vue` - Botões (primary, secondary, outline, ghost)
--   COMPLETO `Input.vue` - Text inputs
--   COMPLETO `Card.vue` - Containers
--   COMPLETO `Badge.vue` - Status tags
--   COMPLETO `Avatar.vue` - User avatars
--   PENDENTE `Dropdown.vue` - Menus (criar em Sprint 2)
+- COMPLETO `Button.vue` - Botões (primary, secondary, outline, ghost)
+- COMPLETO `Input.vue` - Text inputs
+- COMPLETO `Card.vue` - Containers
+- COMPLETO `Badge.vue` - Status tags
+- COMPLETO `Avatar.vue` - User avatars
+- PENDENTE `Dropdown.vue` - Menus (criar em Sprint 2)
 
 ### Sprint 2-3 (Tickets)
 
--   `Dialog.vue` - Modals
--   `Table.vue` - DataTable tickets
--   `Select.vue` - Dropdowns
--   `Textarea.vue` - Descrições
--   `Toast.vue` - Notifications
+- `Dialog.vue` - Modals
+- `Table.vue` - DataTable tickets
+- `Select.vue` - Dropdowns
+- `Textarea.vue` - Descrições
+- `Toast.vue` - Notifications
 
 ### Sprint 4-5 (Colaboração)
 
--   `Tabs.vue` - Navigation tabs
--   `Accordion.vue` - FAQ/KB
--   `Command.vue` - Search palette (Cmd+K)
+- `Tabs.vue` - Navigation tabs
+- `Accordion.vue` - FAQ/KB
+- `Command.vue` - Search palette (Cmd+K)
 
 ---
 
@@ -341,10 +341,10 @@ php artisan scout:import "App\Models\Article"
 
 ## Referências
 
--   [Stack Analysis 2025](STACK-ANALYSIS-2025.md) - Análise completa e score 8.7/10
--   [ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md) - Validação para mercado ITSM (8.5/10)
--   [Implementation Checklist](implementation-checklist.md) - Roadmap detalhado Sprint 1-6
--   [Commands Reference](COMMANDS-REFERENCE.md) - Comandos úteis do projeto
+- [Stack Analysis 2025](STACK-ANALYSIS-2025.md) - Análise completa e score 8.7/10
+- [ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md) - Validação para mercado ITSM (8.5/10)
+- [Implementation Checklist](implementation-checklist.md) - Roadmap detalhado Sprint 1-6
+- [Commands Reference](COMMANDS-REFERENCE.md) - Comandos úteis do projeto
 
 ---
 
@@ -387,14 +387,14 @@ Ver [Implementation Checklist](implementation-checklist.md) para instruções TD
 
 ### FASE 2 (Sprint 3-4) - Otimizações
 
--   @tanstack/vue-query (se necessário)
--   Laravel Pulse (monitoring)
+- @tanstack/vue-query (se necessário)
+- Laravel Pulse (monitoring)
 
 ### FASE 3 (Sprint 6) - Produção
 
--   spatie/laravel-backup
--   Laravel Horizon (queues)
--   GitHub Actions CI/CD
+- spatie/laravel-backup
+- Laravel Horizon (queues)
+- GitHub Actions CI/CD
 
 ---
 
