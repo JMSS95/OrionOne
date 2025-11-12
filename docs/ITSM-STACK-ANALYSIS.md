@@ -57,17 +57,17 @@
 ### ServiceNow Architecture (The Benchmark)
 
 ```
-┌──────────────────────────────────────────────┐
-│ ServiceNow Platform (Proprietary) │
-├──────────────────────────────────────────────┤
-│ Frontend: Angular (Now Platform) │
-│ Backend: Glide API (Java-based) │
-│ DB: MySQL (heavily customized) │
-│ Workflow: Flow Designer (proprietary) │
-│ Forms: Service Portal (Angular) │
-│ Integration: IntegrationHub (Java) │
-│ Automation: Business Rules (server-side JS) │
-└──────────────────────────────────────────────┘
+
+ ServiceNow Platform (Proprietary) 
+
+ Frontend: Angular (Now Platform) 
+ Backend: Glide API (Java-based) 
+ DB: MySQL (heavily customized) 
+ Workflow: Flow Designer (proprietary) 
+ Forms: Service Portal (Angular) 
+ Integration: IntegrationHub (Java) 
+ Automation: Business Rules (server-side JS) 
+
 ```
 
 **Strengths:**
@@ -90,17 +90,17 @@
 ### Zendesk Architecture (Ruby on Rails Success Story)
 
 ```
-┌──────────────────────────────────────────────┐
-│ Zendesk Suite (Modular Monolith) │
-├──────────────────────────────────────────────┤
-│ Frontend: React + Backbone.js (legacy) │
-│ Backend: Ruby on Rails (monolith) │
-│ DB: MySQL (primary), PostgreSQL (analytics) │
-│ Queue: Sidekiq (Redis-backed) │
-│ Search: Elasticsearch │
-│ API: RESTful + GraphQL │
-│ Integrations: Marketplace (1000+ apps) │
-└──────────────────────────────────────────────┘
+
+ Zendesk Suite (Modular Monolith) 
+
+ Frontend: React + Backbone.js (legacy) 
+ Backend: Ruby on Rails (monolith) 
+ DB: MySQL (primary), PostgreSQL (analytics) 
+ Queue: Sidekiq (Redis-backed) 
+ Search: Elasticsearch 
+ API: RESTful + GraphQL 
+ Integrations: Marketplace (1000+ apps) 
+
 ```
 
 **Strengths:**
@@ -122,19 +122,19 @@
 ### OrionOne Architecture (Modern Laravel + Vue)
 
 ```
-┌──────────────────────────────────────────────┐
-│ OrionOne Platform (Open-source Core) │
-├──────────────────────────────────────────────┤
-│ Frontend: Vue 3 + Inertia 2.0 │
-│ Backend: Laravel 12 + Laravel Actions │
-│ DB: PostgreSQL 16 + Redis 7 │
-│ Queue: Laravel Queue (Redis) │
-│ Search: PostgreSQL FTS (upgrade: Meilisearch)│
-│ API: RESTful (Sanctum) + Swagger │
-│ Workflow: Laravel Actions (reusable logic) │
-│ Auth: Spatie Permissions + Sanctum │
-│ Audit: Spatie Activity Log │
-└──────────────────────────────────────────────┘
+
+ OrionOne Platform (Open-source Core) 
+
+ Frontend: Vue 3 + Inertia 2.0 
+ Backend: Laravel 12 + Laravel Actions 
+ DB: PostgreSQL 16 + Redis 7 
+ Queue: Laravel Queue (Redis) 
+ Search: PostgreSQL FTS (upgrade: Meilisearch)
+ API: RESTful (Sanctum) + Swagger 
+ Workflow: Laravel Actions (reusable logic) 
+ Auth: Spatie Permissions + Sanctum 
+ Audit: Spatie Activity Log 
+
 ```
 
 **Strengths:**
@@ -570,7 +570,7 @@ $encrypted = Crypt::encryptString($sensitive);
 
 ## Competitive Advantages
 
-### 1. Development Velocity (OrionOne Wins) 
+### 1. Development Velocity (OrionOne Wins)
 
 **Time to MVP:**
 
@@ -609,12 +609,12 @@ $encrypted = Crypt::encryptString($sensitive);
 
 ---
 
-### 3. Customization Freedom (OrionOne Wins) 
+### 3. Customization Freedom (OrionOne Wins)
 
 **Customization Comparison:**
 
 | Requirement | ServiceNow | Zendesk | OrionOne |
-| ---------------- | ----------------- | --------------------- | ---------------------- |
+| ---------------- | -------------- | ------------------ | ------------------- |
 | Custom fields | UI config | UI config | Migration + model |
 | Custom workflows | Flow Designer | Triggers (limited) | Full PHP code |
 | White-label UI | Service Portal | Logo only | Full Vue source |
@@ -643,7 +643,7 @@ class CustomSLAService extends SLAService
 
 ---
 
-### 4. Modern Developer Experience (OrionOne Wins) 
+### 4. Modern Developer Experience (OrionOne Wins)
 
 **Developer Productivity:**
 
@@ -749,19 +749,19 @@ class CustomSLAService extends SLAService
 
 ### Immediate (Sprint 2-3) - CRITICAL
 
-1. **Pin Swagger Version** ❗ URGENT
+1. **Pin Swagger Version** URGENT
 
  ```json
  "darkaonline/l5-swagger": "8.6" // Current: "*" (DANGEROUS)
  ```
 
-2. **Downgrade Vite to Stable** ❗ URGENT
+2. **Downgrade Vite to Stable** URGENT
 
  ```json
  "vite": "^6.0.0" // Current: 7.0.7-rc (UNSTABLE)
  ```
 
-3. **Update VueUse** ❗ URGENT
+3. **Update VueUse** URGENT
 
  ```json
  "@vueuse/core": "^11.3.0" // Current: 14.0.0 (WRONG, typo?)
@@ -839,26 +839,23 @@ class CustomSLAService extends SLAService
 ### Market Positioning Matrix
 
 ```
-High Complexity ▲
- │
- ServiceNow │
- ◆ │
- │
- │ Zendesk
- │ ◆ Freshservice
- │ ◆
- │
- │ OrionOne (Target)
- │ ◆
- │
-Low Complexity ├─────────────────────────────────►
+High Complexity 
+
+ ServiceNow 
+
+ Zendesk
+ Freshservice
+
+ OrionOne (Target)
+
+Low Complexity 
  Low Cost High Cost
 
 Legend:
-◆ ServiceNow: Enterprise, $2500/mo, complex
-◆ Zendesk: Mid-market, $890/mo, mature
-◆ Freshservice: SME, $490/mo, modern
-◆ OrionOne: SME/Startups, $150/mo, simple + modern
+ ServiceNow: Enterprise, $2500/mo, complex
+ Zendesk: Mid-market, $890/mo, mature
+ Freshservice: SME, $490/mo, modern
+ OrionOne: SME/Startups, $150/mo, simple + modern
 ```
 
 ### Competitive Strategy
@@ -928,7 +925,7 @@ Laravel 12 + Vue 3 + Inertia + PostgreSQL is an **EXCELLENT stack** for building
 ### Stack Validation by Market Segment
 
 | Market Segment | Stack Suitability | Recommendation |
-| ------------------------------ | -------------------- | -------------------------------------- |
+| ------------------------------ | ----------------- | -------------------------------------- |
 | **Startups (10-50 employees)** | Excellent | **PROCEED - IDEAL FIT** |
 | **SMEs (50-200 employees)** | Very Good | **PROCEED - STRONG FIT** |
 | **Mid-Market (200-1000)** | Good | Add: Workflow UI, SSO, native apps |

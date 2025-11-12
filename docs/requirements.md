@@ -1,4 +1,4 @@
-﻿# Requisitos do Sistema OrionOne
+# Requisitos do Sistema OrionOne
 
 ## Visão Geral
 

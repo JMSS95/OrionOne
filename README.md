@@ -180,10 +180,10 @@ laravel/telescope # Debug & monitoring
 
 **NÃO é necessário instalar:**
 
-- ❌ PHP local (usamos Docker com PHP 8.3)
-- ❌ Composer local (incluído no container Docker)
-- ❌ PostgreSQL local (container Docker)
-- ❌ Redis local (container Docker)
+- PHP local (usamos Docker com PHP 8.3)
+- Composer local (incluído no container Docker)
+- PostgreSQL local (container Docker)
+- Redis local (container Docker)
 
 ### Setup em 10 Minutos
 

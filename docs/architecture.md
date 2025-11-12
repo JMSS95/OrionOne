@@ -14,34 +14,28 @@ OrionOne seguirá uma arquitetura **MVC com Service Layer**, equilibrando simpli
 ### MVC + Service Layer + Actions
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│ PRESENTATION LAYER │
-│ - Controllers: Request handling (5-15 linhas) │
-│ - Requests: Form validation │
-│ - Resources: API responses (futuro) │
-└────────────────────────┬────────────────────────────────────┘
- │
-┌────────────────────────▼────────────────────────────────────┐
-│ BUSINESS LOGIC LAYER │
-│ - Services: Lógica de negócio complexa e orquestração │
-│ - Actions: Operações atómicas (single responsibility) │
-│ - Policies: Regras de autorização │
-│ - Events/Listeners: Domain events │
-└────────────────────────┬────────────────────────────────────┘
- │
-┌────────────────────────▼────────────────────────────────────┐
-│ DATA LAYER │
-│ - Models: Eloquent ORM │
-│ - Observers: Hooks automáticos de modelos │
-│ - Repositories: Abstração de queries (opcional) │
-└────────────────────────┬────────────────────────────────────┘
- │
-┌────────────────────────▼────────────────────────────────────┐
-│ INFRASTRUCTURE │
-│ - Database: PostgreSQL 16 │
-│ - Cache: Redis (sessions, queries, queues) │
-│ - Storage: Local filesystem / S3 (produção) │
-└─────────────────────────────────────────────────────────────┘
+
+ PRESENTATION LAYER 
+ - Controllers: Request handling (5-15 linhas) 
+ - Requests: Form validation 
+ - Resources: API responses (futuro) 
+
+ BUSINESS LOGIC LAYER 
+ - Services: Lógica de negócio complexa e orquestração 
+ - Actions: Operações atómicas (single responsibility) 
+ - Policies: Regras de autorização 
+ - Events/Listeners: Domain events 
+
+ DATA LAYER 
+ - Models: Eloquent ORM 
+ - Observers: Hooks automáticos de modelos 
+ - Repositories: Abstração de queries (opcional) 
+
+ INFRASTRUCTURE 
+ - Database: PostgreSQL 16 
+ - Cache: Redis (sessions, queries, queues) 
+ - Storage: Local filesystem / S3 (produção) 
+
 ```
 
 ---
@@ -163,26 +157,24 @@ Observers implementarão hooks automáticos de lifecycle:
 ### Exemplo: Criar Ticket
 
 ```
-┌─────────┐
-│ User │ submete formulário
-└────┬────┘
- │ POST /tickets
- │
-┌────▼────────────────┐
-│ TicketController │ → valida com StoreTicketRequest
-└────┬────────────────┘
- │ createTicket()
-┌────▼────────────────┐
-│ TicketService │ → orquestra operação
-└────┬────────────────┘
- │
- ├──→ Ticket::create() [Data Layer]
- ├──→ AssignmentService [determina equipa/agent]
- ├──→ SLAService [calcula deadlines]
- ├──→ NotificationService [envia emails]
- └──→ event(TicketCreated) [dispara event]
- │
- └──→ Listeners
+
+ User submete formulário
+
+ POST /tickets
+
+ TicketController → valida com StoreTicketRequest
+
+ createTicket()
+
+ TicketService → orquestra operação
+
+ → Ticket::create() [Data Layer]
+ → AssignmentService [determina equipa/agent]
+ → SLAService [calcula deadlines]
+ → NotificationService [envia emails]
+ → event(TicketCreated) [dispara event]
+
+ → Listeners
  - LogTicketActivity
  - UpdateStatistics
 ```
@@ -238,75 +230,75 @@ Observers implementarão hooks automáticos de lifecycle:
 
 ```
 app/
-├── Http/
-│ ├── Controllers/ # Thin controllers
-│ │ ├── TicketController.php
-│ │ ├── CommentController.php
-│ │ ├── DashboardController.php
-│ │ └── KnowledgeBaseController.php
-│ │
-│ ├── Requests/ # Form validation
-│ │ ├── StoreTicketRequest.php
-│ │ ├── UpdateTicketRequest.php
-│ │ └── StoreCommentRequest.php
-│ │
-│ └── Middleware/
-│ └── CheckTicketAccess.php
-│
-├── Services/ # Business logic orchestration
-│ ├── TicketService.php
-│ ├── AssignmentService.php
-│ ├── SLAService.php
-│ ├── NotificationService.php
-│ └── ReportingService.php
-│
-├── Actions/ # Atomic operations
-│ ├── Tickets/
-│ │ ├── CreateTicketAction.php
-│ │ ├── AssignTicketAction.php
-│ │ ├── ResolveTicketAction.php
-│ │ ├── CloseTicketAction.php
-│ │ └── EscalateTicketAction.php
-│ │
-│ └── Comments/
-│ └── AddCommentAction.php
-│
-├── Models/ # Eloquent models
-│ ├── Ticket.php
-│ ├── Comment.php
-│ ├── Team.php
-│ ├── Article.php
-│ └── Category.php
-│
-├── Policies/ # Authorization
-│ ├── TicketPolicy.php
-│ ├── CommentPolicy.php
-│ └── ArticlePolicy.php
-│
-├── Observers/ # Model hooks
-│ ├── TicketObserver.php
-│ └── CommentObserver.php
-│
-├── Notifications/ # Email/Slack/Database
-│ ├── TicketCreated.php
-│ ├── TicketAssigned.php
-│ ├── CommentAdded.php
-│ └── SLAViolation.php
-│
-├── Events/ # Domain events
-│ ├── TicketCreated.php
-│ ├── TicketStatusChanged.php
-│ └── SLAViolated.php
-│
-├── Listeners/ # Event handlers
-│ ├── LogTicketActivity.php
-│ ├── UpdateStatistics.php
-│ └── SendNotifications.php
-│
-└── Jobs/ # Async tasks
- ├── CheckSLAViolations.php
- ├── GenerateDailyReport.php
- └── SendBulkNotifications.php
+ Http/
+ Controllers/ # Thin controllers
+ TicketController.php
+ CommentController.php
+ DashboardController.php
+ KnowledgeBaseController.php
+
+ Requests/ # Form validation
+ StoreTicketRequest.php
+ UpdateTicketRequest.php
+ StoreCommentRequest.php
+
+ Middleware/
+ CheckTicketAccess.php
+
+ Services/ # Business logic orchestration
+ TicketService.php
+ AssignmentService.php
+ SLAService.php
+ NotificationService.php
+ ReportingService.php
+
+ Actions/ # Atomic operations
+ Tickets/
+ CreateTicketAction.php
+ AssignTicketAction.php
+ ResolveTicketAction.php
+ CloseTicketAction.php
+ EscalateTicketAction.php
+
+ Comments/
+ AddCommentAction.php
+
+ Models/ # Eloquent models
+ Ticket.php
+ Comment.php
+ Team.php
+ Article.php
+ Category.php
+
+ Policies/ # Authorization
+ TicketPolicy.php
+ CommentPolicy.php
+ ArticlePolicy.php
+
+ Observers/ # Model hooks
+ TicketObserver.php
+ CommentObserver.php
+
+ Notifications/ # Email/Slack/Database
+ TicketCreated.php
+ TicketAssigned.php
+ CommentAdded.php
+ SLAViolation.php
+
+ Events/ # Domain events
+ TicketCreated.php
+ TicketStatusChanged.php
+ SLAViolated.php
+
+ Listeners/ # Event handlers
+ LogTicketActivity.php
+ UpdateStatistics.php
+ SendNotifications.php
+
+ Jobs/ # Async tasks
+ CheckSLAViolations.php
+ GenerateDailyReport.php
+ SendBulkNotifications.php
 ```
 
 ---

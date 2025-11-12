@@ -299,14 +299,14 @@ docker-compose exec orionone-app php artisan ide-helper:generate
 ## Cronograma MVP
 
 ```
-Sprint 1 (Auth & RBAC) ████████████████████ 100% (Done)
-Sprint 2 (Tickets CRUD) ░░░░░░░░░░░░░░░░░░░░ 0% (6 weeks)
-Sprint 3 (Comments) ░░░░░░░░░░░░░░░░░░░░ 0% (6 weeks)
-Sprint 4 (Knowledge Base) ░░░░░░░░░░░░░░░░░░░░ 0% (6 weeks)
-Sprint 5 (SLA) ░░░░░░░░░░░░░░░░░░░░ 0% (6 weeks)
-Sprint 6 (Teams) ░░░░░░░░░░░░░░░░░░░░ 0% (4 weeks)
-Sprint 7 (Asset Management) ░░░░░░░░░░░░░░░░░░░░ 0% (4 weeks) ← NOVO
- ━━━━━━━━━━━━━━━━━━━━
+Sprint 1 (Auth & RBAC) 100% (Done)
+Sprint 2 (Tickets CRUD) 0% (6 weeks)
+Sprint 3 (Comments) 0% (6 weeks)
+Sprint 4 (Knowledge Base) 0% (6 weeks)
+Sprint 5 (SLA) 0% (6 weeks)
+Sprint 6 (Teams) 0% (4 weeks)
+Sprint 7 (Asset Management) 0% (4 weeks) ← NOVO
+
 MVP Launch Fev 10, 2026
 ```
 

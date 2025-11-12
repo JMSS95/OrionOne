@@ -13,7 +13,7 @@
 
 ### 1. About Section (Lado direito do repositório)
 
-**Localização:** Página principal do repo → ⚙️ (ícone engrenagem ao lado de "About")
+**Localização:** Página principal do repo → (ícone engrenagem ao lado de "About")
 
 **Description:**
 

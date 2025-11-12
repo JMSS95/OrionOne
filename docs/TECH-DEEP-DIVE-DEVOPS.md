@@ -322,8 +322,8 @@ COPY --from=node-builder /app/public/build /var/www/public/build
 ```
 
 **Vantagens:**
-✅ Imagem final **menor** (sem node_modules)
-✅ Build mais rápido (cache de layers)
+ Imagem final **menor** (sem node_modules)
+ Build mais rápido (cache de layers)
 
 ---
 
@@ -341,8 +341,8 @@ COPY --from=node-builder /app/public/build /var/www/public/build
 2. Nginx (porta 80) recebe request
  ↓
 3. Nginx verifica se é ficheiro estático (.css, .js, .png)
- ├─ SIM → Nginx serve diretamente (rápido!)
- └─ NÃO → Nginx passa para PHP-FPM (porta 9000)
+ SIM → Nginx serve diretamente (rápido!)
+ NÃO → Nginx passa para PHP-FPM (porta 9000)
  ↓
 4. PHP-FPM executa Laravel
  ↓

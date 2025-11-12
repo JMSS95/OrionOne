@@ -27,27 +27,27 @@
 
 ```
 resources/js/
-├── components/
-│ └── ui/
-│ ├── Alert.vue
-│ ├── Avatar.vue
-│ ├── Badge.vue
-│ ├── Button.vue
-│ ├── Card.vue
-│ ├── CardContent.vue
-│ ├── CardDescription.vue
-│ ├── CardFooter.vue
-│ ├── CardHeader.vue
-│ ├── CardTitle.vue
-│ ├── Input.vue
-│ ├── Label.vue
-│ ├── Select.vue
-│ ├── Textarea.vue
-│ └── index.js
-├── lib/
-│ └── utils.js (cn() helper)
-└── Pages/
- └── ComponentsDemo.vue (página de teste)
+ components/
+ ui/
+ Alert.vue
+ Avatar.vue
+ Badge.vue
+ Button.vue
+ Card.vue
+ CardContent.vue
+ CardDescription.vue
+ CardFooter.vue
+ CardHeader.vue
+ CardTitle.vue
+ Input.vue
+ Label.vue
+ Select.vue
+ Textarea.vue
+ index.js
+ lib/
+ utils.js (cn() helper)
+ Pages/
+ ComponentsDemo.vue (página de teste)
 ```
 
 ### Página de Demo

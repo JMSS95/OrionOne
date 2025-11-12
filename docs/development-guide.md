@@ -35,9 +35,9 @@ Cada feature passa por **TODAS as camadas** antes de passar para a próxima.
 
 ```
  Definir feature
- ├─ Requisito funcional (do requirements.md)
- ├─ User story
- └─ Critérios de aceitação
+ Requisito funcional (do requirements.md)
+ User story
+ Critérios de aceitação
 ```
 
 **Exemplo - RF02: Criar Ticket**
@@ -648,13 +648,13 @@ Este documento define a estratégia de testes do OrionOne, estabelecendo guideli
 ## Pirâmide de Testes
 
 ```
- ╱╲
- ╱E2E╲ <- 5-10% (Selenium, Cypress)
- ╱──────╲
- ╱ Feature╲ <- 30-40% (HTTP tests, Inertia)
- ╱──────────╲
- ╱ Unit ╲ <- 50-60% (Services, Actions, Models)
- ╱──────────────╲
+
+ E2E <- 5-10% (Selenium, Cypress)
+
+ Feature <- 30-40% (HTTP tests, Inertia)
+
+ Unit <- 50-60% (Services, Actions, Models)
+
 ```
 
 ### Distribuição Recomendada
@@ -807,34 +807,34 @@ docker-compose exec orionone-app php artisan test --coverage --path=app/Services
 
 ```
 tests/
-├── Feature/
-│ ├── Auth/
-│ │ ├── LoginTest.php
-│ │ ├── RegisterTest.php
-│ │ └── PasswordResetTest.php
-│ ├── Tickets/
-│ │ ├── TicketCrudTest.php
-│ │ ├── TicketAssignmentTest.php
-│ │ └── TicketNotificationTest.php
-│ ├── Comments/
-│ │ └── CommentTest.php
-│ └── Teams/
-│ └── TeamTest.php
-│
-├── Unit/
-│ ├── Services/
-│ │ ├── TicketServiceTest.php
-│ │ ├── SLAServiceTest.php
-│ │ └── AssignmentServiceTest.php
-│ ├── Actions/
-│ │ ├── CreateTicketActionTest.php
-│ │ └── AssignTicketActionTest.php
-│ └── Models/
-│ ├── TicketTest.php
-│ └── UserTest.php
-│
-└── Browser/ (futuro)
- └── TicketCreationTest.php
+ Feature/
+ Auth/
+ LoginTest.php
+ RegisterTest.php
+ PasswordResetTest.php
+ Tickets/
+ TicketCrudTest.php
+ TicketAssignmentTest.php
+ TicketNotificationTest.php
+ Comments/
+ CommentTest.php
+ Teams/
+ TeamTest.php
+
+ Unit/
+ Services/
+ TicketServiceTest.php
+ SLAServiceTest.php
+ AssignmentServiceTest.php
+ Actions/
+ CreateTicketActionTest.php
+ AssignTicketActionTest.php
+ Models/
+ TicketTest.php
+ UserTest.php
+
+ Browser/ (futuro)
+ TicketCreationTest.php
 ```
 
 ---
@@ -1108,34 +1108,34 @@ class DevelopmentSeeder extends Seeder
 
 ```
 tests/
-├── Feature/
-│ ├── Auth/
-│ │ ├── LoginTest.php
-│ │ ├── RegisterTest.php
-│ │ └── PasswordResetTest.php
-│ ├── Tickets/
-│ │ ├── TicketCrudTest.php
-│ │ ├── TicketAssignmentTest.php
-│ │ └── TicketNotificationTest.php
-│ ├── Comments/
-│ │ └── CommentTest.php
-│ └── Teams/
-│ └── TeamTest.php
-│
-├── Unit/
-│ ├── Services/
-│ │ ├── TicketServiceTest.php
-│ │ ├── SLAServiceTest.php
-│ │ └── AssignmentServiceTest.php
-│ ├── Actions/
-│ │ ├── CreateTicketActionTest.php
-│ │ └── AssignTicketActionTest.php
-│ └── Models/
-│ ├── TicketTest.php
-│ └── UserTest.php
-│
-└── Browser/ (futuro)
- └── TicketCreationTest.php
+ Feature/
+ Auth/
+ LoginTest.php
+ RegisterTest.php
+ PasswordResetTest.php
+ Tickets/
+ TicketCrudTest.php
+ TicketAssignmentTest.php
+ TicketNotificationTest.php
+ Comments/
+ CommentTest.php
+ Teams/
+ TeamTest.php
+
+ Unit/
+ Services/
+ TicketServiceTest.php
+ SLAServiceTest.php
+ AssignmentServiceTest.php
+ Actions/
+ CreateTicketActionTest.php
+ AssignTicketActionTest.php
+ Models/
+ TicketTest.php
+ UserTest.php
+
+ Browser/ (futuro)
+ TicketCreationTest.php
 ```
 
 ---

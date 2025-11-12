@@ -1194,37 +1194,37 @@ php artisan make:migration create_stored_procedures
 
 Este schema foi desenhado para nível **Enterprise-Grade**:
 
-✅ **Performance:**
+ **Performance:**
 
 - Views pré-computadas (Dashboard, SLA, Agent performance)
 - Indexes estratégicos (Partial, Composite, Expression, GIN)
 - Triggers para automação (zero overhead PHP)
 
-✅ **Escalabilidade:**
+ **Escalabilidade:**
 
 - Estrutura normalizada (3NF)
 - Partitioning ready
 - Stored Procedures para lógica complexa
 
-✅ **Auditoria:**
+ **Auditoria:**
 
 - Soft deletes
 - Activity log automático (triggers)
 - Status change tracking
 
-✅ **Flexibilidade:**
+ **Flexibilidade:**
 
 - JSONB para custom_fields
 - Views customizáveis
 - Extensível com novas triggers
 
-✅ **Data Integrity:**
+ **Data Integrity:**
 
 - Check constraints (validation em DB)
 - Foreign keys com CASCADE
 - Triggers de validação (ex: agent assignment)
 
-✅ **Best Practices:**
+ **Best Practices:**
 
 - Convenções Laravel
 - Spatie packages integration

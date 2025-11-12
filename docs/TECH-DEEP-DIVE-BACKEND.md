@@ -315,13 +315,13 @@ php artisan migrate
 # Ver status (quais já foram executadas)
 php artisan migrate:status
 # Output:
-# ┌─────────────────────────────────────────────────────┬─────────┐
-# │ Migration │ Ran? │
-# ├─────────────────────────────────────────────────────┼─────────┤
-# │ 2014_10_12_000000_create_users_table │ Yes │
-# │ 2025_11_11_000001_create_tickets_table │ Yes │
-# │ 2025_11_11_000002_add_priority_to_tickets_table │ No │
-# └─────────────────────────────────────────────────────┴─────────┘
+# 
+# Migration Ran? 
+# 
+# 2014_10_12_000000_create_users_table Yes 
+# 2025_11_11_000001_create_tickets_table Yes 
+# 2025_11_11_000002_add_priority_to_tickets_table No 
+# 
 
 # Rollback última migration
 php artisan migrate:rollback
@@ -1513,10 +1513,10 @@ public function index()
 
 #### Vantagens:
 
-✅ **Frontend-friendly**: Vue.js constrói URLs facilmente
-✅ **Performance**: Só carrega o necessário
-✅ **Consistência**: Mesma sintaxe em todas as APIs
-✅ **Documentação automática**: Scribe documenta filtros
+ **Frontend-friendly**: Vue.js constrói URLs facilmente
+ **Performance**: Só carrega o necessário
+ **Consistência**: Mesma sintaxe em todas as APIs
+ **Documentação automática**: Scribe documenta filtros
 
 ---
 
@@ -1621,10 +1621,10 @@ Artisan::command('ticket:create', CreateTicketAction::class); // CLI
 
 ### Vantagens:
 
-✅ **DRY**: Lógica escrita uma vez
-✅ **Testável**: Testes unitários simples
-✅ **Reusável**: Controller, Job, Command, Listener
-✅ **Organizado**: Cada ação num ficheiro
+ **DRY**: Lógica escrita uma vez
+ **Testável**: Testes unitários simples
+ **Reusável**: Controller, Job, Command, Listener
+ **Organizado**: Cada ação num ficheiro
 
 ---
 
@@ -1647,7 +1647,7 @@ axios.post('/login', {
 
 // Laravel retorna cookie httpOnly (seguro!)
 // Proximos requests incluem cookie automaticamente
-axios.get('/api/user'); // ✅ Autenticado automaticamente
+axios.get('/api/user'); // Autenticado automaticamente
 ```
 
 #### 2. **Token-based (API Externa)**
@@ -1712,7 +1712,7 @@ $ticket = Ticket::create($data);
 // → Mails: Preview do email enviado
 ```
 
-**⚠️ IMPORTANTE:** Desativar em produção!
+** IMPORTANTE:** Desativar em produção!
 
 ```php
 // .env
@@ -1731,7 +1731,7 @@ Gera ficheiros que dão **autocomplete** no PHPStorm/VSCode.
 
 ```php
 $user = User::find(1);
-$user->name; // ❌ IDE não sabe que 'name' existe (User é dinâmico)
+$user->name; // IDE não sabe que 'name' existe (User é dinâmico)
 ```
 
 ### Solução:
@@ -1768,7 +1768,7 @@ Framework de testes **moderno e elegante**. Alternativa ao PHPUnit (mais bonito!
 ### Sintaxe:
 
 ```php
-// ❌ PHPUnit (antigo)
+// PHPUnit (antigo)
 class TicketTest extends TestCase
 {
  public function test_user_can_create_ticket(): void
@@ -1779,14 +1779,14 @@ class TicketTest extends TestCase
  }
 }
 
-// ✅ Pest (moderno)
+// Pest (moderno)
 test('user can create ticket', function() {
  actingAs($user)
  ->post('/tickets', $data)
  ->assertRedirect('/tickets');
 });
 
-// ✅ Ainda melhor (it() syntax)
+// Ainda melhor (it() syntax)
 it('allows authenticated users to create tickets', function() {
  $user = User::factory()->create();
  $data = ['title' => 'Bug', 'description' => 'Critical bug'];
@@ -1803,10 +1803,10 @@ it('allows authenticated users to create tickets', function() {
 
 ### Vantagens:
 
-✅ **Legível**: Parece inglês normal
-✅ **Rápido**: Executa em paralelo
-✅ **Expect API**: Assertions modernas
-✅ **Snapshot testing**: `expect($html)->toMatchSnapshot()`
+ **Legível**: Parece inglês normal
+ **Rápido**: Executa em paralelo
+ **Expect API**: Assertions modernas
+ **Snapshot testing**: `expect($html)->toMatchSnapshot()`
 
 ### Executar Testes:
 

@@ -374,8 +374,8 @@ JSON (via X-Inertia header) Render Vue
 - **Sem API**: Laravel chama Vue diretamente
 - **Routing Laravel**: `route('tickets.index')`
 - **Validação Laravel**: Form Requests
- ✅ **Autenticação Laravel**: `auth()` funciona
- ✅ **SEO**: Server-side rendering possível
+ **Autenticação Laravel**: `auth()` funciona
+ **SEO**: Server-side rendering possível
 
 ### Como Funciona?
 
@@ -580,11 +580,11 @@ Framework CSS com **classes utilitárias**. Em vez de escrever CSS custom, usas 
 ```
 
 **Vantagens:**
-✅ **Sem naming debates**: "Como chamar esta classe?"
-✅ **Sem CSS não usado**: Purge automático
-✅ **Responsive**: `md:text-lg lg:text-xl`
-✅ **Dark mode**: `dark:bg-gray-800`
-✅ **Consistência**: Design system integrado
+ **Sem naming debates**: "Como chamar esta classe?"
+ **Sem CSS não usado**: Purge automático
+ **Responsive**: `md:text-lg lg:text-xl`
+ **Dark mode**: `dark:bg-gray-800`
+ **Consistência**: Design system integrado
 
 ### Tailwind no OrionOne:
 
@@ -748,11 +748,11 @@ npx shadcn-vue@latest add button
 
 ### Vantagens:
 
-✅ **Ownership**: Tu és dono do código (não dependência)
-✅ **Customizável**: Edita livremente
-✅ **Type-safe**: TypeScript completo
-✅ **Accessible**: ARIA completo (a11y)
-✅ **Tailwind-first**: Estilização fácil
+ **Ownership**: Tu és dono do código (não dependência)
+ **Customizável**: Edita livremente
+ **Type-safe**: TypeScript completo
+ **Accessible**: ARIA completo (a11y)
+ **Tailwind-first**: Estilização fácil
 
 ### Componentes Usados no OrionOne:
 
@@ -952,10 +952,10 @@ function showToast() {
 
 ### Porque Vite?
 
-✅ **Dev Server instantâneo**: < 1 segundo para iniciar
-✅ **Hot Module Replacement (HMR)**: Mudanças aparecem sem refresh
-✅ **Build otimizado**: Code splitting automático
-✅ **ES Modules**: Usa import/export nativos
+ **Dev Server instantâneo**: < 1 segundo para iniciar
+ **Hot Module Replacement (HMR)**: Mudanças aparecem sem refresh
+ **Build otimizado**: Code splitting automático
+ **ES Modules**: Usa import/export nativos
 
 ### Como Funciona?
 

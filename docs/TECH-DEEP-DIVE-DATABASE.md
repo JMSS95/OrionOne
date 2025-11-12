@@ -12,7 +12,7 @@
 
 ### Porque PostgreSQL (não MySQL)?
 
-| Feature | PostgreSQL ✅ | MySQL ❌ |
+| Feature | PostgreSQL | MySQL |
 | -------------------- | ----------------- | ---------------- |
 | **JSONB** | Nativo, indexável | JSON simples |
 | **Full-Text Search** | Built-in (pt-PT!) | Precisa extensão |
@@ -288,9 +288,9 @@ $hierarchy = DB::select("
 id | title | level
 ----|----------------------------|------
 1 | Problema com servidor | 1 (pai)
-2 | ├─ Investigar logs | 2 (filho)
-3 | ├─ Verificar disco | 2 (filho)
-4 | └─ Substituir HD | 3 (neto)
+2 | Investigar logs | 2 (filho)
+3 | Verificar disco | 2 (filho)
+4 | Substituir HD | 3 (neto)
 ```
 
 ---
@@ -321,9 +321,9 @@ CREATE TABLE activity_logs_2024_02 PARTITION OF activity_logs
 ```
 
 **Vantagens:**
-✅ **Performance**: Queries só leem partição relevante
-✅ **Manutenção**: Apagar logs antigos = DROP PARTITION (rápido)
-✅ **Escalabilidade**: Cada partição pode ter índices próprios
+ **Performance**: Queries só leem partição relevante
+ **Manutenção**: Apagar logs antigos = DROP PARTITION (rápido)
+ **Escalabilidade**: Cada partição pode ter índices próprios
 
 ---
 
@@ -402,7 +402,7 @@ $stats = DB::table('tickets')
  ->select(DB::raw('COUNT(*) as total, users.name'))
  ->groupBy('users.id', 'users.name')
  ->get();
-// ⏱️ 500ms
+// ⏱ 500ms
 ```
 
 #### Solução: Cache com Redis
@@ -417,7 +417,7 @@ $stats = Cache::remember('dashboard-stats', now()->addMinutes(10), function () {
  ->groupBy('users.id', 'users.name')
  ->get();
 });
-// ⏱️ 2ms (cached!)
+// ⏱ 2ms (cached!)
 ```
 
 #### Cache Patterns no OrionOne:
@@ -481,7 +481,7 @@ public function store(Request $request)
 {
  $ticket = Ticket::create($request->validated());
 
- // Envia email (3 segundos!) ⏱️
+ // Envia email (3 segundos!) ⏱
  Mail::to($ticket->user)->send(new TicketCreated($ticket));
 
  return redirect()->back(); // Utilizador espera 3s!
@@ -628,8 +628,8 @@ RateLimiter::for('api', function (Request $request) {
 
 **Resultado:**
 
-- ✅ 60 requests por minuto permitidos
-- ❌ 61º request → HTTP 429 Too Many Requests
+- 60 requests por minuto permitidos
+- 61º request → HTTP 429 Too Many Requests
 
 ---
 
@@ -637,9 +637,9 @@ RateLimiter::for('api', function (Request $request) {
 
 #### Porque Redis para sessões?
 
-✅ **Performance**: Mais rápido que file/database
-✅ **Escalabilidade**: Multi-server (load balancer)
-✅ **Auto-expiring**: TTL automático
+ **Performance**: Mais rápido que file/database
+ **Escalabilidade**: Multi-server (load balancer)
+ **Auto-expiring**: TTL automático
 
 ```php
 // config/session.php
@@ -826,7 +826,7 @@ $tickets = DB::table('v_ticket_dashboard')
  ->where('team_id', $teamId)
  ->orderBy('is_overdue', 'desc')
  ->get();
-// ✅ Mais simples, mais rápido!
+// Mais simples, mais rápido!
 ```
 
 ### VIEW 2: v_sla_compliance (Relatório SLA)
@@ -950,7 +950,7 @@ Ticket::create([
  'title' => $request->title,
  // ...
 ]);
-// ❌ Código repetido, race condition possível
+// Código repetido, race condition possível
 ```
 
 **Com Trigger (automático!):**
@@ -1019,7 +1019,7 @@ $resolutionDeadline = match($priority) {
  'medium' => now()->addDays(5),
  'low' => now()->addDays(10),
 };
-// ❌ Lógica repetida, precisa testar tudo
+// Lógica repetida, precisa testar tudo
 ```
 
 **Com Trigger:**
@@ -1066,7 +1066,7 @@ $ticket = Ticket::create([
 // Resultado automático:
 // first_response_deadline = created_at + 2 hours
 // resolution_deadline = created_at + 8 hours
-// ✅ Zero cálculos em PHP!
+// Zero cálculos em PHP!
 ```
 
 ### TRIGGER 3: Validar agent assignment
@@ -1095,7 +1095,7 @@ public function rules() {
  ],
  ];
 }
-// ❌ Validação complexa, pode ser bypass em console/seed
+// Validação complexa, pode ser bypass em console/seed
 ```
 
 **Com Trigger (garantido sempre!):**
@@ -1149,7 +1149,7 @@ activity()
  ->performedOn($ticket)
  ->withProperties(['old_status' => $oldStatus, 'new_status' => 'resolved'])
  ->log('status_changed');
-// ❌ Código repetido em vários lugares, fácil esquecer
+// Código repetido em vários lugares, fácil esquecer
 ```
 
 **Com Trigger:**
@@ -1186,7 +1186,7 @@ EXECUTE FUNCTION log_ticket_status_change();
 ```php
 // Simples - log automático!
 $ticket->update(['status' => 'resolved']);
-// ✅ activity_log atualizado automaticamente pelo trigger!
+// activity_log atualizado automaticamente pelo trigger!
 
 // Consultar histórico
 $statusHistory = Activity::forSubject($ticket)
@@ -1230,7 +1230,7 @@ $agent = User::role('agent')
 if ($agent) {
  $ticket->update(['assigned_to' => $agent->id, 'team_id' => $teamId]);
 }
-// ❌ Query complexa, múltiplas round-trips
+// Query complexa, múltiplas round-trips
 ```
 
 **Com Stored Procedure:**
@@ -1272,7 +1272,7 @@ $$ LANGUAGE plpgsql;
 $agentId = DB::selectOne('SELECT assign_ticket_auto(?, ?)', [$ticketId, $teamId])->assign_ticket_auto;
 
 activity()->log("Auto-assigned to agent {$agentId}");
-// ✅ 1 chamada DB vs 3-4 queries
+// 1 chamada DB vs 3-4 queries
 ```
 
 ### PROCEDURE 2: generate_sla_report()
@@ -1293,7 +1293,7 @@ $report = Ticket::selectRaw('
  ->where('team_id', $teamId)
  ->groupBy('priority')
  ->get();
-// ❌ SQL complexo misturado com PHP
+// SQL complexo misturado com PHP
 ```
 
 **Com Stored Procedure:**
@@ -1338,7 +1338,7 @@ $slaReport = DB::select('SELECT * FROM generate_sla_report(?, ?, ?)', [
 ]);
 
 return view('reports.sla', compact('slaReport'));
-// ✅ SQL limpo, reutilizável, testável isoladamente
+// SQL limpo, reutilizável, testável isoladamente
 ```
 
 **Benefício:** Procedure pode ser testada diretamente no PostgreSQL (sem Laravel).
@@ -1375,10 +1375,10 @@ ALTER TABLE tickets ADD CONSTRAINT chk_tickets_priority
 ```php
 // Tentativa de inserir status inválido
 Ticket::create([
- 'status' => 'invalid_status', // ❌
+ 'status' => 'invalid_status', // 
 ]);
 // PostgreSQL EXCEPTION: new row for relation "tickets" violates check constraint "chk_tickets_status"
-// ✅ Impossível burlar validation!
+// Impossível burlar validation!
 ```
 
 ### Exemplo 2: Validar datas lógicas
@@ -1417,7 +1417,7 @@ ALTER TABLE users ADD CONSTRAINT chk_users_email_format
 | Validação | Laravel Form Request | PostgreSQL Check Constraint |
 | --------------- | ---------------------- | --------------------------- |
 | **Quando** | HTTP requests | INSERT/UPDATE sempre |
-| **Bypass?** | Console, Tinker, Seeds | ❌ NUNCA |
+| **Bypass?** | Console, Tinker, Seeds | NUNCA |
 | **Performance** | ~5ms | ~0.01ms (instantâneo) |
 | **Mensagens** | Customizáveis | Generic SQL error |
 
@@ -1465,7 +1465,7 @@ CREATE INDEX idx_tickets_team_status_created ON tickets(team_id, status, created
 SELECT * FROM tickets
 WHERE team_id = 5 AND status = 'open' AND deleted_at IS NULL
 ORDER BY created_at DESC;
--- ✅ Usa idx_tickets_team_status_created (super rápido!)
+-- Usa idx_tickets_team_status_created (super rápido!)
 ```
 
 ### Expression Indexes (Calculated Columns)
@@ -1489,7 +1489,7 @@ CREATE INDEX idx_articles_helpfulness ON articles((
 SELECT * FROM articles
 WHERE (helpful_count::NUMERIC / (helpful_count + not_helpful_count)) > 0.8
  AND is_published = true;
--- ✅ Usa idx_articles_helpfulness
+-- Usa idx_articles_helpfulness
 ```
 
 ---
@@ -1554,29 +1554,27 @@ save 60 10000 # Salva se 10k keys mudaram em 1min
 ## Stack Levels (Arquitetura)
 
 ```
-┌─────────────────────────────────────────────────┐
-│ LARAVEL (PHP 8.3) │
-│ ├─ Eloquent Models │
-│ ├─ Query Builder │
-│ └─ Cache Facade (Redis) │
-└─────────────────┬───────────────────────────────┘
- │
-┌─────────────────▼───────────────────────────────┐
-│ DATABASE LAYER (PostgreSQL 16) │
-│ ├─ Tables (10 principais + Spatie + Sistema) │
-│ ├─ Views (Dashboard, SLA, Performance, KB) │
-│ ├─ Triggers (ticket_number, SLA, validation) │
-│ ├─ Stored Procedures (auto-assign, reports) │
-│ ├─ Check Constraints (enums, dates, format) │
-│ └─ Indexes (Partial, Composite, Expression) │
-└──────────────────────────────────────────────────┘
+
+ LARAVEL (PHP 8.3) 
+ Eloquent Models 
+ Query Builder 
+ Cache Facade (Redis) 
+
+ DATABASE LAYER (PostgreSQL 16) 
+ Tables (10 principais + Spatie + Sistema) 
+ Views (Dashboard, SLA, Performance, KB) 
+ Triggers (ticket_number, SLA, validation) 
+ Stored Procedures (auto-assign, reports) 
+ Check Constraints (enums, dates, format) 
+ Indexes (Partial, Composite, Expression) 
+
 ```
 
 ---
 
 ## Performance Checklist (Sempre Seguir!)
 
-✅ **Indexes:**
+ **Indexes:**
 
 1. Foreign keys sempre indexadas
 2. Status/Priority (queries frequentes)
@@ -1586,7 +1584,7 @@ save 60 10000 # Salva se 10k keys mudaram em 1min
 6. Partial indexes (WHERE clauses específicos)
 7. Composite indexes (múltiplas colunas em WHERE/JOIN)
 
-✅ **Queries:**
+ **Queries:**
 
 1. Eager load relationships (`with()`) - evita N+1
 2. Select apenas colunas necessárias (não `SELECT *`)
@@ -1594,19 +1592,19 @@ save 60 10000 # Salva se 10k keys mudaram em 1min
 4. Chunk datasets grandes (`chunk(1000)`)
 5. Use Views para queries complexas repetidas
 
-✅ **Automação:**
+ **Automação:**
 
 1. Triggers para lógica repetitiva (ticket_number, SLA)
 2. Stored Procedures para lógica complexa reutilizável
 3. Check Constraints para validação crítica
 
-✅ **Cache:**
+ **Cache:**
 
 1. Redis para cache de queries (`ttl: 3600`)
 2. Tags para invalidação seletiva
 3. Queues para operações assíncronas (emails)
 
-✅ **Monitoring:**
+ **Monitoring:**
 
 1. `DB::enableQueryLog()` em desenvolvimento
 2. Laravel Telescope para queries lentas
