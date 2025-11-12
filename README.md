@@ -18,7 +18,9 @@
 
 ## Sobre o Projeto
 
-**OrionOne** é um sistema ITSM (IT Service Management) desenvolvido como **projeto final de Engenharia de Software** (TCC). Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, demonstra arquitetura moderna, boas práticas de desenvolvimento, e stack tecnológica atual.
+**OrionOne** é uma **plataforma ITSM (IT Service Management) completa** desenvolvida como **projeto final de Engenharia de Software** (TCC). Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, OrionOne vai além de um Helpdesk moderno para oferecer **gestão profissional de IT Service Management**, incluindo **Asset Management (CMDB)**, Knowledge Base com AI Search, SLA Management, e reporting avançado.
+
+Demonstra arquitetura moderna, boas práticas de desenvolvimento (TDD, SOLID, Clean Architecture), e stack tecnológica atual.
 
 > **Projeto Académico** • CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação
 > Centro de Formação Profissional de Évora • 2024/2026
@@ -75,33 +77,49 @@
 -   Estados (Open, In Progress, Resolved, Closed)
 -   Priorização (Low, Medium, High, Urgent)
 -   Atribuição a utilizadores/equipas
+
+### Roadmap (Sprints 2-7)
+
+#### **Sprint 2: Tickets CRUD** (6 semanas)
+
+-   Gestão completa de tickets (CRUD)
+-   Campos: título, descrição, prioridade, status, assigned_to
 -   Números automáticos (TKT-000001, TKT-000002...)
 
-### Roadmap (Sprints 3-6)
-
-#### **Sprint 3: Comentários**
+#### **Sprint 3: Comentários** (6 semanas)
 
 -   Sistema de comentários públicos e internos
 -   Menções de utilizadores (@username)
 -   Notificações em tempo real
 
-#### **Sprint 4: Knowledge Base**
+#### **Sprint 4: Knowledge Base** (6 semanas)
 
 -   Artigos com categorias
 -   Full-text search (PostgreSQL)
 -   Sistema de votação (útil/não útil)
 
-#### **Sprint 5: Dashboard & SLA**
+#### **Sprint 5: Dashboard & SLA** (6 semanas)
 
 -   Métricas de tickets por estado
 -   SLA tracking com alertas
 -   Estatísticas por equipa
 
-#### **Sprint 6: Relatórios**
+#### **Sprint 6: Teams & Automation** (4 semanas)
 
--   Geração de relatórios (PDF/Excel)
--   Analytics avançadas
--   Export de dados
+-   Teams management
+-   Auto-assignment rules
+-   Scheduled reports
+
+#### **Sprint 7: Asset Management (CMDB)** (4 semanas) ← **NOVO**
+
+-   **Assets CRUD** (6 types: Laptop, Desktop, Server, License, Mobile, Network)
+-   **Asset→Ticket linking** (affected_asset_id)
+-   **CSV Import/Export** (bulk operations)
+-   **Asset Reports** (status, warranty alerts, cost summary)
+
+**MVP Launch:** Fevereiro 2026 (32 semanas ~ 8 meses)
+**ITSM Score:** 8.5/10 (ITSM Profissional - inclui Asset Management)
+**Target Market:** 10-500 funcionários
 
 **Roadmap completo:** [docs/MVP.md](docs/MVP.md)
 
@@ -512,34 +530,48 @@ Este projeto segue **boas práticas profissionais** de desenvolvimento:
 
 ## Funcionalidades Planeadas
 
-### MVP (Fase 1) - 2.5 meses
+### MVP (Fase 1) - 8 meses (Fevereiro 2026)
 
--   [ ] Autenticação e autorização multi-role
--   [ ] CRUD completo de tickets
+**ITSM Core:**
+
+-   [x] Autenticação e autorização multi-role (RBAC - Spatie Permission)
+-   [ ] CRUD completo de tickets (TKT-000001 auto-generated)
 -   [ ] Sistema de comentários (públicos e internos)
--   [ ] Gestão de equipas
+-   [ ] Gestão de equipas (Teams + Assignment)
 -   [ ] Atribuição automática de tickets
--   [ ] SLA tracking básico
--   [ ] Knowledge base com pesquisa
--   [ ] Dashboard com métricas
--   [ ] Notificações por email
--   [ ] Activity log (auditoria)
+-   [ ] SLA tracking + alertas de breach
+-   [ ] Knowledge base com AI Search (Meilisearch)
+-   [ ] Dashboard com métricas (Chart.js)
+-   [ ] Notificações por email (queues)
+-   [x] Activity log (auditoria - Spatie Activity Log)
 
-### Fase 2 (Futuro)
+**Asset Management (CMDB):** ← **NOVO Sprint 7**
+
+-   [ ] Assets CRUD (6 types: Laptop, Desktop, Server, License, Mobile, Network)
+-   [ ] Asset→Ticket linking (affected_asset_id)
+-   [ ] CSV Import/Export (Maatwebsite Excel)
+-   [ ] Asset relationships (Asset→User, Asset→Ticket, Asset→Asset)
+-   [ ] Asset reports (status, warranty alerts, cost summary)
+
+**ITSM Score:** 8.5/10 (ITSM Profissional - inclui Asset Management)
+
+### Fase 2 (Post-MVP)
 
 -   [ ] Real-time updates via WebSockets
--   [ ] Anexos de ficheiros
--   [ ] Relatórios avançados (PDF/Excel)
--   [ ] Full-text search (PostgreSQL)
--   [ ] API RESTful
+-   [ ] Anexos de ficheiros (Intervention Image)
+-   [ ] Relatórios avançados (PDF/Excel export)
+-   [ ] Full-text search PostgreSQL
+-   [ ] API RESTful pública (OAuth 2.0)
 
 ### Roadmap (Longo Prazo)
 
--   [ ] Multi-tenancy
--   [ ] Workflows configuráveis
+-   [ ] Change Management (ITIL)
+-   [ ] Problem Management (ITIL)
+-   [ ] Multi-tenancy support
+-   [ ] Workflows configuráveis (drag-and-drop)
 -   [ ] Integração com email (IMAP)
--   [ ] Mobile app
--   [ ] Sistema de aprovações
+-   [ ] Mobile app (PWA + native)
+-   [ ] Sistema de aprovações (multi-stage)
 
 ---
 

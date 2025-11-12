@@ -1310,13 +1310,100 @@ dd($ticket->fresh());
 
 ---
 
+## Asset Management Patterns (Sprint 7)
+
+### Asset→Ticket Relationship
+
+**Migration:**
+
+```php
+Schema::table('tickets', function (Blueprint $table) {
+    $table->foreignId('affected_asset_id')->nullable()->constrained('assets')->nullOnDelete();
+});
+```
+
+**Models:**
+
+```php
+// Ticket.php
+public function affectedAsset(): BelongsTo {
+    return $this->belongsTo(Asset::class, 'affected_asset_id');
+}
+
+// Asset.php
+public function tickets(): HasMany {
+    return $this->hasMany(Ticket::class, 'affected_asset_id');
+}
+```
+
+---
+
+### CSV Import (Maatwebsite Excel)
+
+```php
+// app/Imports/AssetsImport.php
+class AssetsImport implements ToModel, WithHeadingRow, WithValidation
+{
+    public function model(array $row) {
+        return new Asset([
+            'name' => $row['name'],
+            'serial_number' => $row['serial_number'],
+            'asset_type' => $row['asset_type'],
+            'status' => $row['status'] ?? 'available',
+        ]);
+    }
+
+    public function rules(): array {
+        return [
+            'serial_number' => 'required|unique:assets',
+            'asset_type' => 'required|in:laptop,desktop,server,software_license,mobile_device,network_equipment',
+        ];
+    }
+}
+
+// Controller
+Excel::import(new AssetsImport, $request->file('file'));
+```
+
+---
+
+### Activity History (Spatie)
+
+```php
+// Model
+use LogsActivity;
+public function getActivitylogOptions(): LogOptions {
+    return LogOptions::defaults()->logOnly(['name', 'status', 'assigned_to'])->logOnlyDirty();
+}
+
+// Controller
+activity()->performedOn($asset)->causedBy(auth()->user())->log('Asset updated');
+
+// Retrieve history
+$asset->activities()->with('causer')->latest()->get();
+```
+
+---
+
+### Reports (Chart.js)
+
+```php
+// API
+$byStatus = Asset::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+```
+
+```vue
+// Vue Component import { Chart, registerables } from 'chart.js'
+Chart.register(...registerables) new Chart(chartCanvas.value, { type:
+'doughnut', data: { labels: Object.keys(data.by_status), datasets: [{ data:
+Object.values(data.by_status) }] } })
+```
+
+---
+
 ## Recursos
 
 -   [Laravel Testing Docs](https://laravel.com/docs/11.x/testing)
 -   [PHPUnit Documentation](https://phpunit.de/documentation.html)
 -   [Test Driven Laravel](https://course.testdrivenlaravel.com/)
 -   [Laracasts: Testing](https://laracasts.com/topics/testing)
-
-**Regra de Ouro:**
-
-> "Código sem testes é código legado."

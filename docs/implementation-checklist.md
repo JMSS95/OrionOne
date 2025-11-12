@@ -2677,44 +2677,44 @@ class TicketController extends Controller
 /\*\*
 
 -   @OA\Get(
--               path="/api/tickets",
--               summary="List all tickets",
--               description="Retrieve paginated list of tickets with optional filters",
--               operationId="getTickets",
--               tags={"Tickets"},
--               security={{"sanctum":{}}},
--               @OA\Parameter(
--                   name="filter[status]",
--                   in="query",
--                   description="Filter by status",
--                   required=false,
--                   @OA\Schema(type="string", enum={"open","in_progress","resolved","closed"})
--               ),
--               @OA\Parameter(
--                   name="filter[priority]",
--                   in="query",
--                   description="Filter by priority",
--                   required=false,
--                   @OA\Schema(type="string", enum={"low","medium","high","urgent"})
--               ),
--               @OA\Parameter(
--                   name="sort",
--                   in="query",
--                   description="Sort by field (use - for descending)",
--                   required=false,
--                   @OA\Schema(type="string", example="-created_at")
--               ),
--               @OA\Response(
--                   response=200,
--                   description="Successful operation",
--                   @OA\JsonContent(
--                       type="object",
--                       @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Ticket")),
--                       @OA\Property(property="links", type="object"),
--                       @OA\Property(property="meta", type="object")
--                   )
--               ),
--               @OA\Response(response=401, description="Unauthenticated")
+-                     path="/api/tickets",
+-                     summary="List all tickets",
+-                     description="Retrieve paginated list of tickets with optional filters",
+-                     operationId="getTickets",
+-                     tags={"Tickets"},
+-                     security={{"sanctum":{}}},
+-                     @OA\Parameter(
+-                         name="filter[status]",
+-                         in="query",
+-                         description="Filter by status",
+-                         required=false,
+-                         @OA\Schema(type="string", enum={"open","in_progress","resolved","closed"})
+-                     ),
+-                     @OA\Parameter(
+-                         name="filter[priority]",
+-                         in="query",
+-                         description="Filter by priority",
+-                         required=false,
+-                         @OA\Schema(type="string", enum={"low","medium","high","urgent"})
+-                     ),
+-                     @OA\Parameter(
+-                         name="sort",
+-                         in="query",
+-                         description="Sort by field (use - for descending)",
+-                         required=false,
+-                         @OA\Schema(type="string", example="-created_at")
+-                     ),
+-                     @OA\Response(
+-                         response=200,
+-                         description="Successful operation",
+-                         @OA\JsonContent(
+-                             type="object",
+-                             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Ticket")),
+-                             @OA\Property(property="links", type="object"),
+-                             @OA\Property(property="meta", type="object")
+-                         )
+-                     ),
+-                     @OA\Response(response=401, description="Unauthenticated")
 -   )
     \*/
     public function index(Request $request)
@@ -2725,28 +2725,28 @@ class TicketController extends Controller
 /\*\*
 
 -   @OA\Post(
--               path="/api/tickets",
--               summary="Create a new ticket",
--               description="Create a new support ticket",
--               operationId="createTicket",
--               tags={"Tickets"},
--               security={{"sanctum":{}}},
--               @OA\RequestBody(
--                   required=true,
--                   @OA\JsonContent(
--                       required={"title","description"},
--                       @OA\Property(property="title", type="string", maxLength=255, example="Laptop não liga"),
--                       @OA\Property(property="description", type="string", example="Detalhes do problema..."),
--                       @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"}, example="high"),
--                       @OA\Property(property="category_id", type="integer", example=1)
--                   )
--               ),
--               @OA\Response(
--                   response=201,
--                   description="Ticket created successfully",
--                   @OA\JsonContent(ref="#/components/schemas/Ticket")
--               ),
--               @OA\Response(response=422, description="Validation error")
+-                     path="/api/tickets",
+-                     summary="Create a new ticket",
+-                     description="Create a new support ticket",
+-                     operationId="createTicket",
+-                     tags={"Tickets"},
+-                     security={{"sanctum":{}}},
+-                     @OA\RequestBody(
+-                         required=true,
+-                         @OA\JsonContent(
+-                             required={"title","description"},
+-                             @OA\Property(property="title", type="string", maxLength=255, example="Laptop não liga"),
+-                             @OA\Property(property="description", type="string", example="Detalhes do problema..."),
+-                             @OA\Property(property="priority", type="string", enum={"low","medium","high","urgent"}, example="high"),
+-                             @OA\Property(property="category_id", type="integer", example=1)
+-                         )
+-                     ),
+-                     @OA\Response(
+-                         response=201,
+-                         description="Ticket created successfully",
+-                         @OA\JsonContent(ref="#/components/schemas/Ticket")
+-                     ),
+-                     @OA\Response(response=422, description="Validation error")
 -   )
     \*/
     public function store(Request $request)
@@ -3683,9 +3683,10 @@ Interface de pesquisa com:
 
 **Objetivo:** Documentar Chart.js integration para Dashboard analytics.
 
-**Contexto:** 
-- ✅ Chart.js (`chart.js: ^4.5.1`) + vue-chartjs (`^5.3.3`) **JÁ INSTALADOS!**
-- ⏳ Apenas falta documentar uso e criar wrapper components
+**Contexto:**
+
+-   ✅ Chart.js (`chart.js: ^4.5.1`) + vue-chartjs (`^5.3.3`) **JÁ INSTALADOS!**
+-   ⏳ Apenas falta documentar uso e criar wrapper components
 
 ---
 
@@ -3695,38 +3696,38 @@ Interface de pesquisa com:
 
 ```javascript
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js'
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler,
+} from "chart.js";
 
 // Registar components necessários (tree-shaking)
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-)
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+);
 
 // Configuração global
-ChartJS.defaults.responsive = true
-ChartJS.defaults.maintainAspectRatio = false
-ChartJS.defaults.color = '#6b7280' // text-gray-500
-ChartJS.defaults.font.family = "'Inter', sans-serif"
+ChartJS.defaults.responsive = true;
+ChartJS.defaults.maintainAspectRatio = false;
+ChartJS.defaults.color = "#6b7280"; // text-gray-500
+ChartJS.defaults.font.family = "'Inter', sans-serif";
 ```
 
 ---
@@ -3738,48 +3739,48 @@ ChartJS.defaults.font.family = "'Inter', sans-serif"
 ```vue
 <!-- resources/js/components/charts/LineChart.vue -->
 <script setup>
-import { Line } from 'vue-chartjs'
-import { computed } from 'vue'
+import { Line } from "vue-chartjs";
+import { computed } from "vue";
 
 const props = defineProps({
-  data: Object, // { labels: [], datasets: [] }
-  title: String,
-  height: { type: Number, default: 300 },
-})
+    data: Object, // { labels: [], datasets: [] }
+    title: String,
+    height: { type: Number, default: 300 },
+});
 
 const options = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    title: {
-      display: !!props.title,
-      text: props.title,
-      font: { size: 16, weight: 'bold' },
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        title: {
+            display: !!props.title,
+            text: props.title,
+            font: { size: 16, weight: "bold" },
+        },
+        legend: {
+            display: true,
+            position: "bottom",
+        },
+        tooltip: {
+            mode: "index",
+            intersect: false,
+        },
     },
-    legend: {
-      display: true,
-      position: 'bottom',
+    scales: {
+        y: {
+            beginAtZero: true,
+            ticks: {
+                precision: 0, // Inteiros apenas
+            },
+        },
     },
-    tooltip: {
-      mode: 'index',
-      intersect: false,
-    },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: {
-        precision: 0, // Inteiros apenas
-      },
-    },
-  },
-}))
+}));
 </script>
 
 <template>
-  <div :style="{ height: `${height}px` }">
-    <Line :data="data" :options="options" />
-  </div>
+    <div :style="{ height: `${height}px` }">
+        <Line :data="data" :options="options" />
+    </div>
 </template>
 ```
 
@@ -3787,41 +3788,41 @@ const options = computed(() => ({
 
 ```vue
 <script setup>
-import LineChart from '@/components/charts/LineChart.vue'
+import LineChart from "@/components/charts/LineChart.vue";
 
 const props = defineProps({
-  ticketsTrend: Object, // Backend retorna: { labels: ['1 Nov', '2 Nov'], datasets: [{ data: [10, 15] }] }
-})
+    ticketsTrend: Object, // Backend retorna: { labels: ['1 Nov', '2 Nov'], datasets: [{ data: [10, 15] }] }
+});
 
 // Transform backend data to Chart.js format
 const chartData = {
-  labels: props.ticketsTrend.labels,
-  datasets: [
-    {
-      label: 'Tickets Criados',
-      data: props.ticketsTrend.data,
-      borderColor: 'rgb(59, 130, 246)', // blue-500
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      fill: true,
-      tension: 0.3, // Smooth curve
-    },
-  ],
-}
+    labels: props.ticketsTrend.labels,
+    datasets: [
+        {
+            label: "Tickets Criados",
+            data: props.ticketsTrend.data,
+            borderColor: "rgb(59, 130, 246)", // blue-500
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: true,
+            tension: 0.3, // Smooth curve
+        },
+    ],
+};
 </script>
 
 <template>
-  <Card>
-    <CardHeader>
-      <CardTitle>Tickets Criados (Últimos 30 Dias)</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <LineChart
-        :data="chartData"
-        title="Tendência de Tickets"
-        :height="300"
-      />
-    </CardContent>
-  </Card>
+    <Card>
+        <CardHeader>
+            <CardTitle>Tickets Criados (Últimos 30 Dias)</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <LineChart
+                :data="chartData"
+                title="Tendência de Tickets"
+                :height="300"
+            />
+        </CardContent>
+    </Card>
 </template>
 ```
 
@@ -3837,13 +3838,13 @@ public function index()
         ->selectRaw('DATE(created_at) as date, count(*) as total')
         ->orderBy('date')
         ->get();
-    
+
     // Format para Chart.js
     $chartData = [
         'labels' => $ticketsTrend->pluck('date')->map(fn($date) => Carbon::parse($date)->format('d M')),
         'data' => $ticketsTrend->pluck('total'),
     ];
-    
+
     return Inertia::render('Dashboard', [
         'ticketsTrend' => $chartData,
     ]);
@@ -3857,35 +3858,35 @@ public function index()
 ```vue
 <!-- resources/js/components/charts/PieChart.vue -->
 <script setup>
-import { Pie } from 'vue-chartjs'
-import { computed } from 'vue'
+import { Pie } from "vue-chartjs";
+import { computed } from "vue";
 
 const props = defineProps({
-  data: Object,
-  title: String,
-  height: { type: Number, default: 300 },
-})
+    data: Object,
+    title: String,
+    height: { type: Number, default: 300 },
+});
 
 const options = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    title: {
-      display: !!props.title,
-      text: props.title,
-      font: { size: 16, weight: 'bold' },
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        title: {
+            display: !!props.title,
+            text: props.title,
+            font: { size: 16, weight: "bold" },
+        },
+        legend: {
+            position: "right",
+        },
     },
-    legend: {
-      position: 'right',
-    },
-  },
-}))
+}));
 </script>
 
 <template>
-  <div :style="{ height: `${height}px` }">
-    <Pie :data="data" :options="options" />
-  </div>
+    <div :style="{ height: `${height}px` }">
+        <Pie :data="data" :options="options" />
+    </div>
 </template>
 ```
 
@@ -3894,33 +3895,30 @@ const options = computed(() => ({
 ```vue
 <script setup>
 const statusData = {
-  labels: ['Aberto', 'Em Progresso', 'Resolvido', 'Fechado'],
-  datasets: [
-    {
-      data: [45, 32, 78, 123], // Backend retorna contadores
-      backgroundColor: [
-        'rgb(59, 130, 246)',  // blue - open
-        'rgb(234, 179, 8)',   // yellow - in_progress
-        'rgb(34, 197, 94)',   // green - resolved
-        'rgb(156, 163, 175)', // gray - closed
-      ],
-    },
-  ],
-}
+    labels: ["Aberto", "Em Progresso", "Resolvido", "Fechado"],
+    datasets: [
+        {
+            data: [45, 32, 78, 123], // Backend retorna contadores
+            backgroundColor: [
+                "rgb(59, 130, 246)", // blue - open
+                "rgb(234, 179, 8)", // yellow - in_progress
+                "rgb(34, 197, 94)", // green - resolved
+                "rgb(156, 163, 175)", // gray - closed
+            ],
+        },
+    ],
+};
 </script>
 
 <template>
-  <Card>
-    <CardHeader>
-      <CardTitle>Tickets por Status</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <PieChart
-        :data="statusData"
-        :height="300"
-      />
-    </CardContent>
-  </Card>
+    <Card>
+        <CardHeader>
+            <CardTitle>Tickets por Status</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <PieChart :data="statusData" :height="300" />
+        </CardContent>
+    </Card>
 </template>
 ```
 
@@ -3931,43 +3929,43 @@ const statusData = {
 ```vue
 <!-- resources/js/components/charts/BarChart.vue -->
 <script setup>
-import { Bar } from 'vue-chartjs'
-import { computed } from 'vue'
+import { Bar } from "vue-chartjs";
+import { computed } from "vue";
 
 const props = defineProps({
-  data: Object,
-  title: String,
-  height: { type: Number, default: 300 },
-})
+    data: Object,
+    title: String,
+    height: { type: Number, default: 300 },
+});
 
 const options = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    title: {
-      display: !!props.title,
-      text: props.title,
-      font: { size: 16, weight: 'bold' },
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        title: {
+            display: !!props.title,
+            text: props.title,
+            font: { size: 16, weight: "bold" },
+        },
+        legend: {
+            display: false,
+        },
     },
-    legend: {
-      display: false,
+    scales: {
+        y: {
+            beginAtZero: true,
+            ticks: {
+                precision: 0,
+            },
+        },
     },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: {
-        precision: 0,
-      },
-    },
-  },
-}))
+}));
 </script>
 
 <template>
-  <div :style="{ height: `${height}px` }">
-    <Bar :data="data" :options="options" />
-  </div>
+    <div :style="{ height: `${height}px` }">
+        <Bar :data="data" :options="options" />
+    </div>
 </template>
 ```
 
@@ -4002,34 +4000,34 @@ return Inertia::render('Dashboard', [
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import Button from '@/components/ui/Button.vue'
+import { ref } from "vue";
+import Button from "@/components/ui/Button.vue";
 
-const chartRef = ref(null)
+const chartRef = ref(null);
 
 const exportChart = () => {
-  const chart = chartRef.value?.chart // Aceder ao ChartJS instance
-  if (!chart) return
-  
-  // Gerar PNG base64
-  const url = chart.toBase64Image()
-  
-  // Download
-  const link = document.createElement('a')
-  link.download = 'tickets-trend.png'
-  link.href = url
-  link.click()
-}
+    const chart = chartRef.value?.chart; // Aceder ao ChartJS instance
+    if (!chart) return;
+
+    // Gerar PNG base64
+    const url = chart.toBase64Image();
+
+    // Download
+    const link = document.createElement("a");
+    link.download = "tickets-trend.png";
+    link.href = url;
+    link.click();
+};
 </script>
 
 <template>
-  <div>
-    <LineChart ref="chartRef" :data="data" />
-    
-    <Button @click="exportChart" variant="outline" class="mt-4">
-      Exportar PNG
-    </Button>
-  </div>
+    <div>
+        <LineChart ref="chartRef" :data="data" />
+
+        <Button @click="exportChart" variant="outline" class="mt-4">
+            Exportar PNG
+        </Button>
+    </div>
 </template>
 ```
 
@@ -4037,26 +4035,26 @@ const exportChart = () => {
 
 ```vue
 <script setup>
-import { ref, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { ref, onMounted } from "vue";
+import { router } from "@inertiajs/vue3";
 
-const chartData = ref(props.ticketsTrend)
+const chartData = ref(props.ticketsTrend);
 
 // Poll backend a cada 30 segundos
 onMounted(() => {
-  setInterval(() => {
-    router.reload({
-      only: ['ticketsTrend'],
-      onSuccess: (page) => {
-        chartData.value = page.props.ticketsTrend
-      },
-    })
-  }, 30000) // 30 seconds
-})
+    setInterval(() => {
+        router.reload({
+            only: ["ticketsTrend"],
+            onSuccess: (page) => {
+                chartData.value = page.props.ticketsTrend;
+            },
+        });
+    }, 30000); // 30 seconds
+});
 </script>
 
 <template>
-  <LineChart :data="chartData" />
+    <LineChart :data="chartData" />
 </template>
 ```
 
@@ -4064,35 +4062,37 @@ onMounted(() => {
 
 ```javascript
 // Auto-detect dark mode e ajustar cores
-import { useDark } from '@vueuse/core'
+import { useDark } from "@vueuse/core";
 
-const isDark = useDark()
+const isDark = useDark();
 
 const chartColors = computed(() => ({
-  borderColor: isDark.value ? 'rgb(147, 197, 253)' : 'rgb(59, 130, 246)',
-  backgroundColor: isDark.value ? 'rgba(147, 197, 253, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-  gridColor: isDark.value ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-}))
+    borderColor: isDark.value ? "rgb(147, 197, 253)" : "rgb(59, 130, 246)",
+    backgroundColor: isDark.value
+        ? "rgba(147, 197, 253, 0.1)"
+        : "rgba(59, 130, 246, 0.1)",
+    gridColor: isDark.value ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+}));
 ```
 
 ---
 
 #### Checklist Chart.js Integration
 
-- [ ] Chart.js components registados globalmente (tree-shaking)
-- [ ] LineChart component criado (tickets trend)
-- [ ] PieChart component criado (tickets por status)
-- [ ] BarChart component criado (agent performance)
-- [ ] DoughnutChart component criado (tickets por prioridade)
-- [ ] Backend gera dados no formato Chart.js (labels + datasets)
-- [ ] Export PNG funcional (toBase64Image)
-- [ ] Real-time updates (polling a cada 30s)
-- [ ] Dark mode support (cores adaptativas)
-- [ ] Responsive (funciona em mobile)
-- [ ] Testado: Charts renderizam corretamente
-- [ ] Testado: Tooltips mostram dados corretos
-- [ ] Testado: Legend funcional (hide/show datasets)
-- [ ] Documentado em `docs/CHARTS-GUIDE.md`
+-   [ ] Chart.js components registados globalmente (tree-shaking)
+-   [ ] LineChart component criado (tickets trend)
+-   [ ] PieChart component criado (tickets por status)
+-   [ ] BarChart component criado (agent performance)
+-   [ ] DoughnutChart component criado (tickets por prioridade)
+-   [ ] Backend gera dados no formato Chart.js (labels + datasets)
+-   [ ] Export PNG funcional (toBase64Image)
+-   [ ] Real-time updates (polling a cada 30s)
+-   [ ] Dark mode support (cores adaptativas)
+-   [ ] Responsive (funciona em mobile)
+-   [ ] Testado: Charts renderizam corretamente
+-   [ ] Testado: Tooltips mostram dados corretos
+-   [ ] Testado: Legend funcional (hide/show datasets)
+-   [ ] Documentado em `docs/CHARTS-GUIDE.md`
 
 **Tempo estimado:** ~2h (Setup 30min + Components 1h + Advanced 30min)
 
@@ -4390,7 +4390,1644 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 
 ---
 
-## Checklist Resumo Completo
+## Sprint 7: Asset Management (CMDB) (27 Jan - 23 Fev)
+
+### Feature 13: Assets CRUD (6 Asset Types)
+
+#### Phase 1: Planning (30 min)
+
+**User Story:** Como administrador, quero gerir assets (laptops, servers, licenças) para rastrear inventário e relacionar com tickets.
+
+**Asset Types:**
+
+-   Laptop, Desktop, Server, Software License, Mobile Device, Network Equipment
+
+**Asset Fields:**
+
+-   `name`, `serial_number`, `model`, `manufacturer`, `purchase_date`, `warranty_end`, `cost`
+-   `status`: In Use, Available, Under Repair, Retired, Lost/Stolen
+-   `assigned_to` (user_id), `location` (office, remote, storage)
+
+**Acceptance Criteria:**
+
+-   Admin pode criar/editar/deletar assets
+-   Assets listados com filtros (type, status, assigned_to)
+-   Asset show page exibe histórico completo (Spatie Activity Log)
+-   CSV import para bulk create
+
+---
+
+#### Phase 2: Tests First (RED)
+
+**a) Create AssetTest.php:**
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Asset;
+use App\Models\User;
+use Tests\TestCase;
+
+class AssetTest extends TestCase
+{
+    /** @test */
+    public function admin_can_create_asset()
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->post('/api/v1/assets', [
+                'name' => 'Dell Latitude 5520',
+                'serial_number' => 'SN123456',
+                'asset_type' => 'laptop',
+                'model' => 'Latitude 5520',
+                'manufacturer' => 'Dell',
+                'status' => 'available',
+                'purchase_date' => '2024-01-15',
+                'warranty_end' => '2027-01-15',
+                'cost' => 1200.00,
+            ])
+            ->assertCreated()
+            ->assertJsonStructure(['data' => ['id', 'name', 'serial_number']]);
+
+        $this->assertDatabaseHas('assets', ['serial_number' => 'SN123456']);
+    }
+
+    /** @test */
+    public function serial_number_must_be_unique()
+    {
+        Asset::factory()->create(['serial_number' => 'SN123456']);
+
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->post('/api/v1/assets', [
+                'name' => 'Another Laptop',
+                'serial_number' => 'SN123456', // Duplicate
+                'asset_type' => 'laptop',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('serial_number');
+    }
+
+    /** @test */
+    public function asset_can_be_assigned_to_user()
+    {
+        $asset = Asset::factory()->create(['status' => 'available']);
+        $user = User::factory()->create();
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->patch("/api/v1/assets/{$asset->id}", [
+                'assigned_to' => $user->id,
+                'status' => 'in_use',
+            ])
+            ->assertOk();
+
+        $this->assertEquals($user->id, $asset->fresh()->assigned_to);
+    }
+
+    /** @test */
+    public function asset_shows_history_timeline()
+    {
+        $asset = Asset::factory()->create();
+        activity()->performedOn($asset)->log('Asset created');
+
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)
+            ->get("/api/v1/assets/{$asset->id}")
+            ->assertOk();
+
+        $this->assertArrayHasKey('history', $response->json('data'));
+    }
+}
+```
+
+**b) Create AssetFactory.php:**
+
+```php
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Asset;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class AssetFactory extends Factory
+{
+    protected $model = Asset::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => $this->faker->words(3, true),
+            'serial_number' => strtoupper($this->faker->unique()->bothify('SN######')),
+            'asset_type' => $this->faker->randomElement(['laptop', 'desktop', 'server', 'software_license', 'mobile_device', 'network_equipment']),
+            'model' => $this->faker->words(2, true),
+            'manufacturer' => $this->faker->randomElement(['Dell', 'HP', 'Lenovo', 'Apple', 'Cisco']),
+            'status' => $this->faker->randomElement(['in_use', 'available', 'under_repair', 'retired', 'lost']),
+            'purchase_date' => $this->faker->dateTimeBetween('-3 years', 'now'),
+            'warranty_end' => $this->faker->dateTimeBetween('now', '+3 years'),
+            'cost' => $this->faker->randomFloat(2, 500, 5000),
+            'location' => $this->faker->randomElement(['office', 'remote', 'storage']),
+            'assigned_to' => $this->faker->boolean(60) ? User::factory() : null,
+        ];
+    }
+
+    public function laptop(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'asset_type' => 'laptop',
+            'manufacturer' => 'Dell',
+            'model' => 'Latitude 5520',
+        ]);
+    }
+
+    public function available(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'available',
+            'assigned_to' => null,
+        ]);
+    }
+
+    public function inUse(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'in_use',
+            'assigned_to' => User::factory(),
+        ]);
+    }
+}
+```
+
+**Run tests (should FAIL - RED):**
+
+```bash
+docker-compose exec orionone-app php artisan test --filter=AssetTest
+```
+
+---
+
+#### Phase 3: Implementation (GREEN)
+
+**a) Create Migration:**
+
+```bash
+docker-compose exec orionone-app php artisan make:migration create_assets_table
+```
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('assets', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('serial_number')->unique();
+            $table->enum('asset_type', ['laptop', 'desktop', 'server', 'software_license', 'mobile_device', 'network_equipment']);
+            $table->string('model')->nullable();
+            $table->string('manufacturer')->nullable();
+            $table->enum('status', ['in_use', 'available', 'under_repair', 'retired', 'lost'])->default('available');
+            $table->date('purchase_date')->nullable();
+            $table->date('warranty_end')->nullable();
+            $table->decimal('cost', 10, 2)->nullable();
+            $table->string('location')->nullable(); // office, remote, storage
+            $table->text('notes')->nullable();
+
+            // Relationships
+            $table->foreignId('assigned_to')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('parent_id')->nullable()->constrained('assets')->nullOnDelete(); // For components (e.g., RAM → Laptop)
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            // Indexes
+            $table->index('serial_number');
+            $table->index('asset_type');
+            $table->index('status');
+            $table->index('assigned_to');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('assets');
+    }
+};
+```
+
+**Run migration:**
+
+```bash
+docker-compose exec orionone-app php artisan migrate
+```
+
+**b) Create Asset Model:**
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+class Asset extends Model
+{
+    use HasFactory, SoftDeletes, LogsActivity;
+
+    protected $fillable = [
+        'name',
+        'serial_number',
+        'asset_type',
+        'model',
+        'manufacturer',
+        'status',
+        'purchase_date',
+        'warranty_end',
+        'cost',
+        'location',
+        'notes',
+        'assigned_to',
+        'parent_id',
+    ];
+
+    protected $casts = [
+        'purchase_date' => 'date',
+        'warranty_end' => 'date',
+        'cost' => 'decimal:2',
+    ];
+
+    // Activity Log Configuration
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'status', 'assigned_to', 'location'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    // Relationships
+    public function assignedUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'affected_asset_id');
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Asset::class, 'parent_id');
+    }
+
+    public function components(): HasMany
+    {
+        return $this->hasMany(Asset::class, 'parent_id');
+    }
+
+    // Scopes
+    public function scopeAvailable($query)
+    {
+        return $query->where('status', 'available');
+    }
+
+    public function scopeInUse($query)
+    {
+        return $query->where('status', 'in_use');
+    }
+
+    public function scopeWarrantyExpiring($query, int $days = 30)
+    {
+        return $query->where('warranty_end', '<=', now()->addDays($days))
+            ->where('warranty_end', '>=', now());
+    }
+}
+```
+
+**c) Create AssetController:**
+
+```bash
+docker-compose exec orionone-app php artisan make:controller Api/AssetController --resource
+```
+
+```php
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Asset;
+use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
+
+/**
+ * @group Assets
+ *
+ * Gerenciar assets (CMDB).
+ */
+class AssetController extends Controller
+{
+    /**
+     * List all assets
+     *
+     * @queryParam filter[asset_type] Filter by type. Example: laptop
+     * @queryParam filter[status] Filter by status. Example: available
+     * @queryParam filter[assigned_to] Filter by assigned user ID. Example: 5
+     * @queryParam sort Sort by field. Example: -created_at
+     *
+     * @response 200 {
+     *   "data": [
+     *     {"id": 1, "name": "Dell Latitude 5520", "serial_number": "SN123456", "status": "in_use"}
+     *   ],
+     *   "meta": {"total": 45}
+     * }
+     */
+    public function index(Request $request)
+    {
+        $assets = QueryBuilder::for(Asset::class)
+            ->allowedFilters(['asset_type', 'status', 'assigned_to'])
+            ->allowedSorts(['name', 'created_at', 'purchase_date'])
+            ->with(['assignedUser:id,name,email'])
+            ->paginate($request->per_page ?? 20);
+
+        return response()->json($assets);
+    }
+
+    /**
+     * Create new asset
+     *
+     * @bodyParam name string required Asset name. Example: Dell Latitude 5520
+     * @bodyParam serial_number string required Unique serial number. Example: SN123456
+     * @bodyParam asset_type string required Type. Example: laptop
+     * @bodyParam status string Status. Example: available
+     *
+     * @response 201 {"data": {"id": 1, "name": "Dell Latitude 5520"}}
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'serial_number' => 'required|string|unique:assets,serial_number|max:255',
+            'asset_type' => 'required|in:laptop,desktop,server,software_license,mobile_device,network_equipment',
+            'model' => 'nullable|string|max:255',
+            'manufacturer' => 'nullable|string|max:255',
+            'status' => 'required|in:in_use,available,under_repair,retired,lost',
+            'purchase_date' => 'nullable|date',
+            'warranty_end' => 'nullable|date|after:purchase_date',
+            'cost' => 'nullable|numeric|min:0',
+            'location' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+            'assigned_to' => 'nullable|exists:users,id',
+            'parent_id' => 'nullable|exists:assets,id',
+        ]);
+
+        $asset = Asset::create($validated);
+
+        activity()
+            ->performedOn($asset)
+            ->causedBy(auth()->user())
+            ->log('Asset created');
+
+        return response()->json(['data' => $asset], 201);
+    }
+
+    /**
+     * Show asset details
+     *
+     * @urlParam id int required Asset ID. Example: 1
+     *
+     * @response 200 {
+     *   "data": {
+     *     "id": 1,
+     *     "name": "Dell Latitude 5520",
+     *     "serial_number": "SN123456",
+     *     "assigned_user": {"id": 5, "name": "João Silva"},
+     *     "tickets": [{"id": 10, "title": "Teclado não funciona"}],
+     *     "history": [{"description": "Asset created", "created_at": "2024-11-10"}]
+     *   }
+     * }
+     */
+    public function show(Asset $asset)
+    {
+        $asset->load([
+            'assignedUser:id,name,email',
+            'tickets:id,title,status,created_at',
+            'components:id,name,asset_type',
+        ]);
+
+        // Get activity history
+        $history = $asset->activities()
+            ->with('causer:id,name')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'data' => array_merge($asset->toArray(), [
+                'history' => $history,
+            ]),
+        ]);
+    }
+
+    /**
+     * Update asset
+     *
+     * @urlParam id int required Asset ID. Example: 1
+     * @bodyParam status string Status. Example: in_use
+     * @bodyParam assigned_to int Assigned user ID. Example: 5
+     *
+     * @response 200 {"data": {"id": 1, "status": "in_use"}}
+     */
+    public function update(Request $request, Asset $asset)
+    {
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'serial_number' => "sometimes|string|unique:assets,serial_number,{$asset->id}|max:255",
+            'asset_type' => 'sometimes|in:laptop,desktop,server,software_license,mobile_device,network_equipment',
+            'model' => 'nullable|string|max:255',
+            'manufacturer' => 'nullable|string|max:255',
+            'status' => 'sometimes|in:in_use,available,under_repair,retired,lost',
+            'purchase_date' => 'nullable|date',
+            'warranty_end' => 'nullable|date',
+            'cost' => 'nullable|numeric|min:0',
+            'location' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+            'assigned_to' => 'nullable|exists:users,id',
+            'parent_id' => 'nullable|exists:assets,id',
+        ]);
+
+        $asset->update($validated);
+
+        activity()
+            ->performedOn($asset)
+            ->causedBy(auth()->user())
+            ->log('Asset updated');
+
+        return response()->json(['data' => $asset->fresh()]);
+    }
+
+    /**
+     * Delete asset
+     *
+     * @urlParam id int required Asset ID. Example: 1
+     *
+     * @response 204
+     */
+    public function destroy(Asset $asset)
+    {
+        $asset->delete();
+
+        activity()
+            ->performedOn($asset)
+            ->causedBy(auth()->user())
+            ->log('Asset deleted');
+
+        return response()->noContent();
+    }
+
+    /**
+     * Get warranty expiring soon
+     *
+     * @queryParam days int Days threshold. Example: 30
+     *
+     * @response 200 {
+     *   "data": [
+     *     {"id": 1, "name": "Dell Laptop", "warranty_end": "2024-12-10"}
+     *   ]
+     * }
+     */
+    public function warrantyExpiring(Request $request)
+    {
+        $days = $request->query('days', 30);
+
+        $assets = Asset::warrantyExpiring($days)
+            ->with('assignedUser:id,name,email')
+            ->get();
+
+        return response()->json(['data' => $assets]);
+    }
+}
+```
+
+**d) Add Routes:**
+
+```php
+// routes/api.php
+
+Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+    // Assets
+    Route::apiResource('assets', AssetController::class);
+    Route::get('assets/warranty/expiring', [AssetController::class, 'warrantyExpiring']);
+});
+```
+
+**Run tests again (should PASS - GREEN):**
+
+```bash
+docker-compose exec orionone-app php artisan test --filter=AssetTest
+```
+
+---
+
+#### Phase 4: Frontend (Vue + Shadcn)
+
+**a) Create Assets/Index.vue:**
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { router } from "@inertiajs/vue3";
+import AppLayout from "@/Layouts/AppLayout.vue";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/Components/ui/table";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
+import { Badge } from "@/Components/ui/badge";
+import {
+    Laptop,
+    Server,
+    Smartphone,
+    HardDrive,
+    Package,
+} from "lucide-vue-next";
+
+interface Asset {
+    id: number;
+    name: string;
+    serial_number: string;
+    asset_type: string;
+    status: string;
+    assigned_user?: { name: string; email: string };
+    warranty_end: string;
+}
+
+interface Props {
+    assets: {
+        data: Asset[];
+        meta: { total: number; current_page: number };
+    };
+}
+
+const props = defineProps<Props>();
+
+const filters = ref({
+    asset_type: "",
+    status: "",
+    search: "",
+});
+
+const assetTypeIcons = {
+    laptop: Laptop,
+    desktop: Laptop,
+    server: Server,
+    mobile_device: Smartphone,
+    network_equipment: HardDrive,
+    software_license: Package,
+};
+
+const statusColors = {
+    in_use: "default",
+    available: "success",
+    under_repair: "warning",
+    retired: "secondary",
+    lost: "destructive",
+};
+
+function applyFilters() {
+    router.get(
+        "/assets",
+        { ...filters.value },
+        { preserveState: true, preserveScroll: true }
+    );
+}
+
+function clearFilters() {
+    filters.value = { asset_type: "", status: "", search: "" };
+    applyFilters();
+}
+</script>
+
+<template>
+    <AppLayout title="Assets">
+        <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h2
+                                    class="text-2xl font-semibold text-gray-900"
+                                >
+                                    Assets ({{ assets.meta.total }})
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    Gerir inventário de assets
+                                </p>
+                            </div>
+                            <Button @click="router.visit('/assets/create')">
+                                + Novo Asset
+                            </Button>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                            <Input
+                                v-model="filters.search"
+                                placeholder="Pesquisar..."
+                                @input="applyFilters"
+                            />
+
+                            <Select
+                                v-model="filters.asset_type"
+                                @update:modelValue="applyFilters"
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Tipo" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">Todos</SelectItem>
+                                    <SelectItem value="laptop"
+                                        >Laptop</SelectItem
+                                    >
+                                    <SelectItem value="desktop"
+                                        >Desktop</SelectItem
+                                    >
+                                    <SelectItem value="server"
+                                        >Server</SelectItem
+                                    >
+                                    <SelectItem value="software_license"
+                                        >Software License</SelectItem
+                                    >
+                                    <SelectItem value="mobile_device"
+                                        >Mobile Device</SelectItem
+                                    >
+                                    <SelectItem value="network_equipment"
+                                        >Network Equipment</SelectItem
+                                    >
+                                </SelectContent>
+                            </Select>
+
+                            <Select
+                                v-model="filters.status"
+                                @update:modelValue="applyFilters"
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">Todos</SelectItem>
+                                    <SelectItem value="in_use"
+                                        >In Use</SelectItem
+                                    >
+                                    <SelectItem value="available"
+                                        >Available</SelectItem
+                                    >
+                                    <SelectItem value="under_repair"
+                                        >Under Repair</SelectItem
+                                    >
+                                    <SelectItem value="retired"
+                                        >Retired</SelectItem
+                                    >
+                                    <SelectItem value="lost"
+                                        >Lost/Stolen</SelectItem
+                                    >
+                                </SelectContent>
+                            </Select>
+
+                            <Button variant="outline" @click="clearFilters">
+                                Limpar Filtros
+                            </Button>
+                        </div>
+
+                        <!-- Table -->
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Asset</TableHead>
+                                    <TableHead>Serial Number</TableHead>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Assigned To</TableHead>
+                                    <TableHead>Warranty</TableHead>
+                                    <TableHead>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow
+                                    v-for="asset in assets.data"
+                                    :key="asset.id"
+                                >
+                                    <TableCell>
+                                        <div class="flex items-center gap-2">
+                                            <component
+                                                :is="
+                                                    assetTypeIcons[
+                                                        asset.asset_type
+                                                    ]
+                                                "
+                                                class="h-4 w-4 text-gray-500"
+                                            />
+                                            <span class="font-medium">{{
+                                                asset.name
+                                            }}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <code
+                                            class="text-xs bg-gray-100 px-2 py-1 rounded"
+                                        >
+                                            {{ asset.serial_number }}
+                                        </code>
+                                    </TableCell>
+                                    <TableCell>{{
+                                        asset.asset_type
+                                    }}</TableCell>
+                                    <TableCell>
+                                        <Badge
+                                            :variant="
+                                                statusColors[asset.status]
+                                            "
+                                        >
+                                            {{ asset.status }}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span v-if="asset.assigned_user">
+                                            {{ asset.assigned_user.name }}
+                                        </span>
+                                        <span v-else class="text-gray-400"
+                                            >Unassigned</span
+                                        >
+                                    </TableCell>
+                                    <TableCell>
+                                        <span
+                                            v-if="asset.warranty_end"
+                                            :class="{
+                                                'text-red-600':
+                                                    new Date(
+                                                        asset.warranty_end
+                                                    ) < new Date(),
+                                            }"
+                                        >
+                                            {{ asset.warranty_end }}
+                                        </span>
+                                        <span v-else class="text-gray-400"
+                                            >N/A</span
+                                        >
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            @click="
+                                                router.visit(
+                                                    `/assets/${asset.id}`
+                                                )
+                                            "
+                                        >
+                                            Ver
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>
+```
+
+**b) Create Assets/Create.vue:**
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { useForm } from "@inertiajs/vue3";
+import AppLayout from "@/Layouts/AppLayout.vue";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
+import { Textarea } from "@/Components/ui/textarea";
+
+interface Props {
+    users: { id: number; name: string }[];
+}
+
+const props = defineProps<Props>();
+
+const form = useForm({
+    name: "",
+    serial_number: "",
+    asset_type: "laptop",
+    model: "",
+    manufacturer: "",
+    status: "available",
+    purchase_date: "",
+    warranty_end: "",
+    cost: "",
+    location: "",
+    notes: "",
+    assigned_to: null,
+});
+
+function submit() {
+    form.post("/api/v1/assets", {
+        onSuccess: () => {
+            // Redirect to assets list
+            router.visit("/assets");
+        },
+    });
+}
+</script>
+
+<template>
+    <AppLayout title="Novo Asset">
+        <div class="py-12">
+            <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-semibold mb-6">
+                            Criar Novo Asset
+                        </h2>
+
+                        <form @submit.prevent="submit" class="space-y-6">
+                            <!-- Name -->
+                            <div>
+                                <Label for="name">Nome *</Label>
+                                <Input
+                                    id="name"
+                                    v-model="form.name"
+                                    type="text"
+                                    placeholder="Dell Latitude 5520"
+                                    required
+                                />
+                                <span
+                                    v-if="form.errors.name"
+                                    class="text-sm text-red-600"
+                                >
+                                    {{ form.errors.name }}
+                                </span>
+                            </div>
+
+                            <!-- Serial Number -->
+                            <div>
+                                <Label for="serial_number"
+                                    >Serial Number *</Label
+                                >
+                                <Input
+                                    id="serial_number"
+                                    v-model="form.serial_number"
+                                    type="text"
+                                    placeholder="SN123456"
+                                    required
+                                />
+                                <span
+                                    v-if="form.errors.serial_number"
+                                    class="text-sm text-red-600"
+                                >
+                                    {{ form.errors.serial_number }}
+                                </span>
+                            </div>
+
+                            <!-- Asset Type -->
+                            <div>
+                                <Label for="asset_type">Tipo *</Label>
+                                <Select v-model="form.asset_type">
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="laptop"
+                                            >Laptop</SelectItem
+                                        >
+                                        <SelectItem value="desktop"
+                                            >Desktop</SelectItem
+                                        >
+                                        <SelectItem value="server"
+                                            >Server</SelectItem
+                                        >
+                                        <SelectItem value="software_license"
+                                            >Software License</SelectItem
+                                        >
+                                        <SelectItem value="mobile_device"
+                                            >Mobile Device</SelectItem
+                                        >
+                                        <SelectItem value="network_equipment"
+                                            >Network Equipment</SelectItem
+                                        >
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <!-- Model & Manufacturer -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label for="model">Modelo</Label>
+                                    <Input
+                                        id="model"
+                                        v-model="form.model"
+                                        type="text"
+                                        placeholder="Latitude 5520"
+                                    />
+                                </div>
+                                <div>
+                                    <Label for="manufacturer">Fabricante</Label>
+                                    <Input
+                                        id="manufacturer"
+                                        v-model="form.manufacturer"
+                                        type="text"
+                                        placeholder="Dell"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div>
+                                <Label for="status">Status *</Label>
+                                <Select v-model="form.status">
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="available"
+                                            >Available</SelectItem
+                                        >
+                                        <SelectItem value="in_use"
+                                            >In Use</SelectItem
+                                        >
+                                        <SelectItem value="under_repair"
+                                            >Under Repair</SelectItem
+                                        >
+                                        <SelectItem value="retired"
+                                            >Retired</SelectItem
+                                        >
+                                        <SelectItem value="lost"
+                                            >Lost/Stolen</SelectItem
+                                        >
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <!-- Purchase Date & Warranty End -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label for="purchase_date"
+                                        >Data de Compra</Label
+                                    >
+                                    <Input
+                                        id="purchase_date"
+                                        v-model="form.purchase_date"
+                                        type="date"
+                                    />
+                                </div>
+                                <div>
+                                    <Label for="warranty_end"
+                                        >Fim Garantia</Label
+                                    >
+                                    <Input
+                                        id="warranty_end"
+                                        v-model="form.warranty_end"
+                                        type="date"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Cost & Location -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label for="cost">Custo (€)</Label>
+                                    <Input
+                                        id="cost"
+                                        v-model="form.cost"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="1200.00"
+                                    />
+                                </div>
+                                <div>
+                                    <Label for="location">Localização</Label>
+                                    <Input
+                                        id="location"
+                                        v-model="form.location"
+                                        type="text"
+                                        placeholder="Office"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Assigned To -->
+                            <div>
+                                <Label for="assigned_to">Atribuído a</Label>
+                                <Select v-model="form.assigned_to">
+                                    <SelectTrigger>
+                                        <SelectValue
+                                            placeholder="Selecionar utilizador"
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem :value="null"
+                                            >Nenhum</SelectItem
+                                        >
+                                        <SelectItem
+                                            v-for="user in users"
+                                            :key="user.id"
+                                            :value="user.id"
+                                        >
+                                            {{ user.name }}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <!-- Notes -->
+                            <div>
+                                <Label for="notes">Notas</Label>
+                                <Textarea
+                                    id="notes"
+                                    v-model="form.notes"
+                                    placeholder="Informações adicionais..."
+                                />
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="flex justify-end gap-4">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    @click="router.visit('/assets')"
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    :disabled="form.processing"
+                                >
+                                    Criar Asset
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>
+```
+
+---
+
+### Feature 14: Asset→Ticket Linking
+
+#### Add affected_asset_id to Tickets
+
+**a) Migration to add affected_asset_id:**
+
+```bash
+docker-compose exec orionone-app php artisan make:migration add_affected_asset_id_to_tickets_table
+```
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('tickets', function (Blueprint $table) {
+            $table->foreignId('affected_asset_id')
+                ->nullable()
+                ->after('assigned_to')
+                ->constrained('assets')
+                ->nullOnDelete();
+
+            $table->index('affected_asset_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('tickets', function (Blueprint $table) {
+            $table->dropForeign(['affected_asset_id']);
+            $table->dropColumn('affected_asset_id');
+        });
+    }
+};
+```
+
+**b) Update Ticket Model:**
+
+```php
+// app/Models/Ticket.php
+
+public function affectedAsset(): BelongsTo
+{
+    return $this->belongsTo(Asset::class, 'affected_asset_id');
+}
+```
+
+**c) Update TicketController validation:**
+
+```php
+// app/Http/Controllers/Api/TicketController.php
+
+$validated = $request->validate([
+    // ... existing fields
+    'affected_asset_id' => 'nullable|exists:assets,id',
+]);
+```
+
+**d) Update Tickets/Create.vue (add Asset select):**
+
+```vue
+<!-- Add Asset Select in Tickets/Create.vue -->
+<div>
+    <Label for="affected_asset_id">Asset Afetado</Label>
+    <Select v-model="form.affected_asset_id">
+        <SelectTrigger>
+            <SelectValue placeholder="Selecionar asset" />
+        </SelectTrigger>
+        <SelectContent>
+            <SelectItem :value="null">Nenhum</SelectItem>
+            <SelectItem v-for="asset in assets" :key="asset.id" :value="asset.id">
+                {{ asset.name }} ({{ asset.serial_number }})
+            </SelectItem>
+        </SelectContent>
+    </Select>
+</div>
+```
+
+---
+
+### Feature 15: CSV Import/Export (Maatwebsite Excel)
+
+#### Bulk Asset Import
+
+**a) Create AssetImport class:**
+
+```bash
+docker-compose exec orionone-app php artisan make:import AssetsImport --model=Asset
+```
+
+```php
+<?php
+
+namespace App\Imports;
+
+use App\Models\Asset;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+
+class AssetsImport implements ToModel, WithHeadingRow, WithValidation
+{
+    public function model(array $row)
+    {
+        return new Asset([
+            'name' => $row['name'],
+            'serial_number' => $row['serial_number'],
+            'asset_type' => $row['asset_type'],
+            'model' => $row['model'] ?? null,
+            'manufacturer' => $row['manufacturer'] ?? null,
+            'status' => $row['status'] ?? 'available',
+            'purchase_date' => $row['purchase_date'] ?? null,
+            'warranty_end' => $row['warranty_end'] ?? null,
+            'cost' => $row['cost'] ?? null,
+            'location' => $row['location'] ?? null,
+        ]);
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'serial_number' => 'required|string|unique:assets,serial_number',
+            'asset_type' => 'required|in:laptop,desktop,server,software_license,mobile_device,network_equipment',
+            'status' => 'nullable|in:in_use,available,under_repair,retired,lost',
+        ];
+    }
+}
+```
+
+**b) Add Import endpoint in AssetController:**
+
+```php
+// app/Http/Controllers/Api/AssetController.php
+
+use App\Imports\AssetsImport;
+use Maatwebsite\Excel\Facades\Excel;
+
+/**
+ * Import assets from CSV
+ *
+ * @bodyParam file file required CSV file with assets
+ *
+ * @response 200 {"message": "45 assets imported successfully"}
+ */
+public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|mimes:csv,xlsx|max:2048',
+    ]);
+
+    Excel::import(new AssetsImport, $request->file('file'));
+
+    return response()->json([
+        'message' => 'Assets imported successfully',
+    ]);
+}
+```
+
+**c) Add route:**
+
+```php
+// routes/api.php
+
+Route::post('assets/import', [AssetController::class, 'import']);
+```
+
+**d) Create AssetImport.vue:**
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { useForm } from "@inertiajs/vue3";
+import AppLayout from "@/Layouts/AppLayout.vue";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { Alert, AlertDescription } from "@/Components/ui/alert";
+import { Upload, Download } from "lucide-vue-next";
+
+const form = useForm({
+    file: null,
+});
+
+const fileInput = ref<HTMLInputElement | null>(null);
+
+function handleFileChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files[0]) {
+        form.file = target.files[0];
+    }
+}
+
+function submit() {
+    form.post("/api/v1/assets/import", {
+        onSuccess: () => {
+            alert("Assets imported successfully!");
+            router.visit("/assets");
+        },
+    });
+}
+
+function downloadTemplate() {
+    // Generate CSV template
+    const headers =
+        "name,serial_number,asset_type,model,manufacturer,status,purchase_date,warranty_end,cost,location\n";
+    const example =
+        "Dell Latitude 5520,SN123456,laptop,Latitude 5520,Dell,available,2024-01-15,2027-01-15,1200.00,Office\n";
+    const csvContent = headers + example;
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "assets_template.csv";
+    link.click();
+}
+</script>
+
+<template>
+    <AppLayout title="Importar Assets">
+        <div class="py-12">
+            <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-semibold mb-6">
+                            Importar Assets (CSV)
+                        </h2>
+
+                        <Alert class="mb-6">
+                            <AlertDescription>
+                                <p class="mb-2">
+                                    <strong>Formato CSV esperado:</strong>
+                                </p>
+                                <p class="text-sm">
+                                    name, serial_number, asset_type, model,
+                                    manufacturer, status, purchase_date,
+                                    warranty_end, cost, location
+                                </p>
+                            </AlertDescription>
+                        </Alert>
+
+                        <div class="mb-6">
+                            <Button variant="outline" @click="downloadTemplate">
+                                <Download class="mr-2 h-4 w-4" />
+                                Download Template CSV
+                            </Button>
+                        </div>
+
+                        <form @submit.prevent="submit" class="space-y-6">
+                            <div>
+                                <Label for="file"
+                                    >Selecionar Ficheiro CSV *</Label
+                                >
+                                <Input
+                                    id="file"
+                                    ref="fileInput"
+                                    type="file"
+                                    accept=".csv,.xlsx"
+                                    @change="handleFileChange"
+                                    required
+                                />
+                                <span
+                                    v-if="form.errors.file"
+                                    class="text-sm text-red-600"
+                                >
+                                    {{ form.errors.file }}
+                                </span>
+                            </div>
+
+                            <div class="flex justify-end gap-4">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    @click="router.visit('/assets')"
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    :disabled="form.processing"
+                                >
+                                    <Upload class="mr-2 h-4 w-4" />
+                                    Importar Assets
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>
+```
+
+---
+
+### Feature 16: Asset Reports (Chart.js)
+
+#### Asset Analytics Dashboard
+
+**a) Create AssetReportController:**
+
+```php
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Asset;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * @group Asset Reports
+ */
+class AssetReportController extends Controller
+{
+    /**
+     * Get asset statistics
+     *
+     * @response 200 {
+     *   "data": {
+     *     "by_status": {"in_use": 25, "available": 10},
+     *     "by_type": {"laptop": 20, "desktop": 15},
+     *     "warranty_expiring_30_days": 5,
+     *     "total_cost": 125000.00
+     *   }
+     * }
+     */
+    public function statistics()
+    {
+        $byStatus = Asset::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $byType = Asset::select('asset_type', DB::raw('count(*) as count'))
+            ->groupBy('asset_type')
+            ->pluck('count', 'asset_type');
+
+        $warrantyExpiring = Asset::warrantyExpiring(30)->count();
+
+        $totalCost = Asset::sum('cost');
+
+        return response()->json([
+            'data' => [
+                'by_status' => $byStatus,
+                'by_type' => $byType,
+                'warranty_expiring_30_days' => $warrantyExpiring,
+                'total_cost' => $totalCost,
+            ],
+        ]);
+    }
+
+    /**
+     * Get cost summary by location
+     *
+     * @response 200 {
+     *   "data": [
+     *     {"location": "Office", "total_cost": 75000, "count": 30},
+     *     {"location": "Remote", "total_cost": 50000, "count": 15}
+     *   ]
+     * }
+     */
+    public function costByLocation()
+    {
+        $data = Asset::select('location', DB::raw('SUM(cost) as total_cost'), DB::raw('COUNT(*) as count'))
+            ->groupBy('location')
+            ->orderByDesc('total_cost')
+            ->get();
+
+        return response()->json(['data' => $data]);
+    }
+}
+```
+
+**b) Add routes:**
+
+```php
+// routes/api.php
+
+Route::get('assets/reports/statistics', [AssetReportController::class, 'statistics']);
+Route::get('assets/reports/cost-by-location', [AssetReportController::class, 'costByLocation']);
+```
+
+**c) Create AssetDashboard.vue (Chart.js):**
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { Chart, registerables } from "chart.js";
+import AppLayout from "@/Layouts/AppLayout.vue";
+
+Chart.register(...registerables);
+
+const chartByStatus = ref<HTMLCanvasElement | null>(null);
+const chartByType = ref<HTMLCanvasElement | null>(null);
+
+onMounted(async () => {
+    const response = await fetch("/api/v1/assets/reports/statistics");
+    const { data } = await response.json();
+
+    // Chart: Assets by Status
+    if (chartByStatus.value) {
+        new Chart(chartByStatus.value, {
+            type: "doughnut",
+            data: {
+                labels: Object.keys(data.by_status),
+                datasets: [
+                    {
+                        data: Object.values(data.by_status),
+                        backgroundColor: [
+                            "#10b981",
+                            "#3b82f6",
+                            "#f59e0b",
+                            "#6b7280",
+                            "#ef4444",
+                        ],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Assets por Status",
+                    },
+                },
+            },
+        });
+    }
+
+    // Chart: Assets by Type
+    if (chartByType.value) {
+        new Chart(chartByType.value, {
+            type: "bar",
+            data: {
+                labels: Object.keys(data.by_type),
+                datasets: [
+                    {
+                        label: "Quantidade",
+                        data: Object.values(data.by_type),
+                        backgroundColor: "#3b82f6",
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Assets por Tipo",
+                    },
+                },
+            },
+        });
+    }
+});
+</script>
+
+<template>
+    <AppLayout title="Asset Dashboard">
+        <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Chart: Assets by Status -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <canvas ref="chartByStatus"></canvas>
+                    </div>
+
+                    <!-- Chart: Assets by Type -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <canvas ref="chartByType"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>
+```
+
+---
+
+### Checklist Sprint 7
+
+-   [ ] Assets migration (6 types, status, relationships)
+-   [ ] Asset Model (Eloquent relationships, scopes, activity log)
+-   [ ] AssetFactory (generate test data)
+-   [ ] AssetTest (CRUD, uniqueness, relationships, history)
+-   [ ] AssetController (CRUD, warranty expiring API)
+-   [ ] Asset→Ticket linking (affected_asset_id migration)
+-   [ ] CSV Import (AssetsImport class + Maatwebsite Excel)
+-   [ ] CSV Export template download
+-   [ ] Assets/Index.vue (DataTable with filters, Shadcn components)
+-   [ ] Assets/Create.vue (Form with Asset type select)
+-   [ ] Assets/Edit.vue
+-   [ ] AssetImport.vue (CSV upload + template download)
+-   [ ] Asset Reports (AssetReportController statistics API)
+-   [ ] AssetDashboard.vue (Chart.js charts - by status, by type)
+-   [ ] API Documentation (Scribe annotations)
+-   [ ] Tests passing (pest --filter=AssetTest)
+
+---
 
 ### Sprint 1: Auth & Users (85% Completo)
 
@@ -4445,6 +6082,14 @@ SENTRY_LARAVEL_DSN=your-sentry-dsn
 -   [ ] Monitoring (Sentry)
 -   [ ] Documentation completa
 -   [ ] Video demo
+
+### Sprint 7: Asset Management (CMDB)
+
+-   [ ] Assets CRUD (6 types: Laptop, Desktop, Server, License, Mobile, Network)
+-   [ ] Asset→Ticket linking (affected_asset_id foreign key)
+-   [ ] CSV Import/Export (Maatwebsite Excel)
+-   [ ] Basic relationships (Asset→User, Asset→Ticket, Asset→Asset)
+-   [ ] Asset reports (status, type, warranty alerts, cost summary)
 
 ---
 
@@ -4584,6 +6229,27 @@ Se houver tempo extra após completar todos os 6 sprints:
 
 ---
 
+### Sprint 7: Asset Management (CMDB) - NÃO INICIADO
+
+-   [ ] Assets migration (6 types, status, relationships)
+-   [ ] Asset Model (Eloquent relationships, scopes, activity log)
+-   [ ] AssetFactory (generate test data)
+-   [ ] AssetTest (CRUD, uniqueness, relationships, history)
+-   [ ] AssetController (CRUD, warranty expiring API)
+-   [ ] Asset→Ticket linking (affected_asset_id migration)
+-   [ ] CSV Import (AssetsImport class + Maatwebsite Excel)
+-   [ ] CSV Export template download
+-   [ ] Assets/Index.vue (DataTable with filters)
+-   [ ] Assets/Create.vue (Form with Asset type select)
+-   [ ] Assets/Edit.vue
+-   [ ] AssetImport.vue (CSV upload + template download)
+-   [ ] Asset Reports (AssetReportController statistics API)
+-   [ ] AssetDashboard.vue (Chart.js charts)
+-   [ ] API Documentation (Scribe annotations)
+-   [ ] Tests passing
+
+---
+
 ## Features Opcionais (Nice-to-Have)
 
 Se houver tempo extra após completar todos os 6 sprints:
@@ -4624,7 +6290,8 @@ Se houver tempo extra após completar todos os 6 sprints:
 | Sprint 4  | 5        | 0         | 0            | 5             | 0%      |
 | Sprint 5  | 5        | 0         | 0            | 5             | 0%      |
 | Sprint 6  | 9        | 0         | 0            | 9             | 0%      |
-| **TOTAL** | **35**   | **6**     | **0**        | **29**        | **17%** |
+| Sprint 7  | 4        | 0         | 0            | 4             | 0%      |
+| **TOTAL** | **39**   | **6**     | **0**        | **33**        | **15%** |
 
 ---
 
@@ -4634,5 +6301,5 @@ Se houver tempo extra após completar todos os 6 sprints:
 2. **Iniciar Sprint 2** - Criar sistema de Tickets (Feature 3 e 4)
 3. **Setup Scribe** - Adicionar documentação API (Feature 5)
 
-**Última Atualização:** 10 Novembro 2025, 02:20
-**Última Verificação Automática:** 10 Novembro 2025, 02:20
+**Última Atualização:** 11 Novembro 2025, 18:45 ← **Sprint 7 (Asset Management) adicionado**
+**Última Verificação Automática:** 11 Novembro 2025, 18:45
