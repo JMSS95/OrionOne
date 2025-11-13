@@ -12,14 +12,14 @@ Guia Completo e Detalhado: O que cada biblioteca faz, como funciona, e porque us
 
 ### Porque usamos Laravel 12?
 
-- **Routing automático**: Define rotas URL → Controller numa linha
-- **Eloquent ORM**: Trabalhar com BD usando objetos (não SQL puro)
-- **Migrations**: Versionamento da estrutura da BD
-- **Blade Templates**: (não usamos, preferimos Inertia.js)
-- **Authentication**: Sistema de login pronto
-- **Queue Jobs**: Tarefas assíncronas (emails, processamento)
-- **Validation**: Validação de dados integrada
-- **Cache**: Redis/Memcached out-of-the-box
+-   **Routing automático**: Define rotas URL → Controller numa linha
+-   **Eloquent ORM**: Trabalhar com BD usando objetos (não SQL puro)
+-   **Migrations**: Versionamento da estrutura da BD
+-   **Blade Templates**: (não usamos, preferimos Inertia.js)
+-   **Authentication**: Sistema de login pronto
+-   **Queue Jobs**: Tarefas assíncronas (emails, processamento)
+-   **Validation**: Validação de dados integrada
+-   **Cache**: Redis/Memcached out-of-the-box
 
 ### Como funciona? (Ciclo de Vida de um Request)
 
@@ -73,8 +73,8 @@ echo $users[0]->name; // Objeto com propriedades
 
 Imagine que tens 2 tabelas:
 
-- `tickets` (id, title, user_id)
-- `users` (id, name, email)
+-   `tickets` (id, title, user_id)
+-   `users` (id, name, email)
 
 ```php
 // SEM ELOQUENT: Tens que fazer JOINs manualmente
@@ -315,13 +315,13 @@ php artisan migrate
 # Ver status (quais já foram executadas)
 php artisan migrate:status
 # Output:
-# 
-# Migration Ran? 
-# 
-# 2014_10_12_000000_create_users_table Yes 
-# 2025_11_11_000001_create_tickets_table Yes 
-# 2025_11_11_000002_add_priority_to_tickets_table No 
-# 
+#
+# Migration Ran?
+#
+# 2014_10_12_000000_create_users_table Yes
+# 2025_11_11_000001_create_tickets_table Yes
+# 2025_11_11_000002_add_priority_to_tickets_table No
+#
 
 # Rollback última migration
 php artisan migrate:rollback
@@ -694,48 +694,48 @@ class TicketController extends Controller
 ```vue
 <!-- resources/js/Pages/Tickets/Create.vue -->
 <template>
- <form @submit.prevent="submit">
- <!-- Campo Título -->
- <div>
- <label for="title">Título</label>
- <input
- id="title"
- v-model="form.title"
- type="text"
- :class="{ 'border-red-500': form.errors.title }"
- />
- <!-- Mostrar erro de validação (vem do Laravel) -->
- <p v-if="form.errors.title" class="text-red-500 text-sm">
- {{ form.errors.title }}
- </p>
- </div>
+    <form @submit.prevent="submit">
+        <!-- Campo Título -->
+        <div>
+            <label for="title">Título</label>
+            <input
+                id="title"
+                v-model="form.title"
+                type="text"
+                :class="{ 'border-red-500': form.errors.title }"
+            />
+            <!-- Mostrar erro de validação (vem do Laravel) -->
+            <p v-if="form.errors.title" class="text-red-500 text-sm">
+                {{ form.errors.title }}
+            </p>
+        </div>
 
- <button type="submit" :disabled="form.processing">Criar Ticket</button>
- </form>
+        <button type="submit" :disabled="form.processing">Criar Ticket</button>
+    </form>
 </template>
 
 <script setup>
 import { useForm } from "@inertiajs/vue3";
 
 const form = useForm({
- title: "",
- description: "",
- priority: "medium",
- category_id: null,
+    title: "",
+    description: "",
+    priority: "medium",
+    category_id: null,
 });
 
 function submit() {
- form.post("/tickets", {
- onSuccess: () => {
- // Sucesso! Ticket criado
- form.reset();
- },
- onError: (errors) => {
- // Erros de validação do Laravel
- // form.errors.title, form.errors.description, etc.
- console.log(errors);
- },
- });
+    form.post("/tickets", {
+        onSuccess: () => {
+            // Sucesso! Ticket criado
+            form.reset();
+        },
+        onError: (errors) => {
+            // Erros de validação do Laravel
+            // form.errors.title, form.errors.description, etc.
+            console.log(errors);
+        },
+    });
 }
 </script>
 ```
@@ -1145,19 +1145,19 @@ Queue::failing(function (JobFailed $event) {
 
 **USE para:**
 
-- Enviar emails/notificações
-- Gerar relatórios PDF/Excel
-- Processar uploads (resize imagens, etc)
-- Imports/Exports grandes
-- API calls externas (Stripe, AWS, etc)
-- Limpeza de dados antigos
-- Backups
+-   Enviar emails/notificações
+-   Gerar relatórios PDF/Excel
+-   Processar uploads (resize imagens, etc)
+-   Imports/Exports grandes
+-   API calls externas (Stripe, AWS, etc)
+-   Limpeza de dados antigos
+-   Backups
 
 **NÃO USE para:**
 
-- Buscar dados da BD (use cache)
-- Operações críticas que devem ser imediatas
-- Dados que utilizador precisa VER agora
+-   Buscar dados da BD (use cache)
+-   Operações críticas que devem ser imediatas
+-   Dados que utilizador precisa VER agora
 
 **Vantagens das Queues:**
 
@@ -1309,18 +1309,18 @@ Route::middleware(['permission:tickets.delete'])->group(function() {
 
 #### Porque usamos?
 
-- **Escalável**: 100+ permissões sem problemas
-- **Cache integrado**: Performance excelente
-- **Middleware pronto**: Proteção de rotas automática
-- **Blade directives**: `@can('tickets.delete')` nos templates
+-   **Escalável**: 100+ permissões sem problemas
+-   **Cache integrado**: Performance excelente
+-   **Middleware pronto**: Proteção de rotas automática
+-   **Blade directives**: `@can('tickets.delete')` nos templates
 
 **Tabelas criadas:**
 
-- `roles` - Papéis (admin, agent, user)
-- `permissions` - Permissões granulares
-- `role_has_permissions` - Relacionamento
-- `model_has_roles` - Utilizadores têm roles
-- `model_has_permissions` - Permissões diretas (override)
+-   `roles` - Papéis (admin, agent, user)
+-   `permissions` - Permissões granulares
+-   `role_has_permissions` - Relacionamento
+-   `model_has_roles` - Utilizadores têm roles
+-   `model_has_permissions` - Permissões diretas (override)
 
 ---
 
@@ -1385,11 +1385,11 @@ public function store(TicketData $data)
 
 #### Vantagens:
 
-- **Type safety**: IDE sabe os tipos
-- **Validação integrada**: Rules no próprio DTO
-- **Documentação viva**: A classe É a documentação
-- **Refactoring seguro**: Rename funciona
-- **Testes mais fáceis**: `TicketData::from(['title' => 'Test'])`
+-   **Type safety**: IDE sabe os tipos
+-   **Validação integrada**: Rules no próprio DTO
+-   **Documentação viva**: A classe É a documentação
+-   **Refactoring seguro**: Rename funciona
+-   **Testes mais fáceis**: `TicketData::from(['title' => 'Test'])`
 
 ---
 
@@ -1451,14 +1451,14 @@ foreach ($ticket->activities as $activity) {
 
 #### Porque é essencial?
 
-- **Compliance**: GDPR, ISO 27001 exigem audit logs
-- **Debug**: "Quem mudou este ticket para closed?"
-- **Histórico**: Timeline completa de mudanças
-- **Rollback**: Reverter mudanças indesejadas
+-   **Compliance**: GDPR, ISO 27001 exigem audit logs
+-   **Debug**: "Quem mudou este ticket para closed?"
+-   **Histórico**: Timeline completa de mudanças
+-   **Rollback**: Reverter mudanças indesejadas
 
 **Tabela criada:**
 
-- `activity_log` - Todos os eventos (JSON)
+-   `activity_log` - Todos os eventos (JSON)
 
 ---
 
@@ -1513,10 +1513,10 @@ public function index()
 
 #### Vantagens:
 
- **Frontend-friendly**: Vue.js constrói URLs facilmente
- **Performance**: Só carrega o necessário
- **Consistência**: Mesma sintaxe em todas as APIs
- **Documentação automática**: Scribe documenta filtros
+**Frontend-friendly**: Vue.js constrói URLs facilmente
+**Performance**: Só carrega o necessário
+**Consistência**: Mesma sintaxe em todas as APIs
+**Documentação automática**: Scribe documenta filtros
 
 ---
 
@@ -1621,10 +1621,10 @@ Artisan::command('ticket:create', CreateTicketAction::class); // CLI
 
 ### Vantagens:
 
- **DRY**: Lógica escrita uma vez
- **Testável**: Testes unitários simples
- **Reusável**: Controller, Job, Command, Listener
- **Organizado**: Cada ação num ficheiro
+**DRY**: Lógica escrita uma vez
+**Testável**: Testes unitários simples
+**Reusável**: Controller, Job, Command, Listener
+**Organizado**: Cada ação num ficheiro
 
 ---
 
@@ -1685,14 +1685,14 @@ Dashboard de **debugging profissional**. Vê TUDO o que acontece na aplicação.
 
 ### Features:
 
-- **Requests**: Todas as HTTP requests (URL, payload, response)
-- **Queries**: Todas as SQL queries (com timing!)
-- **Jobs**: Queue jobs (pendentes, executados, falhados)
-- **Mails**: Emails enviados (preview HTML)
-- **Notifications**: Notificações enviadas
-- **Cache**: Hits/misses do cache
-- **Exceptions**: Erros capturados
-- **Logs**: Todos os logs (`Log::info()`)
+-   **Requests**: Todas as HTTP requests (URL, payload, response)
+-   **Queries**: Todas as SQL queries (com timing!)
+-   **Jobs**: Queue jobs (pendentes, executados, falhados)
+-   **Mails**: Emails enviados (preview HTML)
+-   **Notifications**: Notificações enviadas
+-   **Cache**: Hits/misses do cache
+-   **Exceptions**: Erros capturados
+-   **Logs**: Todos os logs (`Log::info()`)
 
 ### Acesso:
 
@@ -1803,10 +1803,10 @@ it('allows authenticated users to create tickets', function() {
 
 ### Vantagens:
 
- **Legível**: Parece inglês normal
- **Rápido**: Executa em paralelo
- **Expect API**: Assertions modernas
- **Snapshot testing**: `expect($html)->toMatchSnapshot()`
+**Legível**: Parece inglês normal
+**Rápido**: Executa em paralelo
+**Expect API**: Assertions modernas
+**Snapshot testing**: `expect($html)->toMatchSnapshot()`
 
 ### Executar Testes:
 
@@ -1925,19 +1925,19 @@ $user->unreadNotifications;
 
 ## RESUMO: Quando Usar Cada Biblioteca?
 
-| Biblioteca | Usa Quando... |
+| Biblioteca                | Usa Quando...                                |
 | ------------------------- | -------------------------------------------- |
-| **Laravel Eloquent** | Qualquer interação com BD |
-| **Spatie Permission** | Controlar acessos (roles/permissions) |
-| **Spatie Data** | Passar dados entre camadas (type-safe) |
-| **Spatie Activity Log** | Registar ações dos utilizadores |
-| **Spatie Query Builder** | APIs com filtros/ordenação |
-| **Laravel Actions** | Lógica reutilizável (Controller+Job+Command) |
-| **Laravel Sanctum** | Autenticação SPA ou API tokens |
-| **Laravel Telescope** | Debug em desenvolvimento |
-| **Intervention Image** | Upload e processamento de imagens |
-| **Pest PHP** | Escrever testes (TDD) |
-| **Laravel Notifications** | Enviar emails/notificações |
+| **Laravel Eloquent**      | Qualquer interação com BD                    |
+| **Spatie Permission**     | Controlar acessos (roles/permissions)        |
+| **Spatie Data**           | Passar dados entre camadas (type-safe)       |
+| **Spatie Activity Log**   | Registar ações dos utilizadores              |
+| **Spatie Query Builder**  | APIs com filtros/ordenação                   |
+| **Laravel Actions**       | Lógica reutilizável (Controller+Job+Command) |
+| **Laravel Sanctum**       | Autenticação SPA ou API tokens               |
+| **Laravel Telescope**     | Debug em desenvolvimento                     |
+| **Intervention Image**    | Upload e processamento de imagens            |
+| **Pest PHP**              | Escrever testes (TDD)                        |
+| **Laravel Notifications** | Enviar emails/notificações                   |
 
 ---
 
@@ -1945,14 +1945,14 @@ $user->unreadNotifications;
 
 Agora que sabes o que cada biblioteca faz, vê:
 
-- **[TECH-DEEP-DIVE-FRONTEND.md](./TECH-DEEP-DIVE-FRONTEND.md)** - Vue.js, Inertia, Tailwind
-- **[TECH-DEEP-DIVE-DATABASE.md](./TECH-DEEP-DIVE-DATABASE.md)** - PostgreSQL, Redis
-- **[TECH-DEEP-DIVE-DEVOPS.md](./TECH-DEEP-DIVE-DEVOPS.md)** - Docker, Nginx
+-   **[TECH-DEEP-DIVE-FRONTEND.md](./TECH-DEEP-DIVE-FRONTEND.md)** - Vue.js, Inertia, Tailwind
+-   **[TECH-DEEP-DIVE-DATABASE.md](./TECH-DEEP-DIVE-DATABASE.md)** - PostgreSQL, Redis
+-   **[TECH-DEEP-DIVE-DEVOPS.md](./TECH-DEEP-DIVE-DEVOPS.md)** - Docker, Nginx
 
 ---
 
 **Dúvidas?** Abre issue ou lê a documentação oficial:
 
-- [Laravel Docs](https://laravel.com/docs)
-- [Spatie Docs](https://spatie.be/docs)
-- [Laravel Actions](https://laravelactions.com)
+-   [Laravel Docs](https://laravel.com/docs)
+-   [Spatie Docs](https://spatie.be/docs)
+-   [Laravel Actions](https://laravelactions.com)
