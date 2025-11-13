@@ -156,6 +156,7 @@
 -   [Git](https://git-scm.com/) (2.40+)
 -   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (4.25+)
 -   [Node.js](https://nodejs.org/) (20.x LTS) - Optional, for local npm
+
 ---
 
 ## Development
