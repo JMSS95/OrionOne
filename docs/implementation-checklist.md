@@ -5838,7 +5838,7 @@ onMounted(async () => {
 
 ---
 
-### Sprint 1: Auth & Users (100% Completo) ✅
+### Sprint 1: Auth & Users (100% Completo)
 
 -   [x] Laravel IDE Helper
 -   [x] Inertia Progress
@@ -6107,8 +6107,8 @@ Se houver tempo extra após completar todos os 6 sprints:
 
 **Próximos Passos Recomendados:**
 
-1. ✅ ~~Completar Sprint 1~~ - **CONCLUÍDO** (Avatar Upload implementado)
-2. **🎯 PRÓXIMO: Iniciar Sprint 2** - Criar sistema de Tickets (Migrations, Models, Actions, Controllers, Views)
+1. ~~Completar Sprint 1~~ - **CONCLUÍDO** (Avatar Upload implementado)
+2. PRÓXIMO: Iniciar Sprint 2\*\* - Criar sistema de Tickets (Migrations, Models, Actions, Controllers, Views)
 3. **Instalar pacotes críticos** - Tiptap (rich text), Chart.js (dashboard), MediaLibrary migrations
 
 **Última Atualização:** 13 Novembro 2025, 12:00 ← **Sprint 1 COMPLETO (100%) + Pacotes instalados**
