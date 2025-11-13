@@ -8,32 +8,38 @@
 
 ### Setup & Getting Started
 
-1. **[Quick Start](QUICK-START.md)** - Setup completo em 10 minutos (Docker-first)
+1. **[Setup Guide](../SETUP.md)** - Setup completo em 10 minutos (Docker-first)
 2. **[Commands Reference](COMMANDS-REFERENCE.md)** - Guia completo de todos os comandos (Git, Docker, Laravel, etc)
-3. **[Docker Guide](DOCKER-GUIDE.md)** - Guia Docker para iniciantes
 
 ### Arquitetura & Design
 
-4. **[Architecture](architecture.md)** - Arquitetura do sistema (MVC + Services + Actions + Observers + Events)
-5. **[Tech Stack](tech-stack.md)** - Stack tecnológica completa (Backend, Frontend, API REST, DevOps)
-6. **[Database Schema](database-schema.md)** - Esquema completo da base de dados
+3. **[Architecture](architecture.md)** - Arquitetura do sistema (MVC + Services + Actions + Observers + Events)
+4. **[Tech Stack](tech-stack.md)** - Stack tecnológica completa (Backend, Frontend, API REST, DevOps)
+5. **[Database Schema](database-schema.md)** - Esquema completo da base de dados
 
 ### Desenvolvimento
 
-7. **[Development Guide](development-guide.md)** - Guia de desenvolvimento (TDD, patterns, conventions)
-8. **[Implementation Checklist](implementation-checklist.md)** - Checklist TDD sprint-by-sprint (Sprints 1-2 completos: Auth, Tickets, API REST, Observers, Events)
-9. **[Components Guide](COMPONENTS-GUIDE.md)** - Guia completo dos componentes Shadcn-vue (uso + implementação)
+6. **[Development Guide](development-guide.md)** - Guia de desenvolvimento (TDD, patterns, conventions)
+7. **[Implementation Checklist](implementation-checklist.md)** - Checklist TDD sprint-by-sprint (Sprint 1 completo, Sprints 2-7 detalhados)
+8. **[Components Guide](COMPONENTS-GUIDE.md)** - Guia completo dos componentes Shadcn-vue (uso + implementação)
+
+### Tech Deep Dives
+
+9. **[Backend Deep Dive](TECH-DEEP-DIVE-BACKEND.md)** - Laravel 12, Spatie, Actions, API REST (1,538 linhas)
+10. **[Frontend Deep Dive](TECH-DEEP-DIVE-FRONTEND.md)** - Vue 3, Inertia 2.0, Shadcn-vue, VueUse (944 linhas)
+11. **[Database Deep Dive](TECH-DEEP-DIVE-DATABASE.md)** - PostgreSQL 16, Views, Triggers, Redis (1,253 linhas)
+12. **[DevOps Deep Dive](TECH-DEEP-DIVE-DEVOPS.md)** - Docker, Nginx, CI/CD, Monitoring (718 linhas)
 
 ### Análises & Planeamento
 
-10. **[Stack Analysis 2025](STACK-ANALYSIS-2025.md)** - Análise completa da stack (Score: 8.7/10)
-11. **[ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md)** - Análise do mercado ITSM (Score: 7.2/10)
-12. **[MVP Roadmap & Status](MVP.md)** - Roadmap Sprint 2-6, status 95% pronto, métricas
+13. **[Stack Analysis 2025](STACK-ANALYSIS-2025.md)** - Análise completa da stack (Score: 8.7/10)
+14. **[ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md)** - Análise do mercado ITSM (Score: 8.5/10 com Sprint 7)
+15. **[MVP Roadmap & Status](MVP.md)** - Roadmap completo Sprints 1-7, cronograma 32 semanas
 
 ### Business & Requirements
 
-14. **[Business Model](business-model.md)** - Modelo de negócio, value proposition, análise SWOT
-15. **[Requirements](requirements.md)** - Requisitos funcionais e não-funcionais
+16. **[Business Model](business-model.md)** - Modelo de negócio, value proposition, análise SWOT
+17. **[Requirements](requirements.md)** - Requisitos funcionais e não-funcionais
 
 ---
 
@@ -42,20 +48,28 @@
 ```
 docs/
 ├── README.md                           # Este ficheiro (índice)
-├── QUICK-START.md                      # Setup em 10 minutos
-├── COMMANDS-REFERENCE.md               # Comandos completos
-├── DOCKER-GUIDE.md                     # Docker para iniciantes
+├── COMMANDS-REFERENCE.md               # Comandos completos (Git, Docker, Laravel)
 ├── architecture.md                     # Arquitetura do sistema
 ├── tech-stack.md                       # Stack tecnológica
-├── database-schema.md                  # Schema da BD
-├── development-guide.md                # Guia de desenvolvimento
-├── implementation-checklist.md         # Checklist TDD
-├── COMPONENTS-GUIDE.md                 # Componentes UI (completo)
+├── database-schema.md                  # Schema completo da BD
+├── development-guide.md                # Guia de desenvolvimento TDD
+├── implementation-checklist.md         # Checklist sprint-by-sprint (4,965 linhas)
+├── COMPONENTS-GUIDE.md                 # Componentes Shadcn-vue
+├── TECH-DEEP-DIVE-BACKEND.md           # Deep dive Backend (1,538 linhas)
+├── TECH-DEEP-DIVE-FRONTEND.md          # Deep dive Frontend (944 linhas)
+├── TECH-DEEP-DIVE-DATABASE.md          # Deep dive Database (1,253 linhas)
+├── TECH-DEEP-DIVE-DEVOPS.md            # Deep dive DevOps (718 linhas)
 ├── STACK-ANALYSIS-2025.md              # Análise stack (8.7/10)
-├── ITSM-STACK-ANALYSIS.md              # Análise ITSM (7.2/10)
-├── MVP.md                              # Roadmap & Status MVP
+├── ITSM-STACK-ANALYSIS.md              # Análise ITSM (8.5/10)
+├── MVP.md                              # Roadmap completo Sprint 1-7
 ├── business-model.md                   # Modelo de negócio
 └── requirements.md                     # Requisitos do projeto
+
+Raiz do projeto:
+├── README.md                           # README GitHub-standard
+├── SETUP.md                            # Setup rápido + Docker guide
+├── DEPLOYMENT.md                       # Deploy produção
+└── CONTRIBUTING.md                     # Guidelines contribuição
 ```
 
 ---
@@ -64,11 +78,11 @@ docs/
 
 ### 1. Setup Inicial (10 minutos)
 
-Consultar [QUICK-START.md](QUICK-START.md) para guia completo.
+Consultar **[SETUP.md](../SETUP.md)** na raiz do projeto para guia completo.
 
 ```bash
 # Clone do repositório
-git clone https://github.com/JMSS/OrionOne.git
+git clone https://github.com/JMSS95/OrionOne.git
 cd OrionOne
 
 # Copiar .env
@@ -79,46 +93,53 @@ docker-compose up -d
 
 # Instalar dependências
 docker-compose exec orionone-app composer install
-docker-compose exec orionone-frontend npm install --legacy-peer-deps
+docker-compose exec orionone-app npm install
 
 # Configurar Laravel
 docker-compose exec orionone-app php artisan key:generate
 docker-compose exec orionone-app php artisan migrate
-docker-compose exec orionone-app php artisan db:seed --class=RolePermissionSeeder
+docker-compose exec orionone-app php artisan db:seed
 
-# Dev mode
-docker-compose exec orionone-frontend npm run dev
+# Dev mode (com hot reload)
+docker-compose exec orionone-app npm run dev
 ```
 
-````
-
 **Acesso:**
-- Frontend: http://localhost
-- Pulse: http://localhost/pulse
-- API Docs: http://localhost/docs
-- Meilisearch: http://localhost:7700
+
+-   Frontend: http://localhost:8888
+-   Laravel Telescope: http://localhost:8888/telescope
+-   Laravel Pulse: http://localhost:8888/pulse
+-   API Docs (Scribe): http://localhost:8888/docs
+-   Meilisearch: http://localhost:7700
+
+**Credenciais de teste:**
+
+-   Admin: admin@orionone.test / password
+-   Agent: agent@orionone.test / password
+-   User: user@orionone.test / password
 
 ### 2. Desenvolvimento
 
 Seguir **[Development Guide](development-guide.md)** para:
 
 -   Filosofia TDD (Red-Green-Refactor)
--   Padrões de código
+-   Padrões de código (Services, Actions, Observers)
 -   Convenções de nomenclatura
--   Git workflow
+-   Git workflow (Conventional Commits)
 
 ### 3. Implementar Features
 
 Usar **[Implementation Checklist](implementation-checklist.md)** para:
 
--   **Sprint 1: Auth & Users** (Completo - Roles, Permissions, Avatar Upload)
--   **Sprint 2: Tickets Core** (Próximo - CRUD, Filtros, API REST, Observers, Events)
--   Sprint 3: Colaboração (Comments, Mentions, Notifications)
--   Sprint 4: Knowledge Base (Articles, Categories, Search)
--   Sprint 5: Dashboard & Reports (Analytics, KPIs)
--   Sprint 6: Polish & Deploy (CI/CD, Performance)
+-   **Sprint 1: Auth & Users** (Completo - Roles, Permissions, Profile, Avatar, Database Views/Triggers/Constraints)
+-   **Sprint 2: Tickets Core** (Próximo - CRUD, Filtros, Search, API REST, Observers, Events)
+-   **Sprint 3: Comments** (Colaboração, Mentions, Notifications)
+-   **Sprint 4: Knowledge Base** (Articles, Categories, Full-text Search)
+-   **Sprint 5: Dashboard & SLA** (Analytics, SLA tracking, Charts)
+-   **Sprint 6: Teams & Automation** (Team management, Auto-assignment)
+-   **Sprint 7: Asset Management** (CMDB, CSV Import/Export, Asset reports)
 
-**Roadmap MVP:** Ver [MVP-PRIORITIES.md](MVP-PRIORITIES.md) para prioridades Sprint 2-6.
+**Roadmap MVP:** Ver **[MVP.md](MVP.md)** para cronograma completo (32 semanas, 8.5/10 ITSM score).
 
 ---
 
@@ -128,10 +149,10 @@ Usar **[Implementation Checklist](implementation-checklist.md)** para:
 
 **Começar aqui:**
 
-1. [QUICK-START.md](QUICK-START.md) - Setup em 10 minutos
-2. [Development Guide](development-guide.md) - Entender workflow TDD
-3. [Architecture](architecture.md) - Compreender estrutura do código
-4. [COMPONENTS-GUIDE.md](COMPONENTS-GUIDE.md) - Usar componentes UI
+1. **[SETUP.md](../SETUP.md)** - Setup completo em 10 minutos
+2. **[Development Guide](development-guide.md)** - Entender workflow TDD
+3. **[Architecture](architecture.md)** - Compreender estrutura do código (MVC + Services + Actions)
+4. **[COMPONENTS-GUIDE.md](COMPONENTS-GUIDE.md)** - Usar componentes Shadcn-vue
 
 **Workflow diário:**
 
@@ -160,23 +181,25 @@ docker-compose exec orionone-app php artisan test
 git add .
 git commit -m "feat: add ticket filters"
 git push origin feature/ticket-filters
-````
+```
 
 ### Para DevOps
 
 **Focar em:**
 
-1. [DOCKER-GUIDE.md](DOCKER-GUIDE.md) - Gestão de containers
-2. [COMMANDS-REFERENCE.md](COMMANDS-REFERENCE.md) - Secção Docker e deployment
-3. [tech-stack.md](tech-stack.md) - Infraestrutura completa
+1. **[SETUP.md](../SETUP.md)** - Docker setup completo (6 containers)
+2. **[DEPLOYMENT.md](../DEPLOYMENT.md)** - Deploy produção (Nginx, SSL, Supervisor, Backups)
+3. **[COMMANDS-REFERENCE.md](COMMANDS-REFERENCE.md)** - Todos os comandos Docker, Laravel, Git
+4. **[TECH-DEEP-DIVE-DEVOPS.md](TECH-DEEP-DIVE-DEVOPS.md)** - Docker, Nginx, CI/CD, Monitoring (718 linhas)
 
 ### Para Product Owners / Stakeholders
 
 **Ler primeiro:**
 
-1. [business-model.md](business-model.md) - Value proposition, mercado
-2. [requirements.md](requirements.md) - Features e requisitos
-3. [MVP.md](MVP.md) - Roadmap Sprint 2-6, status 95% pronto
+1. **[Business Model](business-model.md)** - Value proposition, mercado, SWOT analysis
+2. **[Requirements](requirements.md)** - Features e requisitos funcionais/não-funcionais
+3. **[MVP.md](MVP.md)** - Roadmap completo Sprint 1-7, cronograma 32 semanas, ITSM score 8.5/10
+4. **[ITSM Stack Analysis](ITSM-STACK-ANALYSIS.md)** - Comparativo mercado, competitive analysis
 
 ---
 
@@ -353,11 +376,12 @@ git commit -m "docs: update development guide with new patterns"
 
 ## Contactos
 
-**Desenvolvedor Principal:** João Santos (@JMSS)
-**Repositório:** https://github.com/JMSS/OrionOne
-**Documentação Online:** (TBD)
+**Desenvolvedor Principal:** João Santos
+**Email:** JMSS1995@hotmail.com
+**GitHub:** https://github.com/JMSS95
+**Repositório:** https://github.com/JMSS95/OrionOne
 
 ---
 
-**Última Atualização:** 10 Novembro 2025, 06:00
+**Última Atualização:** 13 Novembro 2025
 **Versão:** 2.0 (Docker-first, Stack 8.7/10)
