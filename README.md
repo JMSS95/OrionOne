@@ -12,8 +12,6 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Uma plataforma ITSM completa para gestão profissional de IT Service Management, incluindo Asset Management (CMDB), Knowledge Base com AI Search, SLA Management e reporting avançado.
-
 [Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](CONTRIBUTING.md)
 
 </div>
@@ -36,20 +34,10 @@ Uma plataforma ITSM completa para gestão profissional de IT Service Management,
 
 ## About
 
-**OrionOne** é uma **plataforma ITSM (IT Service Management) completa** desenvolvida como projeto final de Engenharia de Software (TCC). Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, OrionOne oferece gestão profissional de IT Service Management para empresas de 10-500 funcionários.
-
-**Diferenciais:**
-
--   Arquitetura moderna (Laravel 12 + Vue 3 + PostgreSQL 16)
--   Desenvolvimento guiado por testes (TDD, >80% coverage)
--   Asset Management (CMDB) incluído no MVP
--   Documentação técnica completa
--   Stack enterprise open-source
+**OrionOne** é uma **plataforma ITSM (IT Service Management) completa** desenvolvida como projeto final CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação. Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, OrionOne oferece gestão profissional de IT Service Management para empresas.
 
 > **Projeto Académico** • CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação
 > Centro de Formação Profissional de Évora • 2024/2026
-
-**ITSM Score:** 8.5/10 | **Target Market:** 10-500 funcionários | **MVP Launch:** Fevereiro 2026
 
 ---
 
@@ -163,88 +151,11 @@ Uma plataforma ITSM completa para gestão profissional de IT Service Management,
 
 ### Prerequisites
 
-This project uses **Docker exclusively**. No need to install PHP, PostgreSQL or Redis locally.
-
 **Required:**
 
 -   [Git](https://git-scm.com/) (2.40+)
 -   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (4.25+)
 -   [Node.js](https://nodejs.org/) (20.x LTS) - Optional, for local npm
-
-### Setup (10 minutes)
-
-```bash
-# 1. Clone repository
-git clone https://github.com/JMSS95/OrionOne.git
-cd OrionOne
-
-# 2. Configure environment
-cp .env.example .env
-# Defaults work without changes
-
-# 3. Start all Docker containers
-docker-compose up -d
-
-# 4. Verify containers are running
-docker-compose ps
-# Should see: orionone-app, orionone-nginx, orionone-postgres, orionone-redis
-
-# 5. Install backend dependencies
-docker-compose exec orionone-app composer install
-
-# 6. Setup Laravel
-docker-compose exec orionone-app php artisan key:generate
-docker-compose exec orionone-app php artisan migrate
-docker-compose exec orionone-app php artisan db:seed
-
-# 7. Install frontend dependencies
-docker-compose exec orionone-app npm install
-
-# 8. Build assets (or dev mode with hot reload)
-docker-compose exec orionone-app npm run build
-# OR for development with HMR:
-docker-compose exec orionone-app npm run dev
-```
-
-### Access Application
-
-**URLs:**
-
--   **Frontend:** http://localhost
--   **Laravel Telescope:** http://localhost/telescope (debugging)
--   **Laravel Pulse:** http://localhost/pulse (monitoring)
--   **API Docs:** http://localhost/docs (Scribe)
-
-**Test Credentials:**
-
-```
-Admin: admin@orionone.test / password
-Agent: agent@orionone.test / password
-User: user@orionone.test / password
-```
-
-### Common Commands
-
-```bash
-# View logs
-docker-compose logs -f orionone-app
-
-# Stop containers
-docker-compose down
-
-# Rebuild after Dockerfile changes
-docker-compose up -d --build
-
-# Run tests
-docker-compose exec orionone-app php artisan test
-
-# Clear cache
-docker-compose exec orionone-app php artisan config:clear
-docker-compose exec orionone-app php artisan cache:clear
-```
-
-**[Complete Setup Guide →](SETUP.md)** | **[Commands Reference →](docs/COMMANDS-REFERENCE.md)**
-
 ---
 
 ## Development
@@ -319,20 +230,6 @@ OrionOne/
 
 ### Testing
 
-```bash
-# Run all tests
-docker-compose exec orionone-app php artisan test
-
-# With coverage
-docker-compose exec orionone-app php artisan test --coverage
-
-# Specific test
-docker-compose exec orionone-app php artisan test --filter=UpdateProfileTest
-
-# Continuous testing
-docker-compose exec orionone-app php artisan test --watch
-```
-
 **Test Strategy:**
 
 -   **Unit Tests:** Services, Actions (mock dependencies)
@@ -379,7 +276,7 @@ docker-compose exec orionone-app php artisan test --watch
 
 ## Roadmap
 
-### Phase 1: MVP (8 months - February 2026)
+### Phase 1: MVP
 
 **Completed:**
 
@@ -424,24 +321,6 @@ docker-compose exec orionone-app php artisan test --watch
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-### Contribution Workflow
-
-```bash
-# 1. Fork the repository
-# 2. Create a feature branch
-git checkout -b feature/your-feature-name
-
-# 3. Make your changes following our conventions
-# 4. Run tests
-php artisan test
-
-# 5. Commit using Conventional Commits
-git commit -m "feat: add new feature X"
-
-# 6. Push and create Pull Request
-git push origin feature/your-feature-name
-```
-
 ### Commit Conventions
 
 We use [Conventional Commits](https://www.conventionalcommits.org/):
@@ -454,14 +333,6 @@ refactor: code refactoring
 test: adding tests
 chore: maintenance
 ```
-
-### Code Style
-
--   **PHP**: PSR-12 (enforced by Laravel Pint)
--   **JavaScript**: ESLint + Prettier
--   **Vue**: Vue 3 Composition API style guide
-
----
 
 ## Security
 
@@ -476,8 +347,6 @@ OrionOne implements enterprise-grade security:
 -   Granular authorization via Policies
 -   Activity logging (audit trail)
 -   Soft deletes for data recovery
-
-**Found a security issue?** Please email JMSS1995@hotmail.com instead of opening a public issue.
 
 ---
 
