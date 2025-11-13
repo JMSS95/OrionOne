@@ -53,6 +53,28 @@ Esta pasta contém a documentação técnica da implementação inicial em **Lar
     -   Nginx reverse proxy
     -   Deployment strategy
 
+### Guias de Desenvolvimento
+
+-   **`development-guide-laravel.md`** (1410 linhas)
+    -   Rotina de desenvolvimento Feature-Driven + TDD
+    -   Ciclo: Planeamento → DB → Backend → Frontend → Testes
+    -   Convenções Laravel (Controllers, Models, Services)
+    -   Git workflow e commit messages
+
+-   **`COMMANDS-REFERENCE-LARAVEL.md`** (1129 linhas)
+    -   Git commands (branch, commit, rebase, cherry-pick)
+    -   Laravel Artisan commands (make:*, migrate, seed, queue)
+    -   Composer commands (install, update, require)
+    -   npm commands (install, build, dev)
+    -   Docker commands (up, down, logs, exec)
+    -   Testing commands (PHPUnit, Pest)
+
+-   **`COMPONENTS-GUIDE-VUE.md`** (729 linhas)
+    -   14 Shadcn-vue components (Button, Card, Input, Select, Badge, Alert, Avatar)
+    -   Props e variantes de cada componente
+    -   Exemplos de uso em Vue 3
+    -   Tailwind CSS customizations
+
 ---
 
 ## 🔄 Migração para Next.js + Nest.js
