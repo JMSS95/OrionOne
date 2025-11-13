@@ -1,305 +1,290 @@
 import { PrismaClient, Role } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import { hash } from 'bcrypt';
 
 const prisma = new PrismaClient();
+const SALT_ROUNDS = 10;
 
-async function main() {
-    console.log('🌱 Starting seed...');
+const PERMISSIONS = {
+    TICKETS: [
+        'tickets.create',
+        'tickets.view',
+        'tickets.update',
+        'tickets.delete',
+        'tickets.assign',
+        'tickets.close',
+        'tickets.reopen',
+        'tickets.export',
+    ],
+    USERS: ['users.create', 'users.view', 'users.update', 'users.delete'],
+    CATEGORIES: [
+        'categories.create',
+        'categories.view',
+        'categories.update',
+        'categories.delete',
+    ],
+    TEAMS: ['teams.create', 'teams.view', 'teams.update', 'teams.delete'],
+    ARTICLES: [
+        'articles.create',
+        'articles.view',
+        'articles.update',
+        'articles.delete',
+    ],
+    ASSETS: ['assets.create', 'assets.view', 'assets.update', 'assets.delete'],
+    REPORTS: [
+        'reports.view',
+        'reports.export',
+        'reports.dashboard',
+        'reports.analytics',
+    ],
+} as const;
 
-    // Clean existing data (development only)
-    if (process.env.NODE_ENV !== 'production') {
-        console.log('🗑️  Cleaning database...');
-        await prisma.roleHasPermission.deleteMany();
-        await prisma.permission.deleteMany();
-        await prisma.comment.deleteMany();
-        await prisma.ticket.deleteMany();
-        await prisma.category.deleteMany();
-        await prisma.teamMember.deleteMany();
-        await prisma.team.deleteMany();
-        await prisma.articleVersion.deleteMany();
-        await prisma.article.deleteMany();
-        await prisma.asset.deleteMany();
-        await prisma.media.deleteMany();
-        await prisma.activityLog.deleteMany();
-        await prisma.notification.deleteMany();
-        await prisma.user.deleteMany();
-    }
+const ROLE_PERMISSIONS = {
+    [Role.ADMIN]: Object.values(PERMISSIONS).flat(),
+    [Role.AGENT]: [
+        ...PERMISSIONS.TICKETS,
+        'categories.view',
+        'teams.view',
+        ...PERMISSIONS.ARTICLES,
+    ],
+    [Role.USER]: ['tickets.create', 'tickets.view', 'articles.view'],
+} as const;
 
-    // 1. Create Permissions (32 total)
-    console.log('📝 Creating permissions...');
-    const permissionGroups = [
-        // Tickets (8)
-        ['tickets.create', 'tickets.view', 'tickets.update', 'tickets.delete', 
-         'tickets.assign', 'tickets.close', 'tickets.reopen', 'tickets.export'],
-        // Users (4)
-        ['users.create', 'users.view', 'users.update', 'users.delete'],
-        // Categories (4)
-        ['categories.create', 'categories.view', 'categories.update', 'categories.delete'],
-        // Teams (4)
-        ['teams.create', 'teams.view', 'teams.update', 'teams.delete'],
-        // Articles (4)
-        ['articles.create', 'articles.view', 'articles.update', 'articles.delete'],
-        // Assets (4)
-        ['assets.create', 'assets.view', 'assets.update', 'assets.delete'],
-        // Reports (4)
-        ['reports.view', 'reports.export', 'reports.dashboard', 'reports.analytics'],
-    ];
+async function cleanDatabase() {
+    if (process.env.NODE_ENV === 'production') return;
 
+    await prisma.roleHasPermission.deleteMany();
+    await prisma.permission.deleteMany();
+    await prisma.comment.deleteMany();
+    await prisma.ticket.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.teamMember.deleteMany();
+    await prisma.team.deleteMany();
+    await prisma.articleVersion.deleteMany();
+    await prisma.article.deleteMany();
+    await prisma.asset.deleteMany();
+    await prisma.media.deleteMany();
+    await prisma.activityLog.deleteMany();
+    await prisma.notification.deleteMany();
+    await prisma.user.deleteMany();
+}
+
+async function createPermissions() {
+    const allPermissions = Object.values(PERMISSIONS).flat();
     const permissions = await Promise.all(
-        permissionGroups.flat().map((name) =>
+        allPermissions.map((name) =>
             prisma.permission.create({
-                data: {
-                    name,
-                    guardName: 'web', // Default guard name for web routes
-                },
+                data: { name, guardName: 'api' },
             }),
         ),
     );
 
-    console.log(`✅ Created ${permissions.length} permissions`);
+    return permissions;
+}
 
-    // 2. Create RoleHasPermissions mapping
-    console.log('🔐 Mapping permissions to roles...');
+async function assignRolePermissions(
+    permissions: { id: string; name: string }[],
+) {
+    const permissionMap = new Map(permissions.map((p) => [p.name, p.id]));
 
-    // ADMIN: all permissions
-    const adminPerms = await prisma.roleHasPermission.createMany({
-        data: permissions.map((perm) => ({
-            roleName: Role.ADMIN,
-            permissionId: perm.id,
-        })),
-    });
+    for (const [role, permNames] of Object.entries(ROLE_PERMISSIONS)) {
+        const rolePermissions = permNames
+            .map((name) => permissionMap.get(name))
+            .filter((id): id is string => id !== undefined)
+            .map((permissionId) => ({
+                roleName: role as Role,
+                permissionId,
+            }));
 
-    // AGENT: tickets, categories, teams, articles (no users, assets, reports)
-    const agentPermissionNames = [
-        ...permissionGroups[0], // tickets.*
-        'categories.view',
-        'teams.view',
-        ...permissionGroups[4], // articles.*
+        await prisma.roleHasPermission.createMany({
+            data: rolePermissions,
+        });
+    }
+}
+
+async function createUsers() {
+    const password = await hash('password123', SALT_ROUNDS);
+
+    const users = await Promise.all([
+        prisma.user.create({
+            data: {
+                name: 'Admin User',
+                email: 'admin@orionone.test',
+                password,
+                role: Role.ADMIN,
+                emailVerifiedAt: new Date(),
+            },
+        }),
+        prisma.user.create({
+            data: {
+                name: 'Agent User',
+                email: 'agent@orionone.test',
+                password,
+                role: Role.AGENT,
+                emailVerifiedAt: new Date(),
+            },
+        }),
+        prisma.user.create({
+            data: {
+                name: 'Normal User',
+                email: 'user@orionone.test',
+                password,
+                role: Role.USER,
+                emailVerifiedAt: new Date(),
+            },
+        }),
+    ]);
+
+    return users;
+}
+
+async function createCategories() {
+    const categoryData = [
+        {
+            name: 'Hardware',
+            slug: 'hardware',
+            description: 'Hardware issues (laptops, desktops, peripherals)',
+        },
+        {
+            name: 'Software',
+            slug: 'software',
+            description: 'Software problems (applications, licenses)',
+        },
+        {
+            name: 'Network',
+            slug: 'network',
+            description: 'Network connectivity and VPN issues',
+        },
+        {
+            name: 'Access',
+            slug: 'access',
+            description: 'Access requests and permissions',
+        },
+        {
+            name: 'Other',
+            slug: 'other',
+            description: 'Miscellaneous issues',
+        },
     ];
-    const agentPerms = await prisma.roleHasPermission.createMany({
-        data: permissions
-            .filter((p) => agentPermissionNames.includes(p.name))
-            .map((perm) => ({
-                roleName: Role.AGENT,
-                permissionId: perm.id,
-            })),
-    });
 
-    // USER: limited to own tickets + view articles
-    const userPermissionNames = [
-        'tickets.create',
-        'tickets.view',
-        'articles.view',
-    ];
-    const userPerms = await prisma.roleHasPermission.createMany({
-        data: permissions
-            .filter((p) => userPermissionNames.includes(p.name))
-            .map((perm) => ({
-                roleName: Role.USER,
-                permissionId: perm.id,
-            })),
-    });
-
-    console.log(
-        `✅ Mapped permissions: ADMIN (${adminPerms.count}), AGENT (${agentPerms.count}), USER (${userPerms.count})`,
+    const categories = await Promise.all(
+        categoryData.map((data) => prisma.category.create({ data })),
     );
 
-    // 3. Create Test Users
-    console.log('👥 Creating users...');
-    const hashedPassword = await bcrypt.hash('password123', 10);
+    return categories;
+}
 
-    const adminUser = await prisma.user.create({
-        data: {
-            name: 'Admin User',
-            email: 'admin@orionone.test',
-            password: hashedPassword,
-            role: Role.ADMIN,
-            emailVerifiedAt: new Date(),
+async function createTickets(
+    users: { id: string }[],
+    categories: { id: string }[],
+) {
+    const agent = users[1];
+    const user = users[2];
+    const [hardware, software, network, access] = categories;
+
+    const ticketData = [
+        {
+            ticketNumber: 'TKT-2024-0001',
+            title: 'Laptop screen flickering',
+            description:
+                'Laptop screen flickering intermittently for 2 days. Happens with heavy applications.',
+            status: 'OPEN' as const,
+            priority: 'HIGH' as const,
+            requesterId: user.id,
+            categoryId: hardware.id,
         },
-    });
-
-    const agentUser = await prisma.user.create({
-        data: {
-            name: 'Agent User',
-            email: 'agent@orionone.test',
-            password: hashedPassword,
-            role: Role.AGENT,
-            emailVerifiedAt: new Date(),
+        {
+            ticketNumber: 'TKT-2024-0002',
+            title: 'Office activation failed',
+            description:
+                'Cannot activate Microsoft Office 365. Error code 0x80070426.',
+            status: 'IN_PROGRESS' as const,
+            priority: 'MEDIUM' as const,
+            requesterId: user.id,
+            assignedTo: agent.id,
+            categoryId: software.id,
         },
-    });
-
-    const normalUser = await prisma.user.create({
-        data: {
-            name: 'Normal User',
-            email: 'user@orionone.test',
-            password: hashedPassword,
-            role: Role.USER,
-            emailVerifiedAt: new Date(),
+        {
+            ticketNumber: 'TKT-2024-0003',
+            title: 'VPN connection timeout',
+            description:
+                'VPN connection times out after 5 minutes. Frequent reconnects needed.',
+            status: 'ON_HOLD' as const,
+            priority: 'LOW' as const,
+            requesterId: user.id,
+            assignedTo: agent.id,
+            categoryId: network.id,
         },
-    });
+        {
+            ticketNumber: 'TKT-2024-0004',
+            title: 'Shared drive access request',
+            description: 'Need read/write access to Marketing shared drive.',
+            status: 'RESOLVED' as const,
+            priority: 'MEDIUM' as const,
+            requesterId: user.id,
+            assignedTo: agent.id,
+            categoryId: access.id,
+            resolvedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        },
+        {
+            ticketNumber: 'TKT-2024-0005',
+            title: 'Desktop not booting',
+            description:
+                'Workstation in office 302 not booting. Black screen error.',
+            status: 'OPEN' as const,
+            priority: 'URGENT' as const,
+            requesterId: agent.id,
+            categoryId: hardware.id,
+        },
+    ];
 
-    console.log('✅ Created 3 users (admin, agent, user)');
+    const tickets = await Promise.all(
+        ticketData.map((data) => prisma.ticket.create({ data })),
+    );
 
-    // 4. Create Categories
-    console.log('📁 Creating categories...');
-    const categories = await Promise.all([
-        prisma.category.create({
-            data: {
-                name: 'Hardware',
-                slug: 'hardware',
-                description: 'Hardware issues (laptops, desktops, peripherals)',
-            },
-        }),
-        prisma.category.create({
-            data: {
-                name: 'Software',
-                slug: 'software',
-                description: 'Software problems (applications, licenses)',
-            },
-        }),
-        prisma.category.create({
-            data: {
-                name: 'Network',
-                slug: 'network',
-                description: 'Network connectivity and VPN issues',
-            },
-        }),
-        prisma.category.create({
-            data: {
-                name: 'Access',
-                slug: 'access',
-                description: 'Access requests and permissions',
-            },
-        }),
-        prisma.category.create({
-            data: {
-                name: 'Other',
-                slug: 'other',
-                description: 'Miscellaneous issues',
-            },
-        }),
-    ]);
+    return tickets;
+}
 
-    console.log(`✅ Created ${categories.length} categories`);
+async function createComments(
+    tickets: { id: string }[],
+    users: { id: string }[],
+) {
+    const agent = users[1];
 
-    // 5. Create Sample Tickets
-    console.log('🎫 Creating sample tickets...');
-    const tickets = await Promise.all([
-        // Ticket 1: OPEN - Hardware
-        prisma.ticket.create({
-            data: {
-                ticketNumber: 'TKT-2024-0001',
-                title: 'Laptop screen flickering',
-                description:
-                    'My laptop screen has been flickering intermittently for the past 2 days. It happens mostly when I open heavy applications like Chrome with multiple tabs.',
-                status: 'OPEN',
-                priority: 'HIGH',
-                requesterId: normalUser.id,
-                categoryId: categories[0].id, // Hardware
-            },
-        }),
-        // Ticket 2: IN_PROGRESS - Software
-        prisma.ticket.create({
-            data: {
-                ticketNumber: 'TKT-2024-0002',
-                title: 'Microsoft Office activation failed',
-                description:
-                    'Cannot activate Microsoft Office 365. Getting error code 0x80070426.',
-                status: 'IN_PROGRESS',
-                priority: 'MEDIUM',
-                requesterId: normalUser.id,
-                assignedTo: agentUser.id,
-                categoryId: categories[1].id, // Software
-            },
-        }),
-        // Ticket 3: ON_HOLD - Network
-        prisma.ticket.create({
-            data: {
-                ticketNumber: 'TKT-2024-0003',
-                title: 'VPN connection timeout',
-                description:
-                    'VPN connection times out after 5 minutes. Need to reconnect frequently.',
-                status: 'ON_HOLD',
-                priority: 'LOW',
-                requesterId: normalUser.id,
-                assignedTo: agentUser.id,
-                categoryId: categories[2].id, // Network
-            },
-        }),
-        // Ticket 4: RESOLVED - Access
-        prisma.ticket.create({
-            data: {
-                ticketNumber: 'TKT-2024-0004',
-                title: 'Request access to shared drive',
-                description:
-                    'Need read/write access to the Marketing shared drive (\\\\server\\marketing).',
-                status: 'RESOLVED',
-                priority: 'MEDIUM',
-                requesterId: normalUser.id,
-                assignedTo: agentUser.id,
-                categoryId: categories[3].id, // Access
-                resolvedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-            },
-        }),
-        // Ticket 5: URGENT - Hardware
-        prisma.ticket.create({
-            data: {
-                ticketNumber: 'TKT-2024-0005',
-                title: 'Desktop computer not booting',
-                description:
-                    'Workstation in office 302 is not booting. Black screen with "No bootable device" error.',
-                status: 'OPEN',
-                priority: 'URGENT',
-                requesterId: agentUser.id,
-                categoryId: categories[0].id, // Hardware
-            },
-        }),
-    ]);
+    const commentData = [
+        {
+            content: 'Checking laptop. Likely graphics driver issue.',
+            ticketId: tickets[0].id,
+            userId: agent.id,
+        },
+        {
+            content: 'Drivers updated. Please test.',
+            ticketId: tickets[0].id,
+            userId: agent.id,
+        },
+        {
+            content: 'New license key generated: XXXXX-XXXXX-XXXXX',
+            ticketId: tickets[1].id,
+            userId: agent.id,
+        },
+        {
+            content: 'Waiting for network team to check VPN logs.',
+            ticketId: tickets[2].id,
+            userId: agent.id,
+        },
+        {
+            content: 'Access granted. Check Marketing shared drive.',
+            ticketId: tickets[3].id,
+            userId: agent.id,
+        },
+    ];
 
-    console.log(`✅ Created ${tickets.length} sample tickets`);
+    await prisma.comment.createMany({ data: commentData });
+}
 
-    // 6. Create Comments on Tickets
-    console.log('💬 Creating comments...');
-    await prisma.comment.createMany({
-        data: [
-            {
-                content:
-                    'I have checked the laptop, seems to be a graphics driver issue. Will update drivers and test.',
-                ticketId: tickets[0].id,
-                userId: agentUser.id,
-            },
-            {
-                content:
-                    'Drivers updated successfully. Please test and confirm if the issue persists.',
-                ticketId: tickets[0].id,
-                userId: agentUser.id,
-            },
-            {
-                content:
-                    'I have generated a new license key. Please use this key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX',
-                ticketId: tickets[1].id,
-                userId: agentUser.id,
-            },
-            {
-                content:
-                    'Waiting for network team to investigate VPN server logs.',
-                ticketId: tickets[2].id,
-                userId: agentUser.id,
-            },
-            {
-                content:
-                    'Access granted. You should now be able to access the Marketing shared drive.',
-                ticketId: tickets[3].id,
-                userId: agentUser.id,
-            },
-        ],
-    });
+async function createTeam(users: { id: string }[]) {
+    const [admin, agent] = users;
 
-    console.log('✅ Created 5 comments on tickets');
-
-    // 7. Create a Team
-    console.log('👨‍💼 Creating teams...');
-    const supportTeam = await prisma.team.create({
+    const team = await prisma.team.create({
         data: {
             name: 'IT Support Team',
             slug: 'it-support-team',
@@ -309,33 +294,51 @@ async function main() {
 
     await prisma.teamMember.createMany({
         data: [
-            { teamId: supportTeam.id, userId: agentUser.id, role: 'LEAD' },
-            { teamId: supportTeam.id, userId: adminUser.id, role: 'MEMBER' },
+            { teamId: team.id, userId: agent.id, role: 'LEAD' },
+            { teamId: team.id, userId: admin.id, role: 'MEMBER' },
         ],
     });
 
-    console.log('✅ Created 1 team with 2 members');
+    return team;
+}
 
-    console.log('🎉 Seed completed successfully!');
-    console.log('\n📊 Summary:');
-    console.log(`   - ${permissions.length} permissions`);
-    console.log(
-        `   - ${adminPerms.count + agentPerms.count + userPerms.count} role-permission mappings`,
-    );
-    console.log('   - 3 users (admin, agent, user)');
-    console.log(`   - ${categories.length} categories`);
-    console.log(`   - ${tickets.length} tickets`);
-    console.log('   - 5 comments');
-    console.log('   - 1 team with 2 members');
-    console.log('\n🔑 Test credentials:');
-    console.log('   - admin@orionone.test / password123 (ADMIN)');
-    console.log('   - agent@orionone.test / password123 (AGENT)');
-    console.log('   - user@orionone.test / password123 (USER)');
+async function main() {
+    console.log('Starting database seed...');
+
+    await cleanDatabase();
+    console.log('Database cleaned');
+
+    const permissions = await createPermissions();
+    console.log(`Created ${permissions.length} permissions`);
+
+    await assignRolePermissions(permissions);
+    console.log('Assigned role permissions');
+
+    const users = await createUsers();
+    console.log('Created 3 users');
+
+    const categories = await createCategories();
+    console.log('Created 5 categories');
+
+    const tickets = await createTickets(users, categories);
+    console.log('Created 5 tickets');
+
+    await createComments(tickets, users);
+    console.log('Created 5 comments');
+
+    await createTeam(users);
+    console.log('Created 1 team');
+
+    console.log('\nSeed completed successfully');
+    console.log('\nTest credentials:');
+    console.log('  admin@orionone.test / password123 (ADMIN)');
+    console.log('  agent@orionone.test / password123 (AGENT)');
+    console.log('  user@orionone.test / password123 (USER)');
 }
 
 main()
-    .catch((e) => {
-        console.error('❌ Seed failed:', e);
+    .catch((error) => {
+        console.error('Seed failed:', error);
         process.exit(1);
     })
     .finally(async () => {
