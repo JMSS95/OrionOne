@@ -1,8 +1,43 @@
-# PARTE 5: Limpeza & Arquivamento (Week 10+)
+# PARTE 5: Limpeza & Arquivamento (Week 2 End)
 
-> **Execução**: Semana 10+ (27-31 Jan 2025)
+> **⚠️ TIMING ATUALIZADO:** > **Execução**: **Week 2 End (29 Nov 2024) → Weekend (30 Nov - 1 Dec)** > **Timing Original**: Week 10+ (27-31 Jan 2025) ❌
 > **Duração**: 2-3 horas
-> **Pré-requisitos**: Migração 100% completa, MVP testado e funcionando
+> **Pré-requisitos**: Week 2 completo (Tickets Module backend), Week 3 CSS migration ainda pendente
+
+---
+
+## 🔄 Justificativa da Antecipação
+
+### Por Que Antecipar de Week 10 para Week 2?
+
+**Bloqueio Identificado:**
+
+-   **Week 3 Day 1:** Tarefa "Copiar Tailwind CSS do Laravel"
+-   **Ficheiros Necessários:**
+    -   `resources/css/app.css` (30+ CSS variables)
+    -   `tailwind.config.js` (colors, borderRadius, fonts)
+-   **Window de Execução:** Após Week 2 Friday (29 Nov), antes de Week 3 Monday (2 Dec)
+
+**Benefícios:**
+
+-   ✅ Libera ~350 MB de espaço (vendor/ + node_modules/ Laravel)
+-   ✅ Reduz confusão no workspace (sem 2 stacks paralelas)
+-   ✅ Acelera Git operations (200+ ficheiros a menos)
+-   ✅ Foco 100% no Next.js/Nest.js
+
+**Sem Riscos:**
+
+-   Git tag `v0.1.0-laravel` permanece (backup sempre disponível)
+-   Docker Compose já não usa Laravel (migrado para Nest.js)
+-   CSS será copiado do arquivo antes de continuar Week 3
+
+---
+
+## 📅 Plano de Execução (29 Nov - 1 Dec)
+
+1. **Week 2 Friday (29 Nov):** Completar Tickets Module backend
+2. **Weekend (30 Nov - 1 Dec):** Executar cleanup → `archive-laravel-vue/`
+3. **Week 3 Monday (2 Dec):** Copiar CSS do arquivo → Continuar frontend
 
 ---
 
