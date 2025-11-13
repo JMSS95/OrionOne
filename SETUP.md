@@ -325,13 +325,13 @@ Docker permite executar aplicações em **containers** - ambientes isolados que 
 
 ### Conceitos Básicos
 
-| Termo              | Explicação                             | Exemplo                            |
-| ------------------ | -------------------------------------- | ---------------------------------- |
-| **Image**          | Template do container (como um ISO)    | `node:20-alpine`                   |
-| **Container**      | Instância executável de uma image      | `orionone-backend` a correr        |
-| **Volume**         | Pasta compartilhada (host ↔ container) | `./nest-backend` ↔ `/app`          |
-| **Port Mapping**   | Expor portas do container              | `3000:3000` (host:container)       |
-| **docker-compose** | Orquestra múltiplos containers         | `docker-compose.yml`               |
+| Termo              | Explicação                             | Exemplo                      |
+| ------------------ | -------------------------------------- | ---------------------------- |
+| **Image**          | Template do container (como um ISO)    | `node:20-alpine`             |
+| **Container**      | Instância executável de uma image      | `orionone-backend` a correr  |
+| **Volume**         | Pasta compartilhada (host ↔ container) | `./nest-backend` ↔ `/app`    |
+| **Port Mapping**   | Expor portas do container              | `3000:3000` (host:container) |
+| **docker-compose** | Orquestra múltiplos containers         | `docker-compose.yml`         |
 
 ### Comandos Essenciais
 
@@ -465,18 +465,18 @@ docker system df
 
 ### Docker vs Local (Quando usar cada um?)
 
-| Tarefa           | Usar      | Comando                                         |
-| ---------------- | --------- | ----------------------------------------------- |
-| Rodar backend    | ❌ Local  | `cd nest-backend && npm run start:dev`          |
-| Rodar frontend   | ❌ Local  | `cd next-frontend && npm run dev`               |
-| Migrations       | ❌ Local  | `cd nest-backend && npx prisma migrate dev`     |
-| Testes           | ❌ Local  | `npm run test` (em cada projeto)                |
-| PostgreSQL       | ✅ Docker | `docker-compose up -d orionone-postgres`        |
-| Redis            | ✅ Docker | `docker-compose up -d orionone-redis`           |
-| Mailpit          | ✅ Docker | `docker-compose up -d orionone-mailpit`         |
-| Nginx            | ✅ Docker | `docker-compose up -d orionone-nginx`           |
-| Editar código    | ❌ Local  | VS Code no host                                 |
-| Git              | ❌ Local  | `git` no host                                   |
+| Tarefa         | Usar      | Comando                                     |
+| -------------- | --------- | ------------------------------------------- |
+| Rodar backend  | ❌ Local  | `cd nest-backend && npm run start:dev`      |
+| Rodar frontend | ❌ Local  | `cd next-frontend && npm run dev`           |
+| Migrations     | ❌ Local  | `cd nest-backend && npx prisma migrate dev` |
+| Testes         | ❌ Local  | `npm run test` (em cada projeto)            |
+| PostgreSQL     | ✅ Docker | `docker-compose up -d orionone-postgres`    |
+| Redis          | ✅ Docker | `docker-compose up -d orionone-redis`       |
+| Mailpit        | ✅ Docker | `docker-compose up -d orionone-mailpit`     |
+| Nginx          | ✅ Docker | `docker-compose up -d orionone-nginx`       |
+| Editar código  | ❌ Local  | VS Code no host                             |
+| Git            | ❌ Local  | `git` no host                               |
 
 **Regra de ouro:** Serviços (PostgreSQL, Redis, Mailpit) → Docker. Código (Next.js, Nest.js) → Local.
 
@@ -500,14 +500,14 @@ docker system df
 
 ## Estrutura de Containers Docker
 
-| Container             | Serviço          | Porta | Propósito                   |
-| --------------------- | ---------------- | ----- | --------------------------- |
-| `orionone-backend`    | Nest.js 10       | 3001  | Backend API                 |
-| `orionone-frontend`   | Next.js 15       | 3000  | Frontend Application        |
-| `orionone-postgres`   | PostgreSQL 16    | 5432  | Base de dados principal     |
-| `orionone-redis`      | Redis 7          | 6379  | Cache + Sessions + Queues   |
-| `orionone-mailpit`    | Mailpit          | 8025  | Email testing (dev only)    |
-| `orionone-nginx`      | Nginx            | 80    | Reverse proxy (production)  |
+| Container           | Serviço       | Porta | Propósito                  |
+| ------------------- | ------------- | ----- | -------------------------- |
+| `orionone-backend`  | Nest.js 10    | 3001  | Backend API                |
+| `orionone-frontend` | Next.js 15    | 3000  | Frontend Application       |
+| `orionone-postgres` | PostgreSQL 16 | 5432  | Base de dados principal    |
+| `orionone-redis`    | Redis 7       | 6379  | Cache + Sessions + Queues  |
+| `orionone-mailpit`  | Mailpit       | 8025  | Email testing (dev only)   |
+| `orionone-nginx`    | Nginx         | 80    | Reverse proxy (production) |
 
 ---
 

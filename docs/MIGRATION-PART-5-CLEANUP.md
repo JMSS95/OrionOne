@@ -1,7 +1,7 @@
 # PARTE 5: Limpeza & Arquivamento (Week 10+)
 
-> **Execução**: Semana 10+ (27-31 Jan 2025)  
-> **Duração**: 2-3 horas  
+> **Execução**: Semana 10+ (27-31 Jan 2025)
+> **Duração**: 2-3 horas
 > **Pré-requisitos**: Migração 100% completa, MVP testado e funcionando
 
 ---
@@ -585,11 +585,11 @@ cd c:\laragon\www\orionone
 
 ### 1. README.md
 
-```markdown
+````markdown
 # OrionOne - ITSM Platform
 
-> **Stack**: Next.js 15 + Nest.js 10 + PostgreSQL + TypeScript  
-> **Versão**: v1.0.0  
+> **Stack**: Next.js 15 + Nest.js 10 + PostgreSQL + TypeScript
+> **Versão**: v1.0.0
 > **Status**: ✅ Production Ready
 
 ---
@@ -608,29 +608,30 @@ docker-compose up -d
 # Frontend: http://localhost
 # Swagger: http://localhost/api/docs
 ```
+````
 
 ## 📦 Stack
 
-- **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS v4, Shadcn-ui
-- **Backend**: Nest.js 10, Prisma ORM, JWT Auth, CASL Permissions
-- **Database**: PostgreSQL 16, Redis 7.2, Meilisearch 1.9
-- **Infrastructure**: Docker Compose, Nginx, Mailpit
+-   **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS v4, Shadcn-ui
+-   **Backend**: Nest.js 10, Prisma ORM, JWT Auth, CASL Permissions
+-   **Database**: PostgreSQL 16, Redis 7.2, Meilisearch 1.9
+-   **Infrastructure**: Docker Compose, Nginx, Mailpit
 
 ## 📚 Documentação
 
-- [`docs/architecture.md`](docs/architecture.md) - Arquitetura completa
-- [`docs/SETUP.md`](SETUP.md) - Setup desenvolvimento
-- [`docs/MIGRATION-PART-*.md`](docs/) - Migração Laravel → Next.js/Nest.js
-- [`nest-backend/README.md`](nest-backend/README.md) - Backend docs
-- [`next-frontend/README.md`](next-frontend/README.md) - Frontend docs
+-   [`docs/architecture.md`](docs/architecture.md) - Arquitetura completa
+-   [`docs/SETUP.md`](SETUP.md) - Setup desenvolvimento
+-   [`docs/MIGRATION-PART-*.md`](docs/) - Migração Laravel → Next.js/Nest.js
+-   [`nest-backend/README.md`](nest-backend/README.md) - Backend docs
+-   [`next-frontend/README.md`](next-frontend/README.md) - Frontend docs
 
 ## 🗃️ Versão Anterior (Laravel/Vue)
 
 Esta aplicação foi migrada de **Laravel 12 + Vue 3** para **Next.js 15 + Nest.js 10**.
 
-- **Backup Git**: Tag `v0.1.0-laravel`
-- **Arquivo**: `archive-laravel-vue/` (código Laravel/Vue completo)
-- **Documentação**: `archive-laravel-vue/README.md`
+-   **Backup Git**: Tag `v0.1.0-laravel`
+-   **Arquivo**: `archive-laravel-vue/` (código Laravel/Vue completo)
+-   **Documentação**: `archive-laravel-vue/README.md`
 
 ```bash
 # Recuperar código Laravel/Vue
@@ -653,7 +654,8 @@ npm run test        # Component tests
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE)
-```
+
+````
 
 ### 2. SETUP.md
 
@@ -680,7 +682,7 @@ Atualizar com instruções Next.js/Nest.js:
 6. Access: http://localhost
 
 Veja documentação completa em `docs/MIGRATION-PART-1-SETUP.md`
-```
+````
 
 ### 3. DEPLOYMENT.md
 
@@ -691,11 +693,11 @@ Atualizar com deploy Next.js/Nest.js:
 
 ## Production
 
-- **Frontend**: Vercel ou Docker (Next.js standalone)
-- **Backend**: AWS ECS, Heroku ou Docker
-- **Database**: AWS RDS PostgreSQL
-- **Storage**: AWS S3
-- **Email**: SendGrid ou AWS SES
+-   **Frontend**: Vercel ou Docker (Next.js standalone)
+-   **Backend**: AWS ECS, Heroku ou Docker
+-   **Database**: AWS RDS PostgreSQL
+-   **Storage**: AWS S3
+-   **Email**: SendGrid ou AWS SES
 
 Veja guia completo em `docs/MIGRATION-PART-1-SETUP.md` (Deploy section)
 ```
@@ -763,8 +765,8 @@ c:\laragon\www\orionone\
 └── .gitignore                   # ✅ ATUALIZADO
 ```
 
-**Raiz**: Apenas Next.js + Nest.js + documentação migração  
-**Arquivo**: Todo código Laravel/Vue em `archive-laravel-vue/`  
+**Raiz**: Apenas Next.js + Nest.js + documentação migração
+**Arquivo**: Todo código Laravel/Vue em `archive-laravel-vue/`
 **Backup Git**: Tags `v0.1.0-laravel` e `v1.0.0-nextjs-nestjs`
 
 ---
@@ -773,36 +775,36 @@ c:\laragon\www\orionone\
 
 ### Após Executar Script de Arquivamento
 
-- [ ] Verificar estrutura: `Get-ChildItem -Recurse -Depth 1`
-- [ ] Confirmar raiz limpa (apenas nest-backend/, next-frontend/, docs/)
-- [ ] Verificar arquivo completo: `Get-ChildItem archive-laravel-vue/ -Recurse`
-- [ ] Testar Docker: `docker-compose up -d` (8 containers)
-- [ ] Testar frontend: http://localhost → Next.js app
-- [ ] Testar backend: http://localhost/api/health → {"status":"ok"}
-- [ ] Testar login completo (Next.js → Nest.js → PostgreSQL)
-- [ ] Verificar Git tags: `git tag` → v0.1.0-laravel, v1.0.0-nextjs-nestjs
-- [ ] Push final: `git push origin feat/migrate-nextjs-nestjs`
-- [ ] Criar Pull Request: feat/migrate-nextjs-nestjs → main
-- [ ] Merge to main após aprovação
-- [ ] Tag production: `git tag v1.0.0 && git push --tags`
+-   [ ] Verificar estrutura: `Get-ChildItem -Recurse -Depth 1`
+-   [ ] Confirmar raiz limpa (apenas nest-backend/, next-frontend/, docs/)
+-   [ ] Verificar arquivo completo: `Get-ChildItem archive-laravel-vue/ -Recurse`
+-   [ ] Testar Docker: `docker-compose up -d` (8 containers)
+-   [ ] Testar frontend: http://localhost → Next.js app
+-   [ ] Testar backend: http://localhost/api/health → {"status":"ok"}
+-   [ ] Testar login completo (Next.js → Nest.js → PostgreSQL)
+-   [ ] Verificar Git tags: `git tag` → v0.1.0-laravel, v1.0.0-nextjs-nestjs
+-   [ ] Push final: `git push origin feat/migrate-nextjs-nestjs`
+-   [ ] Criar Pull Request: feat/migrate-nextjs-nestjs → main
+-   [ ] Merge to main após aprovação
+-   [ ] Tag production: `git tag v1.0.0 && git push --tags`
 
 ### Documentação Atualizada
 
-- [ ] README.md → Next.js/Nest.js stack
-- [ ] SETUP.md → Novo setup instructions
-- [ ] DEPLOYMENT.md → Novo deployment guide
-- [ ] .gitignore → Excluir node_modules dos 2 projetos
-- [ ] docs/architecture.md → Arquitetura Next.js/Nest.js
-- [ ] nest-backend/README.md → Backend docs
-- [ ] next-frontend/README.md → Frontend docs
+-   [ ] README.md → Next.js/Nest.js stack
+-   [ ] SETUP.md → Novo setup instructions
+-   [ ] DEPLOYMENT.md → Novo deployment guide
+-   [ ] .gitignore → Excluir node_modules dos 2 projetos
+-   [ ] docs/architecture.md → Arquitetura Next.js/Nest.js
+-   [ ] nest-backend/README.md → Backend docs
+-   [ ] next-frontend/README.md → Frontend docs
 
 ### Backup & Recovery
 
-- [ ] Backup Git completo no GitHub
-- [ ] Tag v0.1.0-laravel testado: `git checkout v0.1.0-laravel`
-- [ ] Tag v1.0.0-nextjs-nestjs testado: `git checkout v1.0.0-nextjs-nestjs`
-- [ ] Arquivo `archive-laravel-vue/` commitado e pushed
-- [ ] README no arquivo com instruções de recovery
+-   [ ] Backup Git completo no GitHub
+-   [ ] Tag v0.1.0-laravel testado: `git checkout v0.1.0-laravel`
+-   [ ] Tag v1.0.0-nextjs-nestjs testado: `git checkout v1.0.0-nextjs-nestjs`
+-   [ ] Arquivo `archive-laravel-vue/` commitado e pushed
+-   [ ] README no arquivo com instruções de recovery
 
 ---
 
@@ -902,13 +904,14 @@ Após executar este processo:
 5. ✅ **Migração completa**: 100% funcional em Next.js/Nest.js
 
 **Próximos passos**:
-- Merge Pull Request → main
-- Deploy production (Vercel + AWS)
-- Monitor logs & performance
-- Celebrar! 🎉
+
+-   Merge Pull Request → main
+-   Deploy production (Vercel + AWS)
+-   Monitor logs & performance
+-   Celebrar! 🎉
 
 ---
 
-**Última atualização**: 13 Nov 2024  
-**Autor**: [@JMSS95](https://github.com/JMSS95)  
+**Última atualização**: 13 Nov 2024
+**Autor**: [@JMSS95](https://github.com/JMSS95)
 **Executar em**: Week 10+ (27-31 Jan 2025)

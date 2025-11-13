@@ -56,14 +56,16 @@ Esta pasta contém a documentação técnica da implementação inicial em **Lar
 ### Guias de Desenvolvimento
 
 -   **`development-guide-laravel.md`** (1410 linhas)
+
     -   Rotina de desenvolvimento Feature-Driven + TDD
     -   Ciclo: Planeamento → DB → Backend → Frontend → Testes
     -   Convenções Laravel (Controllers, Models, Services)
     -   Git workflow e commit messages
 
 -   **`COMMANDS-REFERENCE-LARAVEL.md`** (1129 linhas)
+
     -   Git commands (branch, commit, rebase, cherry-pick)
-    -   Laravel Artisan commands (make:*, migrate, seed, queue)
+    -   Laravel Artisan commands (make:\*, migrate, seed, queue)
     -   Composer commands (install, update, require)
     -   npm commands (install, build, dev)
     -   Docker commands (up, down, logs, exec)
