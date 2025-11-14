@@ -7,10 +7,10 @@ Implementar sistema completo de gestão de incidentes com Rich Text (Tiptap) e f
 
 **User Stories:**
 
--   [Em Curso] US2.1: Criar Incidente com Rich Text (Essential)
--   [Em Curso] US2.2: Pesquisa Simples (PostgreSQL ILIKE)
--   [Em Curso] US2.3: Listagem com Filtros Básicos
--   [Em Curso] US2.4: Atualizar Incidente
+- [Em Curso] US2.1: Criar Incidente com Rich Text (Essential)
+- [Em Curso] US2.2: Pesquisa Simples (PostgreSQL ILIKE)
+- [Em Curso] US2.3: Listagem com Filtros Básicos
+- [Em Curso] US2.4: Atualizar Incidente
 
 **Pré-requisitos:**
 Sprint 1 completo (Autenticação funcionando, Docker containers a correr)
@@ -35,11 +35,11 @@ Adicione o modelo `Incident` com os tipos de dados apropriados.
 
 **Campos Essenciais:**
 
--   `id`, `incidentNumber` (use `@unique` e lógica customizada no backend para geração)
--   `title` (com `@db.VarChar(255)`)
--   **Rich Text:** `description` do tipo **`Json`** - crucial para preservar a estrutura do Tiptap
--   **Enums:** Crie e use os enums `IncidentStatus` (NEW, IN_PROGRESS, RESOLVED, CLOSED) e `IncidentPriority` (P1, P2, P3, P4)
--   **Relações:** Crie as relações `requester` e `assignee` com o modelo `User` (muitos-para-um) e a relação `category` com o modelo `Category` (muitos-para-um)
+- `id`, `incidentNumber` (use `@unique` e lógica customizada no backend para geração)
+- `title` (com `@db.VarChar(255)`)
+- **Rich Text:** `description` do tipo **`Json`** - crucial para preservar a estrutura do Tiptap
+- **Enums:** Crie e use os enums `IncidentStatus` (NEW, IN_PROGRESS, RESOLVED, CLOSED) e `IncidentPriority` (P1, P2, P3, P4)
+- **Relações:** Crie as relações `requester` e `assignee` com o modelo `User` (muitos-para-um) e a relação `category` com o modelo `Category` (muitos-para-um)
 
 **Documentação:**
 [Guia Oficial do Prisma sobre Modelos de Dados, Enums e Tipos JSON](https://www.prisma.io/docs/orm/prisma-schema/data-model)
@@ -91,19 +91,19 @@ Crie os ficheiros `CreateIncidentDto.ts` e `UpdateIncidentDto.ts` dentro de `nes
 **`CreateIncidentDto.ts`:**
 Defina a estrutura de dados para criar um novo incidente. Os validadores (`class-validator`) garantem a integridade dos dados na entrada da API.
 
--   `title`: Deve ser uma `string` e não pode estar vazio. A API deve rejeitar pedidos sem título.
--   `description`: Deve ser um objeto JSON, preparado para receber a estrutura de dados do editor Tiptap.
--   `priority`: Deve corresponder a um dos valores definidos no enum `IncidentPriority` do Prisma (ex: `P1`, `P2`).
--   `categoryId`: Deve ser o ID (`string`) de uma categoria existente.
+- `title`: Deve ser uma `string` e não pode estar vazio. A API deve rejeitar pedidos sem título.
+- `description`: Deve ser um objeto JSON, preparado para receber a estrutura de dados do editor Tiptap.
+- `priority`: Deve corresponder a um dos valores definidos no enum `IncidentPriority` do Prisma (ex: `P1`, `P2`).
+- `categoryId`: Deve ser o ID (`string`) de uma categoria existente.
 
 **`UpdateIncidentDto.ts`:**
 Defina os campos que podem ser atualizados num incidente existente. Todos os campos devem ser opcionais, permitindo atualizações parciais.
 
--   `title`: Opcional, para renomear o incidente.
--   `description`: Opcional, para editar o conteúdo rich text.
--   `status`: Opcional, para mudar o estado do incidente (ex: de `NEW` para `IN_PROGRESS`).
--   `priority`: Opcional, para re-priorizar o incidente.
--   `assigneeId`: Opcional, para atribuir ou reatribuir o incidente a um utilizador.
+- `title`: Opcional, para renomear o incidente.
+- `description`: Opcional, para editar o conteúdo rich text.
+- `status`: Opcional, para mudar o estado do incidente (ex: de `NEW` para `IN_PROGRESS`).
+- `priority`: Opcional, para re-priorizar o incidente.
+- `assigneeId`: Opcional, para atribuir ou reatribuir o incidente a um utilizador.
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre Validação (class-validator)](https://docs.nestjs.com/techniques/validation)
@@ -117,16 +117,16 @@ No método `create()` do `IncidentsService`, implementar a lógica para gerar um
 
 **Descrição da Lógica:**
 
-1.  **Encontrar o Último Incidente do Dia:**
-    -   Antes de criar o novo incidente, faça uma consulta à base de dados para encontrar o último incidente registado no dia corrente.
-    -   Isto pode ser feito com uma query que filtra os registos por `createdAt` (maior ou igual ao início do dia e menor que o fim do dia) e ordena por data de criação descendente.
-2.  **Calcular o Novo Número Sequencial:**
-    -   Se não houver incidentes registados hoje, o novo número sequencial é `1`.
-    -   Se existirem, extraia o número sequencial do `incidentNumber` do último incidente (ex: de `INC-20251114-0005` extrai `5`), e incremente esse valor.
-3.  **Formatar o `incidentNumber`:**
-    -   Construa o número final juntando o prefixo "INC-", a data no formato `YYYYMMDD`, e o novo número sequencial formatado com 4 dígitos (ex: `0001`, `0012`).
-4.  **Criar o Incidente:**
-    -   Execute a operação de criação na base de dados, passando todos os dados do DTO e o `incidentNumber` recém-gerado.
+1. **Encontrar o Último Incidente do Dia:**
+ - Antes de criar o novo incidente, faça uma consulta à base de dados para encontrar o último incidente registado no dia corrente.
+ - Isto pode ser feito com uma query que filtra os registos por `createdAt` (maior ou igual ao início do dia e menor que o fim do dia) e ordena por data de criação descendente.
+2. **Calcular o Novo Número Sequencial:**
+ - Se não houver incidentes registados hoje, o novo número sequencial é `1`.
+ - Se existirem, extraia o número sequencial do `incidentNumber` do último incidente (ex: de `INC-20251114-0005` extrai `5`), e incremente esse valor.
+3. **Formatar o `incidentNumber`:**
+ - Construa o número final juntando o prefixo "INC-", a data no formato `YYYYMMDD`, e o novo número sequencial formatado com 4 dígitos (ex: `0001`, `0012`).
+4. **Criar o Incidente:**
+ - Execute a operação de criação na base de dados, passando todos os dados do DTO e o `incidentNumber` recém-gerado.
 
 **Documentação:**
 [Guia Oficial do Prisma sobre Consultas Avançadas](https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting)
@@ -170,29 +170,29 @@ Proteja _todos_ os endpoints com o `JwtAuthGuard` (do Sprint 1).
 
 ```typescript
 describe("IncidentsService - CRUD", () => {
-    it("deve criar incidente com número único", async () => {
-        const dto = {
-            title: "Test Incident",
-            description: { type: "doc", content: [] },
-            priority: "P3",
-            categoryId: "cat-123",
-        };
-        const result = await service.create(dto, "user-123");
-        expect(result.incidentNumber).toMatch(/^INC-\d{8}-\d{4}$/);
-    });
+ it("deve criar incidente com número único", async () => {
+ const dto = {
+ title: "Test Incident",
+ description: { type: "doc", content: [] },
+ priority: "P3",
+ categoryId: "cat-123",
+ };
+ const result = await service.create(dto, "user-123");
+ expect(result.incidentNumber).toMatch(/^INC-\d{8}-\d{4}$/);
+ });
 
-    it("deve aplicar filtros básicos corretamente", async () => {
-        const filters = { status: ["NEW", "IN_PROGRESS"], priority: ["P1"] };
-        await service.findAll(filters);
-        expect(prisma.incident.findMany).toHaveBeenCalledWith(
-            expect.objectContaining({
-                where: expect.objectContaining({
-                    status: { in: ["NEW", "IN_PROGRESS"] },
-                    priority: { in: ["P1"] },
-                }),
-            })
-        );
-    });
+ it("deve aplicar filtros básicos corretamente", async () => {
+ const filters = { status: ["NEW", "IN_PROGRESS"], priority: ["P1"] };
+ await service.findAll(filters);
+ expect(prisma.incident.findMany).toHaveBeenCalledWith(
+ expect.objectContaining({
+ where: expect.objectContaining({
+ status: { in: ["NEW", "IN_PROGRESS"] },
+ priority: { in: ["P1"] },
+ }),
+ })
+ );
+ });
 });
 ```
 
@@ -234,11 +234,11 @@ Crie um componente de cliente (`"use client";`) para o editor com formatação *
 
 **Extensões a Incluir:**
 
--   Bold, Italic, Strike (StarterKit)
--   BulletList, OrderedList (StarterKit)
--   Link (extensão separada)
--   CodeBlock, Heading (StarterKit)
--   Placeholder
+- Bold, Italic, Strike (StarterKit)
+- BulletList, OrderedList (StarterKit)
+- Link (extensão separada)
+- CodeBlock, Heading (StarterKit)
+- Placeholder
 
 **Integração com Formulário:**
 Use o componente **`Controller`** do `React Hook Form` para ligar o estado complexo do Tiptap ao estado simples do formulário.
@@ -256,9 +256,9 @@ Use a biblioteca **`TanStack Query`** (`useQuery`) para gerir o estado de carreg
 **Tabela e Filtros:**
 Use a **`DataTable`** (shadcn/ui) e crie uma UI de filtros **básicos**:
 
--   **Quick filters** (sidebar): All, My Incidents, Unassigned, Open, Closed
--   **Single-select filters**: Status dropdown, Priority dropdown, Assignee dropdown
--   **Simple search**: Input para buscar por número ou título
+- **Quick filters** (sidebar): All, My Incidents, Unassigned, Open, Closed
+- **Single-select filters**: Status dropdown, Priority dropdown, Assignee dropdown
+- **Simple search**: Input para buscar por número ou título
 
 O estado dos filtros deve ser gerido no frontend e incluído na `queryKey` do `TanStack Query` para que a tabela atualize automaticamente quando os filtros mudarem.
 
@@ -271,66 +271,66 @@ O estado dos filtros deve ser gerido no frontend e incluído na `queryKey` do `T
 
 1. **Criar Incidente:**
 
--   Navegue para `http://localhost:3000/incidents/create`
--   Preencha título, selecione categoria e prioridade
--   Use Rich Text Editor:
-    -   Adicione texto formatado (bold, italic, listas)
-    -   Adicione heading (H2, H3)
-    -   Adicione link (selecione texto, clique link, cole URL)
-    -   Adicione code block
--   Submeta → verifique PostgreSQL: incident criado
--   **NOTA:** Image paste será testado em Post-MVP P2
+- Navegue para `http://localhost:3000/incidents/create`
+- Preencha título, selecione categoria e prioridade
+- Use Rich Text Editor:
+ - Adicione texto formatado (bold, italic, listas)
+ - Adicione heading (H2, H3)
+ - Adicione link (selecione texto, clique link, cole URL)
+ - Adicione code block
+- Submeta → verifique PostgreSQL: incident criado
+- **NOTA:** Image paste será testado em Post-MVP P2
 
 2. **Testar Pesquisa Simples:**
 
--   Navegue para `/incidents`
--   Digite número de incidente na search bar → deve filtrar
--   Digite parte do título → deve buscar (case-insensitive)
--   Verifique: PostgreSQL ILIKE funcionando
--   **NOTA:** Meilisearch (typo tolerance, highlights) será testado em Sprint 4
+- Navegue para `/incidents`
+- Digite número de incidente na search bar → deve filtrar
+- Digite parte do título → deve buscar (case-insensitive)
+- Verifique: PostgreSQL ILIKE funcionando
+- **NOTA:** Meilisearch (typo tolerance, highlights) será testado em Sprint 4
 
 3. **Testar Filtros Básicos:**
 
--   Navegue para `/incidents`
--   **Quick filters** (sidebar):
-    -   Clique "My Incidents" → deve mostrar apenas seus incidents
-    -   Clique "Unassigned" → deve mostrar incidents sem assignee
-    -   Clique "Open" → deve mostrar NEW + IN_PROGRESS
--   **Single-select filters**:
-    -   Selecione status (dropdown) → tabela atualiza
-    -   Selecione prioridade (dropdown) → tabela atualiza
-    -   Selecione assignee (dropdown) → tabela atualiza
--   URL deve refletir filtros: `?status=NEW&priority=P1&assigneeId=user-123`
--   **NOTA:** Saved filters serão testados em Post-MVP P3
+- Navegue para `/incidents`
+- **Quick filters** (sidebar):
+ - Clique "My Incidents" → deve mostrar apenas seus incidents
+ - Clique "Unassigned" → deve mostrar incidents sem assignee
+ - Clique "Open" → deve mostrar NEW + IN_PROGRESS
+- **Single-select filters**:
+ - Selecione status (dropdown) → tabela atualiza
+ - Selecione prioridade (dropdown) → tabela atualiza
+ - Selecione assignee (dropdown) → tabela atualiza
+- URL deve refletir filtros: `?status=NEW&priority=P1&assigneeId=user-123`
+- **NOTA:** Saved filters serão testados em Post-MVP P3
 
 4. **Testar Atualização:**
 
--   Abra um incident existente
--   Edite título, descrição (rich text), status, priority
--   Verifique: activity log registra mudanças
--   Verifique: email enviado (se assignee mudou ou status mudou)
+- Abra um incident existente
+- Edite título, descrição (rich text), status, priority
+- Verifique: activity log registra mudanças
+- Verifique: email enviado (se assignee mudou ou status mudou)
 
 **Teste E2E (Opcional):**
 
 ```typescript
 // next-frontend/e2e/incidents/create.spec.ts
 test("criar incidente com rich text", async ({ page }) => {
-    await page.goto("/incidents/create");
+ await page.goto("/incidents/create");
 
-    await page.fill('[name="title"]', "Test Incident");
+ await page.fill('[name="title"]', "Test Incident");
 
-    // Rich text
-    const editor = page.locator(".tiptap");
-    await editor.click();
-    await editor.type("This is a **bold** test");
+ // Rich text
+ const editor = page.locator(".tiptap");
+ await editor.click();
+ await editor.type("This is a **bold** test");
 
-    await page.selectOption('[name="priority"]', "P2");
-    await page.selectOption('[name="categoryId"]', { label: "Hardware" });
+ await page.selectOption('[name="priority"]', "P2");
+ await page.selectOption('[name="categoryId"]', { label: "Hardware" });
 
-    await page.click('button[type="submit"]');
+ await page.click('button[type="submit"]');
 
-    await expect(page.getByText(/incident created/i)).toBeVisible();
-    await expect(page).toHaveURL(/\/incidents\/INC-\d{8}-\d{4}/);
+ await expect(page.getByText(/incident created/i)).toBeVisible();
+ await expect(page).toHaveURL(/\/incidents\/INC-\d{8}-\d{4}/);
 });
 ```
 
@@ -354,8 +354,8 @@ Adicione o campo `search` ao DTO de filtros.
 
 **Descrição:**
 
--   Adicione a propriedade `search?: string` (opcional)
--   Use o decorador `@IsOptional()` e `@IsString()`
+- Adicione a propriedade `search?: string` (opcional)
+- Use o decorador `@IsOptional()` e `@IsString()`
 
 **Documentação:**
 [Class Validator - Validação de DTOs](https://github.com/typestack/class-validator)
@@ -369,12 +369,12 @@ No método `findAll()`, adicione suporte para o parâmetro `search` que busca po
 
 **Descrição:**
 
--   Se `filters.search` existir, adicione ao objeto `where` do Prisma:
-    -   `OR` com dois critérios:
-        -   `incidentNumber` contains search term
-        -   `title` contains search term (mode: 'insensitive')
--   Mantenha os filtros existentes (status, priority, assigneeId)
--   Use `orderBy: { createdAt: 'desc' }` para resultados mais recentes primeiro
+- Se `filters.search` existir, adicione ao objeto `where` do Prisma:
+ - `OR` com dois critérios:
+ - `incidentNumber` contains search term
+ - `title` contains search term (mode: 'insensitive')
+- Mantenha os filtros existentes (status, priority, assigneeId)
+- Use `orderBy: { createdAt: 'desc' }` para resultados mais recentes primeiro
 
 **Documentação:**
 [Prisma - Filtering and Sorting](https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting)
@@ -388,8 +388,8 @@ Certifique-se que o endpoint aceita o query parameter `search`.
 
 **Descrição:**
 
--   O decorador `@Query()` já deve mapear automaticamente `?search=termo`
--   Valide que o `FilterDto` está a ser usado corretamente
+- O decorador `@Query()` já deve mapear automaticamente `?search=termo`
+- Valide que o `FilterDto` está a ser usado corretamente
 
 **Documentação:**
 [NestJS - Controllers](https://docs.nestjs.com/controllers)
@@ -407,10 +407,10 @@ Criar uma barra de pesquisa simples na lista de incidentes.
 
 **Descrição:**
 
--   Use o componente `Input` do shadcn/ui
--   Implemente debounce de 300ms para evitar chamadas excessivas à API
--   Ao digitar, faça fetch para `GET /api/incidents?search=termo`
--   Atualize a lista de incidentes com os resultados
+- Use o componente `Input` do shadcn/ui
+- Implemente debounce de 300ms para evitar chamadas excessivas à API
+- Ao digitar, faça fetch para `GET /api/incidents?search=termo`
+- Atualize a lista de incidentes com os resultados
 
 **Documentação:**
 [shadcn/ui - Input Component](https://ui.shadcn.com/docs/components/input)
@@ -424,10 +424,10 @@ Adicione a barra de pesquisa acima da tabela de incidentes.
 
 **Descrição:**
 
--   Posicione o componente `SearchBar` no topo da página
--   Gerencie o estado de pesquisa (search term, loading, resultados)
--   Mostre loading state durante a pesquisa
--   Combine pesquisa com filtros existentes
+- Posicione o componente `SearchBar` no topo da página
+- Gerencie o estado de pesquisa (search term, loading, resultados)
+- Mostre loading state durante a pesquisa
+- Combine pesquisa com filtros existentes
 
 **Documentação:**
 [Next.js - Data Fetching](https://nextjs.org/docs/app/building-your-application/data-fetching)
@@ -463,10 +463,10 @@ npm run test:e2e -- --ui
 
 ### Coverage Mínimo Recomendado
 
--   **Backend Services:** > 80%
--   **Backend Controllers:** > 70%
--   **Frontend Components:** > 70%
--   **E2E Critical Flows:** 100% (Criar Incidente, Pesquisa)
+- **Backend Services:** > 80%
+- **Backend Controllers:** > 70%
+- **Frontend Components:** > 70%
+- **E2E Critical Flows:** 100% (Criar Incidente, Pesquisa)
 
 ### Estrutura de Testes
 
@@ -496,53 +496,53 @@ next-frontend/
 
 ```typescript
 describe("IncidentsService", () => {
-    let service: IncidentsService;
-    let prisma: PrismaService;
-    let meilisearch: MeilisearchService;
+ let service: IncidentsService;
+ let prisma: PrismaService;
+ let meilisearch: MeilisearchService;
 
-    beforeEach(async () => {
-        const module = await Test.createTestingModule({
-            providers: [
-                IncidentsService,
-                { provide: PrismaService, useValue: mockPrisma },
-                { provide: MeilisearchService, useValue: mockMeilisearch },
-            ],
-        }).compile();
+ beforeEach(async () => {
+ const module = await Test.createTestingModule({
+ providers: [
+ IncidentsService,
+ { provide: PrismaService, useValue: mockPrisma },
+ { provide: MeilisearchService, useValue: mockMeilisearch },
+ ],
+ }).compile();
 
-        service = module.get<IncidentsService>(IncidentsService);
-        prisma = module.get<PrismaService>(PrismaService);
-        meilisearch = module.get<MeilisearchService>(MeilisearchService);
-    });
+ service = module.get<IncidentsService>(IncidentsService);
+ prisma = module.get<PrismaService>(PrismaService);
+ meilisearch = module.get<MeilisearchService>(MeilisearchService);
+ });
 
-    it("deve criar incidente com número único", async () => {
-        // Arrange
-        const dto = {
-            title: "Test Incident",
-            description: { type: "doc", content: [] },
-            priority: "P3",
-            categoryId: "cat-123",
-        };
+ it("deve criar incidente com número único", async () => {
+ // Arrange
+ const dto = {
+ title: "Test Incident",
+ description: { type: "doc", content: [] },
+ priority: "P3",
+ categoryId: "cat-123",
+ };
 
-        // Act
-        const result = await service.create(dto, "user-123");
+ // Act
+ const result = await service.create(dto, "user-123");
 
-        // Assert
-        expect(result.incidentNumber).toMatch(/^INC-\d{8}-\d{4}$/);
-        expect(meilisearch.syncIncident).toHaveBeenCalledWith(result);
-    });
+ // Assert
+ expect(result.incidentNumber).toMatch(/^INC-\d{8}-\d{4}$/);
+ expect(meilisearch.syncIncident).toHaveBeenCalledWith(result);
+ });
 
-    it("deve filtrar incidentes por status", async () => {
-        // Arrange
-        const filters = { status: "NEW" };
+ it("deve filtrar incidentes por status", async () => {
+ // Arrange
+ const filters = { status: "NEW" };
 
-        // Act
-        const result = await service.findAll(filters);
+ // Act
+ const result = await service.findAll(filters);
 
-        // Assert
-        expect(prisma.incident.findMany).toHaveBeenCalledWith(
-            expect.objectContaining({ where: { status: "NEW" } })
-        );
-    });
+ // Assert
+ expect(prisma.incident.findMany).toHaveBeenCalledWith(
+ expect.objectContaining({ where: { status: "NEW" } })
+ );
+ });
 });
 ```
 
@@ -550,54 +550,54 @@ describe("IncidentsService", () => {
 
 ```typescript
 describe("Incidents API (e2e)", () => {
-    let app: INestApplication;
-    let accessToken: string;
+ let app: INestApplication;
+ let accessToken: string;
 
-    beforeAll(async () => {
-        const moduleFixture = await Test.createTestingModule({
-            imports: [AppModule],
-        }).compile();
+ beforeAll(async () => {
+ const moduleFixture = await Test.createTestingModule({
+ imports: [AppModule],
+ }).compile();
 
-        app = moduleFixture.createNestApplication();
-        await app.init();
+ app = moduleFixture.createNestApplication();
+ await app.init();
 
-        // Login to get token
-        const loginResponse = await request(app.getHttpServer())
-            .post("/auth/login")
-            .send({ email: "test@example.com", password: "Test123!@" });
+ // Login to get token
+ const loginResponse = await request(app.getHttpServer())
+ .post("/auth/login")
+ .send({ email: "test@example.com", password: "Test123!@" });
 
-        accessToken = loginResponse.body.accessToken;
-    });
+ accessToken = loginResponse.body.accessToken;
+ });
 
-    it("POST /incidents - deve criar incidente", () => {
-        return request(app.getHttpServer())
-            .post("/incidents")
-            .set("Authorization", `Bearer ${accessToken}`)
-            .send({
-                title: "Test Incident",
-                description: { type: "doc", content: [] },
-                priority: "P3",
-                categoryId: "cat-123",
-            })
-            .expect(201)
-            .expect((res) => {
-                expect(res.body.incidentNumber).toBeDefined();
-            });
-    });
+ it("POST /incidents - deve criar incidente", () => {
+ return request(app.getHttpServer())
+ .post("/incidents")
+ .set("Authorization", `Bearer ${accessToken}`)
+ .send({
+ title: "Test Incident",
+ description: { type: "doc", content: [] },
+ priority: "P3",
+ categoryId: "cat-123",
+ })
+ .expect(201)
+ .expect((res) => {
+ expect(res.body.incidentNumber).toBeDefined();
+ });
+ });
 
-    it("GET /incidents/search - deve pesquisar com typo tolerance", () => {
-        return request(app.getHttpServer())
-            .get("/incidents/search?q=tset") // typo: "test"
-            .set("Authorization", `Bearer ${accessToken}`)
-            .expect(200)
-            .expect((res) => {
-                expect(res.body.hits).toBeDefined();
-            });
-    });
+ it("GET /incidents/search - deve pesquisar com typo tolerance", () => {
+ return request(app.getHttpServer())
+ .get("/incidents/search?q=tset") // typo: "test"
+ .set("Authorization", `Bearer ${accessToken}`)
+ .expect(200)
+ .expect((res) => {
+ expect(res.body.hits).toBeDefined();
+ });
+ });
 
-    afterAll(async () => {
-        await app.close();
-    });
+ afterAll(async () => {
+ await app.close();
+ });
 });
 ```
 
@@ -608,59 +608,59 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { RichTextEditor } from "./rich-text-editor";
 
 describe("RichTextEditor", () => {
-    it("deve renderizar toolbar com botões de formatação", () => {
-        render(<RichTextEditor value="" onChange={() => {}} />);
+ it("deve renderizar toolbar com botões de formatação", () => {
+ render(<RichTextEditor value="" onChange={() => {}} />);
 
-        expect(
-            screen.getByRole("button", { name: /bold/i })
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole("button", { name: /italic/i })
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole("button", { name: /heading/i })
-        ).toBeInTheDocument();
-    });
+ expect(
+ screen.getByRole("button", { name: /bold/i })
+ ).toBeInTheDocument();
+ expect(
+ screen.getByRole("button", { name: /italic/i })
+ ).toBeInTheDocument();
+ expect(
+ screen.getByRole("button", { name: /heading/i })
+ ).toBeInTheDocument();
+ });
 
-    it("deve aplicar formatação bold ao texto selecionado", async () => {
-        const onChange = jest.fn();
-        render(<RichTextEditor value="" onChange={onChange} />);
+ it("deve aplicar formatação bold ao texto selecionado", async () => {
+ const onChange = jest.fn();
+ render(<RichTextEditor value="" onChange={onChange} />);
 
-        const editor = screen.getByRole("textbox");
-        fireEvent.input(editor, { target: { textContent: "test text" } });
+ const editor = screen.getByRole("textbox");
+ fireEvent.input(editor, { target: { textContent: "test text" } });
 
-        // Simular seleção e click no bold
-        const boldButton = screen.getByRole("button", { name: /bold/i });
-        fireEvent.click(boldButton);
+ // Simular seleção e click no bold
+ const boldButton = screen.getByRole("button", { name: /bold/i });
+ fireEvent.click(boldButton);
 
-        await waitFor(() => {
-            expect(onChange).toHaveBeenCalled();
-        });
-    });
+ await waitFor(() => {
+ expect(onChange).toHaveBeenCalled();
+ });
+ });
 
-    it("deve fazer upload de imagem por drag & drop", async () => {
-        const mockUpload = jest
-            .fn()
-            .mockResolvedValue({ url: "https://s3.amazonaws.com/image.jpg" });
-        render(
-            <RichTextEditor
-                value=""
-                onChange={() => {}}
-                onImageUpload={mockUpload}
-            />
-        );
+ it("deve fazer upload de imagem por drag & drop", async () => {
+ const mockUpload = jest
+ .fn()
+ .mockResolvedValue({ url: "https://s3.amazonaws.com/image.jpg" });
+ render(
+ <RichTextEditor
+ value=""
+ onChange={() => {}}
+ onImageUpload={mockUpload}
+ />
+ );
 
-        const editor = screen.getByRole("textbox");
-        const file = new File(["image"], "test.jpg", { type: "image/jpeg" });
+ const editor = screen.getByRole("textbox");
+ const file = new File(["image"], "test.jpg", { type: "image/jpeg" });
 
-        fireEvent.drop(editor, {
-            dataTransfer: { files: [file] },
-        });
+ fireEvent.drop(editor, {
+ dataTransfer: { files: [file] },
+ });
 
-        await waitFor(() => {
-            expect(mockUpload).toHaveBeenCalledWith(file);
-        });
-    });
+ await waitFor(() => {
+ expect(mockUpload).toHaveBeenCalledWith(file);
+ });
+ });
 });
 ```
 
@@ -670,79 +670,79 @@ describe("RichTextEditor", () => {
 import { test, expect } from "@playwright/test";
 
 test.describe("Criar Incidente", () => {
-    test.beforeEach(async ({ page }) => {
-        // Login
-        await page.goto("/login");
-        await page.fill('[name="email"]', "test@example.com");
-        await page.fill('[name="password"]', "Test123!@");
-        await page.click('button[type="submit"]');
-        await expect(page).toHaveURL("/dashboard");
-    });
+ test.beforeEach(async ({ page }) => {
+ // Login
+ await page.goto("/login");
+ await page.fill('[name="email"]', "test@example.com");
+ await page.fill('[name="password"]', "Test123!@");
+ await page.click('button[type="submit"]');
+ await expect(page).toHaveURL("/dashboard");
+ });
 
-    test("deve criar incidente com rich text", async ({ page }) => {
-        await page.goto("/incidents/create");
+ test("deve criar incidente com rich text", async ({ page }) => {
+ await page.goto("/incidents/create");
 
-        // Preencher formulário
-        await page.fill('[name="title"]', "Test Incident");
+ // Preencher formulário
+ await page.fill('[name="title"]', "Test Incident");
 
-        // Rich text editor
-        const editor = page.locator(".tiptap");
-        await editor.click();
-        await editor.type("This is a **bold** description");
+ // Rich text editor
+ const editor = page.locator(".tiptap");
+ await editor.click();
+ await editor.type("This is a **bold** description");
 
-        // Selecionar prioridade
-        await page.selectOption('[name="priority"]', "P2");
+ // Selecionar prioridade
+ await page.selectOption('[name="priority"]', "P2");
 
-        // Selecionar categoria
-        await page.selectOption('[name="categoryId"]', { label: "Hardware" });
+ // Selecionar categoria
+ await page.selectOption('[name="categoryId"]', { label: "Hardware" });
 
-        // Submeter
-        await page.click('button[type="submit"]');
+ // Submeter
+ await page.click('button[type="submit"]');
 
-        // Verificar sucesso
-        await expect(page.getByText(/incident created/i)).toBeVisible();
-        await expect(page).toHaveURL(/\/incidents\/INC-\d{8}-\d{4}/);
-    });
+ // Verificar sucesso
+ await expect(page.getByText(/incident created/i)).toBeVisible();
+ await expect(page).toHaveURL(/\/incidents\/INC-\d{8}-\d{4}/);
+ });
 
-    test("deve pesquisar incidentes com typo tolerance", async ({ page }) => {
-        await page.goto("/incidents");
+ test("deve pesquisar incidentes com typo tolerance", async ({ page }) => {
+ await page.goto("/incidents");
 
-        // Pesquisar com typo
-        const searchBox = page.locator('[placeholder*="Search"]');
-        await searchBox.fill("hardwre"); // typo: "hardware"
+ // Pesquisar com typo
+ const searchBox = page.locator('[placeholder*="Search"]');
+ await searchBox.fill("hardwre"); // typo: "hardware"
 
-        // Esperar resultados
-        await page.waitForTimeout(300); // debounce
+ // Esperar resultados
+ await page.waitForTimeout(300); // debounce
 
-        // Verificar highlights
-        await expect(page.locator(".search-result").first()).toBeVisible();
-        await expect(page.locator("mark")).toHaveCount({ gte: 1 }); // highlights
-    });
+ // Verificar highlights
+ await expect(page.locator(".search-result").first()).toBeVisible();
+ await expect(page.locator("mark")).toHaveCount({ gte: 1 }); // highlights
+ });
 
-    test("deve aplicar filtros avançados", async ({ page }) => {
-        await page.goto("/incidents");
+ test("deve aplicar filtros avançados", async ({ page }) => {
+ await page.goto("/incidents");
 
-        // Abrir filtros
-        await page.click('button:has-text("Filters")');
+ // Abrir filtros
+ await page.click('button:has-text("Filters")');
 
-        // Aplicar filtro de status
-        await page.check('[value="NEW"]');
-        await page.check('[value="IN_PROGRESS"]');
+ // Aplicar filtro de status
+ await page.check('[value="NEW"]');
+ await page.check('[value="IN_PROGRESS"]');
 
-        // Aplicar filtro de prioridade
-        await page.check('[value="P1"]');
+ // Aplicar filtro de prioridade
+ await page.check('[value="P1"]');
 
-        // Fechar modal
-        await page.click('button:has-text("Apply")');
+ // Fechar modal
+ await page.click('button:has-text("Apply")');
 
-        // Verificar URL atualizada
-        await expect(page).toHaveURL(/status=NEW,IN_PROGRESS/);
-        await expect(page).toHaveURL(/priority=P1/);
+ // Verificar URL atualizada
+ await expect(page).toHaveURL(/status=NEW,IN_PROGRESS/);
+ await expect(page).toHaveURL(/priority=P1/);
 
-        // Verificar resultados filtrados
-        const statusBadges = page.locator(".status-badge");
-        await expect(statusBadges.first()).toHaveText(/NEW|IN_PROGRESS/);
-    });
+ // Verificar resultados filtrados
+ const statusBadges = page.locator(".status-badge");
+ await expect(statusBadges.first()).toHaveText(/NEW|IN_PROGRESS/);
+ });
 });
 ```
 
@@ -784,9 +784,9 @@ FRONTEND_URL="http://localhost:3000"
 
 **Importante:**
 
--   **Meilisearch:** `MEILISEARCH_HOST` deve apontar para o container Docker (localhost:7700 em dev)
--   **AWS S3:** Configurar credenciais IAM com permissões S3 (PutObject, GetObject)
--   **Presigned URLs:** Expiram em 1 hora por segurança
+- **Meilisearch:** `MEILISEARCH_HOST` deve apontar para o container Docker (localhost:7700 em dev)
+- **AWS S3:** Configurar credenciais IAM com permissões S3 (PutObject, GetObject)
+- **Presigned URLs:** Expiram em 1 hora por segurança
 
 ---
 
@@ -813,8 +813,8 @@ NEXT_PUBLIC_ALLOWED_IMAGE_TYPES="image/jpeg,image/png,image/webp"
 
 **Importante:**
 
--   **Meilisearch no Frontend:** Permite pesquisa instantânea direta do browser
--   **Security:** Em produção, use API key com permissões limitadas (search-only)
+- **Meilisearch no Frontend:** Permite pesquisa instantânea direta do browser
+- **Security:** Em produção, use API key com permissões limitadas (search-only)
 
 ---
 
@@ -830,131 +830,131 @@ import { MeiliSearch } from "meilisearch";
 
 @Injectable()
 export class MeilisearchService implements OnModuleInit {
-    private client: MeiliSearch;
-    private readonly indexName = "incidents";
+ private client: MeiliSearch;
+ private readonly indexName = "incidents";
 
-    constructor() {
-        this.client = new MeiliSearch({
-            host: process.env.MEILISEARCH_HOST,
-            apiKey: process.env.MEILISEARCH_KEY,
-        });
-    }
+ constructor() {
+ this.client = new MeiliSearch({
+ host: process.env.MEILISEARCH_HOST,
+ apiKey: process.env.MEILISEARCH_KEY,
+ });
+ }
 
-    async onModuleInit() {
-        // Criar índice se não existir
-        try {
-            await this.client.getIndex(this.indexName);
-        } catch {
-            await this.client.createIndex(this.indexName, { primaryKey: "id" });
-        }
+ async onModuleInit() {
+ // Criar índice se não existir
+ try {
+ await this.client.getIndex(this.indexName);
+ } catch {
+ await this.client.createIndex(this.indexName, { primaryKey: "id" });
+ }
 
-        // Configurar índice
-        const index = this.client.index(this.indexName);
+ // Configurar índice
+ const index = this.client.index(this.indexName);
 
-        await index.updateSettings({
-            searchableAttributes: [
-                "incidentNumber",
-                "title",
-                "description", // texto simples convertido do JSON
-            ],
-            filterableAttributes: [
-                "status",
-                "priority",
-                "categoryId",
-                "assigneeId",
-                "createdAt",
-            ],
-            sortableAttributes: ["createdAt", "updatedAt", "priority"],
-            rankingRules: [
-                "words",
-                "typo",
-                "proximity",
-                "attribute",
-                "sort",
-                "exactness",
-            ],
-            typoTolerance: {
-                enabled: true,
-                minWordSizeForTypos: {
-                    oneTypo: 5,
-                    twoTypos: 9,
-                },
-            },
-        });
-    }
+ await index.updateSettings({
+ searchableAttributes: [
+ "incidentNumber",
+ "title",
+ "description", // texto simples convertido do JSON
+ ],
+ filterableAttributes: [
+ "status",
+ "priority",
+ "categoryId",
+ "assigneeId",
+ "createdAt",
+ ],
+ sortableAttributes: ["createdAt", "updatedAt", "priority"],
+ rankingRules: [
+ "words",
+ "typo",
+ "proximity",
+ "attribute",
+ "sort",
+ "exactness",
+ ],
+ typoTolerance: {
+ enabled: true,
+ minWordSizeForTypos: {
+ oneTypo: 5,
+ twoTypos: 9,
+ },
+ },
+ });
+ }
 
-    async syncIncident(incident: any) {
-        // Converter Tiptap JSON para texto simples
-        const description = this.tiptapToPlainText(incident.description);
+ async syncIncident(incident: any) {
+ // Converter Tiptap JSON para texto simples
+ const description = this.tiptapToPlainText(incident.description);
 
-        const document = {
-            id: incident.id,
-            incidentNumber: incident.incidentNumber,
-            title: incident.title,
-            description,
-            status: incident.status,
-            priority: incident.priority,
-            categoryId: incident.categoryId,
-            assigneeId: incident.assigneeId,
-            createdAt: incident.createdAt.toISOString(),
-            updatedAt: incident.updatedAt.toISOString(),
-        };
+ const document = {
+ id: incident.id,
+ incidentNumber: incident.incidentNumber,
+ title: incident.title,
+ description,
+ status: incident.status,
+ priority: incident.priority,
+ categoryId: incident.categoryId,
+ assigneeId: incident.assigneeId,
+ createdAt: incident.createdAt.toISOString(),
+ updatedAt: incident.updatedAt.toISOString(),
+ };
 
-        const index = this.client.index(this.indexName);
-        await index.addDocuments([document]);
-    }
+ const index = this.client.index(this.indexName);
+ await index.addDocuments([document]);
+ }
 
-    async search(query: string, filters?: any) {
-        const index = this.client.index(this.indexName);
+ async search(query: string, filters?: any) {
+ const index = this.client.index(this.indexName);
 
-        const searchParams: any = {
-            attributesToHighlight: ["title", "description"],
-            highlightPreTag: "<mark>",
-            highlightPostTag: "</mark>",
-            limit: 20,
-        };
+ const searchParams: any = {
+ attributesToHighlight: ["title", "description"],
+ highlightPreTag: "<mark>",
+ highlightPostTag: "</mark>",
+ limit: 20,
+ };
 
-        if (filters) {
-            searchParams.filter = this.buildFilters(filters);
-        }
+ if (filters) {
+ searchParams.filter = this.buildFilters(filters);
+ }
 
-        return index.search(query, searchParams);
-    }
+ return index.search(query, searchParams);
+ }
 
-    private tiptapToPlainText(json: any): string {
-        if (!json || !json.content) return "";
+ private tiptapToPlainText(json: any): string {
+ if (!json || !json.content) return "";
 
-        return json.content
-            .map((node: any) => {
-                if (node.type === "paragraph" && node.content) {
-                    return node.content.map((c: any) => c.text || "").join("");
-                }
-                return "";
-            })
-            .join(" ");
-    }
+ return json.content
+ .map((node: any) => {
+ if (node.type === "paragraph" && node.content) {
+ return node.content.map((c: any) => c.text || "").join("");
+ }
+ return "";
+ })
+ .join(" ");
+ }
 
-    private buildFilters(filters: any): string {
-        const conditions = [];
+ private buildFilters(filters: any): string {
+ const conditions = [];
 
-        if (filters.status) {
-            conditions.push(
-                `status IN [${filters.status
-                    .map((s: string) => `"${s}"`)
-                    .join(",")}]`
-            );
-        }
+ if (filters.status) {
+ conditions.push(
+ `status IN [${filters.status
+ .map((s: string) => `"${s}"`)
+ .join(",")}]`
+ );
+ }
 
-        if (filters.priority) {
-            conditions.push(
-                `priority IN [${filters.priority
-                    .map((p: string) => `"${p}"`)
-                    .join(",")}]`
-            );
-        }
+ if (filters.priority) {
+ conditions.push(
+ `priority IN [${filters.priority
+ .map((p: string) => `"${p}"`)
+ .join(",")}]`
+ );
+ }
 
-        return conditions.join(" AND ");
-    }
+ return conditions.join(" AND ");
+ }
 }
 ```
 
@@ -980,40 +980,40 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 @Injectable()
 export class UploadService {
-    private s3Client: S3Client;
-    private bucketName: string;
+ private s3Client: S3Client;
+ private bucketName: string;
 
-    constructor() {
-        this.s3Client = new S3Client({
-            region: process.env.AWS_REGION,
-            credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-            },
-        });
-        this.bucketName = process.env.AWS_S3_BUCKET;
-    }
+ constructor() {
+ this.s3Client = new S3Client({
+ region: process.env.AWS_REGION,
+ credentials: {
+ accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+ secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+ },
+ });
+ this.bucketName = process.env.AWS_S3_BUCKET;
+ }
 
-    async getPresignedUploadUrl(
-        filename: string,
-        contentType: string
-    ): Promise<{ uploadUrl: string; fileUrl: string }> {
-        const key = `incidents/${Date.now()}-${filename}`;
+ async getPresignedUploadUrl(
+ filename: string,
+ contentType: string
+ ): Promise<{ uploadUrl: string; fileUrl: string }> {
+ const key = `incidents/${Date.now()}-${filename}`;
 
-        const command = new PutObjectCommand({
-            Bucket: this.bucketName,
-            Key: key,
-            ContentType: contentType,
-        });
+ const command = new PutObjectCommand({
+ Bucket: this.bucketName,
+ Key: key,
+ ContentType: contentType,
+ });
 
-        const uploadUrl = await getSignedUrl(this.s3Client, command, {
-            expiresIn: parseInt(process.env.AWS_S3_PRESIGNED_URL_EXPIRES),
-        });
+ const uploadUrl = await getSignedUrl(this.s3Client, command, {
+ expiresIn: parseInt(process.env.AWS_S3_PRESIGNED_URL_EXPIRES),
+ });
 
-        const fileUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+ const fileUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 
-        return { uploadUrl, fileUrl };
-    }
+ return { uploadUrl, fileUrl };
+ }
 }
 ```
 
@@ -1107,29 +1107,29 @@ async getPresignedUploadUrl(filename: string, contentType: string) {
 
 ```typescript
 export function handleApiError(error: any): string {
-    if (error.response) {
-        const message = error.response.data?.message;
+ if (error.response) {
+ const message = error.response.data?.message;
 
-        if (Array.isArray(message)) {
-            return message.join(", ");
-        }
+ if (Array.isArray(message)) {
+ return message.join(", ");
+ }
 
-        // Erros específicos do Sprint 2
-        switch (error.response.status) {
-            case 413:
-                return "Ficheiro demasiado grande. Máximo: 5MB";
-            case 415:
-                return "Tipo de ficheiro não suportado. Use: JPG, PNG, WEBP";
-            case 503:
-                return "Pesquisa temporariamente indisponível. Tente novamente.";
-            default:
-                return message || "Erro no servidor";
-        }
-    } else if (error.request) {
-        return "Servidor não responde. Verifique a ligação.";
-    } else {
-        return error.message || "Erro desconhecido";
-    }
+ // Erros específicos do Sprint 2
+ switch (error.response.status) {
+ case 413:
+ return "Ficheiro demasiado grande. Máximo: 5MB";
+ case 415:
+ return "Tipo de ficheiro não suportado. Use: JPG, PNG, WEBP";
+ case 503:
+ return "Pesquisa temporariamente indisponível. Tente novamente.";
+ default:
+ return message || "Erro no servidor";
+ }
+ } else if (error.request) {
+ return "Servidor não responde. Verifique a ligação.";
+ } else {
+ return error.message || "Erro desconhecido";
+ }
 }
 ```
 
@@ -1139,54 +1139,54 @@ export function handleApiError(error: any): string {
 // next-frontend/components/rich-text-editor.tsx
 
 const handleImageUpload = async (file: File) => {
-    try {
-        // Validar tamanho
-        if (file.size > parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE)) {
-            toast({
-                title: "Erro",
-                description: "Imagem demasiado grande (máx: 5MB)",
-                variant: "destructive",
-            });
-            return null;
-        }
+ try {
+ // Validar tamanho
+ if (file.size > parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE)) {
+ toast({
+ title: "Erro",
+ description: "Imagem demasiado grande (máx: 5MB)",
+ variant: "destructive",
+ });
+ return null;
+ }
 
-        // Validar tipo
-        const allowedTypes =
-            process.env.NEXT_PUBLIC_ALLOWED_IMAGE_TYPES.split(",");
-        if (!allowedTypes.includes(file.type)) {
-            toast({
-                title: "Erro",
-                description: "Tipo de ficheiro não suportado",
-                variant: "destructive",
-            });
-            return null;
-        }
+ // Validar tipo
+ const allowedTypes =
+ process.env.NEXT_PUBLIC_ALLOWED_IMAGE_TYPES.split(",");
+ if (!allowedTypes.includes(file.type)) {
+ toast({
+ title: "Erro",
+ description: "Tipo de ficheiro não suportado",
+ variant: "destructive",
+ });
+ return null;
+ }
 
-        // 1. Obter presigned URL
-        const { uploadUrl, fileUrl } = await api.post("/incidents/upload-url", {
-            filename: file.name,
-            contentType: file.type,
-        });
+ // 1. Obter presigned URL
+ const { uploadUrl, fileUrl } = await api.post("/incidents/upload-url", {
+ filename: file.name,
+ contentType: file.type,
+ });
 
-        // 2. Upload direto para S3
-        await fetch(uploadUrl, {
-            method: "PUT",
-            body: file,
-            headers: {
-                "Content-Type": file.type,
-            },
-        });
+ // 2. Upload direto para S3
+ await fetch(uploadUrl, {
+ method: "PUT",
+ body: file,
+ headers: {
+ "Content-Type": file.type,
+ },
+ });
 
-        return fileUrl;
-    } catch (error) {
-        const errorMessage = handleApiError(error);
-        toast({
-            title: "Erro no upload",
-            description: errorMessage,
-            variant: "destructive",
-        });
-        return null;
-    }
+ return fileUrl;
+ } catch (error) {
+ const errorMessage = handleApiError(error);
+ toast({
+ title: "Erro no upload",
+ description: errorMessage,
+ variant: "destructive",
+ });
+ return null;
+ }
 };
 ```
 
@@ -1198,8 +1198,8 @@ const handleImageUpload = async (file: File) => {
 
 **Sintomas:**
 
--   Pesquisa não retorna resultados
--   Console: "MeiliSearchApiError: Index not found"
+- Pesquisa não retorna resultados
+- Console: "MeiliSearchApiError: Index not found"
 
 **Diagnóstico:**
 
@@ -1244,8 +1244,8 @@ MEILISEARCH_KEY=masterKey
 
 **Sintomas:**
 
--   Erro 403 Forbidden ao fazer upload
--   Imagens não aparecem no editor
+- Erro 403 Forbidden ao fazer upload
+- Imagens não aparecem no editor
 
 **Diagnóstico:**
 
@@ -1279,14 +1279,14 @@ aws s3 mb s3://orionone-uploads --region eu-west-1
 
 ```json
 {
-    "CORSRules": [
-        {
-            "AllowedOrigins": ["http://localhost:3000"],
-            "AllowedMethods": ["PUT", "GET"],
-            "AllowedHeaders": ["*"],
-            "MaxAgeSeconds": 3000
-        }
-    ]
+ "CORSRules": [
+ {
+ "AllowedOrigins": ["http://localhost:3000"],
+ "AllowedMethods": ["PUT", "GET"],
+ "AllowedHeaders": ["*"],
+ "MaxAgeSeconds": 3000
+ }
+ ]
 }
 ```
 
@@ -1296,8 +1296,8 @@ aws s3 mb s3://orionone-uploads --region eu-west-1
 
 **Sintomas:**
 
--   Editor funciona mas ao guardar perde formatação
--   JSON retornado está vazio
+- Editor funciona mas ao guardar perde formatação
+- JSON retornado está vazio
 
 **Diagnóstico:**
 
@@ -1327,11 +1327,11 @@ description Json // Não String!
 
 ```tsx
 <Controller
-    name="description"
-    control={control}
-    render={({ field }) => (
-        <RichTextEditor value={field.value} onChange={field.onChange} />
-    )}
+ name="description"
+ control={control}
+ render={({ field }) => (
+ <RichTextEditor value={field.value} onChange={field.onChange} />
+ )}
 />
 ```
 
@@ -1341,8 +1341,8 @@ description Json // Não String!
 
 **Sintomas:**
 
--   Selecionar filtros não atualiza tabela
--   URL não muda quando aplica filtros
+- Selecionar filtros não atualiza tabela
+- URL não muda quando aplica filtros
 
 **Diagnóstico:**
 
@@ -1357,8 +1357,8 @@ console.log(queryKey); // ['incidents', { status: 'NEW', priority: 'P1' }]
 
 ```tsx
 const { data } = useQuery({
-    queryKey: ["incidents", filters], // ← Importante!
-    queryFn: () => fetchIncidents(filters),
+ queryKey: ["incidents", filters], // ← Importante!
+ queryFn: () => fetchIncidents(filters),
 });
 ```
 
@@ -1369,7 +1369,7 @@ const [filters, setFilters] = useState({});
 
 // Atualizar filtros
 const handleFilterChange = (newFilters) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
+ setFilters((prev) => ({ ...prev, ...newFilters }));
 };
 ```
 
@@ -1389,8 +1389,8 @@ return this.incidentsService.findAll(query);
 
 **Sintomas:**
 
--   Delay visível ao digitar na search box
--   Meilisearch retorna resultados mas demora
+- Delay visível ao digitar na search box
+- Meilisearch retorna resultados mas demora
 
 **Diagnóstico:**
 
@@ -1410,8 +1410,8 @@ curl http://localhost:7700/indexes/incidents/stats \
 ```typescript
 // Implementar paginação
 const searchParams = {
-    limit: 20, // ← Reduzir
-    offset: page * 20,
+ limit: 20, // ← Reduzir
+ offset: page * 20,
 };
 ```
 
@@ -1420,9 +1420,9 @@ const searchParams = {
 ```typescript
 // Reduzir campos pesquisáveis
 searchableAttributes: [
-    "title", // ← Manter
-    "incidentNumber", // ← Manter
-    // 'description', // ← Remover se muito grande
+ "title", // ← Manter
+ "incidentNumber", // ← Manter
+ // 'description', // ← Remover se muito grande
 ];
 ```
 
@@ -1430,9 +1430,9 @@ searchableAttributes: [
 
 ```typescript
 rankingRules: [
-    "words",
-    "typo",
-    "proximity", // ← Remover se não necessário
+ "words",
+ "typo",
+ "proximity", // ← Remover se não necessário
 ];
 ```
 
