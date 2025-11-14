@@ -921,10 +921,10 @@ JWT_EXPIRES_IN="15m"
 JWT_REFRESH_EXPIRES_IN="7d"
 
 # Email (Nodemailer)
-MAIL_HOST="smtp.gmail.com"
+MAIL_HOST="smtp.example.com"
 MAIL_PORT=587
-MAIL_USER="your-email@gmail.com"
-MAIL_PASSWORD="your-app-specific-password"
+MAIL_USER="your-email@example.com"
+MAIL_PASSWORD="your-app-password"
 MAIL_FROM="noreply@orionone.com"
 
 # App

@@ -516,10 +516,10 @@ docker system df
 ### Utilizadores Seedados
 
 | Email | Password | Role | Permissões |
-| ------------------- | -------- | ----- | -------------------- |
-| admin@orionone.test | password | admin | Todas |
-| agent@orionone.test | password | agent | Tickets + Comments |
-| user@orionone.test | password | user | Criar tickets apenas |
+| ------------------- | ------------ | ----- | -------------------- |
+| admin@orionone.test | your_password | admin | Todas |
+| agent@orionone.test | your_password | agent | Tickets + Comments |
+| user@orionone.test | your_password | user | Criar tickets apenas |
 
 ### Base de Dados
 
@@ -527,7 +527,7 @@ docker system df
 - **Porta:** 5432
 - **Database:** orionone
 - **User:** postgres
-- **Password:** postgres
+- **Password:** your_db_password
 
 ---
 
