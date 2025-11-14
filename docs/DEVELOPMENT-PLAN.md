@@ -5,8 +5,8 @@
 **Methodology:** Agile Scrum with mixed sprint durations
 **Target:** Professional ITSM platform with Rich UX
 **Timeline:** 11 weeks (6 sprints)
-**Start Date:** November 16, 2024
-**Target Launch:** January 31, 2025
+**Start Date:** November 16, 2025
+**Target Launch:** January 31, 2026
 
 ---
 
@@ -38,13 +38,13 @@ Build a modern, cloud-native ITSM platform that competes with ServiceNow and Zen
 
 | Sprint | Duration | Focus Area | Status |
 | ------------ | -------------- | ----------------------------------- | -------------- |
-| **Sprint 0** | Nov 1-15 | Infrastructure Setup | Complete |
-| **Sprint 1** | Nov 16-22 (1w) | Authentication & User Management | In Progress |
-| **Sprint 2** | Nov 23-Dec 6 | Incident + Rich Text + Meilisearch | Planned |
-| **Sprint 3** | Dec 7-17 | Comments & Attachments | Planned |
-| **Sprint 4** | Dec 18-31 | Knowledge Base + Meilisearch Search | Planned |
-| **Sprint 5** | Jan 1-10 | Advanced SLA Management | Planned |
-| **Sprint 6** | Jan 11-31 | Dashboard + Polish + Buffer | Planned |
+| **Sprint 0** | Nov 1-15, 2025 | Infrastructure Setup | Complete |
+| **Sprint 1** | Nov 16-27, 2025 | Authentication & User Management | In Progress |
+| **Sprint 2** | Nov 28-Dec 11, 2025 | Incident + Rich Text + Meilisearch | Planned |
+| **Sprint 3** | Dec 12-22, 2025 | Comments & Attachments | Planned |
+| **Sprint 4** | Dec 23-Jan 5, 2026 | Knowledge Base + Meilisearch Search | Planned |
+| **Sprint 5** | Jan 6-15, 2026 | Advanced SLA Management | Planned |
+| **Sprint 6** | Jan 16-31, 2026 | Dashboard + Polish + Buffer | Planned |
 
 ---
 
@@ -306,7 +306,7 @@ None - Infrastructure is production-ready.
 ## Sprint 2: Incident Management + Rich Text + Meilisearch (PLANNED)
 
 **Status:** Planned
-**Duration:** 2 weeks (Nov 23 - Dec 6, 2024)
+**Duration:** 2 weeks (Nov 28 - Dec 11, 2025)
 **Team:** Backend (2) + Frontend (2) + QA (1)
 
 ### User Stories
@@ -469,7 +469,7 @@ None - Infrastructure is production-ready.
 ## Sprint 3: Comments & Attachments (PLANNED)
 
 **Status:** Planned
-**Duration:** 1.5 weeks (Dec 7-17, 2024)
+**Duration:** 1.5 weeks (Dec 12-22, 2025)
 **Team:** Backend (1) + Frontend (2) + QA (1)
 
 ### User Stories
@@ -549,7 +549,7 @@ None - Infrastructure is production-ready.
 ## Sprint 4: Knowledge Base + Meilisearch (PLANNED)
 
 **Status:** Planned
-**Duration:** 2 weeks (Dec 18-31, 2024)
+**Duration:** 2 weeks (Dec 23, 2025 - Jan 5, 2026)
 **Team:** Backend (2) + Frontend (2) + QA (1)
 
 ### User Stories
@@ -613,7 +613,7 @@ None - Infrastructure is production-ready.
 ## Sprint 5: Advanced SLA Management (PLANNED)
 
 **Status:** Planned
-**Duration:** 1.5 weeks (Jan 1-10, 2025)
+**Duration:** 1.5 weeks (Jan 6-15, 2026)
 **Team:** Backend (2) + Frontend (1) + QA (1)
 
 ### User Stories
@@ -676,7 +676,7 @@ None - Infrastructure is production-ready.
 ## Sprint 6: Dashboard + Polish + Buffer (PLANNED)
 
 **Status:** Planned
-**Duration:** 2 weeks (Jan 11-31, 2025)
+**Duration:** 2 weeks (Jan 16-31, 2026)
 **Team:** Full Team
 
 ### Week 1: Professional Dashboard (Jan 11-17)
@@ -746,7 +746,7 @@ None - Infrastructure is production-ready.
 
 ---
 
-### MVP LAUNCH: JANUARY 31, 2025
+### MVP LAUNCH: JANUARY 31, 2026
 
 **Final Buffer Week (Jan 25-31):**
 
@@ -976,6 +976,6 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ---
 
-**Last Updated:** 13 November 2025
+**Last Updated:** 14 November 2025
 **Maintained by:** OrionOne Product Team
 **Next Review:** End of Sprint 1 (Nov 27, 2025)

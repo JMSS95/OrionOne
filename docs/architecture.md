@@ -2,7 +2,7 @@
 
 **Stack Tecnológico**: Next.js 16 + Nest.js 11 + Prisma + PostgreSQL + TypeScript
 **Versão**: v0.2.0 (Week 0 + Week 1 Monday completo)
-**Última atualização**: 13 Nov 2024
+**Última atualização**: 14 Nov 2025
 
 ---
 
@@ -743,7 +743,7 @@ OrionOne é ideal para:
 
 ---
 
-**Última atualização**: 13 Nov 2024
+**Última atualização**: 14 Nov 2025
 **Versão**: v0.2.0 (Week 0 + Week 1 Monday)
 **Mantido por**: [@JMSS95](https://github.com/JMSS95)
 **Status**: READY FOR SPRINT 1 (Week 1 Tuesday - Auth Module)

@@ -1,9 +1,9 @@
 # MVP - Roadmap & Status - OrionOne ITSM
 
-**Date:** 13 November 2024
+**Date:** 14 November 2025
 **Status:** Infrastructure Complete - Ready for Development
 **Target Market:** SMEs (10-200 employees) - Professional ITSM
-**Target Launch:** 31 January 2025 (11 weeks)
+**Target Launch:** 31 January 2026 (11 weeks)
 **Positioning:** Affordable ITSM Platform - Modern Stack, Open Source
 
 ---
@@ -74,7 +74,7 @@
 
 ## Sprint Roadmap (0-6) - 11 Weeks Total
 
-**Timeline:** November 16, 2024 → January 31, 2025
+**Timeline:** November 1, 2025 → January 31, 2026
 **Methodology:** Agile Scrum, TDD, Feature-Driven Development
 **Goal:** Launch professional ITSM platform with rich UX
 **Focus:** Incident management + AI search + Advanced SLA
@@ -99,8 +99,8 @@
 
 ### Sprint 1: Authentication & User Management (IN PROGRESS)
 
-**Duration:** 1 week (Nov 16-22, 2025)
-**Status:** 85% Complete
+**Duration:** 1.5 weeks (Nov 16-27, 2025)
+**Status:** 70% Complete (started Nov 16)
 **Priority:** CRITICAL
 **ServiceNow Module:** User Administration + Security
 
@@ -149,7 +149,7 @@
 
 ### Sprint 2: Incident Management + Rich Text (CRITICAL)
 
-**Duration:** 2 weeks (Nov 23 - Dec 6, 2024)
+**Duration:** 2 weeks (Nov 28 - Dec 11, 2025)
 **Status:** Planned
 **Priority:** CRITICAL
 **ServiceNow Module:** Incident Management (Professional)
@@ -214,7 +214,7 @@
 
 ### Sprint 3: Comments & Attachments
 
-**Duration:** 1.5 weeks (Dec 7-17, 2024)
+**Duration:** 1.5 weeks (Dec 12-22, 2025)
 **Status:** Planned
 **Priority:** HIGH
 **ServiceNow Module:** Comments + Attachments (Simplified)
@@ -257,7 +257,7 @@
 
 ### Sprint 4: Knowledge Base + Meilisearch
 
-**Duration:** 2 weeks (Dec 18-31, 2024)
+**Duration:** 2 weeks (Dec 23, 2025 - Jan 5, 2026)
 **Status:** Planned
 **Priority:** MEDIUM
 **ServiceNow Module:** Knowledge Management (Professional)
@@ -304,7 +304,7 @@
 
 ### Sprint 5: Advanced SLA Management
 
-**Duration:** 1.5 weeks (Jan 1-10, 2025)
+**Duration:** 1.5 weeks (Jan 6-15, 2026)
 **Status:** Planned
 **Priority:** HIGH
 **ServiceNow Module:** SLA Management (Professional)
@@ -352,7 +352,7 @@
 
 ### Sprint 6: Dashboard & Polish
 
-**Duration:** 2 weeks (Jan 11-24, 2025)
+**Duration:** 2 weeks (Jan 16-31, 2026)
 **Status:** Planned
 **Priority:** MEDIUM
 
@@ -403,29 +403,28 @@
 ## Timeline & Milestones
 
 ```
- Sprint 0: Infrastructure (Nov 1-15, 2024) COMPLETE
- Sprint 1: Auth & Users (Nov 16-22, 2024) 85% DONE
- Sprint 2: Incident + Rich Text (Nov 23-Dec 6) NEXT
- Sprint 3: Comments & Files (Dec 7-17)
- Sprint 4: Knowledge + Search (Dec 18-31)
- Sprint 5: Advanced SLA (Jan 1-10, 2025)
- Sprint 6: Dashboard & Polish (Jan 11-31, 2025)
+ Sprint 0: Infrastructure (Nov 1-15, 2025) ✅ COMPLETE
+ Sprint 1: Auth & Users (Nov 16-27, 2025) 🔄 IN PROGRESS (70%)
+ Sprint 2: Incident + Rich Text (Nov 28-Dec 11, 2025) NEXT
+ Sprint 3: Comments & Files (Dec 12-22, 2025)
+ Sprint 4: Knowledge + Search (Dec 23, 2025-Jan 5, 2026)
+ Sprint 5: Advanced SLA (Jan 6-15, 2026)
+ Sprint 6: Dashboard & Polish (Jan 16-31, 2026)
 
- MVP LAUNCH: JANUARY 31, 2025
+ MVP LAUNCH: JANUARY 31, 2026
 ```
 
 **Total:** 11 weeks (77 days)
 
 **Key Milestones:**
 
-- Nov 15: Infrastructure complete
-- Nov 22: Auth system live
-- Dec 6: Incident management + Rich Text operational
-- Dec 17: Comments & attachments working
-- Dec 31: Knowledge base + Meilisearch ready
-- Jan 10: Advanced SLA complete
-- Jan 24: Dashboard + polish complete
-- Jan 31: **MVP LAUNCH** 
+- Nov 15, 2025: ✅ Infrastructure complete
+- Nov 27, 2025: Auth system live (Sprint 1 end)
+- Dec 11, 2025: Incident management + Rich Text operational
+- Dec 22, 2025: Comments & attachments working
+- Jan 5, 2026: Knowledge base + Meilisearch ready
+- Jan 15, 2026: Advanced SLA complete
+- Jan 31, 2026: **MVP LAUNCH** (Dashboard + polish complete) 
 
 ---
 
@@ -626,37 +625,25 @@
 
 ---
 
-## Features Post-MVP (Antigas - Referência)
+## Features Post-MVP
 
-### Phase 1: Enhanced Core (v1.1 - Feb 2025)
+> **Note:** Rich Text (Tiptap), Meilisearch, and Advanced SLA are already included in MVP (Sprints 2, 4, 5).
+> Features below are for v1.2+ releases.
 
-**Sprint 6: Teams & Auto-Assignment**
+### Phase 1: Enhanced Core (v1.2 - Feb 2026)
 
-- Team management
+**Teams & Auto-Assignment** (1 week)
+
+- Team management (Assignment Groups)
 - Auto-assignment rules engine
 - Workload balancing
-- Escalation management
+- Round-robin assignment
 
-**Sprint 7: Advanced SLA**
-
-- Configurable SLA policies
-- Business hours calendar
-- SLA pause/resume
-- Auto-escalation
-- Breach notifications
-
-**Sprint 8: Rich Content & Search**
-
-- Tiptap rich text editor
-- Meilisearch integration
-- Advanced filtering
-- Saved filters
-
-**Duration:** 3 weeks
+**Duration:** 1 week
 
 ---
 
-### Phase 2: Enterprise Features (v1.5 - Mar 2025)
+### Phase 2: Enterprise Features (v1.5 - Mar 2026)
 
 **CMDB / Asset Management**
 
@@ -678,7 +665,7 @@
 
 ---
 
-### Phase 3: Integration & Automation (v2.0 - Apr 2025)
+### Phase 3: Integration & Automation (v2.0 - Apr 2026)
 
 **REST API & Webhooks**
 

@@ -3,7 +3,8 @@
 **Stack:** Next.js 15.5.6 + Nest.js 11.1.8 + Prisma 6.4.0 + PostgreSQL 18.0
 **Philosophy:** Feature-Driven Development + Test-Driven Development (TDD)
 **MVP Scope:** 11 weeks (6 sprints), Rich Text + Meilisearch + Advanced SLA
-**Last Updated:** 13 November 2024
+**Timeline:** Nov 16, 2025 - Jan 31, 2026
+**Last Updated:** 14 November 2025
 
 ---
 
