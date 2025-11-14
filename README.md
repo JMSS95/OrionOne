@@ -26,17 +26,17 @@
 
 ### Key Features
 
-- ** Multi-Role Authentication** - JWT-based auth with Admin, Agent, and User roles
-- ** Incident Management** - Complete CRUD with priorities, SLA tracking, and status workflow
-- ** Rich Text Editor** - Tiptap editor for professional ticket descriptions with formatting
-- ** AI-Powered Search** - Meilisearch with typo-tolerance and instant results
-- ** Real-Time Collaboration** - Comments and file attachments on incidents
-- ** Knowledge Base** - Searchable articles with full-text search
-- ** SLA Management** - Configurable policies with automated tracking (24/7)
-- ** Dashboard & Analytics** - Real-time metrics and performance insights
-- ** Email Notifications** - Automated alerts for assignments and updates
-- ** Docker Ready** - Complete containerized setup with Redis, PostgreSQL, and Meilisearch
-- ** 90% Cost Savings** - Enterprise features at $20/agent vs $200+ (ServiceNow, Zendesk)
+- **Multi-Role Authentication** - JWT-based auth with Admin, Agent, and User roles
+- **Incident Management** - Complete CRUD with priorities, SLA tracking, and status workflow
+- **Rich Text Editor** - Tiptap editor for professional ticket descriptions with formatting
+- **AI-Powered Search** - Meilisearch with typo-tolerance and instant results
+- **Real-Time Collaboration** - Comments and file attachments on incidents
+- **Knowledge Base** - Searchable articles with full-text search
+- **SLA Management** - Configurable policies with automated tracking (24/7)
+- **Dashboard & Analytics** - Real-time metrics and performance insights
+- **Email Notifications** - Automated alerts for assignments and updates
+- **Docker Ready** - Complete containerized setup with Redis, PostgreSQL, and Meilisearch
+- **90% Cost Savings** - Enterprise features at $20/agent vs $200+ (ServiceNow, Zendesk)
 
 ---
 
@@ -61,8 +61,9 @@
 ## Tech Stack
 
 ### Backend
+
 | Technology | Version | Purpose |
-| ------------ | ------- | ------------------------------------------------ |
+| --------------- | ------- | ------------------------------------------------ |
 | **Nest.js** | 11.1.8 | Enterprise-grade Node.js framework for REST APIs |
 | **Prisma** | 6.4.0 | Type-safe ORM with migrations |
 | **PostgreSQL** | 18.0 | Primary relational database (pgcrypto, pg_trgm) |
@@ -72,8 +73,9 @@
 | **Passport** | 0.7.0 | Authentication middleware (JWT strategy) |
 
 ### Frontend
+
 | Technology | Version | Purpose |
-| --------------- | ------- | --------------------------------------------- |
+| ------------------- | ------- | --------------------------------------- |
 | **Next.js** | 15.5.6 | React framework with App Router & SSR |
 | **React** | 19.2.0 | UI library with Server Components |
 | **TypeScript** | 5.6+ | Type-safe JavaScript with strict mode |
@@ -86,16 +88,18 @@
 | **Axios** | 1.13.2 | HTTP client with interceptors |
 
 ### DevOps & Infrastructure
+
 | Technology | Version | Purpose |
-| ---------- | ------- | -------------------------------------------------- |
+| ------------------ | ------- | ------------------------------------------ |
 | **Docker** | latest | Container platform for all services |
 | **Docker Compose** | v2 | Multi-container orchestration (7 services) |
 | **Nginx** | 1.24+ | Reverse proxy and load balancer |
 | **Playwright** | 1.x | End-to-end testing framework |
 
 ### Development Tools
+
 | Tool | Purpose |
-| ----------------- | ---------------------------------------------- |
+| ------------------- | ------------------------------------------- |
 | **ESLint** | Code linting and style enforcement |
 | **Prettier** | Code formatting |
 | **Husky** | Git hooks for pre-commit checks |
@@ -109,6 +113,7 @@
 ## Quick Start
 
 ### Prerequisites
+
 - **Docker** & **Docker Compose** installed
 - **Node.js** 20+ (for local development)
 - **Git** for version control
@@ -173,7 +178,7 @@ npm run dev # Runs on http://localhost:3000
 After running the seed script:
 
 | Role | Email | Password |
-| ------- | ---------------------- | ---------- |
+| ----- | ----------------- | --------- |
 | Admin | admin@orionone.io | Admin123! |
 | Agent | agent@orionone.io | Agent123! |
 | User | user@orionone.io | User123! |
@@ -306,7 +311,7 @@ orionone/
 The `docker-compose.yml` orchestrates 7 services:
 
 | Service | Port | Purpose |
-| -------------- | ---- | -------------------------------------------- |
+| --------------- | ---- | ---------------------------------------- |
 | **postgres** | 5432 | PostgreSQL 18.0 database |
 | **redis** | 6379 | Redis 8.2 for sessions & caching |
 | **meilisearch** | 7700 | Meilisearch 1.25 search engine |
