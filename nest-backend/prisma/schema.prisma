@@ -1,0 +1,389 @@
+// Prisma Schema - OrionOne ITSM
+// Generated from Laravel migrations (Sprint 1-7)
+// Database: PostgreSQL 18.0 (Alpine)
+// ORM: Prisma 6.19.0
+// Models: 15 (Auth, Tickets, CMDB, KB, Activity)
+// Last Updated: 13 Nov 2025
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres", "postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// AUTHENTICATION & AUTHORIZATION
+// ==========================================
+
+model User {
+  id                String    @id @default(uuid())
+  name              String
+  email             String    @unique
+  emailVerifiedAt   DateTime? @map("email_verified_at")
+  password          String
+  rememberToken     String?   @map("remember_token")
+  avatar            String?
+  isActive          Boolean   @default(true) @map("is_active")
+  role              Role      @default(USER)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  // Relationships
+  ticketsCreated    Ticket[]       @relation("TicketRequester")
+  ticketsAssigned   Ticket[]       @relation("TicketAssignee")
+  comments          Comment[]
+  articles          Article[]
+  teamMembers       TeamMember[]
+  activityLogs      ActivityLog[]
+  assets            Asset[]
+  notifications     Notification[]
+
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  AGENT
+  USER
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  guardName   String   @map("guard_name")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  roles RoleHasPermission[]
+
+  @@map("permissions")
+}
+
+model RoleHasPermission {
+  id           String     @id @default(uuid())
+  roleName     Role       @map("role_name")
+  permissionId String     @map("permission_id")
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleName, permissionId])
+  @@map("role_has_permissions")
+}
+
+// ==========================================
+// TICKETS SYSTEM
+// ==========================================
+
+model Ticket {
+  id                    String         @id @default(uuid())
+  ticketNumber          String         @unique @map("ticket_number")
+  title                 String
+  description           String         @db.Text
+  status                TicketStatus   @default(OPEN)
+  priority              TicketPriority @default(MEDIUM)
+  requesterId           String         @map("requester_id")
+  assignedTo            String?        @map("assigned_to")
+  teamId                String?        @map("team_id")
+  categoryId            String?        @map("category_id")
+  firstResponseAt       DateTime?      @map("first_response_at")
+  firstResponseDeadline DateTime?      @map("first_response_deadline")
+  resolutionDeadline    DateTime?      @map("resolution_deadline")
+  resolvedAt            DateTime?      @map("resolved_at")
+  closedAt              DateTime?      @map("closed_at")
+  isEscalated           Boolean        @default(false) @map("is_escalated")
+  customFields          Json?          @map("custom_fields")
+  createdAt             DateTime       @default(now()) @map("created_at")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
+  deletedAt             DateTime?      @map("deleted_at")
+
+  // Relationships
+  requester   User          @relation("TicketRequester", fields: [requesterId], references: [id])
+  assignee    User?         @relation("TicketAssignee", fields: [assignedTo], references: [id])
+  team        Team?         @relation(fields: [teamId], references: [id])
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  comments    Comment[]
+  attachments Media[]
+  activities  ActivityLog[]
+
+  @@index([ticketNumber])
+  @@index([status, priority])
+  @@index([requesterId])
+  @@index([assignedTo])
+  @@index([teamId])
+  @@index([createdAt])
+  @@map("tickets")
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  ON_HOLD
+  RESOLVED
+  CLOSED
+  CANCELLED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  parentId    String?   @map("parent_id")
+  order       Int       @default(0)
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  tickets  Ticket[]
+  articles Article[]
+
+  @@index([slug])
+  @@index([parentId])
+  @@map("categories")
+}
+
+// ==========================================
+// COLLABORATION
+// ==========================================
+
+model Comment {
+  id         String    @id @default(uuid())
+  ticketId   String    @map("ticket_id")
+  userId     String    @map("user_id")
+  content    String    @db.Text
+  isInternal Boolean   @default(false) @map("is_internal")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  ticket      Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id])
+  attachments Media[]
+  activities  ActivityLog[]
+
+  @@index([ticketId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  email       String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  members TeamMember[]
+  tickets Ticket[]
+
+  @@index([slug])
+  @@map("teams")
+}
+
+model TeamMember {
+  id       String   @id @default(uuid())
+  teamId   String   @map("team_id")
+  userId   String   @map("user_id")
+  role     TeamRole @default(MEMBER)
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+enum TeamRole {
+  LEAD
+  MEMBER
+}
+
+// ==========================================
+// KNOWLEDGE BASE
+// ==========================================
+
+model Article {
+  id              String    @id @default(uuid())
+  title           String
+  slug            String    @unique
+  content         String    @db.Text
+  excerpt         String?
+  categoryId      String    @map("category_id")
+  authorId        String    @map("author_id")
+  isPublished     Boolean   @default(false) @map("is_published")
+  viewCount       Int       @default(0) @map("view_count")
+  helpfulVotes    Int       @default(0) @map("helpful_votes")
+  notHelpfulVotes Int       @default(0) @map("not_helpful_votes")
+  publishedAt     DateTime? @map("published_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  category Category         @relation(fields: [categoryId], references: [id])
+  author   User             @relation(fields: [authorId], references: [id])
+  versions ArticleVersion[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([isPublished])
+  @@map("articles")
+}
+
+model ArticleVersion {
+  id        String   @id @default(uuid())
+  articleId String   @map("article_id")
+  title     String
+  content   String   @db.Text
+  version   Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId])
+  @@map("article_versions")
+}
+
+// ==========================================
+// ASSETS (CMDB)
+// ==========================================
+
+model Asset {
+  id             String      @id @default(uuid())
+  assetTag       String      @unique @map("asset_tag")
+  name           String
+  type           AssetType
+  manufacturer   String?
+  model          String?
+  serialNumber   String?     @map("serial_number")
+  purchaseDate   DateTime?   @map("purchase_date")
+  purchaseCost   Decimal?    @map("purchase_cost") @db.Decimal(10, 2)
+  warrantyExpiry DateTime?   @map("warranty_expiry")
+  status         AssetStatus @default(AVAILABLE)
+  assignedTo     String?     @map("assigned_to")
+  location       String?
+  notes          String?     @db.Text
+  customFields   Json?       @map("custom_fields")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+  deletedAt      DateTime?   @map("deleted_at")
+
+  assignedUser User? @relation(fields: [assignedTo], references: [id])
+
+  @@index([assetTag])
+  @@index([type])
+  @@index([status])
+  @@index([assignedTo])
+  @@map("assets")
+}
+
+enum AssetType {
+  LAPTOP
+  DESKTOP
+  SERVER
+  LICENSE
+  MOBILE
+  NETWORK
+}
+
+enum AssetStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  RETIRED
+}
+
+// ==========================================
+// FILE STORAGE
+// ==========================================
+
+model Media {
+  id               String   @id @default(uuid())
+  modelType        String   @map("model_type")
+  modelId          String   @map("model_id")
+  collection       String
+  name             String
+  fileName         String   @map("file_name")
+  mimeType         String   @map("mime_type")
+  disk             String   @default("public")
+  size             Int
+  customProperties Json?    @map("custom_properties")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  ticket  Ticket?  @relation(fields: [modelId], references: [id], map: "media_ticket")
+  comment Comment? @relation(fields: [modelId], references: [id], map: "media_comment")
+
+  @@index([modelType, modelId])
+  @@map("media")
+}
+
+// ==========================================
+// ACTIVITY LOG (AUDIT)
+// ==========================================
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  logName     String?  @map("log_name")
+  description String
+  subjectType String?  @map("subject_type")
+  subjectId   String?  @map("subject_id")
+  causerId    String?  @map("causer_id")
+  properties  Json?
+  event       String?
+  batchUuid   String?  @map("batch_uuid")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  causer  User?    @relation(fields: [causerId], references: [id])
+  ticket  Ticket?  @relation(fields: [subjectId], references: [id], map: "activity_ticket")
+  comment Comment? @relation(fields: [subjectId], references: [id], map: "activity_comment")
+
+  @@index([logName])
+  @@index([subjectType, subjectId])
+  @@index([causerId])
+  @@index([createdAt])
+  @@map("activity_log")
+}
+
+// ==========================================
+// NOTIFICATIONS
+// ==========================================
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String
+  title     String
+  message   String    @db.Text
+  data      Json?
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([readAt])
+  @@map("notifications")
+}

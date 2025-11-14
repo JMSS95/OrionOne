@@ -1,408 +1,238 @@
-# Guia de Contribuição - OrionOne
+# Contributing Guide - OrionOne ITSM
 
-## Visão Geral
+**Last Updated:** November 13, 2025
 
-Este documento descreve as convenções e boas práticas para contribuir com o projeto OrionOne. Como projeto académico, seguimos standards profissionais da indústria.
+Welcome! This guide will help you contribute to OrionOne following professional standards.
 
 ---
 
-## Workflow de Desenvolvimento
+## Overview
 
-### 1. Criar uma Nova Feature
+OrionOne follows **Feature-Driven Development** with **Test-Driven Development (TDD)** practices. We prioritize code quality, type safety, and maintainability.
 
-```powershell
-# Use o script de scaffolding
-.\scripts\feature.ps1 NomeDaFeature
+**Stack:** Next.js 15 + Nest.js 11 + Prisma 6 + PostgreSQL 18
 
-# Exemplo: Para criar feature de Tickets
-.\scripts\feature.ps1 Ticket
+---
+
+## Development Workflow
+
+### 1. Create Feature Branch
+
+```bash
+git checkout -b feat/feature-name
+# Example: git checkout -b feat/ticket-comments
 ```
 
-Isto irá gerar:
-
--   Migration (`create_tickets_table`)
--   Model + Factory + Seeder (`Ticket.php`)
--   Controller (`TicketController.php`)
--   Form Requests (`StoreTicketRequest`, `UpdateTicketRequest`)
--   Tests (`TicketTest.php`, `TicketServiceTest.php`)
--   Policy (`TicketPolicy.php`)
--   Observer (`TicketObserver.php`)
-
-### 2. Seguir o Ciclo TDD
+### 2. Follow TDD Cycle
 
 **RED → GREEN → REFACTOR**
 
-1. **RED**: Escrever teste que falha
-2. **GREEN**: Implementar código mínimo para passar
-3. **REFACTOR**: Melhorar código mantendo testes verdes
+1. **RED**: Write failing test
+2. **GREEN**: Implement minimum code to pass
+3. **REFACTOR**: Improve code while keeping tests green
 
-Ver detalhes completos em [`docs/development-workflow.md`](docs/development-workflow.md)
+See detailed methodology: [`docs/guides/Development-Guide.md`](docs/guides/Development-Guide.md)
 
-### 3. Garantir Qualidade
+### 3. Run Quality Checks
 
-```powershell
-# Executar todos os testes
-docker-compose exec orionone-app php artisan test
-
-# PHPStan (static analysis)
-docker-compose exec orionone-app ./vendor/bin/phpstan analyse
-
-# Laravel Pint (code style)
-docker-compose exec orionone-app ./vendor/bin/pint
-
-# Coverage (opcional)
-docker-compose exec orionone-app php artisan test --coverage
-```
-
-### 4. Commit
+**Backend:**
 
 ```bash
-# Seguir Conventional Commits
-git add .
-git commit -m "feat(tickets): adiciona CRUD completo de tickets
-
-- Migration com campos title, description, status, priority
-- TicketController com resource methods
-- Tests com >90% coverage
-- Policy para autorização
-- Observer para audit log"
-
-git push origin main
+cd nest-backend
+npm run test # All tests
+npm run lint # Code quality
+npm run build # Type checking
 ```
 
----
-
-## Convenções de Código
-
-### PHP (Laravel)
-
-**PSR-12** + Laravel Best Practices + **Modern Architecture**
-
-#### DTOs com Spatie Laravel Data
-
-```php
-<?php
-
-namespace App\Data;
-
-use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Attributes\Validation\Required;
-use Spatie\LaravelData\Attributes\Validation\Max;
-
-class TicketData extends Data
-{
-    public function __construct(
-        #[Required, Max(255)]
-        public string $title,
-
-        #[Required]
-        public string $description,
-
-        public string $priority = 'medium',
-    ) {}
-}
-```
-
-#### Actions com Laravel Actions
-
-```php
-<?php
-
-namespace App\Actions\Tickets;
-
-use App\Models\Ticket;
-use App\Data\TicketData;
-use Lorisleiva\Actions\Concerns\AsAction;
-
-class CreateTicketAction
-{
-    use AsAction;
-
-    public function handle(TicketData $data, User $user): Ticket
-    {
-        $ticket = Ticket::create([
-            'title' => $data->title,
-            'description' => $data->description,
-            'priority' => $data->priority,
-            'requester_id' => $user->id,
-        ]);
-
-        activity()
-            ->performedOn($ticket)
-            ->log('Ticket criado');
-
-        return $ticket;
-    }
-
-    // Funciona como Controller
-    public function asController(): RedirectResponse
-    {
-        $data = TicketData::from(request());
-        $ticket = $this->handle($data, auth()->user());
-
-        return redirect()->route('tickets.show', $ticket);
-    }
-
-    // Funciona como Job
-    public function asJob(TicketData $data, User $user): void
-    {
-        $this->handle($data, $user);
-    }
-}
-```
-
-#### Conventional PHP
-
-**Regras principais:**
-
--   Type hints obrigatórios (params e return types)
--   DocBlocks apenas quando adiciona valor
--   Constructor property promotion (PHP 8.2+)
--   Readonly properties quando possível
--   Maximum 120 caracteres por linha
--   1 classe por ficheiro
-
-### JavaScript/Vue 3
-
-**ESLint** + Vue 3 Composition API + **Shadcn-vue**
-
-**Regras principais:**
-
--   Composition API (não Options API)
--   `<script setup>` syntax
--   Prefer `const` sobre `let`
--   2 espaços de indentação
--   Single quotes para strings
--   No semicolons (;)
--   Usar componentes Shadcn-vue (Button, Input, Card, etc)
-
-**Exemplo Shadcn-vue:**
-
-```vue
-<script setup>
-import Button from "@/components/ui/Button.vue";
-import Input from "@/components/ui/Input.vue";
-import { Icon } from "@iconify/vue";
-
-const handleSubmit = () => {
-    // ...
-};
-</script>
-
-<template>
-    <form @submit.prevent="handleSubmit">
-        <Input v-model="form.title" placeholder="Título do ticket" />
-
-        <Button type="submit">
-            <Icon icon="lucide:check" class="w-4 h-4 mr-2" />
-            Criar Ticket
-        </Button>
-    </form>
-</template>
-```
-
-### Database Migrations
-
-**Regras principais:**
-
--   UUIDs para primary keys (não auto-increment)
--   Foreign keys com `constrained()`
--   Indexes em colunas frequentemente filtradas
--   `softDeletes()` para tabelas principais
--   Sempre implementar `down()`
-
----
-
----
-
-## Conventional Commits
-
-Formato: `<type>(<scope>): <subject>`
-
-### Types
-
-| Type       | Uso                                |
-| ---------- | ---------------------------------- |
-| `feat`     | Nova funcionalidade                |
-| `fix`      | Correção de bug                    |
-| `docs`     | Documentação                       |
-| `style`    | Formatação (sem mudança de lógica) |
-| `refactor` | Refatoração                        |
-| `test`     | Adicionar/corrigir testes          |
-| `chore`    | Tarefas de manutenção              |
-| `perf`     | Performance                        |
-
-### Scopes (opcional)
-
--   `tickets` - Funcionalidade de tickets
--   `comments` - Comentários
--   `teams` - Equipas
--   `auth` - Autenticação
--   `sla` - SLA tracking
--   `kb` - Knowledge base
--   `dashboard` - Dashboard
-
-### Exemplos
+**Frontend:**
 
 ```bash
-# Feature completa
-feat(tickets): adiciona CRUD completo de tickets
+cd next-frontend
+npm run test # All tests
+npm run lint # Code quality
+npm run type-check # TypeScript
+```
 
-# Bug fix
-fix(auth): corrige validação de email duplicado
+### 4. Commit Changes
 
-# Documentação
-docs(readme): atualiza instruções de setup
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-# Refactoring
-refactor(tickets): move lógica para TicketService
+```bash
+git commit -m "feat(tickets): add comment functionality
 
-# Tests
-test(tickets): adiciona testes para criação de tickets
+- Add Comment model to Prisma schema
+- Implement CommentsService with CRUD
+- Add validation with class-validator
+- Create comment form with React Hook Form
+- Add unit and E2E tests
 
-# Performance
-perf(dashboard): otimiza query de estatísticas com eager loading
+Refs: #42"
+```
+
+**Types:**
+
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation
+- `style:` Formatting
+- `refactor:` Code restructuring
+- `test:` Add tests
+- `chore:` Maintenance
+
+**Scopes:** `auth`, `tickets`, `assets`, `users`, `kb`, `api`, `ui`
+
+### 5. Push & Create PR
+
+```bash
+git push origin feat/feature-name
+```
+
+Create Pull Request on GitHub with:
+
+- Clear description
+- Screenshots (if UI changes)
+- Related issue number
+
+---
+
+## Code Conventions
+
+### TypeScript
+
+- **Strict mode** enabled (`tsconfig.json`)
+- **ESLint + Prettier** for formatting
+- **No `any` types** - use proper typing
+- **Functional components** (React)
+- **Descriptive variable names** (no abbreviations)
+
+### Backend (Nest.js)
+
+- **DTOs**: Use `class-validator` decorators (`@IsString`, `@IsEmail`, `@MinLength`)
+- **Services**: Business logic layer, inject PrismaService
+- **Controllers**: Route handlers with `@ApiOperation` for Swagger docs
+- **Error handling**: Use built-in HTTP exceptions (`NotFoundException`, `BadRequestException`)
+
+### Frontend (Next.js)
+
+- **Components**: Functional components with TypeScript
+- **Forms**: React Hook Form + Zod validation
+- **State**: Local state with `useState`, server state with TanStack Query
+- **Styling**: Tailwind CSS utility classes + shadcn/ui components
+
+### Database (Prisma)
+
+- **Models**: `PascalCase` (singular) - `User`, `Ticket`, `Asset`
+- **Fields**: `camelCase` - `userId`, `createdAt`, `ticketNo`
+- **Relations**: Descriptive names - `@relation("TicketRequester")`
+- **Enums**: `PascalCase` with `UPPERCASE` values - `TicketStatus { OPEN, CLOSED }`
+- **Indexes**: Add `@@index()` for foreign keys and frequently queried fields
+
+ **Code examples:** See [TECH-STACK.md](../TECH-STACK.md) for detailed implementation patterns
+
+---
+
+## Testing Strategy
+
+### Backend Tests (Jest + Supertest)
+
+- **Unit Tests**: Test services in isolation with mocked dependencies
+- **Integration Tests**: Test controllers with real database (test DB)
+- **E2E Tests**: Test complete flows from HTTP request to database
+
+### Frontend Tests (Jest + React Testing Library)
+
+- **Component Tests**: Test user interactions and rendering
+- **Hook Tests**: Test custom hooks in isolation
+- **Integration Tests**: Test forms with validation and API calls
+
+### Coverage Requirements
+
+- **Minimum 80%** test coverage for all modules
+- **All services** must have unit tests
+- **Critical user flows** must have E2E tests
+
+### Running Tests
+
+```bash
+# Backend
+cd nest-backend
+npm run test # Unit tests
+npm run test:e2e # E2E tests
+npm run test:cov # Coverage report
+
+# Frontend
+cd next-frontend
+npm run test # All tests
+npm run test:watch # Watch mode
+```
+
+- **Critical paths** must have E2E tests
+
+---
+
+## Common Commands
+
+**Backend:**
+
+```bash
+npm run start:dev # Dev server
+npm run test # Run tests
+npm run test:cov # Coverage
+npm run lint # Lint code
+npm run prisma:studio # Database GUI
+```
+
+**Frontend:**
+
+```bash
+npm run dev # Dev server
+npm run test # Run tests
+npm run lint # Lint code
+npm run build # Production build
+```
+
+**Database:**
+
+```bash
+npm run prisma:generate # Generate client
+npm run prisma:migrate:dev # Create migration
+npm run prisma:seed # Seed data
+npm run prisma:studio # Database GUI
+```
+
+**Docker:**
+
+```bash
+docker compose up -d # Start services
+docker compose logs -f # View logs
+docker exec -it orionone_postgres psql -U orionone # PostgreSQL shell
 ```
 
 ---
 
-## Estrutura de Branches (Opcional)
+## Quality Checklist
 
-Para projetos maiores com múltiplos colaboradores:
+Before submitting PR, ensure:
 
-```
-main                    # Production-ready code
-└── feature/tickets     # Nova feature
-└── fix/auth-bug        # Bug fix
-└── refactor/services   # Refactoring
-```
-
-**Para este projeto académico (solo):**
-
--   Trabalhar diretamente em `main`
--   Commits frequentes e pequenos
--   Push regular para backup
+- [ ] All tests passing (`npm run test`)
+- [ ] Code coverage >80%
+- [ ] No linting errors (`npm run lint`)
+- [ ] TypeScript strict mode passes
+- [ ] Prisma schema validated
+- [ ] API documented in Swagger
+- [ ] Conventional commit format
+- [ ] PR description clear and complete
 
 ---
 
-## Testes
+## Need Help?
 
-### Feature Tests (HTTP)
-
-Testam endpoints HTTP completos, incluindo validação e autorização.
-
-### Unit Tests (Lógica)
-
-Testam lógica de negócio isolada (Services, Actions, Models).
-
-### Executar Testes
-
-```powershell
-# Todos os testes
-docker-compose exec orionone-app php artisan test
-
-# Teste específico
-docker-compose exec orionone-app php artisan test --filter=TicketTest
-
-# Com coverage
-docker-compose exec orionone-app php artisan test --coverage --min=80
-```
-
-Ver mais detalhes em [`docs/testing-strategy.md`](docs/testing-strategy.md)
+- **Commands:** See [`docs/COMMANDS-REFERENCE.md`](docs/COMMANDS-REFERENCE.md)
+- **Components:** See [`docs/COMPONENTS-GUIDE.md`](docs/COMPONENTS-GUIDE.md)
+- **TDD Workflow:** See [`docs/guides/Development-Guide.md`](docs/guides/Development-Guide.md)
+- **Roadmap:** See [`docs/DEVELOPMENT-PLAN.md`](docs/DEVELOPMENT-PLAN.md)
+- **Tech Stack:** See [`TECH-STACK.md`](TECH-STACK.md)
 
 ---
 
-## Checklist de Qualidade
-
-Antes de cada commit:
-
--   [ ] Testes passam (`php artisan test`)
--   [ ] PHPStan sem erros (`./vendor/bin/phpstan analyse`)
--   [ ] Pint sem warnings (`./vendor/bin/pint --test`)
--   [ ] Coverage >80% (feature) ou >90% (service/action)
--   [ ] Commit message segue Conventional Commits
--   [ ] Código documentado onde necessário
--   [ ] Sem `dd()`, `dump()`, `console.log()` no código
-
----
-
-## Comandos Úteis
-
-### Workflow Diário
-
-```bash
-# Iniciar containers
-docker-compose up -d
-
-# Ver logs em tempo real
-docker-compose logs -f
-
-# Parar containers (mantém dados)
-docker-compose stop
-
-# Parar e remover containers (mantém volumes)
-docker-compose down
-```
-
-### Antes de Commit
-
-```bash
-# 1. Code style
-docker-compose exec orionone-app ./vendor/bin/pint
-
-# 2. Análise estática
-docker-compose exec orionone-app ./vendor/bin/phpstan analyse
-
-# 3. Testes
-docker-compose exec orionone-app php artisan test
-```
-
-### Artisan Commands
-
-```bash
-# Migrations
-docker-compose exec orionone-app php artisan migrate
-docker-compose exec orionone-app php artisan migrate:fresh --seed
-
-# Cache
-docker-compose exec orionone-app php artisan config:clear
-docker-compose exec orionone-app php artisan cache:clear
-
-# Tinker (REPL)
-docker-compose exec orionone-app php artisan tinker
-```
-
-### Composer
-
-```bash
-# Instalar dependências
-docker-compose exec orionone-app composer install
-
-# Adicionar package
-docker-compose exec orionone-app composer require package/name
-```
-
-### NPM (Frontend)
-
-```bash
-# Instalar dependências (Linux-compatible)
-docker-compose run --rm orionone-frontend npm install
-
-# Build para produção
-docker-compose run --rm orionone-frontend npm run build
-```
-
----
-
-## Dúvidas?
-
-Consultar:
-
--   [`docs/development-workflow.md`](docs/development-workflow.md) - Workflow completo
--   [`docs/testing-strategy.md`](docs/testing-strategy.md) - Estratégia de testes
--   [`docs/architecture.md`](docs/architecture.md) - Decisões arquiteturais
--   [`SETUP.md`](SETUP.md) - Setup do ambiente
-
-**Regra de Ouro:**
-
-> "Se não está testado, não está feito."
+**Thank you for contributing to OrionOne!** 

@@ -1,6 +1,25 @@
-# Commands Reference - OrionOne
+# Commands Reference - OrionOne ITSM
 
 **Complete command reference for development, deployment, and maintenance.**
+
+**Stack:** Next.js 15 + Nest.js 11 + PostgreSQL 18 + Redis 8.2 + Meilisearch 1.25
+**Last Updated:** 13 November 2025
+
+---
+
+## Table of Contents
+
+1. [Git Commands](#git-commands)
+2. [GitHub Commands](#github-commands)
+3. [Docker Commands](#docker-commands)
+4. [Nest.js Backend Commands](#nestjs-backend-commands)
+5. [Next.js Frontend Commands](#nextjs-frontend-commands)
+6. [Prisma ORM Commands](#prisma-orm-commands)
+7. [npm Commands](#npm-commands)
+8. [Database Commands (PostgreSQL)](#database-commands-postgresql)
+9. [Testing Commands](#testing-commands)
+10. [Deployment Commands](#deployment-commands)
+11. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -14,51 +33,73 @@ git status
 
 # View commit history
 git log --oneline --graph --all -10
+git log --oneline --author="Your Name" -10
 
 # View differences
-git diff                    # Unstaged changes
-git diff --staged          # Staged changes
-git diff HEAD~1            # Compare with previous commit
+git diff # Unstaged changes
+git diff --staged # Staged changes
+git diff HEAD~1 # Compare with previous commit
+git diff main..feature/branch # Compare branches
 ```
 
 ### Branching
 
 ```bash
-# Create new branch
-git checkout -b feature/feature-name
+# Create new branch from current
+git checkout -b feature/ticket-system
+git checkout -b fix/login-bug
 
 # Switch between branches
 git checkout main
-git checkout feature/feature-name
+git checkout feat/migrate-nextjs-nestjs
 
 # List all branches
-git branch -a
+git branch -a # All branches (local + remote)
+git branch -r # Remote branches only
 
 # Delete branch (local)
-git branch -d feature/feature-name
+git branch -d feature/old-feature
+git branch -D feature/old-feature # Force delete
 
 # Delete branch (remote)
-git push origin --delete feature/feature-name
+git push origin --delete feature/old-feature
+
+# Rename branch
+git branch -m old-name new-name
 ```
 
-### Committing
+### Committing (Conventional Commits)
 
 ```bash
 # Stage files
-git add .                              # All files
-git add file1.php file2.js            # Specific files
-git add docs/                         # Directory
+git add . # All files
+git add src/ # Directory
+git add nest-backend/src/auth/ # Specific path
+git add next-frontend/app/ # Frontend changes
 
-# Commit
-git commit -m "feat: add user authentication"
-git commit -m "fix: resolve login bug"
-git commit -m "docs: update README"
+# Commit with conventional commit format
+git commit -m "feat(auth): add JWT authentication"
+git commit -m "fix(tickets): resolve status update bug"
+git commit -m "docs(readme): update installation steps"
+git commit -m "chore(deps): update to Next.js 15.5.6"
+git commit -m "refactor(api): improve error handling"
+git commit -m "test(auth): add login integration tests"
+git commit -m "perf(db): add indexes to tickets table"
+git commit -m "style(ui): format with Prettier"
+
+# Multi-line commit
+git commit -m "feat(tickets): implement ticket creation" \
+-m "- Add CreateTicketDto validation" \
+-m "- Add Prisma ticket model" \
+-m "- Add API endpoint POST /api/tickets"
 
 # Amend last commit
 git commit --amend -m "Updated message"
+git commit --amend --no-edit # Keep message
 
 # Unstage files
-git restore --staged file.php
+git restore --staged file.ts
+git restore --staged .
 ```
 
 ### Pushing & Pulling
@@ -66,36 +107,41 @@ git restore --staged file.php
 ```bash
 # Push to remote
 git push origin main
-git push origin feature/feature-name
+git push origin feat/migrate-nextjs-nestjs
+
+# Push new branch
+git push -u origin feature/new-feature
 
 # Force push (use with caution)
-git push origin main --force-with-lease
+git push origin main --force-with-lease # Safer than --force
 
 # Pull from remote
 git pull origin main
-git pull --rebase origin main          # Rebase instead of merge
+git pull --rebase origin main # Rebase instead of merge
 
 # Fetch without merging
 git fetch origin
+git fetch --all
 ```
 
 ### Merging & Rebasing
 
 ```bash
 # Merge branch into current
-git merge feature/feature-name
+git merge feature/ticket-system
 git merge origin/main
 
 # Merge keeping our versions on conflicts
 git merge origin/main --strategy-option ours
 
-# Rebase
+# Rebase current branch onto main
 git rebase main
-git rebase --continue                  # After resolving conflicts
-git rebase --abort                     # Cancel rebase
+git rebase --continue # After resolving conflicts
+git rebase --abort # Cancel rebase
 
 # Interactive rebase (squash commits)
 git rebase -i HEAD~3
+git rebase -i main # Rebase all commits since main
 ```
 
 ### Conflict Resolution
@@ -103,14 +149,19 @@ git rebase -i HEAD~3
 ```bash
 # List files with conflicts
 git diff --name-only --diff-filter=U
+git status | grep "both modified"
 
 # Resolve using ours/theirs
-git checkout --ours file.php           # Keep your version
-git checkout --theirs file.php         # Keep their version
+git checkout --ours file.ts # Keep your version
+git checkout --theirs file.ts # Keep their version
 
 # Mark as resolved
-git add file.php
+git add file.ts
 git commit
+
+# Abort merge/rebase
+git merge --abort
+git rebase --abort
 ```
 
 ### Stashing
@@ -118,55 +169,83 @@ git commit
 ```bash
 # Save work temporarily
 git stash
-git stash save "Work in progress"
+git stash save "WIP: ticket creation feature"
+git stash push -m "WIP: authentication" src/auth/
 
 # List stashes
 git stash list
 
 # Apply stash
-git stash apply                        # Keep stash
-git stash pop                          # Apply and remove stash
-git stash pop stash@{1}               # Specific stash
+git stash apply # Keep stash
+git stash pop # Apply and remove stash
+git stash pop stash@{1} # Specific stash
+
+# Show stash content
+git stash show
+git stash show -p stash@{0} # Show diff
 
 # Delete stash
-git stash drop
-git stash clear                        # Remove all stashes
+git stash drop stash@{0}
+git stash clear # Remove all stashes
 ```
 
 ### Tagging
 
 ```bash
-# Create tag
+# Create tag (semantic versioning)
 git tag v1.0.0
-git tag -a v1.0.0 -m "Version 1.0.0"
+git tag -a v1.0.0 -m "Version 1.0.0 - MVP Release"
+git tag -a v0.1.0 -m "Sprint 1 Complete"
 
 # Push tags
 git push origin v1.0.0
-git push origin --tags                 # All tags
+git push origin --tags # All tags
 
 # List tags
 git tag -l
+git tag -l "v1.*" # Filter tags
 
 # Delete tag
-git tag -d v1.0.0
-git push origin --delete v1.0.0
+git tag -d v1.0.0 # Local
+git push origin --delete v1.0.0 # Remote
+
+# Checkout tag
+git checkout v1.0.0
 ```
 
 ### Undoing Changes
 
 ```bash
 # Discard local changes
-git restore file.php                   # Single file
-git restore .                          # All files
+git restore file.ts # Single file
+git restore . # All files
+git restore src/ # Directory
 
 # Reset to previous commit
-git reset --soft HEAD~1                # Keep changes staged
-git reset --mixed HEAD~1               # Keep changes unstaged (default)
-git reset --hard HEAD~1                # Discard all changes (dangerous!)
+git reset --soft HEAD~1 # Keep changes staged
+git reset --mixed HEAD~1 # Keep changes unstaged (default)
+git reset --hard HEAD~1 # Discard all changes (dangerous!)
+
+# Reset to specific commit
+git reset --hard abc123
 
 # Revert commit (creates new commit)
 git revert HEAD
 git revert abc123
+git revert HEAD~3..HEAD # Revert multiple commits
+```
+
+### Git Worktree (Work on multiple branches)
+
+```bash
+# Create worktree for hotfix
+git worktree add ../orionone-hotfix hotfix/critical-bug
+
+# List worktrees
+git worktree list
+
+# Remove worktree
+git worktree remove ../orionone-hotfix
 ```
 
 ---
@@ -177,50 +256,86 @@ git revert abc123
 
 ```bash
 # Create PR branch
-git checkout -b feature/new-feature
-git push origin feature/new-feature
+git checkout -b feature/user-dashboard
+git push -u origin feature/user-dashboard
 # Then create PR on GitHub UI
 
-# Update PR
+# Update PR after feedback
 git add .
-git commit -m "Address PR feedback"
-git push origin feature/new-feature
+git commit -m "refactor: address PR review comments"
+git push origin feature/user-dashboard
 
-# Sync with main
+# Sync with main (rebase)
 git checkout main
 git pull origin main
-git checkout feature/new-feature
+git checkout feature/user-dashboard
+git rebase main # Rebase onto latest main
+git push origin feature/user-dashboard --force-with-lease
+
+# Sync with main (merge)
+git checkout feature/user-dashboard
 git merge main
-git push origin feature/new-feature
+git push origin feature/user-dashboard
 ```
 
 ### GitHub CLI (gh)
 
 ```bash
 # Install: https://cli.github.com/
+# Windows: winget install GitHub.cli
+# Mac: brew install gh
 
 # Login
 gh auth login
 
-# Create PR
-gh pr create --title "Feature: Add authentication" --body "Description"
+# Repository operations
+gh repo clone JMSS95/OrionOne
+gh repo view
+gh repo view --web # Open in browser
+
+# Pull Requests
+gh pr create --title "feat: Add ticket dashboard" \
+ --body "Implements ticket listing and filtering"
+gh pr create --draft # Create draft PR
 
 # List PRs
 gh pr list
+gh pr list --state open
+gh pr list --author @me
 
 # View PR
 gh pr view 5
+gh pr view 5 --web # Open in browser
+gh pr diff 5 # Show diff
+
+# Checkout PR locally
+gh pr checkout 5
+
+# Review PR
+gh pr review 5 --approve
+gh pr review 5 --request-changes --body "Comments"
+gh pr review 5 --comment --body "Looks good!"
 
 # Merge PR
 gh pr merge 5 --squash
 gh pr merge 5 --merge
 gh pr merge 5 --rebase
+gh pr merge 5 --delete-branch # Delete after merge
 
-# Clone repository
-gh repo clone JMSS95/OrionOne
+# Issues
+gh issue create --title "Bug: Login fails on mobile" \
+ --body "Description" --label bug
+gh issue list
+gh issue view 10
+gh issue close 10
+gh issue reopen 10
 
-# Create issue
-gh issue create --title "Bug: Login fails" --body "Description"
+# Actions (CI/CD)
+gh workflow list
+gh workflow view
+gh run list
+gh run view
+gh run watch # Watch live run
 ```
 
 ---
@@ -233,18 +348,26 @@ gh issue create --title "Bug: Login fails" --body "Description"
 # Start all containers
 docker-compose up -d
 
+# Start with rebuild
+docker-compose up -d --build
+
 # Stop all containers
 docker-compose down
+
+# Stop and remove volumes ( deletes data)
+docker-compose down -v
 
 # Restart containers
 docker-compose restart
 
 # Restart specific service
-docker-compose restart orionone-app
+docker-compose restart orionone-backend
 docker-compose restart orionone-frontend
+docker-compose restart orionone-db
 
 # View running containers
 docker-compose ps
+docker ps # All Docker containers
 
 # View all containers (including stopped)
 docker ps -a
@@ -254,29 +377,53 @@ docker ps -a
 
 ```bash
 # View logs
-docker-compose logs                    # All services
-docker-compose logs orionone-app       # Specific service
-docker-compose logs --tail=50          # Last 50 lines
-docker-compose logs -f                 # Follow logs (real-time)
+docker-compose logs # All services
+docker-compose logs orionone-backend # Backend logs
+docker-compose logs orionone-frontend # Frontend logs
+docker-compose logs orionone-db # PostgreSQL logs
+docker-compose logs orionone-redis # Redis logs
+docker-compose logs orionone-meilisearch # Meilisearch logs
+
+# Last N lines
+docker-compose logs --tail=50 orionone-backend
+docker-compose logs --tail=100 orionone-frontend
+
+# Follow logs (real-time)
+docker-compose logs -f
+docker-compose logs -f orionone-backend
 
 # Filter logs by time
-docker-compose logs --since 5m         # Last 5 minutes
-docker-compose logs --since "2025-11-08T10:00:00"
+docker-compose logs --since 5m # Last 5 minutes
+docker-compose logs --since "2025-11-13T10:00:00"
+docker-compose logs --since 1h orionone-backend
 ```
 
-### Executing Commands
+### Executing Commands in Containers
 
 ```bash
-# Execute command in container
-docker-compose exec orionone-app bash
-docker-compose exec orionone-app php artisan migrate
-docker-compose exec orionone-frontend npm run dev
+# Backend (Nest.js)
+docker-compose exec orionone-backend bash
+docker-compose exec orionone-backend npm run start:dev
+docker-compose exec orionone-backend npx prisma studio
 
-# Execute as different user
-docker-compose exec -u sail orionone-app bash
+# Frontend (Next.js)
+docker-compose exec orionone-frontend bash
+docker-compose exec orionone-frontend npm run build
+docker-compose exec orionone-frontend npm run lint
 
-# Execute without TTY (for CI/CD)
-docker-compose exec -T orionone-app php artisan test
+# Database (PostgreSQL)
+docker-compose exec orionone-db psql -U postgres -d orionone
+docker-compose exec orionone-db pg_dump -U postgres orionone > backup.sql
+
+# Redis
+docker-compose exec orionone-redis redis-cli
+docker-compose exec orionone-redis redis-cli PING
+
+# Meilisearch
+docker-compose exec orionone-meilisearch curl http://localhost:7700/health
+
+# Execute without TTY (for scripts/CI)
+docker-compose exec -T orionone-backend npm test
 ```
 
 ### Building & Cleaning
@@ -284,18 +431,28 @@ docker-compose exec -T orionone-app php artisan test
 ```bash
 # Build images
 docker-compose build
-docker-compose build --no-cache        # Force rebuild
+docker-compose build --no-cache # Force rebuild without cache
+docker-compose build orionone-backend # Build specific service
+
+# Pull latest images
+docker-compose pull
 
 # Remove stopped containers
 docker-compose rm
+docker-compose rm -f # Force remove
 
 # Remove all (containers, networks, volumes)
 docker-compose down -v
 
-# Prune system
-docker system prune                    # Remove unused data
-docker system prune -a                 # Remove all unused images
-docker volume prune                    # Remove unused volumes
+# Prune Docker system
+docker system prune # Remove unused data
+docker system prune -a # Remove all unused images
+docker system prune -a --volumes # Include volumes
+docker volume prune # Remove unused volumes
+docker image prune # Remove dangling images
+
+# Show disk usage
+docker system df
 ```
 
 ### Docker Images
@@ -303,12 +460,22 @@ docker volume prune                    # Remove unused volumes
 ```bash
 # List images
 docker images
+docker image ls
 
 # Remove image
-docker rmi image_name:tag
+docker rmi orionone-orionone-backend
+docker rmi postgres:18-alpine
 
-# Pull image
-docker pull php:8.2-fpm
+# Pull specific image
+docker pull postgres:18-alpine
+docker pull redis:8.2-alpine
+docker pull getmeili/meilisearch:v1.25
+
+# Inspect image
+docker image inspect postgres:18-alpine
+
+# Tag image
+docker tag orionone-backend:latest orionone-backend:v1.0.0
 ```
 
 ### Networks
@@ -318,811 +485,929 @@ docker pull php:8.2-fpm
 docker network ls
 
 # Inspect network
-docker network inspect orionone_default
+docker network inspect orionone_orionone_network
 
 # Create network
-docker network create my-network
+docker network create orionone-custom-network
+
+# Remove network
+docker network rm orionone-custom-network
+
+# Connect container to network
+docker network connect orionone_orionone_network container_name
+```
+
+### Health Checks
+
+```bash
+# Check service health
+docker-compose ps
+docker inspect --format='{{.State.Health.Status}}' orionone_backend
+docker inspect --format='{{.State.Health.Status}}' orionone_frontend
+docker inspect --format='{{.State.Health.Status}}' orionone_postgres
+
+# View health check logs
+docker inspect orionone_backend | grep -A 10 Health
 ```
 
 ---
 
-## Laravel Artisan Commands
+## Nest.js Backend Commands
 
-### Application
+### Development
 
 ```bash
-# Via Docker
-docker-compose exec orionone-app php artisan [command]
+# Via Docker (recommended)
+docker-compose up -d orionone-backend
+docker-compose logs -f orionone-backend
 
-# Direct (if PHP installed locally)
-php artisan [command]
+# Via npm (if running locally)
+cd nest-backend
+
+# Development mode (watch mode)
+npm run start:dev
+
+# Debug mode
+npm run start:debug
+
+# Production mode
+npm run start:prod
 ```
 
-### Database
+### Building
 
 ```bash
-# Run migrations
-php artisan migrate
+# Build for production
+npm run build
 
-# Rollback last migration
-php artisan migrate:rollback
+# Check build output
+ls -la dist/
 
-# Rollback all migrations
-php artisan migrate:reset
+# Production build in Docker
+docker-compose build orionone-backend
+```
 
-# Fresh migrations (drop all tables)
-php artisan migrate:fresh
+### Generate Resources
 
-# Fresh migrations with seeders
-php artisan migrate:fresh --seed
+```bash
+# Generate module
+npx nest generate module tickets
+npx nest g mo tickets # Short form
 
-# Run seeders
-php artisan db:seed
-php artisan db:seed --class=UserSeeder
+# Generate controller
+npx nest generate controller tickets
+npx nest g co tickets --no-spec # Without test file
 
+# Generate service
+npx nest generate service tickets
+npx nest g s tickets
+
+# Generate complete resource (REST API)
+npx nest generate resource tickets
+# Prompts: REST API, CRUD entry points, Yes
+
+# Generate resource with all files
+npx nest g resource users --no-spec
+
+# Generate guard
+npx nest g guard auth/jwt
+npx nest g guard auth/roles
+
+# Generate interceptor
+npx nest g interceptor common/transform
+
+# Generate pipe
+npx nest g pipe common/validation
+
+# Generate filter
+npx nest g filter common/http-exception
+
+# Generate middleware
+npx nest g middleware common/logger
+
+# Generate decorator
+npx nest g decorator common/user
+```
+
+### Code Quality
+
+```bash
+# Linting
+npm run lint
+npm run lint -- --fix # Auto-fix issues
+
+# Formatting
+npm run format # Format with Prettier
+npm run format -- --check # Check without writing
+
+# Type checking
+npx tsc --noEmit
+```
+
+### Module Structure
+
+```bash
+# Typical module generation workflow
+npx nest g module tickets
+npx nest g controller tickets --no-spec
+npx nest g service tickets --no-spec
+npx nest g class tickets/dto/create-ticket.dto --no-spec
+npx nest g class tickets/dto/update-ticket.dto --no-spec
+npx nest g class tickets/entities/ticket.entity --no-spec
+```
+
+---
+
+## Next.js Frontend Commands
+
+### Development
+
+```bash
+# Via Docker (recommended)
+docker-compose up -d orionone-frontend
+docker-compose logs -f orionone-frontend
+
+# Via npm (if running locally)
+cd next-frontend
+
+# Development mode (with hot reload)
+npm run dev
+
+# Development on specific port
+npm run dev -- -p 3001
+
+# Development with turbo (faster)
+npm run dev -- --turbo
+```
+
+### Building & Production
+
+```bash
+# Build for production
+npm run build
+
+# Check build output
+ls -la .next/
+
+# Start production server
+npm start
+
+# Production on specific port
+npm start -- -p 3000
+
+# Analyze bundle size
+npm run build -- --analyze # If @next/bundle-analyzer is configured
+```
+
+### Code Quality
+
+```bash
+# Linting
+npm run lint
+npm run lint -- --fix # Auto-fix issues
+npm run lint -- --max-warnings 0 # Fail on warnings
+
+# Type checking
+npx tsc --noEmit
+```
+
+### Component Generation (Manual)
+
+```bash
+# Create component structure
+mkdir -p app/components/tickets
+touch app/components/tickets/TicketList.tsx
+touch app/components/tickets/TicketCard.tsx
+touch app/components/tickets/TicketForm.tsx
+
+# Create page
+mkdir -p app/tickets
+touch app/tickets/page.tsx
+touch app/tickets/layout.tsx
+touch app/tickets/loading.tsx
+touch app/tickets/error.tsx
+
+# Create API route
+mkdir -p app/api/tickets
+touch app/api/tickets/route.ts
+
+# Create dynamic route
+mkdir -p app/tickets/[id]
+touch app/tickets/[id]/page.tsx
+```
+
+### Next.js Specific Commands
+
+```bash
+# Clear Next.js cache
+rm -rf .next
+
+# Info about Next.js installation
+npx next info
+
+# Telemetry status
+npx next telemetry status
+npx next telemetry disable
+npx next telemetry enable
+```
+
+---
+
+## Prisma ORM Commands
+
+### Schema Management
+
+```bash
+# Generate Prisma Client
+npx prisma generate
+docker-compose exec orionone-backend npx prisma generate
+
+# Format schema file
+npx prisma format
+
+# Validate schema
+npx prisma validate
+
+# Pull schema from database
+npx prisma db pull
+
+# Push schema to database (dev only)
+npx prisma db push
+```
+
+### Migrations
+
+```bash
 # Create migration
-php artisan make:migration create_tickets_table
-php artisan make:migration add_avatar_to_users_table
+npx prisma migrate dev --name init
+npx prisma migrate dev --name add_tickets_table
+npx prisma migrate dev --name add_avatar_to_users
+
+# Apply migrations (production)
+npx prisma migrate deploy
+docker-compose exec orionone-backend npx prisma migrate deploy
+
+# Reset database ( deletes all data)
+npx prisma migrate reset
+npx prisma migrate reset --skip-seed # Without seeding
+
+# View migration status
+npx prisma migrate status
+
+# Create migration from schema changes
+npx prisma migrate dev
+
+# Resolve migration issues
+npx prisma migrate resolve --applied 20251113_init
+npx prisma migrate resolve --rolled-back 20251113_init
 ```
 
-### Models & Factories
+### Seeding
 
 ```bash
-# Create model
-php artisan make:model Ticket
+# Run seed
+npm run prisma:seed
+npx ts-node prisma/seed.ts
+docker-compose exec orionone-backend npx ts-node prisma/seed.ts
 
-# Model with migration
-php artisan make:model Ticket -m
-
-# Model with migration, factory, seeder
-php artisan make:model Ticket -mfs
-
-# Create factory
-php artisan make:factory TicketFactory
-
-# Create seeder
-php artisan make:seeder TicketSeeder
+# Custom seed scripts
+npx ts-node prisma/seed-users.ts
+npx ts-node prisma/seed-tickets.ts
 ```
 
-### Controllers
+### Prisma Studio (Database GUI)
 
 ```bash
-# Create controller
-php artisan make:controller TicketController
+# Open Prisma Studio
+npx prisma studio
+npm run prisma:studio
 
-# Resource controller (CRUD methods)
-php artisan make:controller TicketController --resource
+# Via Docker
+docker-compose exec orionone-backend npx prisma studio
+# Access at: http://localhost:5555
 
-# API resource controller
-php artisan make:controller Api/TicketController --api
-
-# Invokable controller (single action)
-php artisan make:controller ProcessTicketController --invokable
+# On specific port
+npx prisma studio --port 5556
 ```
 
-### Requests & Validation
+### Database Operations
 
 ```bash
-# Create form request
-php artisan make:request StoreTicketRequest
-php artisan make:request UpdateTicketRequest
-```
+# Execute raw SQL
+npx prisma db execute --file ./script.sql
 
-### Policies
+# Seed database
+npx prisma db seed
 
-```bash
-# Create policy
-php artisan make:policy TicketPolicy
-
-# Policy for model
-php artisan make:policy TicketPolicy --model=Ticket
-```
-
-### Jobs & Queues
-
-```bash
-# Create job
-php artisan make:job ProcessTicket
-
-# Run queue worker
-php artisan queue:work
-php artisan queue:work --once          # Process one job
-php artisan queue:work --stop-when-empty
-
-# List failed jobs
-php artisan queue:failed
-
-# Retry failed job
-php artisan queue:retry all
-php artisan queue:retry 5              # Specific job ID
-
-# Clear failed jobs
-php artisan queue:flush
-```
-
-### Cache
-
-```bash
-# Clear all caches
-php artisan optimize:clear
-
-# Individual caches
-php artisan cache:clear                # Application cache
-php artisan config:clear               # Configuration cache
-php artisan route:clear                # Route cache
-php artisan view:clear                 # Compiled views
-
-# Cache configuration
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
-
-### Testing
-
-```bash
-# Run all tests
-php artisan test
-
-# Run specific test file
-php artisan test tests/Feature/TicketTest.php
-
-# Run specific test method
-php artisan test --filter=test_user_can_create_ticket
-
-# Run with coverage
-php artisan test --coverage
-
-# Run with coverage minimum
-php artisan test --coverage --min=80
-
-# Parallel testing
-php artisan test --parallel
-```
-
-### IDE Helper
-
-```bash
-# Generate helper files
-php artisan ide-helper:generate        # _ide_helper.php
-php artisan ide-helper:models          # Model docblocks
-php artisan ide-helper:meta            # .phpstorm.meta.php
-
-# Write docblocks to models
-php artisan ide-helper:models --write
-```
-
-### Laravel Data (Spatie)
-
-```bash
-# Create Data class
-php artisan make:data TicketData
-```
-
-### Laravel Actions (Lorisleiva)
-
-```bash
-# Create Action class
-php artisan make:action CreateTicketAction
-php artisan make:action Users/UpdateProfileAction
-```
-
-### Maintenance
-
-```bash
-# Put application in maintenance mode
-php artisan down
-php artisan down --secret="token"      # Allow access with secret
-
-# Bring application up
-php artisan up
-
-# Generate application key
-php artisan key:generate
-
-# Clear expired password reset tokens
-php artisan auth:clear-resets
-```
-
-### Telescope (Debugging)
-
-```bash
-# Publish Telescope assets
-php artisan telescope:install
-
-# Clear Telescope data
-php artisan telescope:clear
-
-# Prune old entries
-php artisan telescope:prune
-```
-
-### Custom Commands
-
-```bash
-# Create custom command
-php artisan make:command SendTicketReminders
+# Database statistics
+npx prisma db stat
 ```
 
 ---
 
-## Composer Commands
+## npm Commands
 
-### Basic Operations
+### Installation
 
 ```bash
-# Install dependencies
-composer install
+# Install all dependencies
+npm install
+npm ci # Clean install (use in CI/CD)
 
-# Install dependencies (production)
-composer install --no-dev --optimize-autoloader
+# Install specific package
+npm install axios
+npm install @tanstack/react-query
+npm install zod
 
-# Update dependencies
-composer update
+# Install dev dependency
+npm install --save-dev @types/node
+npm install -D typescript eslint prettier
+
+# Install specific version
+npm install next@15.5.6
+npm install react@19.2.0
+
+# Install from GitHub
+npm install user/repo#branch
+```
+
+### Updates
+
+```bash
+# Check for updates
+npm outdated
+
+# Update all packages
+npm update
 
 # Update specific package
-composer update spatie/laravel-data
+npm update axios
+npm update next
 
-# Require new package
-composer require spatie/laravel-data
-composer require --dev phpstan/phpstan
+# Update to latest (ignoring semver)
+npm install axios@latest
+npm install next@latest
 
-# Remove package
-composer remove package/name
-
-# Show installed packages
-composer show
-composer show -i                       # Installed only
-```
-
-### Autoloading
-
-```bash
-# Dump autoload
-composer dump-autoload
-
-# Optimized autoload (production)
-composer dump-autoload --optimize
-composer dump-autoload -o
-```
-
-### Validation
-
-```bash
-# Validate composer.json
-composer validate
-
-# Check for security vulnerabilities
-composer audit
+# Interactive update
+npx npm-check-updates
+npx npm-check-updates -u # Update package.json
+npm install # Install updates
 ```
 
 ### Scripts
 
 ```bash
-# Run custom scripts (from composer.json)
-composer run-script test
-composer run-script format
-```
+# List available scripts
+npm run
 
----
+# Run custom script
+npm run custom-script
 
-## NPM Commands
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Install dependencies (CI)
-npm ci                                 # Clean install
-
-# Install specific package
-npm install vue
-npm install --save-dev @vitejs/plugin-vue
-
-# Install global package
-npm install -g pnpm
-```
-
-### Development
-
-```bash
-# Run dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+# Run with arguments
+npm run dev -- --port 3001
+npm run build -- --profile
 ```
 
 ### Package Management
 
 ```bash
-# Update packages
-npm update
-
-# Check outdated packages
-npm outdated
-
 # Remove package
-npm uninstall package-name
-npm uninstall --save-dev package-name
+npm uninstall axios
+npm remove @tanstack/react-query
 
 # List installed packages
 npm list
-npm list --depth=0                     # Top-level only
+npm list --depth=0 # Top-level only
+npm list axios # Specific package
+
+# Show package info
+npm view axios
+npm view next versions # All versions
+npm view @nestjs/common
 ```
 
-### Scripts
+### Security
 
 ```bash
-# Run custom scripts (from package.json)
-npm run format
-npm run lint
-npm run test
+# Audit dependencies
+npm audit
+npm audit --production # Production only
+
+# Fix vulnerabilities
+npm audit fix
+npm audit fix --force # Force major updates
+
+# Check for specific vulnerability
+npm audit --json | grep CVE-2025
 ```
 
-### Troubleshooting
+### Cache
 
 ```bash
 # Clear npm cache
 npm cache clean --force
+npm cache verify
 
-# Remove node_modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
+# Show cache location
+npm config get cache
+```
 
-# Fix permissions (Linux/Mac)
-sudo chown -R $USER:$GROUP ~/.npm
-sudo chown -R $USER:$GROUP node_modules
+### Publishing (if needed)
+
+```bash
+# Login to npm registry
+npm login
+
+# Publish package
+npm publish
+
+# Update version
+npm version patch # 1.0.0 → 1.0.1
+npm version minor # 1.0.0 → 1.1.0
+npm version major # 1.0.0 → 2.0.0
 ```
 
 ---
 
-## PowerShell Commands (Windows)
+## Database Commands (PostgreSQL)
 
-### Navigation
-
-```powershell
-# Change directory
-cd C:\laragon\www\orionone
-Set-Location C:\laragon\www\orionone
-
-# Go back
-cd ..
-
-# Go to home directory
-cd ~
-
-# List files
-ls
-Get-ChildItem
-ls -Force                              # Include hidden files
-```
-
-### File Operations
-
-```powershell
-# Create directory
-mkdir docs\new-folder
-New-Item -ItemType Directory -Path "docs\new-folder"
-
-# Create file
-New-Item -ItemType File -Path "test.txt"
-echo "content" > test.txt
-
-# Copy files
-Copy-Item file.txt backup.txt
-Copy-Item -Recurse folder\ backup-folder\
-
-# Move files
-Move-Item file.txt new-location\
-
-# Delete files
-Remove-Item file.txt
-Remove-Item -Recurse folder\
-Remove-Item -Force file.txt            # Force delete
-```
-
-### Process Management
-
-```powershell
-# Find process
-Get-Process | Where-Object {$_.ProcessName -like "*php*"}
-
-# Kill process by PID
-Stop-Process -Id 1234
-Stop-Process -Name "php"
-
-# Kill process by port
-$process = Get-NetTCPConnection -LocalPort 8888 -ErrorAction SilentlyContinue
-if ($process) { Stop-Process -Id $process.OwningProcess -Force }
-```
-
-### Network
-
-```powershell
-# Check port usage
-netstat -ano | findstr :8888
-Get-NetTCPConnection -LocalPort 8888
-
-# Test connection
-Test-NetConnection localhost -Port 8888
-
-# Get IP address
-ipconfig
-Get-NetIPAddress
-```
-
-### Environment Variables
-
-```powershell
-# View environment variables
-$env:PATH
-Get-ChildItem Env:
-
-# Set environment variable (session)
-$env:APP_ENV = "local"
-
-# Set environment variable (permanent)
-[System.Environment]::SetEnvironmentVariable("APP_ENV", "local", "User")
-```
-
-### Execution Policy
-
-```powershell
-# Check execution policy
-Get-ExecutionPolicy
-
-# Set execution policy (allow scripts)
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-Set-ExecutionPolicy Bypass -Scope Process
-```
-
----
-
-## Bash Commands (Linux/Mac)
-
-### Navigation
+### Connection
 
 ```bash
-# Change directory
-cd /var/www/orionone
+# Connect to database via Docker
+docker-compose exec orionone-db psql -U postgres -d orionone
 
-# Go back
-cd ..
+# Connect as specific user
+docker-compose exec orionone-db psql -U postgres
 
-# Go to home
-cd ~
-
-# List files
-ls
-ls -la                                 # List all with details
-ls -lh                                 # Human-readable sizes
+# Connect and execute command
+docker-compose exec orionone-db psql -U postgres -d orionone -c "SELECT version();"
 ```
 
-### File Operations
+### Database Operations
 
 ```bash
-# Create directory
-mkdir -p docs/new-folder
+# List databases
+docker-compose exec orionone-db psql -U postgres -c "\l"
 
-# Create file
-touch test.txt
-echo "content" > test.txt
+# List tables
+docker-compose exec orionone-db psql -U postgres -d orionone -c "\dt"
 
-# Copy files
-cp file.txt backup.txt
-cp -r folder/ backup-folder/
+# Describe table
+docker-compose exec orionone-db psql -U postgres -d orionone -c "\d users"
+docker-compose exec orionone-db psql -U postgres -d orionone -c "\d+ tickets"
 
-# Move files
-mv file.txt new-location/
+# List indexes
+docker-compose exec orionone-db psql -U postgres -d orionone -c "\di"
 
-# Delete files
-rm file.txt
-rm -rf folder/                         # Recursive force delete
+# Show table size
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT
+ tablename,
+ pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+"
 ```
 
-### File Viewing
+### Queries
 
 ```bash
-# View file content
-cat file.txt
-less file.txt                          # Paginated view
-head -n 20 file.txt                    # First 20 lines
-tail -n 20 file.txt                    # Last 20 lines
-tail -f storage/logs/laravel.log       # Follow log file
+# Execute query
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT * FROM users LIMIT 5;
+"
+
+# Count records
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT COUNT(*) FROM tickets;
+"
+
+# Query with formatting
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT id, email, role FROM users;
+" --html > users.html
+
+# Export to CSV
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+COPY (SELECT * FROM tickets) TO STDOUT WITH CSV HEADER;
+" > tickets.csv
 ```
 
-### Permissions
+### Backup & Restore
 
 ```bash
-# Change permissions
-chmod 755 script.sh
-chmod +x script.sh                     # Make executable
-chmod -R 775 storage/                  # Recursive
-
-# Change owner
-chown user:group file.txt
-chown -R www-data:www-data storage/
-
-# Current user permissions
-sudo chown -R $USER:$USER .
-```
-
-### Process Management
-
-```bash
-# Find process
-ps aux | grep php
-pgrep -f "php artisan"
-
-# Kill process
-kill 1234                              # By PID
-killall php                            # By name
-pkill -f "php artisan queue"           # By pattern
-
-# Check port usage
-lsof -i :8888
-netstat -tuln | grep 8888
-```
-
-### Network
-
-```bash
-# Test connection
-curl http://localhost:8888
-wget http://localhost:8888
-
-# Check IP address
-ifconfig
-ip addr show
-```
-
-### Search
-
-```bash
-# Find files
-find . -name "*.php"
-find . -type f -name "User.php"
-
-# Search in files
-grep -r "function" app/
-grep -r "class User" app/ --include="*.php"
-```
-
-### Compression
-
-```bash
-# Create archive
-tar -czf backup.tar.gz folder/
-zip -r backup.zip folder/
-
-# Extract archive
-tar -xzf backup.tar.gz
-unzip backup.zip
-```
-
----
-
-## Database Commands
-
-### PostgreSQL (psql)
-
-```bash
-# Connect to database
-psql -U postgres -d orionone
-
-# Inside psql
-\l                                     # List databases
-\c orionone                           # Connect to database
-\dt                                   # List tables
-\d users                              # Describe table
-\q                                    # Quit
-
-# Execute SQL file
-psql -U postgres -d orionone -f dump.sql
-
 # Backup database
-pg_dump -U postgres orionone > backup.sql
+docker-compose exec orionone-db pg_dump -U postgres orionone > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Backup with compression
+docker-compose exec orionone-db pg_dump -U postgres orionone | gzip > backup.sql.gz
+
+# Backup specific tables
+docker-compose exec orionone-db pg_dump -U postgres -t users -t tickets orionone > backup_tables.sql
 
 # Restore database
-psql -U postgres orionone < backup.sql
+docker-compose exec -T orionone-db psql -U postgres orionone < backup.sql
+
+# Restore with drop
+docker-compose exec orionone-db psql -U postgres -c "DROP DATABASE orionone;"
+docker-compose exec orionone-db psql -U postgres -c "CREATE DATABASE orionone;"
+docker-compose exec -T orionone-db psql -U postgres orionone < backup.sql
 ```
 
-### Via Docker
+### Maintenance
 
 ```bash
-# Connect to PostgreSQL in Docker
-docker-compose exec orionone-postgres psql -U postgres -d orionone
+# Vacuum database
+docker-compose exec orionone-db psql -U postgres -d orionone -c "VACUUM ANALYZE;"
 
-# Backup
-docker-compose exec orionone-postgres pg_dump -U postgres orionone > backup.sql
+# Reindex database
+docker-compose exec orionone-db psql -U postgres -d orionone -c "REINDEX DATABASE orionone;"
 
-# Restore
-docker-compose exec -T orionone-postgres psql -U postgres orionone < backup.sql
+# Show database statistics
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT schemaname, tablename, n_tup_ins, n_tup_upd, n_tup_del
+FROM pg_stat_user_tables
+ORDER BY n_tup_ins DESC;
+"
 
-# Execute SQL
-docker-compose exec orionone-postgres psql -U postgres -d orionone -c "SELECT * FROM users;"
+# Show index usage
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT
+ schemaname, tablename, indexname, idx_scan, idx_tup_read, idx_tup_fetch
+FROM pg_stat_user_indexes
+ORDER BY idx_scan DESC;
+"
+```
+
+### User Management
+
+```bash
+# Create user
+docker-compose exec orionone-db psql -U postgres -c "
+CREATE USER app_user WITH PASSWORD 'secure_password';
+"
+
+# Grant privileges
+docker-compose exec orionone-db psql -U postgres -c "
+GRANT ALL PRIVILEGES ON DATABASE orionone TO app_user;
+"
+
+# List users
+docker-compose exec orionone-db psql -U postgres -c "\du"
 ```
 
 ---
 
 ## Testing Commands
 
-### PHPUnit
+### Backend (Nest.js + Jest)
 
 ```bash
 # Run all tests
-./vendor/bin/phpunit
+npm test
+docker-compose exec orionone-backend npm test
 
-# Run specific test file
-./vendor/bin/phpunit tests/Feature/TicketTest.php
+# Watch mode
+npm run test:watch
+
+# Coverage
+npm run test:cov
+npm run test:cov -- --coverage-reporters=html # HTML report
+
+# Specific test file
+npm test -- auth.service.spec.ts
+npm test -- tickets.controller.spec.ts
+
+# Specific test suite
+npm test -- --testNamePattern="TicketService"
+npm test -- -t "should create ticket"
+
+# E2E tests
+npm run test:e2e
+npm run test:e2e -- --verbose
+
+# Debug tests
+npm run test:debug
+
+# Clear Jest cache
+npx jest --clearCache
+```
+
+### Frontend (Next.js + Jest)
+
+```bash
+# Run tests (if configured)
+npm test
+docker-compose exec orionone-frontend npm test
 
 # Run with coverage
-./vendor/bin/phpunit --coverage-html coverage
+npm run test:coverage
 
-# Run with filter
-./vendor/bin/phpunit --filter=testUserCanCreateTicket
+# Update snapshots
+npm test -- -u
+npm test -- --updateSnapshot
 ```
 
-### PHPStan (Static Analysis)
+### Test Coverage Reports
 
 ```bash
-# Analyze code
-./vendor/bin/phpstan analyse
+# Backend coverage
+npm run test:cov
+open coverage/lcov-report/index.html # Mac/Linux
+start coverage/lcov-report/index.html # Windows
 
-# Specific level (0-9)
-./vendor/bin/phpstan analyse --level=5
-
-# With configuration file
-./vendor/bin/phpstan analyse -c phpstan.neon
-```
-
-### Laravel Pint (Code Formatting)
-
-```bash
-# Format code
-./vendor/bin/pint
-
-# Dry run (preview changes)
-./vendor/bin/pint --test
-
-# Specific paths
-./vendor/bin/pint app/Models
+# Check coverage thresholds
+npm run test:cov -- --coverageThreshold='{"global":{"branches":80,"functions":80,"lines":80,"statements":80}}'
 ```
 
 ---
 
-## Production Deployment
+## Deployment Commands
 
-### Preparation
+### Production Build
 
 ```bash
-# 1. Pull latest code
-git pull origin main
-
-# 2. Install dependencies
-composer install --no-dev --optimize-autoloader
-npm ci
+# Backend
+cd nest-backend
 npm run build
+npm run start:prod
 
-# 3. Run migrations
-php artisan migrate --force
-
-# 4. Clear and cache
-php artisan optimize:clear
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# 5. Restart queue workers
-php artisan queue:restart
-
-# 6. Set permissions
-chmod -R 775 storage bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache
+# Frontend
+cd next-frontend
+npm run build
+npm start
 ```
 
-### Zero-Downtime Deployment
+### Docker Production
 
 ```bash
-# 1. Put in maintenance mode
-php artisan down --secret="your-secret-token"
+# Build production images
+docker-compose -f docker-compose.prod.yml build
 
-# 2. Deploy updates (steps above)
+# Start production stack
+docker-compose -f docker-compose.prod.yml up -d
 
-# 3. Bring application up
-php artisan up
+# View production logs
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+### Environment Variables
+
+```bash
+# Backend (.env)
+DATABASE_URL="postgresql://user:pass@localhost:5432/orionone"
+JWT_SECRET="your-secret-key"
+NODE_ENV="production"
+
+# Frontend (.env.local)
+NEXT_PUBLIC_API_URL="https://api.orionone.com"
+```
+
+### Health Checks
+
+```bash
+# Backend health
+curl http://localhost:3001/api/health
+
+# Frontend health
+curl http://localhost:3000
+
+# Database health
+docker-compose exec orionone-db pg_isready -U postgres
+
+# Redis health
+docker-compose exec orionone-redis redis-cli PING
+
+# Meilisearch health
+curl http://localhost:7700/health
+```
+
+### Database Migrations (Production)
+
+```bash
+# Apply migrations
+docker-compose exec orionone-backend npx prisma migrate deploy
+
+# Verify migration status
+docker-compose exec orionone-backend npx prisma migrate status
+
+# Rollback (manual)
+# 1. Restore database backup
+# 2. Remove failed migration from _prisma_migrations table
 ```
 
 ---
 
 ## Troubleshooting
 
-### Common Issues
+### Backend Issues
 
 ```bash
-# Storage permission errors
-chmod -R 775 storage bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache
+# Container won't start
+docker-compose logs orionone-backend
+docker-compose restart orionone-backend
+docker-compose up -d --force-recreate orionone-backend
 
-# Class not found
-composer dump-autoload
+# Database connection issues
+docker-compose exec orionone-backend npx prisma db pull
+docker-compose exec orionone-db psql -U postgres -d orionone -c "SELECT 1;"
 
-# Config cached
-php artisan config:clear
-php artisan cache:clear
+# Port already in use
+# Windows:
+netstat -ano | findstr :3001
+taskkill /PID <PID> /F
 
-# Route not working
-php artisan route:clear
-php artisan route:cache
+# Linux/Mac:
+lsof -i :3001
+kill -9 <PID>
 
-# Node modules issues
+# Clear Prisma cache
+rm -rf node_modules/.prisma
+npx prisma generate
+
+# Rebuild node_modules
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Frontend Issues
+
+```bash
+# Next.js cache issues
+rm -rf .next
+npm run dev
+
+# Module not found errors
 rm -rf node_modules package-lock.json
 npm install
 
-# Docker issues
-docker-compose down -v
-docker-compose up -d --build
+# Port already in use
+# Check process on port 3000
+netstat -ano | findstr :3000 # Windows
+lsof -i :3000 # Linux/Mac
 
-# Database connection errors
-php artisan config:clear
-# Check .env file
-# Restart database container
-docker-compose restart orionone-postgres
+# Type errors
+npx tsc --noEmit
+npm run lint
 ```
 
-### Logs
+### Docker Issues
 
 ```bash
-# Laravel logs
-tail -f storage/logs/laravel.log
+# Containers won't start
+docker-compose down
+docker-compose up -d --force-recreate
 
-# Docker logs
-docker-compose logs -f orionone-app
+# Network issues
+docker network prune
+docker-compose down
+docker-compose up -d
 
-# Nginx logs (if using)
-tail -f /var/log/nginx/error.log
+# Volume issues
+docker volume ls
+docker volume prune
+docker-compose down -v # Deletes data
+
+# Image issues
+docker image prune -a
+docker-compose build --no-cache
+
+# Disk space issues
+docker system df
+docker system prune -a --volumes
+```
+
+### Database Issues
+
+```bash
+# Connection refused
+docker-compose ps orionone-db
+docker-compose logs orionone-db
+docker-compose restart orionone-db
+
+# Migration issues
+docker-compose exec orionone-backend npx prisma migrate status
+docker-compose exec orionone-backend npx prisma migrate resolve --applied <migration_name>
+
+# Seed issues
+docker-compose exec orionone-backend npx ts-node prisma/seed.ts
+
+# Lock issues
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT * FROM pg_locks WHERE NOT granted;
+"
+
+# Kill long-running queries
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'active' AND query_start < NOW() - INTERVAL '5 minutes';
+"
+```
+
+### Performance Issues
+
+```bash
+# Check container resources
+docker stats
+
+# Check database connections
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT count(*) FROM pg_stat_activity;
+"
+
+# Check slow queries
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+SELECT query, calls, total_exec_time, mean_exec_time
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 10;
+"
+
+# Analyze query performance
+docker-compose exec orionone-db psql -U postgres -d orionone -c "
+EXPLAIN ANALYZE SELECT * FROM tickets WHERE status = 'OPEN';
+"
+```
+
+### Node.js Issues
+
+```bash
+# Memory leaks
+NODE_OPTIONS="--max-old-space-size=4096" npm run start:dev
+
+# Module resolution issues
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+
+# TypeScript issues
+npx tsc --noEmit --skipLibCheck
 ```
 
 ---
 
-## Useful Aliases
+## Quick Reference
 
-Add to `.bashrc` or `.zshrc`:
+### Daily Development Workflow
 
 ```bash
-# Laravel
-alias art="php artisan"
-alias mfs="php artisan migrate:fresh --seed"
-alias pint="./vendor/bin/pint"
-alias stan="./vendor/bin/phpstan analyse"
+# 1. Start development environment
+docker-compose up -d
 
-# Docker
-alias dcu="docker-compose up -d"
-alias dcd="docker-compose down"
-alias dcr="docker-compose restart"
-alias dcl="docker-compose logs -f"
-alias dce="docker-compose exec"
+# 2. Watch logs
+docker-compose logs -f orionone-backend orionone-frontend
 
-# Git
-alias gs="git status"
-alias ga="git add ."
-alias gc="git commit -m"
-alias gp="git push origin"
-alias gl="git log --oneline --graph --all -10"
+# 3. Make changes...
 
-# NPM
-alias nrd="npm run dev"
-alias nrb="npm run build"
+# 4. Check status
+git status
+npm test
+
+# 5. Commit
+git add .
+git commit -m "feat: add feature"
+git push origin feature/branch
+
+# 6. Stop environment
+docker-compose down
+```
+
+### Production Deployment Checklist
+
+```bash
+# 1. Run tests
+npm run test:cov # Backend
+npm test # Frontend
+
+# 2. Build
+npm run build # Both projects
+
+# 3. Database migrations
+npx prisma migrate deploy
+
+# 4. Environment variables
+cp .env.example .env
+# Edit .env with production values
+
+# 5. Docker build
+docker-compose -f docker-compose.prod.yml build
+
+# 6. Deploy
+docker-compose -f docker-compose.prod.yml up -d
+
+# 7. Health checks
+curl http://localhost:3001/api/health
+curl http://localhost:3000
+
+# 8. Monitor logs
+docker-compose -f docker-compose.prod.yml logs -f
 ```
 
 ---
 
-**Last Updated:** 08 November 2025
-**Version:** 1.0
-**Project:** OrionOne ITSM
+**Last Updated:** 13 November 2025
+**Maintained by:** OrionOne Development Team
+**Stack Version:** Next.js 15.5.6 + Nest.js 11.1.8 + PostgreSQL 18.0

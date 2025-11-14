@@ -1,38 +1,119 @@
-*.log
-.DS_Store
+# ============================================
+# OrionOne - Next.js 15 + Nest.js 11
+# ============================================
+
+# ============================================
+# Environment Variables (NEVER COMMIT!)
+# ============================================
 .env
+.env.local
+.env.*.local
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
+.env.development
+.env.test
 
-# IDE Helper
-_ide_helper.php
-_ide_helper_models.php
-.phpstorm.meta.php
+# ============================================
+# Node.js / npm
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
 
-# Internal analysis documents (not for version control)
+# ============================================
+# Next.js (Frontend)
+# ============================================
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ============================================
+# Nest.js (Backend)
+# ============================================
+/dist
+/uploads
+*.log
+
+# ============================================
+# Testing
+# ============================================
+coverage/
+*.lcov
+.nyc_output
+
+# ============================================
+# IDEs / Editors
+# ============================================
+.vscode/
+.idea/
+.fleet/
+.nova/
+.zed/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================
+# Prisma
+# ============================================
+# Keep migrations in Git, but exclude generated files
+nest-backend/prisma/migrations/**/*.sql.gz
+
+# ============================================
+# Logs
+# ============================================
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================
+# Docker
+# ============================================
+docker-compose.override.yml
+
+# ============================================
+# Temporary files
+# ============================================
+tmp/
+temp/
+*.tmp
+
+# ============================================
+# OS files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ============================================
+# Archive (Laravel/Vue backup)
+# ============================================
+# Keep archive in Git for reference
+# archive-laravel-vue/
+
+# ============================================
+# Internal analysis documents
+# ============================================
 docs/SYSTEM-COMPLETENESS-ANALYSIS.md
 
-/vendor
-Homestead.json
-Homestead.yaml
-Thumbs.db
-npm-debug.log
-yarn-error.log
-_ide_helper.php
-_ide_helper_models.php
-.phpstorm.meta.php
+# ============================================
+# Scripts output
+# ============================================
+scripts/__pycache__/
+scripts/*.pyc

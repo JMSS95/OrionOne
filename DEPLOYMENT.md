@@ -1,363 +1,373 @@
-# Deployment Guide - OrionOne
+# Deployment Guide - OrionOne ITSM
 
-## Produção
+**Last Updated:** November 13, 2025
 
-### Build Assets
+Production deployment guide for Next.js 15 + Nest.js 11 + PostgreSQL 18 stack.
+
+---
+
+## Pre-Deployment Checklist
+
+- [ ] All tests passing (backend + frontend)
+- [ ] Code coverage >80%
+- [ ] Environment variables configured
+- [ ] Database backup created
+- [ ] SSL certificates ready
+- [ ] Domain DNS configured
+
+---
+
+## Server Requirements
+
+### Minimum Hardware
+
+**Small Business (10-50 users):**
+
+- 2 CPU cores, 4GB RAM, 40GB SSD
+
+**Medium Business (50-200 users):**
+
+- 4 CPU cores, 8GB RAM, 80GB SSD
+
+**Large Business (200-500 users):**
+
+- 8 CPU cores, 16GB RAM, 160GB SSD
+
+### Software
+
+- Ubuntu 22.04 LTS
+- Node.js 20.x LTS
+- PostgreSQL 18.0
+- Redis 8.2
+- Nginx 1.24+
+- PM2 (process manager)
+- Certbot (SSL certificates)
+
+---
+
+## Installation
+
+### 1. Install Dependencies
 
 ```bash
-# Compilar assets para produção
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install Node.js 20
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
+
+# Install PM2
+npm install -g pm2
+
+# Install Nginx
+sudo apt install nginx -y
+
+# Install Certbot
+sudo apt install certbot python3-certbot-nginx -y
+```
+
+### 2. Clone Repository
+
+```bash
+cd /var/www
+sudo git clone https://github.com/JMSS95/OrionOne.git orionone
+cd orionone
+sudo chown -R $USER:$USER /var/www/orionone
+```
+
+### 3. Setup Backend
+
+```bash
+cd nest-backend
+npm ci --omit=dev
+cp .env.example .env
+nano .env # Configure production variables
 npm run build
-
-# Verificar que assets foram gerados
-ls public/build/
+npm run prisma:migrate:deploy
 ```
 
-### Optimize Laravel
+### 4. Setup Frontend
 
 ```bash
-# Cache de configuração
-php artisan config:cache
-
-# Cache de rotas
-php artisan route:cache
-
-# Cache de views
-php artisan view:cache
-
-# Optimize autoloader
-composer install --optimize-autoloader --no-dev
-```
-
-### Migrations em Produção
-
-```bash
-# IMPORTANTE: Sempre fazer backup antes de migrations!
-# pg_dump -U postgres -d orionone -F c -f backup_$(date +%Y%m%d).dump
-
-# Executar migrations
-php artisan migrate --force
-
-# Verificar status
-php artisan migrate:status
-```
-
-## Ambiente Recomendado
-
-### Servidor
-
--   **OS**: Ubuntu 22.04 LTS ou superior
--   **PHP**: 8.3+ com PHP-FPM
--   **Web Server**: Nginx 1.24+
--   **Database**: PostgreSQL 16
--   **Cache**: Redis 7.x
--   **Process Manager**: Supervisor (para queues)
-
-### Requisitos Mínimos Hardware
-
-**Pequena Empresa (10-50 users):**
-
--   2 CPU cores
--   4GB RAM
--   20GB SSD
-
-**Média Empresa (50-200 users):**
-
--   4 CPU cores
--   8GB RAM
--   50GB SSD
-
-**Grande Empresa (200-500 users):**
-
--   8 CPU cores
--   16GB RAM
--   100GB SSD
-
-## Nginx Configuration
-
-```nginx
-server {
-    listen 80;
-    server_name orionone.example.com;
-    root /var/www/orionone/public;
-
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff";
-
-    index index.php;
-
-    charset utf-8;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt { access_log off; log_not_found off; }
-
-    error_page 404 /index.php;
-
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
-}
-```
-
-## Supervisor Configuration (Queue Worker)
-
-```ini
-[program:orionone-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/orionone/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
-autostart=true
-autorestart=true
-stopasgroup=true
-killasgroup=true
-user=www-data
-numprocs=2
-redirect_stderr=true
-stdout_logfile=/var/www/orionone/storage/logs/worker.log
-stopwaitsecs=3600
-```
-
-Restart supervisor:
-
-```bash
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl start orionone-worker:*
-```
-
-## Cron Jobs (Scheduler)
-
-Adicionar ao crontab:
-
-```bash
-* * * * * cd /var/www/orionone && php artisan schedule:run >> /dev/null 2>&1
-```
-
-## SSL/HTTPS (Certbot)
-
-```bash
-# Instalar Certbot
-sudo apt install certbot python3-certbot-nginx
-
-# Obter certificado SSL
-sudo certbot --nginx -d orionone.example.com
-
-# Auto-renewal já está configurado
-sudo certbot renew --dry-run
-```
-
-## Backup Strategy
-
-### Database Backup (Diário)
-
-```bash
-#!/bin/bash
-# /usr/local/bin/backup-orionone-db.sh
-
-DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR="/backups/orionone"
-DB_NAME="orionone"
-
-mkdir -p $BACKUP_DIR
-
-pg_dump -U postgres -d $DB_NAME -F c -f $BACKUP_DIR/db_$DATE.dump
-
-# Manter apenas últimos 7 dias
-find $BACKUP_DIR -name "db_*.dump" -mtime +7 -delete
-```
-
-Adicionar ao crontab:
-
-```
-0 2 * * * /usr/local/bin/backup-orionone-db.sh
-```
-
-### Files Backup (Semanal)
-
-```bash
-#!/bin/bash
-# /usr/local/bin/backup-orionone-files.sh
-
-DATE=$(date +%Y%m%d)
-BACKUP_DIR="/backups/orionone"
-APP_DIR="/var/www/orionone"
-
-tar -czf $BACKUP_DIR/files_$DATE.tar.gz \
-    $APP_DIR/storage/app/public \
-    $APP_DIR/.env
-
-# Manter apenas últimas 4 semanas
-find $BACKUP_DIR -name "files_*.tar.gz" -mtime +28 -delete
-```
-
-## Monitoring
-
-### Laravel Telescope (Development/Staging)
-
-Acessível em: `https://orionone.example.com/telescope`
-
-**IMPORTANTE**: Desativar em produção ou proteger com autenticação forte.
-
-### Laravel Pulse (Production Monitoring)
-
-Acessível em: `https://orionone.example.com/pulse`
-
-Monitora:
-
--   Request throughput
--   Slow queries
--   Exceptions
--   Queue jobs
--   Cache hits/misses
-
-### Log Monitoring
-
-```bash
-# Ver logs em tempo real
-tail -f /var/www/orionone/storage/logs/laravel.log
-
-# Ver erros
-grep "ERROR" /var/www/orionone/storage/logs/laravel.log
-```
-
-## Security Checklist
-
--   [ ] `.env` com permissões 600
--   [ ] `APP_DEBUG=false` em produção
--   [ ] `APP_ENV=production`
--   [ ] Firewall configurado (UFW)
--   [ ] SSL/HTTPS ativo
--   [ ] Telescope desativado ou protegido
--   [ ] Database backups automatizados
--   [ ] Redis protegido com password
--   [ ] Fail2ban configurado
--   [ ] SSH com key-based auth
--   [ ] Rate limiting configurado
--   [ ] CORS configurado corretamente
-
-## Troubleshooting
-
-### 500 Internal Server Error
-
-```bash
-# Verificar logs
-tail -f storage/logs/laravel.log
-
-# Limpar cache
-php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
-
-# Verificar permissões
-sudo chown -R www-data:www-data storage bootstrap/cache
-sudo chmod -R 775 storage bootstrap/cache
-```
-
-### Queue não processa jobs
-
-```bash
-# Verificar supervisor
-sudo supervisorctl status orionone-worker:*
-
-# Restart workers
-sudo supervisorctl restart orionone-worker:*
-
-# Ver logs do worker
-tail -f storage/logs/worker.log
-```
-
-### Conexão database falha
-
-```bash
-# Verificar PostgreSQL
-sudo systemctl status postgresql
-
-# Testar conexão
-psql -U laravel -d orionone -h localhost
-
-# Verificar .env
-cat .env | grep DB_
-```
-
-## Performance Tuning
-
-### OPcache (PHP)
-
-Editar `/etc/php/8.3/fpm/conf.d/10-opcache.ini`:
-
-```ini
-opcache.enable=1
-opcache.memory_consumption=256
-opcache.interned_strings_buffer=16
-opcache.max_accelerated_files=10000
-opcache.validate_timestamps=0
-opcache.revalidate_freq=0
-```
-
-### PostgreSQL
-
-Editar `/etc/postgresql/16/main/postgresql.conf`:
-
-```conf
-shared_buffers = 256MB
-effective_cache_size = 1GB
-work_mem = 16MB
-maintenance_work_mem = 128MB
-max_connections = 100
-```
-
-### Redis
-
-Editar `/etc/redis/redis.conf`:
-
-```conf
-maxmemory 512mb
-maxmemory-policy allkeys-lru
-```
-
-## Updates & Maintenance
-
-### Atualizar aplicação
-
-```bash
-cd /var/www/orionone
-
-# Backup
-sudo -u www-data php artisan down
-pg_dump -U postgres -d orionone -F c -f backup_pre_update.dump
-
-# Pull changes
-git pull origin main
-
-# Update dependencies
-composer install --no-dev --optimize-autoloader
-npm install
+cd next-frontend
+npm ci
+cp .env.example .env.production
+nano .env.production # Configure production variables
 npm run build
-
-# Run migrations
-php artisan migrate --force
-
-# Clear cache
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Restart services
-sudo supervisorctl restart orionone-worker:*
-sudo systemctl reload php8.3-fpm
-
-# Up
-sudo -u www-data php artisan up
 ```
 
 ---
 
-**Deployment Guide** • OrionOne ITSM Platform • 2025
+## Environment Variables
+
+### Backend (.env)
+
+```bash
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=postgresql://orionone:password@localhost:5432/orionone
+JWT_SECRET=your-secure-jwt-secret-min-32-chars
+JWT_REFRESH_SECRET=your-secure-refresh-secret
+REDIS_URL=redis://localhost:6379
+MEILISEARCH_URL=http://localhost:7700
+MEILISEARCH_KEY=your-master-key
+AWS_S3_BUCKET=orionone-uploads
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=noreply@orionone.com
+SMTP_PASSWORD=your-smtp-password
+SENTRY_DSN=https://your-sentry-dsn
+```
+
+### Frontend (.env.production)
+
+```bash
+NODE_ENV=production
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXT_PUBLIC_SENTRY_DSN=https://your-sentry-dsn
+```
+
+---
+
+## PM2 Process Management
+
+Create `ecosystem.config.js` in project root with backend and frontend configurations.
+
+**Configuration:**
+
+- Backend: 2 instances (cluster mode), 500MB memory limit, port 3000
+- Frontend: 2 instances (cluster mode), 1GB memory limit, port 3001
+
+**Start applications:**
+
+```bash
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup
+```
+
+**Example config:** See `deployment/ecosystem.config.example.js`
+
+---
+
+## Nginx Configuration
+
+### Setup Reverse Proxy
+
+1. **Backend (API)**: Create `/etc/nginx/sites-available/orionone-api`
+
+ - Upstream: `localhost:3000`
+ - Server name: `api.yourdomain.com`
+ - Proxy headers: X-Real-IP, X-Forwarded-For, X-Forwarded-Proto
+
+2. **Frontend (SPA)**: Create `/etc/nginx/sites-available/orionone-frontend`
+
+ - Upstream: `localhost:3001`
+ - Server name: `yourdomain.com www.yourdomain.com`
+ - Cache static assets: `/_next/static` (60 minutes)
+
+3. **Enable sites:**
+
+```bash
+sudo ln -s /etc/nginx/sites-available/orionone-api /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/orionone-frontend /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+**Example configs:** See `deployment/nginx/` directory
+
+---
+
+## SSL/TLS (Let's Encrypt)
+
+```bash
+# Obtain certificates
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+sudo certbot --nginx -d api.yourdomain.com
+
+# Auto-renewal (runs twice daily)
+sudo systemctl enable certbot.timer
+```
+
+---
+
+## Database Optimization
+
+**PostgreSQL tuning** (edit `/etc/postgresql/18/main/postgresql.conf`):
+
+- `shared_buffers = 256MB` (25% of RAM)
+- `effective_cache_size = 1GB` (50% of RAM)
+- `work_mem = 16MB`
+- `maintenance_work_mem = 128MB`
+- `max_connections = 100`
+
+**Apply changes:**
+
+```bash
+sudo systemctl restart postgresql
+```
+
+---
+
+## Backup Strategy
+
+### Automated Daily Backups
+
+Create `/usr/local/bin/backup-orionone.sh`:
+
+```bash
+#!/bin/bash
+BACKUP_DIR="/var/backups/orionone"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+mkdir -p $BACKUP_DIR
+
+# Database backup
+docker exec orionone_postgres pg_dump -U orionone -d orionone -F c > $BACKUP_DIR/db_$DATE.dump
+gzip $BACKUP_DIR/db_$DATE.dump
+
+# Keep last 7 days
+find $BACKUP_DIR -name "*.dump.gz" -mtime +7 -delete
+```
+
+Make executable and schedule:
+
+```bash
+sudo chmod +x /usr/local/bin/backup-orionone.sh
+sudo crontab -e
+```
+
+Add cron job (daily at 2 AM):
+
+```cron
+0 2 * * * /usr/local/bin/backup-orionone.sh
+```
+
+### Restore Database
+
+```bash
+gunzip -c /var/backups/orionone/db_20251113.dump.gz | \
+ docker exec -i orionone_postgres pg_restore -U orionone -d orionone -c
+```
+
+---
+
+## Monitoring
+
+### PM2 Monitoring
+
+```bash
+pm2 monit # Real-time monitoring
+pm2 logs # View logs
+pm2 status # Check status
+```
+
+### Health Checks
+
+```bash
+# Backend API
+curl https://api.yourdomain.com/health
+
+# Frontend
+curl https://yourdomain.com
+```
+
+---
+
+## Security Checklist
+
+- [ ] Environment files secured (chmod 600)
+- [ ] SSL/HTTPS enabled
+- [ ] Firewall configured (UFW: allow 80, 443, 22)
+- [ ] Strong database passwords
+- [ ] Redis password protected
+- [ ] SSH key-based authentication only
+- [ ] Fail2ban configured
+- [ ] CORS configured
+- [ ] Rate limiting enabled
+- [ ] Regular security updates
+
+---
+
+## Updates & Maintenance
+
+### Update Application
+
+```bash
+cd /var/www/orionone
+
+# Stop applications
+pm2 stop all
+
+# Backup database
+/usr/local/bin/backup-orionone.sh
+
+# Pull latest code
+git pull origin main
+
+# Backend
+cd nest-backend
+npm ci
+npm run build
+npm run prisma:migrate:deploy
+
+# Frontend
+cd ../next-frontend
+npm ci
+npm run build
+
+# Restart
+pm2 restart all
+```
+
+### System Updates
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo systemctl restart nginx
+pm2 restart all
+```
+
+---
+
+## Troubleshooting
+
+### 502 Bad Gateway
+
+```bash
+pm2 status # Check if apps are running
+pm2 logs orionone-backend # Check backend logs
+sudo tail -f /var/log/nginx/error.log
+```
+
+### Database Connection Fails
+
+```bash
+docker ps | grep postgres
+docker logs orionone_postgres
+cat nest-backend/.env | grep DATABASE_URL
+```
+
+### High Memory Usage
+
+```bash
+pm2 monit # Check memory usage
+pm2 restart all # Restart applications
+```
+
+---
+
+## Support
+
+- **Documentation:** [`docs/`](docs/)
+- **Tech Stack:** [`TECH-STACK.md`](TECH-STACK.md)
+- **Commands:** [`docs/COMMANDS-REFERENCE.md`](docs/COMMANDS-REFERENCE.md)
+- **Issues:** [GitHub Issues](https://github.com/JMSS95/OrionOne/issues)
+
+---
+
+**OrionOne ITSM Platform** • Production Deployment Guide
