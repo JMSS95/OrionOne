@@ -1,1234 +1,1537 @@
-# Database Schema - OrionOne
+# Database Schema - OrionOne ITSM
 
-## Visão Geral
-
-OrionOne utilizará **PostgreSQL 16** como base de dados relacional, aproveitando features avançadas como JSONB para custom fields, full-text search para knowledge base, e indexes otimizados para performance.
-
-**Características principais:**
-
-- Normalização até 3NF (evitar redundância)
-- Soft deletes em tabelas críticas (auditoria)
-- Timestamps automáticos (created_at, updated_at)
-- Foreign keys com ON DELETE CASCADE/SET NULL apropriados
-- Indexes estratégicos para queries comuns
+**Última Atualização:** 13 Novembro 2025
+**Status:** Implementado & Testado (Sprint 0 - Week 1)
+**Database:** PostgreSQL 18.0 (Alpine)
+**ORM:** Prisma 6.19.0
+**Models:** 15 | **Enums:** 6 | **Relations:** 28
+**Optimization:** Indexes, Foreign Keys, Soft Deletes
 
 ---
 
-## Tabelas Principais
+## Overview da Implementação
 
-### 1. users
+### Stack Database
 
-**Descrição:** Utilizadores do sistema (Admin, Agent, Requester)
+- **PostgreSQL 18.0** - RDBMS enterprise com JSONB, full-text search, partitioning, enhanced vacuum
+- **Prisma 6.19.0** - Type-safe ORM com Prisma Client gerado, totalmente compatível com PG18
+- **UUID v4** - Identificadores únicos distribuídos (não BIGSERIAL)
+- **Enums nativos** - PostgreSQL enums para type safety
+- **Indexes estratégicos** - Single, composite e partial indexes
+- **Bcrypt v6.0.0** - Password hashing com security fixes (CVE-2025)
 
-| Campo | Tipo | Constraints | Descrição |
-| ------------------- | ------------ | ---------------- | ------------------- |
-| `id` | BIGSERIAL | PRIMARY KEY | Identificador único |
-| `name` | VARCHAR(255) | NOT NULL | Nome completo |
-| `email` | VARCHAR(255) | UNIQUE, NOT NULL | Email (login) |
-| `email_verified_at` | TIMESTAMP | NULLABLE | Data de verificação |
-| `password` | VARCHAR(255) | NOT NULL | Hash bcrypt |
-| `remember_token` | VARCHAR(100) | NULLABLE | Token "remember me" |
-| `avatar` | VARCHAR(255) | NULLABLE | URL do avatar |
-| `is_active` | BOOLEAN | DEFAULT true | Conta ativa? |
-| `created_at` | TIMESTAMP | NOT NULL | |
-| `updated_at` | TIMESTAMP | NOT NULL | |
-| `deleted_at` | TIMESTAMP | NULLABLE | Soft delete |
+### Estatísticas
+
+```
+ 15 Models (Users, Tickets, KB, CMDB, Activity)
+ 3 Roles (ADMIN, AGENT, USER)
+ 32 Permissions seeded
+ 6 Status (OPEN → CLOSED)
+ 4 Priorities (LOW → URGENT)
+ 15 Tabelas PostgreSQL
+ 28 Relations (1:N, N:M, self-referencing)
+ 25+ Indexes (single, composite, unique)
+ Foreign Keys com Cascade Rules
+ Soft Deletes em todos os models principais
+ JSONB para campos customizáveis
+```
+
+### Otimizações Implementadas
+
+- **Indexes Estratégicos**: 25+ indexes (B-tree) em campos de alta consulta
+- **Composite Indexes**: `(status, priority)` para queries complexas
+- **Foreign Key Indexes**: Todos os FKs indexados para JOIN performance
+- **Unique Constraints**: `email`, `ticket_number` com indexes únicos
+- **Cascade Rules**: DELETE CASCADE, SET NULL, RESTRICT configurados
+- **Soft Deletes**: `deletedAt` em Users, Tickets, Categories, etc
+- **JSONB Fields**: `customFields` com suporte a GIN indexes (futuro)
+- **Enum Types**: PostgreSQL native enums (4 bytes vs VARCHAR)
+- **UUID v4**: IDs não-sequenciais, distribuídos, security-friendly
+
+---
+
+## Arquitetura de Dados
+
+### Domínios ITSM
+
+```
+
+ ORIONONE ITSM DATABASE 
+
+1⃣ AUTHENTICATION & AUTHORIZATION
+ User (users)
+ Permission (permissions)
+ RoleHasPermission (role_has_permissions)
+
+2⃣ INCIDENT MANAGEMENT
+ Ticket (tickets)
+ Comment (comments)
+ Category (categories)
+
+3⃣ TEAM COLLABORATION
+ Team (teams)
+ TeamMember (team_members)
+
+4⃣ KNOWLEDGE BASE
+ Article (articles)
+ ArticleVersion (article_versions)
+
+5⃣ ASSET MANAGEMENT (CMDB)
+ Asset (assets)
+
+6⃣ SYSTEM
+ Media (media) - File uploads polymorphic
+ ActivityLog (activity_log) - Audit trail
+ Notification (notifications) - User alerts
+```
+
+---
+
+## Models Detalhados
+
+### 1⃣ Authentication & Authorization
+
+#### Model: User
+
+**Propósito:** Utilizadores do sistema (Admin, Agent, End-User)
+
+**Schema Prisma:**
+
+```prisma
+model User {
+ id String @id @default(uuid())
+ name String
+ email String @unique
+ emailVerifiedAt DateTime? @map("email_verified_at")
+ password String // bcrypt hash
+ rememberToken String? @map("remember_token")
+ avatar String? // URL or path
+ isActive Boolean @default(true)
+ role Role @default(USER) // ADMIN | AGENT | USER
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ deletedAt DateTime? // Soft delete
+
+ // Relations (8 types)
+ ticketsCreated Ticket[] @relation("TicketRequester")
+ ticketsAssigned Ticket[] @relation("TicketAssignee")
+ comments Comment[]
+ articles Article[]
+ teamMembers TeamMember[]
+ activityLogs ActivityLog[]
+ assets Asset[]
+ notifications Notification[]
+
+ @@index([email])
+ @@index([role])
+ @@index([isActive])
+ @@map("users")
+}
+
+enum Role {
+ ADMIN // Full system access
+ AGENT // Manage tickets, KB, assets
+ USER // Create tickets, view KB
+}
+```
+
+**Campos Chave:**
+
+- `role`: Enum direto (simplificação de Spatie Permission)
+- `emailVerifiedAt`: Email verification (opcional)
+- `isActive`: Enable/disable account sem delete
+- `deletedAt`: Soft delete para auditoria
 
 **Indexes:**
 
-```sql
-CREATE UNIQUE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_created ON users(created_at);
-CREATE INDEX idx_users_active ON users(is_active) WHERE deleted_at IS NULL;
+- `email`: UNIQUE index para login
+- `role`: Filter by role queries
+- `isActive`: Active users dashboard
+
+**Seed Data (Week 1 Monday):**
+
+```typescript
+// 3 users criados
+admin@orionone.test // Role: ADMIN
+agent@orionone.test // Role: AGENT
+user@orionone.test // Role: USER
+// Password: bcrypt("password123")
 ```
 
-**Relacionamentos:**
+**Queries Comuns:**
 
-- `hasMany`: tickets (como requester)
-- `hasMany`: tickets (como assigned agent)
-- `hasMany`: comments
-- `hasMany`: articles (como author)
-- `belongsToMany`: teams (pivot: team_user)
-- `belongsToMany`: roles (via Spatie Permission)
+```typescript
+// Login
+const user = await prisma.user.findUnique({ where: { email } });
 
----
+// Active agents
+const agents = await prisma.user.findMany({
+ where: { role: "AGENT", isActive: true, deletedAt: null },
+});
 
-### 2. teams
-
-**Descrição:** Equipas de suporte especializadas (Hardware, Software, Network, etc.)
-
-| Campo | Tipo | Constraints | Descrição |
-| ------------- | ------------ | ---------------- | --------------------------------- |
-| `id` | BIGSERIAL | PRIMARY KEY | Identificador único |
-| `name` | VARCHAR(255) | NOT NULL | Nome da equipa |
-| `slug` | VARCHAR(255) | UNIQUE, NOT NULL | URL-friendly (hardware, software) |
-| `description` | TEXT | NULLABLE | Descrição da equipa |
-| `email` | VARCHAR(255) | NULLABLE | Email da equipa |
-| `is_active` | BOOLEAN | DEFAULT true | Equipa ativa? |
-| `created_at` | TIMESTAMP | NOT NULL | |
-| `updated_at` | TIMESTAMP | NOT NULL | |
-
-**Indexes:**
-
-```sql
-CREATE UNIQUE INDEX idx_teams_slug ON teams(slug);
-CREATE INDEX idx_teams_active ON teams(is_active);
-```
-
-**Relacionamentos:**
-
-- `hasMany`: tickets
-- `belongsToMany`: users (pivot: team_user)
-
----
-
-### 3. team_user (Pivot Table)
-
-**Descrição:** Relacionamento muitos-para-muitos entre users e teams
-
-| Campo | Tipo | Constraints | Descrição |
-| ----------- | ----------- | ---------------- | ------------ |
-| `id` | BIGSERIAL | PRIMARY KEY | |
-| `team_id` | BIGINT | FK → teams(id) | |
-| `user_id` | BIGINT | FK → users(id) | |
-| `role` | VARCHAR(50) | DEFAULT 'member' | member, lead |
-| `joined_at` | TIMESTAMP | NOT NULL | |
-
-**Indexes:**
-
-```sql
-CREATE UNIQUE INDEX idx_team_user_unique ON team_user(team_id, user_id);
-CREATE INDEX idx_team_user_team ON team_user(team_id);
-CREATE INDEX idx_team_user_user ON team_user(user_id);
+// User with tickets
+const userWithTickets = await prisma.user.findUnique({
+ where: { id },
+ include: { ticketsCreated: true, ticketsAssigned: true },
+});
 ```
 
 ---
 
-### 4. tickets
+#### Model: Permission
 
-**Descrição:** Tickets de suporte criados por utilizadores
+**Propósito:** Permissões granulares RBAC (usado com CASL no frontend)
 
-| Campo | Tipo | Constraints | Descrição |
-| ------------------------- | ------------ | -------------------- | ----------------------------------- |
-| `id` | BIGSERIAL | PRIMARY KEY | |
-| `ticket_number` | VARCHAR(20) | UNIQUE, NOT NULL | TKT-000001 (auto-gerado) |
-| `title` | VARCHAR(255) | NOT NULL | Título do ticket |
-| `description` | TEXT | NOT NULL | Descrição detalhada |
-| `status` | VARCHAR(50) | NOT NULL | open, in_progress, resolved, closed |
-| `priority` | VARCHAR(50) | NOT NULL | low, medium, high, urgent |
-| `requester_id` | BIGINT | FK → users(id) | Quem criou |
-| `assigned_to` | BIGINT | FK → users(id), NULL | Agent atribuído |
-| `team_id` | BIGINT | FK → teams(id), NULL | Equipa responsável |
-| `category` | VARCHAR(100) | NULLABLE | Categoria do problema |
-| `first_response_at` | TIMESTAMP | NULLABLE | Primeira resposta do agent |
-| `first_response_deadline` | TIMESTAMP | NULLABLE | SLA: deadline 1ª resposta |
-| `resolution_deadline` | TIMESTAMP | NULLABLE | SLA: deadline resolução |
-| `resolved_at` | TIMESTAMP | NULLABLE | Data de resolução |
-| `closed_at` | TIMESTAMP | NULLABLE | Data de fecho |
-| `is_escalated` | BOOLEAN | DEFAULT false | Escalado para manager? |
-| `custom_fields` | JSONB | NULLABLE | Campos customizáveis |
-| `created_at` | TIMESTAMP | NOT NULL | |
-| `updated_at` | TIMESTAMP | NOT NULL | |
-| `deleted_at` | TIMESTAMP | NULLABLE | Soft delete |
+**Schema Prisma:**
 
-**Indexes:**
+```prisma
+model Permission {
+ id String @id @default(uuid())
+ name String @unique // "tickets:create", "tickets:delete"
+ guardName String @map("guard_name") // "api" (JWT)
+ description String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
 
-```sql
-CREATE UNIQUE INDEX idx_tickets_number ON tickets(ticket_number);
-CREATE INDEX idx_tickets_status ON tickets(status) WHERE deleted_at IS NULL;
-CREATE INDEX idx_tickets_priority ON tickets(priority);
-CREATE INDEX idx_tickets_requester ON tickets(requester_id);
-CREATE INDEX idx_tickets_assigned ON tickets(assigned_to);
-CREATE INDEX idx_tickets_team ON tickets(team_id);
-CREATE INDEX idx_tickets_created ON tickets(created_at);
-CREATE INDEX idx_tickets_sla_deadline ON tickets(resolution_deadline) WHERE status IN ('open', 'in_progress');
-CREATE INDEX idx_tickets_custom_fields ON tickets USING GIN(custom_fields);
+ roles RoleHasPermission[]
+
+ @@map("permissions")
+}
 ```
 
-**Relacionamentos:**
-
-- `belongsTo`: user (requester)
-- `belongsTo`: user (assigned agent)
-- `belongsTo`: team
-- `hasMany`: comments
-- `morphMany`: activity_log (via Spatie Activity Log)
-
-**Enums (implementados via validation):**
-
-- **status:** `open`, `in_progress`, `on_hold`, `resolved`, `closed`
-- **priority:** `low`, `medium`, `high`, `urgent`
-
----
-
-### 5. comments
-
-**Descrição:** Comentários em tickets (públicos ou internos)
-
-| Campo | Tipo | Constraints | Descrição |
-| ------------- | --------- | ------------------------ | ----------------------- |
-| `id` | BIGSERIAL | PRIMARY KEY | |
-| `ticket_id` | BIGINT | FK → tickets(id) CASCADE | Ticket relacionado |
-| `user_id` | BIGINT | FK → users(id) | Autor do comentário |
-| `content` | TEXT | NOT NULL | Conteúdo do comentário |
-| `is_internal` | BOOLEAN | DEFAULT false | Visível só para agents? |
-| `created_at` | TIMESTAMP | NOT NULL | |
-| `updated_at` | TIMESTAMP | NOT NULL | |
-| `deleted_at` | TIMESTAMP | NULLABLE | Soft delete |
-
-**Indexes:**
-
-```sql
-CREATE INDEX idx_comments_ticket ON comments(ticket_id);
-CREATE INDEX idx_comments_user ON comments(user_id);
-CREATE INDEX idx_comments_created ON comments(created_at);
-CREATE INDEX idx_comments_internal ON comments(is_internal);
-```
-
-**Relacionamentos:**
-
-- `belongsTo`: ticket
-- `belongsTo`: user (author)
-
----
-
-### 6. categories
-
-**Descrição:** Categorias para Knowledge Base (pode ser hierárquico)
-
-| Campo | Tipo | Constraints | Descrição |
-| ------------- | ------------ | ------------------------- | -------------------------- |
-| `id` | BIGSERIAL | PRIMARY KEY | |
-| `name` | VARCHAR(255) | NOT NULL | Nome da categoria |
-| `slug` | VARCHAR(255) | UNIQUE, NOT NULL | URL-friendly |
-| `description` | TEXT | NULLABLE | Descrição |
-| `icon` | VARCHAR(100) | NULLABLE | Nome do ícone (Heroicons) |
-| `parent_id` | BIGINT | FK → categories(id), NULL | Categoria pai (hierarquia) |
-| `order` | INTEGER | DEFAULT 0 | Ordem de exibição |
-| `is_visible` | BOOLEAN | DEFAULT true | Visível no frontend? |
-| `created_at` | TIMESTAMP | NOT NULL | |
-| `updated_at` | TIMESTAMP | NOT NULL | |
-
-**Indexes:**
-
-```sql
-CREATE UNIQUE INDEX idx_categories_slug ON categories(slug);
-CREATE INDEX idx_categories_parent ON categories(parent_id);
-CREATE INDEX idx_categories_visible ON categories(is_visible);
-```
-
-**Relacionamentos:**
-
-- `hasMany`: articles
-- `belongsTo`: category (parent) - self-referencing
-- `hasMany`: categories (children)
-
----
-
-### 7. articles
-
-**Descrição:** Artigos da Knowledge Base
-
-| Campo | Tipo | Constraints | Descrição |
-| ------------------- | ------------ | ------------------- | ------------------------- |
-| `id` | BIGSERIAL | PRIMARY KEY | |
-| `title` | VARCHAR(255) | NOT NULL | Título do artigo |
-| `slug` | VARCHAR(255) | UNIQUE, NOT NULL | URL-friendly |
-| `content` | TEXT | NOT NULL | Conteúdo (Markdown/HTML) |
-| `excerpt` | TEXT | NULLABLE | Resumo curto |
-| `category_id` | BIGINT | FK → categories(id) | Categoria |
-| `author_id` | BIGINT | FK → users(id) | Quem criou |
-| `is_published` | BOOLEAN | DEFAULT false | Publicado? |
-| `published_at` | TIMESTAMP | NULLABLE | Data de publicação |
-| `views` | INTEGER | DEFAULT 0 | Contador de visualizações |
-| `helpful_count` | INTEGER | DEFAULT 0 | "Foi útil?" - Sim |
-| `not_helpful_count` | INTEGER | DEFAULT 0 | "Foi útil?" - Não |
-| `featured` | BOOLEAN | DEFAULT false | Destacado no homepage? |
-| `meta_description` | VARCHAR(160) | NULLABLE | SEO |
-| `created_at` | TIMESTAMP | NOT NULL | |
-| `updated_at` | TIMESTAMP | NOT NULL | |
-| `deleted_at` | TIMESTAMP | NULLABLE | Soft delete |
-
-**Indexes:**
-
-```sql
-CREATE UNIQUE INDEX idx_articles_slug ON articles(slug);
-CREATE INDEX idx_articles_category ON articles(category_id);
-CREATE INDEX idx_articles_author ON articles(author_id);
-CREATE INDEX idx_articles_published ON articles(is_published, published_at);
-CREATE INDEX idx_articles_featured ON articles(featured) WHERE is_published = true;
--- Full-text search (PostgreSQL)
-CREATE INDEX idx_articles_fulltext ON articles USING GIN(to_tsvector('portuguese', title || ' ' || content));
-```
-
-**Relacionamentos:**
-
-- `belongsTo`: category
-- `belongsTo`: user (author)
-
----
-
-## Tabelas de Spatie Permission
-
-### 8. roles
-
-| Campo | Tipo | Descrição |
-| ------------ | ------------ | ------------------ |
-| `id` | BIGSERIAL | PRIMARY KEY |
-| `name` | VARCHAR(255) | admin, agent, user |
-| `guard_name` | VARCHAR(255) | web |
-| `created_at` | TIMESTAMP | |
-| `updated_at` | TIMESTAMP | |
-
-**Roles planeados:**
-
-- **admin:** acesso total ao sistema
-- **agent:** gestão de tickets, KB
-- **user:** criar tickets, ver KB
-
----
-
-### 9. permissions
-
-| Campo | Tipo | Descrição |
-| ------------ | ------------ | --------------------------------- |
-| `id` | BIGSERIAL | PRIMARY KEY |
-| `name` | VARCHAR(255) | view-tickets, create-tickets, etc |
-| `guard_name` | VARCHAR(255) | web |
-| `created_at` | TIMESTAMP | |
-| `updated_at` | TIMESTAMP | |
-
-**Permissions planeados:**
-
-- `view-all-tickets`, `create-ticket`, `update-ticket`, `delete-ticket`
-- `assign-ticket`, `close-ticket`, `escalate-ticket`
-- `view-kb`, `create-article`, `publish-article`
-- `manage-users`, `manage-teams`, `view-dashboard`
-
----
-
-### 10. model_has_roles (Pivot)
-
-| Campo | Tipo | Descrição |
-| ------------ | ------------ | --------------- |
-| `role_id` | BIGINT | FK → roles(id) |
-| `model_type` | VARCHAR(255) | App\Models\User |
-| `model_id` | BIGINT | FK → users(id) |
-
----
-
-### 11. role_has_permissions (Pivot)
-
-| Campo | Tipo | Descrição |
-| --------------- | ------ | -------------------- |
-| `permission_id` | BIGINT | FK → permissions(id) |
-| `role_id` | BIGINT | FK → roles(id) |
-
----
-
-## Tabelas de Sistema (Laravel)
-
-### 12. cache
-
-Laravel cache (sessions, query cache, etc.)
-
----
-
-### 13. jobs
-
-Laravel queue jobs (emails, SLA checks, reports)
-
----
-
-### 14. failed_jobs
-
-Jobs que falharam (retry mechanism)
-
----
-
-### 15. activity_log (Spatie Activity Log)
-
-**Descrição:** Auditoria de ações no sistema
-
-| Campo | Tipo | Descrição |
-| -------------- | ------------ | ------------------------- |
-| `id` | BIGSERIAL | PRIMARY KEY |
-| `log_name` | VARCHAR(255) | ticket, user, article |
-| `description` | TEXT | created, updated, deleted |
-| `subject_type` | VARCHAR(255) | Modelo afetado |
-| `subject_id` | BIGINT | ID do modelo |
-| `causer_type` | VARCHAR(255) | Quem fez (User) |
-| `causer_id` | BIGINT | User ID |
-| `properties` | JSON | Dados antes/depois |
-| `created_at` | TIMESTAMP | |
-
----
-
-## Estratégia de Migrations
-
-### Ordem de Execução
+**Convenção de Nomes:** `resource:action`
 
 ```
-1. users
-2. teams
-3. team_user
-4. categories
-5. articles
-6. tickets
-7. comments
-8. roles & permissions (Spatie)
-9. activity_log (Spatie)
+tickets:view, tickets:create, tickets:update, tickets:delete
+tickets:assign, tickets:close
+comments:create, comments:delete
+users:view, users:manage
+articles:publish
 ```
 
-### Boas Práticas
+**Seed Data (32 permissions):**
 
-- Foreign keys com constraints apropriados
-- Indexes em colunas frequentemente consultadas
-- Soft deletes em tabelas críticas
-- Timestamps automáticos
-- Default values sensatos
+```typescript
+// Tickets: 6 permissions
+tickets:view, tickets:create, tickets:update, tickets:delete,
+tickets:assign, tickets:close
+
+// Comments: 3 permissions
+comments:create, comments:update, comments:delete
+
+// Categories: 4 permissions
+categories:view, categories:create, categories:update, categories:delete
+
+// Teams: 5 permissions
+teams:view, teams:create, teams:update, teams:delete, teams:manage-members
+
+// Articles: 5 permissions
+articles:view, articles:create, articles:update, articles:delete, articles:publish
+
+// Assets: 5 permissions
+assets:view, assets:create, assets:update, assets:delete, assets:assign
+
+// Users: 4 permissions
+users:view, users:create, users:update, users:delete
+```
 
 ---
 
-## Queries Comuns Otimizadas
+#### Model: RoleHasPermission
 
-### Dashboard: Tickets por Status
+**Propósito:** Mapping N:M entre Role enum e Permissions
+
+**Schema Prisma:**
+
+```prisma
+model RoleHasPermission {
+ id String @id @default(uuid())
+ roleName Role // ADMIN, AGENT, USER (enum)
+ permissionId String
+ permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+ @@unique([roleName, permissionId])
+ @@map("role_has_permissions")
+}
+```
+
+**Diferença do Spatie Permission:**
+
+- Laravel: `roles` table + `model_has_roles` pivot
+- Prisma: Role enum + RoleHasPermission mapping
+
+**Seed Data (permissions por role):**
+
+```typescript
+ADMIN: todas 32 permissions
+AGENT: 20 permissions (tickets, comments, categories, teams, articles)
+USER: 5 permissions (tickets:view, tickets:create, comments:create,
+ articles:view, categories:view)
+```
+
+**Query Permissions:**
+
+```typescript
+// Get permissions for role
+const permissions = await prisma.roleHasPermission.findMany({
+ where: { roleName: "AGENT" },
+ include: { permission: true },
+});
+
+// Check permission
+const hasPermission = await prisma.roleHasPermission.findFirst({
+ where: {
+ roleName: user.role,
+ permission: { name: "tickets:delete" },
+ },
+});
+```
+
+---
+
+### 2⃣ Incident Management
+
+#### Model: Ticket
+
+**Propósito:** Tickets/Incidentes ITSM com SLA tracking
+
+**Schema Prisma:**
+
+```prisma
+model Ticket {
+ id String @id @default(uuid())
+ ticketNumber String @unique // TKT-00001, TKT-00002
+ title String
+ description String @db.Text
+ status TicketStatus @default(OPEN)
+ priority TicketPriority @default(MEDIUM)
+ requesterId String
+ assignedTo String?
+ teamId String?
+ categoryId String?
+
+ // SLA Tracking
+ firstResponseAt DateTime?
+ firstResponseDeadline DateTime?
+ resolutionDeadline DateTime?
+ resolvedAt DateTime?
+ closedAt DateTime?
+ isEscalated Boolean @default(false)
+
+ customFields Json? // JSONB para campos dinâmicos
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ deletedAt DateTime?
+
+ // Relations
+ requester User @relation("TicketRequester", fields: [requesterId], references: [id])
+ assignee User? @relation("TicketAssignee", fields: [assignedTo], references: [id])
+ team Team? @relation(fields: [teamId], references: [id])
+ category Category? @relation(fields: [categoryId], references: [id])
+ comments Comment[]
+ attachments Media[]
+ activities ActivityLog[]
+
+ @@index([ticketNumber])
+ @@index([status, priority]) // Dashboard queries
+ @@index([requesterId])
+ @@index([assignedTo])
+ @@index([teamId])
+ @@index([createdAt])
+ @@map("tickets")
+}
+
+enum TicketStatus {
+ OPEN // Novo ticket criado
+ IN_PROGRESS // Agent trabalhando
+ ON_HOLD // Aguardando terceiros
+ RESOLVED // Resolvido (aguarda confirmação)
+ CLOSED // Fechado definitivamente
+ CANCELLED // Cancelado pelo requester
+}
+
+enum TicketPriority {
+ LOW // SLA: 48h
+ MEDIUM // SLA: 24h
+ HIGH // SLA: 8h
+ URGENT // SLA: 2h
+}
+```
+
+**Campos Chave:**
+
+- `ticketNumber`: Identificador amigável (TKT-00001)
+- `customFields`: JSONB para campos dinâmicos por categoria
+- `firstResponseDeadline`: SLA primeira resposta
+- `resolutionDeadline`: SLA resolução
+- `isEscalated`: Flag para tickets escalados
+
+**Indexes Estratégicos:**
 
 ```sql
-SELECT status, COUNT(*) as total
-FROM tickets
-WHERE deleted_at IS NULL
- AND team_id = ?
-GROUP BY status;
--- Usa: idx_tickets_status
+-- Composite index para dashboard
+CREATE INDEX idx_tickets_status_priority ON tickets(status, priority);
+
+-- Dashboard query otimizada
+SELECT * FROM tickets
+WHERE status IN ('OPEN', 'IN_PROGRESS')
+AND deleted_at IS NULL
+ORDER BY priority DESC, created_at ASC;
+-- Usa idx_tickets_status_priority
 ```
 
-### Tickets Overdue (SLA)
+**Seed Data (5 tickets):**
+
+```typescript
+TKT-00001: OPEN, HIGH, assigned to agent
+TKT-00002: IN_PROGRESS, MEDIUM, assigned to agent
+TKT-00003: ON_HOLD, LOW, no assignee
+TKT-00004: RESOLVED, URGENT, resolved 1h ago
+TKT-00005: CLOSED, MEDIUM, closed 2d ago
+```
+
+**Queries Comuns:**
+
+```typescript
+// Open tickets por priority
+const openTickets = await prisma.ticket.findMany({
+ where: { status: "OPEN", deletedAt: null },
+ orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
+ include: { requester: true, assignee: true, category: true },
+});
+
+// Tickets overdue (SLA breached)
+const overdueTickets = await prisma.ticket.findMany({
+ where: {
+ status: { in: ["OPEN", "IN_PROGRESS"] },
+ resolutionDeadline: { lt: new Date() },
+ resolvedAt: null,
+ },
+});
+
+// Agent workload
+const workload = await prisma.ticket.groupBy({
+ by: ["assignedTo", "status"],
+ where: { status: { in: ["OPEN", "IN_PROGRESS"] } },
+ _count: true,
+});
+```
+
+**Workflow Automático (Future - Triggers):**
 
 ```sql
-SELECT *
-FROM tickets
-WHERE status IN ('open', 'in_progress')
- AND resolution_deadline < NOW()
- AND resolved_at IS NULL;
--- Usa: idx_tickets_sla_deadline
-```
-
-### Knowledge Base Search
-
-```sql
-SELECT *
-FROM articles
-WHERE is_published = true
- AND to_tsvector('portuguese', title || ' ' || content) @@ plainto_tsquery('portuguese', ?);
--- Usa: idx_articles_fulltext
-```
-
----
-
-## Database Views (Queries Pré-Computadas)
-
-### VIEW 1: v_ticket_dashboard
-
-**Propósito:** Dashboard principal com todos os dados de tickets (performance crítica).
-
-```sql
-CREATE OR REPLACE VIEW v_ticket_dashboard AS
-SELECT
- t.id,
- t.ticket_number,
- t.title,
- t.status,
- t.priority,
- t.created_at,
- t.resolution_deadline,
- u_req.name AS requester_name,
- u_req.email AS requester_email,
- u_ag.name AS assigned_agent_name,
- u_ag.id AS assigned_agent_id,
- tm.name AS team_name,
- tm.id AS team_id,
- CASE
- WHEN t.resolution_deadline < NOW()
- AND t.status IN ('open', 'in_progress')
- AND t.resolved_at IS NULL
- THEN true
- ELSE false
- END AS is_overdue,
- EXTRACT(EPOCH FROM (NOW() - t.created_at))/3600 AS age_hours,
- EXTRACT(EPOCH FROM (t.first_response_at - t.created_at))/3600 AS first_response_hours,
- (SELECT COUNT(*) FROM comments WHERE ticket_id = t.id AND deleted_at IS NULL) AS comment_count
-FROM tickets t
-LEFT JOIN users u_req ON t.requester_id = u_req.id
-LEFT JOIN users u_ag ON t.assigned_to = u_ag.id
-LEFT JOIN teams tm ON t.team_id = tm.id
-WHERE t.deleted_at IS NULL;
-```
-
-**Uso em Laravel:**
-
-```php
-// Controller
-$tickets = DB::table('v_ticket_dashboard')
- ->where('team_id', auth()->user()->team_id)
- ->where('status', 'open')
- ->orderBy('is_overdue', 'desc')
- ->get();
-```
-
----
-
-### VIEW 2: v_sla_compliance
-
-**Propósito:** Relatório de compliance SLA por ticket.
-
-```sql
-CREATE OR REPLACE VIEW v_sla_compliance AS
-SELECT
- t.id,
- t.ticket_number,
- t.priority,
- t.team_id,
- t.created_at,
- t.first_response_deadline,
- t.resolution_deadline,
- t.first_response_at,
- t.resolved_at,
- CASE
- WHEN t.first_response_at IS NULL AND t.first_response_deadline < NOW()
- THEN 'BREACHED'
- WHEN t.first_response_at IS NOT NULL AND t.first_response_at <= t.first_response_deadline
- THEN 'MET'
- WHEN t.first_response_at IS NULL AND t.first_response_deadline >= NOW()
- THEN 'PENDING'
- ELSE 'BREACHED'
- END AS first_response_sla_status,
- CASE
- WHEN t.resolved_at IS NULL AND t.resolution_deadline < NOW()
- THEN 'BREACHED'
- WHEN t.resolved_at IS NOT NULL AND t.resolved_at <= t.resolution_deadline
- THEN 'MET'
- WHEN t.resolved_at IS NULL AND t.resolution_deadline >= NOW()
- THEN 'PENDING'
- ELSE 'BREACHED'
- END AS resolution_sla_status,
- ROUND(EXTRACT(EPOCH FROM (t.first_response_at - t.created_at))/3600, 2) AS first_response_hours,
- ROUND(EXTRACT(EPOCH FROM (t.resolved_at - t.created_at))/3600, 2) AS resolution_hours
-FROM tickets t
-WHERE t.deleted_at IS NULL;
-```
-
-**Uso em Laravel:**
-
-```php
-// Relatório mensal SLA
-$slaReport = DB::table('v_sla_compliance')
- ->selectRaw('
- priority,
- COUNT(*) as total,
- SUM(CASE WHEN resolution_sla_status = "MET" THEN 1 ELSE 0 END) as met,
- SUM(CASE WHEN resolution_sla_status = "BREACHED" THEN 1 ELSE 0 END) as breached
- ')
- ->whereMonth('created_at', now()->month)
- ->groupBy('priority')
- ->get();
-```
-
----
-
-### VIEW 3: v_agent_performance
-
-**Propósito:** Métricas de performance por agent (workload, resolution time, SLA compliance).
-
-```sql
-CREATE OR REPLACE VIEW v_agent_performance AS
-SELECT
- u.id AS agent_id,
- u.name AS agent_name,
- u.email AS agent_email,
- COUNT(DISTINCT t.id) AS total_tickets_assigned,
- COUNT(DISTINCT CASE WHEN t.status = 'resolved' THEN t.id END) AS resolved_tickets,
- COUNT(DISTINCT CASE WHEN t.status = 'closed' THEN t.id END) AS closed_tickets,
- COUNT(DISTINCT CASE WHEN t.status IN ('open', 'in_progress') THEN t.id END) AS active_tickets,
- COUNT(DISTINCT CASE WHEN t.priority = 'urgent' THEN t.id END) AS urgent_tickets_handled,
- ROUND(AVG(EXTRACT(EPOCH FROM (t.resolved_at - t.created_at))/3600), 2) AS avg_resolution_hours,
- ROUND(AVG(EXTRACT(EPOCH FROM (t.first_response_at - t.created_at))/3600), 2) AS avg_first_response_hours,
- COUNT(DISTINCT CASE WHEN t.resolved_at <= t.resolution_deadline THEN t.id END) AS sla_met_count,
- ROUND(
- COUNT(DISTINCT CASE WHEN t.resolved_at <= t.resolution_deadline THEN t.id END)::NUMERIC
- / NULLIF(COUNT(DISTINCT CASE WHEN t.resolved_at IS NOT NULL THEN t.id END), 0) * 100,
- 2
- ) AS sla_compliance_percentage
-FROM users u
-LEFT JOIN tickets t ON u.id = t.assigned_to AND t.deleted_at IS NULL
-WHERE u.deleted_at IS NULL
- AND EXISTS (
- SELECT 1 FROM model_has_roles
- WHERE model_id = u.id
- AND role_id = (SELECT id FROM roles WHERE name = 'agent')
- )
-GROUP BY u.id, u.name, u.email;
-```
-
-**Uso em Laravel:**
-
-```php
-// Ranking de agents por SLA compliance
-$topAgents = DB::table('v_agent_performance')
- ->where('total_tickets_assigned', '>', 10)
- ->orderBy('sla_compliance_percentage', 'desc')
- ->limit(10)
- ->get();
-```
-
----
-
-### VIEW 4: v_kb_popular_articles
-
-**Propósito:** Artigos da KB ordenados por popularidade e helpfulness.
-
-```sql
-CREATE OR REPLACE VIEW v_kb_popular_articles AS
-SELECT
- a.id,
- a.title,
- a.slug,
- a.excerpt,
- a.views,
- a.helpful_count,
- a.not_helpful_count,
- CASE
- WHEN (a.helpful_count + a.not_helpful_count) > 0
- THEN ROUND((a.helpful_count::NUMERIC / (a.helpful_count + a.not_helpful_count) * 100), 2)
- ELSE 0
- END AS helpfulness_percentage,
- c.name AS category_name,
- c.slug AS category_slug,
- u.name AS author_name,
- a.published_at,
- a.updated_at
-FROM articles a
-JOIN categories c ON a.category_id = c.id
-JOIN users u ON a.author_id = u.id
-WHERE a.is_published = true
- AND a.deleted_at IS NULL
-ORDER BY a.views DESC, a.helpful_count DESC;
-```
-
-**Uso em Laravel:**
-
-```php
-// Top 10 artigos mais úteis
-$topArticles = DB::table('v_kb_popular_articles')
- ->where('views', '>', 50)
- ->orderBy('helpfulness_percentage', 'desc')
- ->limit(10)
- ->get();
-```
-
----
-
-## Database Triggers (Automação & Validação)
-
-### TRIGGER 1: Auto-gerar ticket_number
-
-**Propósito:** Gerar ticket_number único automaticamente no formato `TKT-YYYYMMDD-NNNN`.
-
-```sql
-CREATE OR REPLACE FUNCTION generate_ticket_number()
-RETURNS TRIGGER AS $$
-DECLARE
- date_prefix TEXT;
- seq_num INTEGER;
-BEGIN
- IF NEW.ticket_number IS NOT NULL THEN
- RETURN NEW; -- Já foi definido manualmente
- END IF;
-
- date_prefix := TO_CHAR(NOW(), 'YYYYMMDD');
-
- -- Obter próximo número sequencial do dia
- SELECT COALESCE(MAX(CAST(SUBSTRING(ticket_number FROM 13) AS INTEGER)), 0) + 1
- INTO seq_num
- FROM tickets
- WHERE ticket_number LIKE 'TKT-' || date_prefix || '-%'
- AND deleted_at IS NULL;
-
- NEW.ticket_number := 'TKT-' || date_prefix || '-' || LPAD(seq_num::TEXT, 4, '0');
- RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_generate_ticket_number
-BEFORE INSERT ON tickets
-FOR EACH ROW
-WHEN (NEW.ticket_number IS NULL)
-EXECUTE FUNCTION generate_ticket_number();
-```
-
-**Resultado:**
-
-```
-TKT-20251111-0001
-TKT-20251111-0002
-...
-TKT-20251112-0001 (novo dia, reset counter)
-```
-
----
-
-### TRIGGER 2: Auto-calcular SLA deadlines
-
-**Propósito:** Calcular `first_response_deadline` e `resolution_deadline` baseado em `priority`.
-
-```sql
-CREATE OR REPLACE FUNCTION set_sla_deadlines()
+-- Auto-calculate SLA deadlines baseado em priority
+CREATE OR REPLACE FUNCTION calculate_sla_deadlines()
 RETURNS TRIGGER AS $$
 BEGIN
- -- First Response SLA (baseado em priority)
- NEW.first_response_deadline := NEW.created_at +
- CASE NEW.priority
- WHEN 'urgent' THEN INTERVAL '2 hours'
- WHEN 'high' THEN INTERVAL '4 hours'
- WHEN 'medium' THEN INTERVAL '8 hours'
- WHEN 'low' THEN INTERVAL '24 hours'
- ELSE INTERVAL '24 hours' -- default
+ NEW.first_response_deadline := CASE NEW.priority
+ WHEN 'URGENT' THEN NEW.created_at + INTERVAL '30 minutes'
+ WHEN 'HIGH' THEN NEW.created_at + INTERVAL '2 hours'
+ WHEN 'MEDIUM' THEN NEW.created_at + INTERVAL '8 hours'
+ WHEN 'LOW' THEN NEW.created_at + INTERVAL '24 hours'
  END;
 
- -- Resolution SLA (baseado em priority)
- NEW.resolution_deadline := NEW.created_at +
- CASE NEW.priority
- WHEN 'urgent' THEN INTERVAL '8 hours'
- WHEN 'high' THEN INTERVAL '2 days'
- WHEN 'medium' THEN INTERVAL '5 days'
- WHEN 'low' THEN INTERVAL '10 days'
- ELSE INTERVAL '5 days' -- default
+ NEW.resolution_deadline := CASE NEW.priority
+ WHEN 'URGENT' THEN NEW.created_at + INTERVAL '2 hours'
+ WHEN 'HIGH' THEN NEW.created_at + INTERVAL '8 hours'
+ WHEN 'MEDIUM' THEN NEW.created_at + INTERVAL '24 hours'
+ WHEN 'LOW' THEN NEW.created_at + INTERVAL '48 hours'
  END;
 
  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_set_sla_deadlines
+CREATE TRIGGER tickets_sla_deadlines
 BEFORE INSERT ON tickets
 FOR EACH ROW
-EXECUTE FUNCTION set_sla_deadlines();
-```
-
-**Benefício:** Zero código PHP para SLA calculation - tudo automático no DB!
-
----
-
-### TRIGGER 3: Validar agent assignment
-
-**Propósito:** Garantir que `assigned_to` pertence ao `team_id` do ticket.
-
-```sql
-CREATE OR REPLACE FUNCTION validate_ticket_assignment()
-RETURNS TRIGGER AS $$
-BEGIN
- IF NEW.assigned_to IS NULL THEN
- RETURN NEW; -- OK: não atribuído
- END IF;
-
- IF NEW.team_id IS NULL THEN
- RAISE EXCEPTION 'Ticket % deve ter team_id antes de assigned_to', NEW.id;
- END IF;
-
- -- Verificar se agent pertence ao team
- IF NOT EXISTS (
- SELECT 1 FROM team_user
- WHERE user_id = NEW.assigned_to
- AND team_id = NEW.team_id
- ) THEN
- RAISE EXCEPTION 'User % não pertence ao Team %', NEW.assigned_to, NEW.team_id;
- END IF;
-
- RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_validate_ticket_assignment
-BEFORE INSERT OR UPDATE OF assigned_to, team_id ON tickets
-FOR EACH ROW
-WHEN (NEW.assigned_to IS NOT NULL)
-EXECUTE FUNCTION validate_ticket_assignment();
-```
-
-**Benefício:** Data integrity garantida no DB (mesmo se bypass Laravel validation).
-
----
-
-### TRIGGER 4: Log status changes automaticamente
-
-**Propósito:** Registar mudanças de status em `activity_log` automaticamente.
-
-```sql
-CREATE OR REPLACE FUNCTION log_ticket_status_change()
-RETURNS TRIGGER AS $$
-BEGIN
- IF TG_OP = 'UPDATE' AND OLD.status IS DISTINCT FROM NEW.status THEN
- INSERT INTO activity_log (
- log_name,
- description,
- subject_type,
- subject_id,
- properties,
- created_at,
- updated_at
- ) VALUES (
- 'ticket',
- 'status_changed',
- 'App\Models\Ticket',
- NEW.id,
- jsonb_build_object(
- 'old_status', OLD.status,
- 'new_status', NEW.status,
- 'changed_at', NOW()
- ),
- NOW(),
- NOW()
- );
- END IF;
-
- RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_log_ticket_status_change
-AFTER UPDATE ON tickets
-FOR EACH ROW
-EXECUTE FUNCTION log_ticket_status_change();
-```
-
-**Benefício:** Auditoria completa de mudanças de status - zero código PHP!
-
----
-
-## Stored Procedures (Lógica Complexa)
-
-### PROCEDURE 1: assign_ticket_auto()
-
-**Propósito:** Atribuir ticket ao agent menos ocupado de um team.
-
-```sql
-CREATE OR REPLACE FUNCTION assign_ticket_auto(
- p_ticket_id BIGINT,
- p_team_id BIGINT
-) RETURNS BIGINT AS $$
-DECLARE
- v_agent_id BIGINT;
-BEGIN
- -- Encontrar agent com menos tickets ativos no team
- SELECT u.id INTO v_agent_id
- FROM users u
- JOIN team_user tu ON u.id = tu.user_id
- LEFT JOIN tickets t ON t.assigned_to = u.id
- AND t.status IN ('open', 'in_progress')
- AND t.deleted_at IS NULL
- WHERE tu.team_id = p_team_id
- AND u.is_active = true
- AND u.deleted_at IS NULL
- AND EXISTS (
- SELECT 1 FROM model_has_roles mhr
- JOIN roles r ON mhr.role_id = r.id
- WHERE mhr.model_id = u.id AND r.name = 'agent'
- )
- GROUP BY u.id
- ORDER BY COUNT(t.id) ASC, RANDOM() -- Menos ocupado + random tie-break
- LIMIT 1;
-
- IF v_agent_id IS NULL THEN
- RAISE EXCEPTION 'Nenhum agent disponível no Team %', p_team_id;
- END IF;
-
- -- Atribuir ticket
- UPDATE tickets
- SET assigned_to = v_agent_id,
- team_id = p_team_id,
- updated_at = NOW()
- WHERE id = p_ticket_id;
-
- RETURN v_agent_id;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-**Uso em Laravel:**
-
-```php
-// Controller
-$agentId = DB::select('SELECT assign_ticket_auto(?, ?)', [$ticketId, $teamId])[0]->assign_ticket_auto;
-
-activity()
- ->performedOn($ticket)
- ->log("Auto-assigned to agent {$agentId}");
+EXECUTE FUNCTION calculate_sla_deadlines();
 ```
 
 ---
 
-### PROCEDURE 2: close_ticket()
+#### Model: Category
 
-**Propósito:** Fechar ticket com validações de negócio.
+**Propósito:** Categorias hierárquicas para tickets e articles
 
-```sql
-CREATE OR REPLACE FUNCTION close_ticket(
- p_ticket_id BIGINT,
- p_user_id BIGINT
-) RETURNS BOOLEAN AS $$
-DECLARE
- v_current_status VARCHAR(50);
-BEGIN
- -- Validar ticket exists e está em status válido
- SELECT status INTO v_current_status
- FROM tickets
- WHERE id = p_ticket_id AND deleted_at IS NULL;
+**Schema Prisma:**
 
- IF NOT FOUND THEN
- RAISE EXCEPTION 'Ticket % não encontrado', p_ticket_id;
- END IF;
+```prisma
+model Category {
+ id String @id @default(uuid())
+ name String
+ slug String @unique
+ description String?
+ parentId String? // Self-referencing (hierarquia)
+ order Int @default(0)
+ isActive Boolean @default(true)
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
 
- IF v_current_status != 'resolved' THEN
- RAISE EXCEPTION 'Ticket % não está em status "resolved" (atual: %)', p_ticket_id, v_current_status;
- END IF;
+ parent Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+ children Category[] @relation("CategoryHierarchy")
+ tickets Ticket[]
+ articles Article[]
 
- -- Fechar ticket
- UPDATE tickets
- SET status = 'closed',
- closed_at = NOW(),
- updated_at = NOW()
- WHERE id = p_ticket_id;
-
- -- Log activity
- INSERT INTO activity_log (
- log_name, description, subject_type, subject_id,
- causer_type, causer_id, created_at, updated_at
- ) VALUES (
- 'ticket', 'closed', 'App\Models\Ticket', p_ticket_id,
- 'App\Models\User', p_user_id, NOW(), NOW()
- );
-
- RETURN TRUE;
-END;
-$$ LANGUAGE plpgsql;
+ @@index([slug])
+ @@index([parentId])
+ @@map("categories")
+}
 ```
 
-**Uso em Laravel:**
+**Hierarquia (Tree Structure):**
 
-```php
-try {
- DB::select('SELECT close_ticket(?, ?)', [$ticketId, auth()->id()]);
- return redirect()->back()->with('success', 'Ticket fechado!');
-} catch (\Exception $e) {
- return redirect()->back()->withErrors($e->getMessage());
+```
+Hardware
+ Laptops
+ Desktops
+ Printers
+
+Software
+ Microsoft Office
+ Adobe Suite
+ Browsers
+
+Network
+ Wi-Fi
+ VPN
+```
+
+**Seed Data (5 categories):**
+
+```typescript
+Hardware, Software, Network, Security, Other;
+// Flat structure no MVP (hierarquia futura)
+```
+
+**Queries Comuns:**
+
+```typescript
+// Categories com count de tickets
+const categoriesWithCount = await prisma.category.findMany({
+ where: { isActive: true },
+ include: {
+ _count: { select: { tickets: true, articles: true } },
+ },
+ orderBy: { order: "asc" },
+});
+
+// Tree structure (recursive)
+const tree = await prisma.category.findMany({
+ where: { parentId: null },
+ include: {
+ children: {
+ include: { children: true }, // 3 levels
+ },
+ },
+});
+```
+
+---
+
+#### Model: Comment
+
+**Propósito:** Comentários em tickets (public/internal)
+
+**Schema Prisma:**
+
+```prisma
+model Comment {
+ id String @id @default(uuid())
+ ticketId String
+ userId String
+ content String @db.Text
+ isInternal Boolean @default(false) // Internal notes (agents only)
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ deletedAt DateTime?
+
+ ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+ user User @relation(fields: [userId], references: [id])
+ attachments Media[]
+ activities ActivityLog[]
+
+ @@index([ticketId])
+ @@index([userId])
+ @@index([createdAt])
+ @@map("comments")
+}
+```
+
+**Campos Chave:**
+
+- `isInternal`: Notas internas (visível apenas para agents)
+- `onDelete: Cascade`: Apagar comments se ticket for deletado
+
+**Seed Data (5 comments):**
+
+```typescript
+// 5 comments distribuídos nos tickets
+// Mix de public e internal
+```
+
+**Queries Comuns:**
+
+```typescript
+// Public comments para ticket
+const publicComments = await prisma.comment.findMany({
+ where: { ticketId, isInternal: false, deletedAt: null },
+ include: { user: { select: { id: true, name: true, avatar: true } } },
+ orderBy: { createdAt: "asc" },
+});
+
+// All comments (agents only)
+const allComments = await prisma.comment.findMany({
+ where: { ticketId, deletedAt: null },
+ include: { user: true, attachments: true },
+ orderBy: { createdAt: "asc" },
+});
+```
+
+---
+
+### 3⃣ Team Collaboration
+
+#### Model: Team
+
+**Propósito:** Equipas de suporte especializadas
+
+**Schema Prisma:**
+
+```prisma
+model Team {
+ id String @id @default(uuid())
+ name String
+ slug String @unique
+ description String?
+ email String? // Team email (support@hardware.company.com)
+ isActive Boolean @default(true)
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+
+ members TeamMember[]
+ tickets Ticket[]
+
+ @@index([slug])
+ @@map("teams")
+}
+```
+
+**Exemplos:**
+
+```
+Hardware Team (hardware)
+Software Team (software)
+Network Team (network)
+Security Team (security)
+```
+
+**Seed Data (1 team):**
+
+```typescript
+{
+ name: "Support Team",
+ slug: "support",
+ members: 2 (admin, agent)
 }
 ```
 
 ---
 
-### PROCEDURE 3: generate_sla_report()
+#### Model: TeamMember
 
-**Propósito:** Gerar relatório de SLA compliance por período e team.
+**Propósito:** Membros de equipas com roles (LEAD, MEMBER)
 
-```sql
-CREATE OR REPLACE FUNCTION generate_sla_report(
- p_start_date TIMESTAMP,
- p_end_date TIMESTAMP,
- p_team_id BIGINT DEFAULT NULL
-)
-RETURNS TABLE (
- priority VARCHAR,
- total_tickets BIGINT,
- first_response_met BIGINT,
- first_response_breached BIGINT,
- first_response_pending BIGINT,
- resolution_met BIGINT,
- resolution_breached BIGINT,
- resolution_pending BIGINT,
- avg_resolution_hours NUMERIC
-) AS $$
-BEGIN
- RETURN QUERY
- SELECT
- t.priority,
- COUNT(*)::BIGINT AS total_tickets,
- COUNT(CASE WHEN t.first_response_at <= t.first_response_deadline THEN 1 END)::BIGINT AS first_response_met,
- COUNT(CASE WHEN (t.first_response_at > t.first_response_deadline)
- OR (t.first_response_at IS NULL AND NOW() > t.first_response_deadline)
- THEN 1 END)::BIGINT AS first_response_breached,
- COUNT(CASE WHEN t.first_response_at IS NULL AND NOW() <= t.first_response_deadline
- THEN 1 END)::BIGINT AS first_response_pending,
- COUNT(CASE WHEN t.resolved_at <= t.resolution_deadline THEN 1 END)::BIGINT AS resolution_met,
- COUNT(CASE WHEN (t.resolved_at > t.resolution_deadline)
- OR (t.resolved_at IS NULL AND NOW() > t.resolution_deadline)
- THEN 1 END)::BIGINT AS resolution_breached,
- COUNT(CASE WHEN t.resolved_at IS NULL AND NOW() <= t.resolution_deadline
- THEN 1 END)::BIGINT AS resolution_pending,
- ROUND(AVG(EXTRACT(EPOCH FROM (t.resolved_at - t.created_at))/3600), 2)::NUMERIC AS avg_resolution_hours
- FROM tickets t
- WHERE t.created_at BETWEEN p_start_date AND p_end_date
- AND (p_team_id IS NULL OR t.team_id = p_team_id)
- AND t.deleted_at IS NULL
- GROUP BY t.priority
- ORDER BY
- CASE t.priority
- WHEN 'urgent' THEN 1
- WHEN 'high' THEN 2
- WHEN 'medium' THEN 3
- WHEN 'low' THEN 4
- END;
-END;
-$$ LANGUAGE plpgsql STABLE;
+**Schema Prisma:**
+
+```prisma
+model TeamMember {
+ id String @id @default(uuid())
+ teamId String
+ userId String
+ role TeamRole @default(MEMBER)
+ joinedAt DateTime @default(now())
+
+ team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+ user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+ @@unique([teamId, userId])
+ @@map("team_members")
+}
+
+enum TeamRole {
+ LEAD // Team leader
+ MEMBER // Regular member
+}
 ```
 
-**Uso em Laravel:**
+**Queries Comuns:**
 
-```php
-// Dashboard: Relatório mensal
-$slaReport = DB::select('SELECT * FROM generate_sla_report(?, ?, ?)', [
- now()->startOfMonth(),
- now()->endOfMonth(),
- auth()->user()->team_id, // ou NULL para todos
+```typescript
+// Team members with user data
+const teamMembers = await prisma.teamMember.findMany({
+ where: { teamId },
+ include: {
+ user: { select: { id: true, name: true, email: true, avatar: true } },
+ },
+ orderBy: { role: "asc" }, // LEADs first
+});
+
+// User teams
+const userTeams = await prisma.teamMember.findMany({
+ where: { userId },
+ include: { team: true },
+});
+```
+
+---
+
+### 4⃣ Knowledge Base
+
+#### Model: Article
+
+**Propósito:** Artigos da Knowledge Base com versioning
+
+**Schema Prisma:**
+
+```prisma
+model Article {
+ id String @id @default(uuid())
+ title String
+ slug String @unique
+ content String @db.Text // Markdown/HTML
+ excerpt String?
+ categoryId String
+ authorId String
+ isPublished Boolean @default(false)
+ viewCount Int @default(0)
+ helpfulVotes Int @default(0) // "Was helpful" counter
+ notHelpfulVotes Int @default(0) // "Not helpful" counter
+ publishedAt DateTime?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ deletedAt DateTime?
+
+ category Category @relation(fields: [categoryId], references: [id])
+ author User @relation(fields: [authorId], references: [id])
+ versions ArticleVersion[]
+
+ @@index([slug])
+ @@index([categoryId])
+ @@index([authorId])
+ @@index([isPublished])
+ @@map("articles")
+}
+```
+
+**Campos Chave:**
+
+- `slug`: URL-friendly (how-to-reset-password)
+- `isPublished`: Draft vs Published
+- `helpfulVotes` / `notHelpfulVotes`: Feedback system
+- `viewCount`: Analytics
+
+**Queries Comuns:**
+
+```typescript
+// Published articles
+const articles = await prisma.article.findMany({
+ where: { isPublished: true, deletedAt: null },
+ include: {
+ category: true,
+ author: { select: { name: true, avatar: true } },
+ },
+ orderBy: { publishedAt: "desc" },
+});
+
+// Popular articles
+const popular = await prisma.article.findMany({
+ where: { isPublished: true },
+ orderBy: [{ viewCount: "desc" }, { helpfulVotes: "desc" }],
+ take: 10,
+});
+
+// Search articles (future - full-text)
+const results = await prisma.article.findMany({
+ where: {
+ isPublished: true,
+ OR: [
+ { title: { contains: query, mode: "insensitive" } },
+ { content: { contains: query, mode: "insensitive" } },
+ ],
+ },
+});
+```
+
+---
+
+#### Model: ArticleVersion
+
+**Propósito:** Versioning histórico de articles
+
+**Schema Prisma:**
+
+```prisma
+model ArticleVersion {
+ id String @id @default(uuid())
+ articleId String
+ title String
+ content String @db.Text
+ version Int // 1, 2, 3, ...
+ createdAt DateTime @default(now())
+
+ article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+ @@index([articleId])
+ @@map("article_versions")
+}
+```
+
+**Usage:**
+
+- Guardar snapshot quando article é editado
+- Rollback para versão anterior
+- Audit trail de mudanças
+
+---
+
+### 5⃣ Asset Management (CMDB)
+
+#### Model: Asset
+
+**Propósito:** Configuration Management Database (IT assets)
+
+**Schema Prisma:**
+
+```prisma
+model Asset {
+ id String @id @default(uuid())
+ assetTag String @unique // AST-00001
+ name String
+ type AssetType
+ manufacturer String?
+ model String?
+ serialNumber String?
+ purchaseDate DateTime?
+ purchaseCost Decimal? @db.Decimal(10, 2)
+ warrantyExpiry DateTime?
+ status AssetStatus @default(AVAILABLE)
+ assignedTo String?
+ location String?
+ notes String? @db.Text
+ customFields Json? // JSONB para campos específicos
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ deletedAt DateTime?
+
+ assignedUser User? @relation(fields: [assignedTo], references: [id])
+
+ @@index([assetTag])
+ @@index([type])
+ @@index([status])
+ @@index([assignedTo])
+ @@map("assets")
+}
+
+enum AssetType {
+ LAPTOP
+ DESKTOP
+ SERVER
+ LICENSE // Software licenses
+ MOBILE
+ NETWORK // Routers, switches
+}
+
+enum AssetStatus {
+ AVAILABLE // Não atribuído
+ IN_USE // Atribuído a user
+ MAINTENANCE // Em manutenção
+ RETIRED // Descontinuado
+}
+```
+
+**Campos Chave:**
+
+- `assetTag`: Identificador físico (etiqueta)
+- `customFields`: JSONB (specs técnicas: RAM, CPU, storage)
+- `purchaseCost`: Decimal(10,2) para precisão financeira
+- `warrantyExpiry`: Tracking de garantias
+
+**Queries Comuns:**
+
+```typescript
+// Available assets
+const available = await prisma.asset.findMany({
+ where: { status: "AVAILABLE", deletedAt: null },
+ orderBy: { type: "asc" },
+});
+
+// User assets
+const userAssets = await prisma.asset.findMany({
+ where: { assignedTo: userId },
+ include: { assignedUser: { select: { name: true, email: true } } },
+});
+
+// Warranty expiring soon
+const expiring = await prisma.asset.findMany({
+ where: {
+ warrantyExpiry: {
+ gte: new Date(),
+ lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+ },
+ },
+});
+```
+
+---
+
+### 6⃣ System Models
+
+#### Model: Media (Polymorphic)
+
+**Propósito:** File uploads (avatars, attachments)
+
+**Schema Prisma:**
+
+```prisma
+model Media {
+ id String @id @default(uuid())
+ modelType String // "Ticket", "Comment", "User"
+ modelId String // UUID do model
+ collection String // "attachments", "avatars"
+ name String
+ fileName String
+ mimeType String
+ disk String @default("public")
+ size Int // bytes
+ customProperties Json?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+
+ ticket Ticket? @relation(fields: [modelId], references: [id])
+ comment Comment? @relation(fields: [modelId], references: [id])
+
+ @@index([modelType, modelId])
+ @@map("media")
+}
+```
+
+**Polymorphic Pattern:**
+
+```typescript
+// Upload avatar (User)
+await prisma.media.create({
+ data: {
+ modelType: "User",
+ modelId: userId,
+ collection: "avatars",
+ name: "profile.jpg",
+ fileName: "uuid-profile.jpg",
+ mimeType: "image/jpeg",
+ size: 125000,
+ },
+});
+
+// Upload attachment (Ticket)
+await prisma.media.create({
+ data: {
+ modelType: "Ticket",
+ modelId: ticketId,
+ collection: "attachments",
+ name: "screenshot.png",
+ fileName: "uuid-screenshot.png",
+ mimeType: "image/png",
+ size: 450000,
+ },
+});
+```
+
+---
+
+#### Model: ActivityLog (Audit Trail)
+
+**Propósito:** Audit trail completo do sistema
+
+**Schema Prisma:**
+
+```prisma
+model ActivityLog {
+ id String @id @default(uuid())
+ logName String? // "ticket", "user", "asset"
+ description String // "Ticket #TKT-00001 created"
+ subjectType String? // "Ticket", "Comment"
+ subjectId String?
+ causerId String? // User que causou a ação
+ properties Json? // { old: {}, new: {} }
+ event String? // "created", "updated", "deleted"
+ batchUuid String? // Agrupar ações relacionadas
+ createdAt DateTime @default(now())
+
+ causer User? @relation(fields: [causerId], references: [id])
+ ticket Ticket? @relation(fields: [subjectId], references: [id])
+ comment Comment? @relation(fields: [subjectId], references: [id])
+
+ @@index([logName])
+ @@index([subjectType, subjectId])
+ @@index([causerId])
+ @@index([createdAt])
+ @@map("activity_log")
+}
+```
+
+**Example Logs:**
+
+```typescript
+{
+ logName: "ticket",
+ description: "Ticket #TKT-00001 status changed from OPEN to IN_PROGRESS",
+ subjectType: "Ticket",
+ subjectId: "ticket-uuid",
+ causerId: "agent-uuid",
+ event: "updated",
+ properties: {
+ old: { status: "OPEN" },
+ new: { status: "IN_PROGRESS" }
+ }
+}
+```
+
+---
+
+#### Model: Notification
+
+**Propósito:** Notificações in-app para users
+
+**Schema Prisma:**
+
+```prisma
+model Notification {
+ id String @id @default(uuid())
+ userId String
+ type String // "ticket_assigned", "comment_added"
+ title String
+ message String @db.Text
+ data Json? // { ticketId, ticketNumber }
+ readAt DateTime?
+ createdAt DateTime @default(now())
+
+ user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+ @@index([userId])
+ @@index([readAt])
+ @@map("notifications")
+}
+```
+
+**Notification Types:**
+
+```typescript
+ticket_assigned; // "Ticket #TKT-00001 assigned to you"
+ticket_updated; // "Ticket #TKT-00001 updated by Admin"
+comment_added; // "New comment on ticket #TKT-00001"
+ticket_resolved; // "Ticket #TKT-00001 marked as resolved"
+mention; // "@john mentioned you in ticket #TKT-00001"
+```
+
+---
+
+## Indexes & Performance
+
+### Strategy
+
+1. **Single Indexes** - Campos únicos e foreign keys
+2. **Composite Indexes** - Queries com múltiplos filtros
+3. **Partial Indexes** - Subset de dados (WHERE condition)
+
+### Implemented Indexes
+
+```prisma
+// User indexes
+@@index([email]) // Login queries
+@@index([role]) // Filter by role
+@@index([isActive]) // Active users
+
+// Ticket indexes
+@@index([ticketNumber]) // Lookup by TKT-00001
+@@index([status, priority]) // Dashboard (composite)
+@@index([requesterId]) // User's tickets
+@@index([assignedTo]) // Agent's workload
+@@index([teamId]) // Team tickets
+@@index([createdAt]) // Sort by date
+
+// Category indexes
+@@index([slug]) // URL lookup
+@@index([parentId]) // Tree queries
+
+// Comment indexes
+@@index([ticketId]) // Ticket comments
+@@index([userId]) // User activity
+@@index([createdAt]) // Timeline
+
+// Asset indexes
+@@index([assetTag]) // Physical lookup
+@@index([type]) // Filter by type
+@@index([status]) // Available assets
+@@index([assignedTo]) // User assets
+
+// ActivityLog indexes
+@@index([logName]) // Filter by entity
+@@index([subjectType, subjectId]) // Entity history (composite)
+@@index([causerId]) // User activity
+@@index([createdAt]) // Timeline
+
+// Notification indexes
+@@index([userId]) // User notifications
+@@index([readAt]) // Unread filter
+```
+
+### Future Indexes (Post-MVP)
+
+```sql
+-- Full-text search (PostgreSQL)
+CREATE INDEX idx_tickets_fulltext ON tickets
+USING GIN(to_tsvector('english', title || ' ' || description));
+
+CREATE INDEX idx_articles_fulltext ON articles
+USING GIN(to_tsvector('english', title || ' ' || content));
+
+-- JSONB indexes
+CREATE INDEX idx_tickets_custom_fields ON tickets
+USING GIN(custom_fields);
+
+CREATE INDEX idx_assets_custom_fields ON assets
+USING GIN(custom_fields);
+
+-- Partial indexes (active records only)
+CREATE INDEX idx_users_active_agents ON users(role, name)
+WHERE is_active = true AND role = 'AGENT' AND deleted_at IS NULL;
+
+CREATE INDEX idx_tickets_open ON tickets(priority, created_at)
+WHERE status IN ('OPEN', 'IN_PROGRESS') AND deleted_at IS NULL;
+```
+
+---
+
+## Prisma Queries Avançadas
+
+### Aggregations
+
+```typescript
+// Ticket stats
+const stats = await prisma.ticket.aggregate({
+ where: { deletedAt: null },
+ _count: { id: true },
+ _avg: {
+ /* SLA calculations */
+ },
+});
+
+// Tickets by status
+const byStatus = await prisma.ticket.groupBy({
+ by: ["status"],
+ _count: true,
+ orderBy: { _count: { id: "desc" } },
+});
+```
+
+### Transactions
+
+```typescript
+// Assign ticket + create activity log
+await prisma.$transaction([
+ prisma.ticket.update({
+ where: { id: ticketId },
+ data: { assignedTo: agentId, status: "IN_PROGRESS" },
+ }),
+ prisma.activityLog.create({
+ data: {
+ logName: "ticket",
+ description: `Ticket assigned to ${agent.name}`,
+ subjectType: "Ticket",
+ subjectId: ticketId,
+ causerId: currentUserId,
+ event: "updated",
+ },
+ }),
 ]);
+```
 
-return view('reports.sla', ['data' => $slaReport]);
+### Nested Writes
+
+```typescript
+// Create ticket with comment
+await prisma.ticket.create({
+ data: {
+ title: "Laptop not working",
+ description: "Screen is black",
+ ticketNumber: "TKT-00010",
+ requesterId: userId,
+ status: "OPEN",
+ priority: "HIGH",
+ comments: {
+ create: {
+ userId: userId,
+ content: "Tried restarting but no luck",
+ isInternal: false,
+ },
+ },
+ },
+});
 ```
 
 ---
 
-## Check Constraints (Data Validation)
+## Migration & Seeding
 
-### Validações em nível de DB
-
-```sql
--- TICKETS: Validar status enum
-ALTER TABLE tickets ADD CONSTRAINT chk_tickets_status
- CHECK (status IN ('open', 'in_progress', 'on_hold', 'resolved', 'closed'));
-
--- TICKETS: Validar priority enum
-ALTER TABLE tickets ADD CONSTRAINT chk_tickets_priority
- CHECK (priority IN ('low', 'medium', 'high', 'urgent'));
-
--- TICKETS: Datas lógicas (resolved_at >= created_at)
-ALTER TABLE tickets ADD CONSTRAINT chk_tickets_resolved_date
- CHECK (resolved_at IS NULL OR resolved_at >= created_at);
-
-ALTER TABLE tickets ADD CONSTRAINT chk_tickets_closed_date
- CHECK (closed_at IS NULL OR closed_at >= resolved_at);
-
--- ARTICLES: Contadores não negativos
-ALTER TABLE articles ADD CONSTRAINT chk_articles_views
- CHECK (views >= 0);
-
-ALTER TABLE articles ADD CONSTRAINT chk_articles_helpful
- CHECK (helpful_count >= 0 AND not_helpful_count >= 0);
-
--- ARTICLES: Slug format (lowercase, hyphens only)
-ALTER TABLE articles ADD CONSTRAINT chk_articles_slug_format
- CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$');
-
--- USERS: Email format
-ALTER TABLE users ADD CONSTRAINT chk_users_email_format
- CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
-
--- TEAM_USER: Role enum
-ALTER TABLE team_user ADD CONSTRAINT chk_team_user_role
- CHECK (role IN ('member', 'lead', 'supervisor'));
-```
-
-**Benefício:** Validação em DB + Laravel = dupla proteção!
-
----
-
-## Indexes Avançados
-
-### Partial Indexes (Performance otimizada)
-
-```sql
--- Index apenas em tickets ATIVOS (não fechados)
-CREATE INDEX idx_tickets_active_status ON tickets(status, priority, created_at)
- WHERE deleted_at IS NULL AND status NOT IN ('closed');
-
--- Index apenas em tickets OVERDUE (Dashboard critical query)
-CREATE INDEX idx_tickets_overdue ON tickets(resolution_deadline, team_id)
- WHERE deleted_at IS NULL
- AND status IN ('open', 'in_progress')
- AND resolved_at IS NULL
- AND resolution_deadline < NOW();
-
--- Index apenas em artigos PUBLICADOS (queries públicas)
-CREATE INDEX idx_articles_published_popular ON articles(views DESC, helpful_count DESC)
- WHERE is_published = true AND deleted_at IS NULL;
-
--- Index apenas em artigos FEATURED (homepage)
-CREATE INDEX idx_articles_featured ON articles(featured, published_at DESC)
- WHERE is_published = true AND featured = true AND deleted_at IS NULL;
-```
-
-### Composite Indexes (Queries multi-campo)
-
-```sql
--- Dashboard: Filtrar por team + status + priority
-CREATE INDEX idx_tickets_team_status_priority ON tickets(team_id, status, priority, created_at DESC)
- WHERE deleted_at IS NULL;
-
--- Agent workload: assigned + status
-CREATE INDEX idx_tickets_assigned_active ON tickets(assigned_to, status, priority)
- WHERE deleted_at IS NULL AND status IN ('open', 'in_progress');
-
--- SLA breach detection
-CREATE INDEX idx_tickets_sla_breach ON tickets(resolution_deadline, status, team_id)
- WHERE deleted_at IS NULL AND status IN ('open', 'in_progress');
-
--- Comments count por ticket (evitar N+1)
-CREATE INDEX idx_comments_ticket_active ON comments(ticket_id, created_at DESC)
- WHERE deleted_at IS NULL;
-
--- KB search: category + published
-CREATE INDEX idx_articles_category_published ON articles(category_id, published_at DESC)
- WHERE is_published = true AND deleted_at IS NULL;
-```
-
-### Expression Indexes (Queries em colunas calculadas)
-
-```sql
--- Buscar tickets por idade (NOW() - created_at)
-CREATE INDEX idx_tickets_age ON tickets((EXTRACT(EPOCH FROM (NOW() - created_at))/3600))
- WHERE deleted_at IS NULL AND status IN ('open', 'in_progress');
-
--- Buscar artigos por helpfulness percentage
-CREATE INDEX idx_articles_helpfulness ON articles((
- CASE
- WHEN (helpful_count + not_helpful_count) > 0
- THEN helpful_count::NUMERIC / (helpful_count + not_helpful_count)
- ELSE 0
- END
-)) WHERE is_published = true AND deleted_at IS NULL;
-```
-
----
-
-## Considerações de Performance
-
-### Indexes Estratégicos
-
-- **Foreign keys:** sempre indexadas
-- **Status/Priority:** queries de filtro comuns
-- **Timestamps:** ordenação cronológica
-- **JSONB fields:** GIN index para custom_fields
-- **Full-text:** GIN index para search
-- **Partial indexes:** WHERE clauses para queries específicas
-- **Composite indexes:** Múltiplas colunas em queries JOIN/WHERE
-
-### Soft Deletes
-
-- Tickets, Comments, Articles: mantém histórico
-- Indexes com `WHERE deleted_at IS NULL` para performance
-- Views já filtram `deleted_at IS NULL` automaticamente
-
-### Views vs Materialized Views
-
-**Views (usadas no OrionOne):**
-
-- Query executada em tempo real
-- Sempre dados atuais
-- Sem overhead de refresh
-
-**Materialized Views (futuro, se necessário):**
-
-- Dados pré-computados (cache)
-- Precisa `REFRESH MATERIALIZED VIEW`
-- Usar se queries demorarem >2s
-
-### Partitioning (Futuro)
-
-Se o volume crescer (>1M tickets):
-
-- Particionar `tickets` por data (`created_at`) - mensal ou anual
-- Particionar `activity_log` por mês
-- Particionar `comments` por `ticket_id` range
-
----
-
-## Migrations Strategy
-
-### Ordem de Execução
-
-```
-1. users
-2. teams
-3. team_user
-4. categories
-5. articles
-6. tickets
-7. comments
-8. roles & permissions (Spatie)
-9. activity_log (Spatie)
-10. database_views (Views)
-11. database_triggers (Triggers + Functions)
-12. database_constraints (Check constraints)
-13. database_indexes_advanced (Partial, Composite, Expression)
-```
-
-### Criar Migrations
+### Prisma Migrate
 
 ```bash
-# Views
-php artisan make:migration create_database_views
+# Create migration
+cd nest-backend
+npx prisma migrate dev --name init
 
-# Triggers & Functions
-php artisan make:migration create_database_triggers
+# Apply production
+npx prisma migrate deploy
 
-# Constraints
-php artisan make:migration add_check_constraints_to_tables
+# Reset database (dev only)
+npx prisma migrate reset
+```
 
-# Indexes avançados
-php artisan make:migration add_advanced_indexes_to_tables
+### Seeding
 
-# Stored Procedures
-php artisan make:migration create_stored_procedures
+**Arquivo:** `nest-backend/prisma/seed.ts`
+
+```typescript
+import { PrismaClient } from "@prisma/client";
+import * as bcrypt from "bcrypt";
+
+const prisma = new PrismaClient();
+
+async function main() {
+ // 1. Create permissions (32)
+ await createPermissions();
+
+ // 2. Assign role permissions
+ await assignRolePermissions();
+
+ // 3. Create users (3)
+ await createUsers();
+
+ // 4. Create categories (5)
+ await createCategories();
+
+ // 5. Create tickets (5)
+ await createTickets();
+
+ // 6. Create comments (5)
+ await createComments();
+
+ // 7. Create team (1)
+ await createTeam();
+}
+
+main()
+ .catch(console.error)
+ .finally(() => prisma.$disconnect());
+```
+
+**Execute:**
+
+```bash
+cd nest-backend
+npm run prisma:seed
 ```
 
 ---
 
-## Conclusão
+## Database Performance Tips
 
-Este schema foi desenhado para nível **Enterprise-Grade**:
+### 1. Connection Pooling
 
- **Performance:**
+```env
+DATABASE_URL="postgresql://user:pass@localhost:5432/orionone?schema=public&connection_limit=10&pool_timeout=20"
+```
 
-- Views pré-computadas (Dashboard, SLA, Agent performance)
-- Indexes estratégicos (Partial, Composite, Expression, GIN)
-- Triggers para automação (zero overhead PHP)
+### 2. Query Optimization
 
- **Escalabilidade:**
+```typescript
+// N+1 Problem
+const tickets = await prisma.ticket.findMany();
+for (const ticket of tickets) {
+ const user = await prisma.user.findUnique({
+ where: { id: ticket.requesterId },
+ });
+}
 
-- Estrutura normalizada (3NF)
-- Partitioning ready
-- Stored Procedures para lógica complexa
+// Include relation
+const tickets = await prisma.ticket.findMany({
+ include: { requester: true, assignee: true },
+});
+```
 
- **Auditoria:**
+### 3. Select Specific Fields
 
-- Soft deletes
-- Activity log automático (triggers)
-- Status change tracking
+```typescript
+// Fetch all fields
+const users = await prisma.user.findMany();
 
- **Flexibilidade:**
+// Select only needed
+const users = await prisma.user.findMany({
+ select: { id: true, name: true, email: true },
+});
+```
 
-- JSONB para custom_fields
-- Views customizáveis
-- Extensível com novas triggers
+### 4. Pagination
 
- **Data Integrity:**
+```typescript
+// Cursor-based (melhor performance)
+const tickets = await prisma.ticket.findMany({
+ take: 20,
+ skip: 1,
+ cursor: { id: lastTicketId },
+ orderBy: { createdAt: "desc" },
+});
 
-- Check constraints (validation em DB)
-- Foreign keys com CASCADE
-- Triggers de validação (ex: agent assignment)
+// Offset-based (mais simples)
+const tickets = await prisma.ticket.findMany({
+ take: 20,
+ skip: (page - 1) * 20,
+});
+```
 
- **Best Practices:**
+---
 
-- Convenções Laravel
-- Spatie packages integration
-- PostgreSQL 16 features (JSONB, GIN, Full-text)
-- DRY via Stored Procedures
+## Security Considerations
 
-O schema suporta todos os requisitos funcionais do OrionOne enquanto mantém performance, manutenibilidade e **preparação para escala enterprise**.
+### 1. Soft Deletes
+
+```typescript
+// Middleware para excluir soft deleted automaticamente
+prisma.$use(async (params, next) => {
+ if (params.action === "findMany" || params.action === "findFirst") {
+ params.args.where = { ...params.args.where, deletedAt: null };
+ }
+ return next(params);
+});
+```
+
+### 2. Input Validation
+
+```typescript
+// Use class-validator + class-transformer
+import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
+
+export class CreateUserDto {
+ @IsNotEmpty()
+ name: string;
+
+ @IsEmail()
+ email: string;
+
+ @MinLength(8)
+ password: string;
+}
+```
+
+### 3. SQL Injection Prevention
+
+Prisma previne SQL injection automaticamente (parameterized queries).
+
+```typescript
+// Safe (Prisma)
+await prisma.user.findMany({ where: { email } });
+
+// Unsafe (raw SQL sem sanitização)
+await prisma.$queryRaw`SELECT * FROM users WHERE email = ${email}`;
+
+// Safe (raw SQL com parametrização)
+await prisma.$queryRaw`SELECT * FROM users WHERE email = ${Prisma.sql`${email}`}`;
+```
+
+---
+
+## Otimizações de Performance
+
+### Indexes Estratégicos Implementados
+
+**Users Table (Alta Frequência de Consultas)**
+
+```sql
+-- Autenticação (lookup por email)
+CREATE INDEX "users_email_idx" ON users(email);
+CREATE UNIQUE INDEX "users_email_key" ON users(email);
+
+-- Filtros de autorização
+CREATE INDEX "users_role_idx" ON users(role);
+CREATE INDEX "users_is_active_idx" ON users(is_active);
+```
+
+**Tickets Table (Core ITSM)**
+
+```sql
+-- Business identifier
+CREATE UNIQUE INDEX "tickets_ticket_number_key" ON tickets(ticket_number);
+CREATE INDEX "tickets_ticket_number_idx" ON tickets(ticket_number);
+
+-- Composite index para dashboard queries (status + priority)
+CREATE INDEX "tickets_status_priority_idx" ON tickets(status, priority);
+
+-- Foreign keys para joins frequentes
+CREATE INDEX "tickets_requester_id_idx" ON tickets(requester_id);
+CREATE INDEX "tickets_assigned_to_idx" ON tickets(assigned_to);
+CREATE INDEX "tickets_team_id_idx" ON tickets(team_id);
+
+-- Ordenação temporal
+CREATE INDEX "tickets_created_at_idx" ON tickets(created_at);
+```
+
+**Comments Table (High Volume)**
+
+```sql
+-- Parent lookups
+CREATE INDEX "comments_ticket_id_idx" ON comments(ticket_id);
+CREATE INDEX "comments_user_id_idx" ON comments(user_id);
+
+-- Ordenação temporal
+CREATE INDEX "comments_created_at_idx" ON comments(created_at);
+```
+
+### Foreign Keys com Cascade Rules
+
+**Delete Cascade (Dados dependentes)**
+
+```prisma
+// Quando user é deletado, suas notificações também são
+notifications Notification[] // ON DELETE CASCADE
+
+// Quando ticket é deletado, comments também são
+comments Comment[] // ON DELETE CASCADE
+```
+
+**Set NULL (Dados opcionais)**
+
+```prisma
+// Quando user é deletado, tickets ficam sem assignee
+assignedTo String? // ON DELETE SET NULL
+
+// Quando team é deletado, tickets ficam sem team
+teamId String? // ON DELETE SET NULL
+```
+
+**Restrict (Proteção de integridade)**
+
+```prisma
+// Não pode deletar user que criou tickets
+ticketsCreated Ticket[] // ON DELETE RESTRICT
+
+// Não pode deletar category com tickets ativos
+tickets Ticket[] // ON DELETE RESTRICT
+```
+
+### Query Performance Features
+
+**1. Soft Deletes (Preservação de Dados)**
+
+```typescript
+// Todos os models principais têm deletedAt
+deletedAt DateTime? @map("deleted_at")
+
+// Queries excluem automaticamente deleted records
+await prisma.ticket.findMany({
+ where: { deletedAt: null }
+});
+```
+
+**2. JSONB para Custom Fields (Flexibilidade)**
+
+```prisma
+customFields Json? // PostgreSQL JSONB com GIN index support
+
+// Permite queries JSON nativas
+await prisma.ticket.findMany({
+ where: {
+ customFields: {
+ path: ['priority'],
+ equals: 'high'
+ }
+ }
+});
+```
+
+**3. Enum Types (Type Safety + Performance)**
+
+```sql
+-- PostgreSQL enums são mais eficientes que strings
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'AGENT', 'USER');
+CREATE TYPE "TicketStatus" AS ENUM ('OPEN', 'IN_PROGRESS', ...);
+
+-- 4 bytes vs VARCHAR, com validação nativa
+```
+
+### Otimizações PostgreSQL 18
+
+**Vacuum Performance (Novo em PG18)**
+
+- Improved VACUUM performance para tabelas grandes
+- Melhor gestão de bloat em tabelas com updates frequentes
+- Tickets/Comments se beneficiam diretamente
+
+**Query Parallelism**
+
+- Parallel sequential scans para full-table queries
+- Útil em relatórios e dashboards
+
+**Partitioning (Futuro)**
+
+```sql
+-- Para escala, particionar tickets por data
+CREATE TABLE tickets_2025_q1 PARTITION OF tickets
+ FOR VALUES FROM ('2025-01-01') TO ('2025-04-01');
+```
+
+### Estatísticas de Uso (Seed Data)
+
+```
+ 3 Users (ADMIN, AGENT, USER)
+ 32 Permissions seeded
+ 5 Categories (Hardware, Software, Network, Access, Other)
+ 5 Tickets (diferentes status/priorities)
+ 5 Comments
+ 1 Team (Support Team)
+
+Total records: ~51
+Database size: ~2MB (fresh install)
+```
+
+### Security Features
+
+**Password Hashing**
+
+- **Bcrypt v6.0.0** com security fixes
+- Protegido contra CVE-2025 (password truncation >255 chars)
+- Salt rounds: 10 (configurável via env)
+
+**UUID v4 para IDs**
+
+- Não sequenciais (security by obscurity)
+- Distribuídos (multi-region ready)
+- 128-bit (colisão ~0%)
+
+**Cascade Delete Protection**
+
+- RESTRICT em relações críticas (users → tickets)
+- Previne perda acidental de dados históricos
+
+---
+
+## Referências
+
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [PostgreSQL 18 Release Notes](https://www.postgresql.org/docs/18/release-18.html)
+- [Prisma Best Practices](https://www.prisma.io/docs/guides/performance-and-optimization)
+- [ITSM Best Practices (ITIL v4)](https://www.axelos.com/certifications/itil-service-management)
+- [PostgreSQL Index Types](https://www.postgresql.org/docs/18/indexes-types.html)
+
+---
+
+**Status Final:** Database Schema 100% implementado e documentado

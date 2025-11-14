@@ -4,6 +4,8 @@
 
 Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) do sistema OrionOne - uma plataforma ITSM moderna para gestão de tickets de suporte técnico.
 
+**Stack:** Next.js 15 + Nest.js 11 + Prisma 6 + PostgreSQL 18
+
 **Objetivo:** Desenvolver um sistema web de gestão de tickets que permita a criação, atribuição, acompanhamento e resolução de pedidos de suporte, com suporte a múltiplos utilizadores, equipas e níveis de acesso.
 
 ---
@@ -19,9 +21,11 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 - Login com email e password
 - Recuperação de password via email
 - Verificação de email obrigatória
-- Logout seguro
+- Logout seguro (invalidação de JWT tokens)
 - Sistema de roles: Admin, Agent, User
-- Permissões granulares via Spatie Permission
+- Permissões granulares via CASL (Authorization)
+- JWT authentication com refresh tokens
+- Password hashing com bcrypt
 
 **Prioridade:** Alta
 **Complexidade:** Média
@@ -102,9 +106,9 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 - Atribuição manual (Admin/Team Lead escolhe agent)
 - Atribuição automática baseada em:
- - Keywords no título/descrição
- - Carga de trabalho do agent (round-robin)
- - Especialização da equipa
+- Keywords no título/descrição
+- Carga de trabalho do agent (round-robin)
+- Especialização da equipa
 - Reatribuição de tickets
 - Histórico de atribuições
 
@@ -120,10 +124,10 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 **Critérios de Aceitação:**
 
 - Cálculo automático de deadlines baseado em prioridade:
- - **Urgent:** 2h primeira resposta, 8h resolução
- - **High:** 4h primeira resposta, 24h resolução
- - **Medium:** 8h primeira resposta, 48h resolução
- - **Low:** 24h primeira resposta, 5 dias resolução
+- **Urgent:** 2h primeira resposta, 8h resolução
+- **High:** 4h primeira resposta, 24h resolução
+- **Medium:** 8h primeira resposta, 48h resolução
+- **Low:** 24h primeira resposta, 5 dias resolução
 - Excluir fins de semana do cálculo
 - Alertas de violação de SLA
 - Dashboard com métricas de SLA
@@ -206,7 +210,7 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 - Log de comentários
 - Armazenar: quem, o quê, quando, antes/depois
 - Interface de visualização de histórico
-- Integração com Spatie Activity Log
+- Model ActivityLog com Prisma ORM
 
 **Prioridade:** Baixa
 **Complexidade:** Baixa
@@ -265,9 +269,9 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Métricas:**
 
-- Response time médio: < 500ms
-- Database queries por request: < 15
-- Memory usage: < 512MB por processo PHP
+- Response time médio: < 200ms
+- Database queries por request: < 10
+- Memory usage: < 512MB por Node.js process
 
 ---
 
@@ -277,20 +281,21 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Passwords armazenadas com hash bcrypt
-- CSRF protection em todos os formulários
-- SQL injection prevention (Eloquent ORM)
-- XSS protection (automatic escaping)
-- Rate limiting por IP (60 requests/min)
+- Passwords: bcrypt hash (10 rounds)
+- CSRF protection: SameSite cookies + CORS
+- SQL injection prevention: Prisma ORM + Prepared Statements
+- XSS protection: React auto-escaping + CSP headers
+- Rate limiting: @nestjs/throttler (60 requests/min)
 - HTTPS obrigatório em produção
-- Validação de inputs (server-side)
-- Autorização granular (Policies)
-- Session security (httpOnly cookies)
+- Validação de inputs: Zod + class-validator
+- Autorização granular: CASL (Ability-based)
+- Session security: httpOnly + secure cookies
+- JWT tokens com refresh strategy
 
 **Compliance:**
 
 - Seguir OWASP Top 10
-- PSR-12 coding standards
+- TypeScript strict mode
 
 ---
 
@@ -310,9 +315,10 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **UX Guidelines:**
 
-- Consistência visual (Tailwind CSS)
-- Ícones claros (Heroicons)
+- Consistência visual (Tailwind CSS + shadcn/ui)
+- Ícones claros (Lucide Icons)
 - Tooltips explicativos
+- React components reutilizáveis
 
 ---
 
@@ -342,20 +348,20 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Arquitetura MVC + Service Layer
+- Arquitetura modular (Controllers, Services, DTOs)
 - Separation of concerns (Controllers thin)
-- Dependency Injection
-- Testes automatizados (Unit + Feature)
-- Coverage mínimo: 70%
+- Dependency Injection (@nestjs DI)
+- Testes automatizados (Jest + Supertest)
+- Coverage mínimo: 80%
 - Documentação técnica (architecture.md, schema.md)
 - Conventional Commits
 - Code review obrigatório
 
 **Standards:**
 
-- PSR-12 (PHP)
-- ESLint (JavaScript)
-- Prettier (formatting)
+- TypeScript strict mode
+- ESLint + Prettier
+- Nest.js best practices
 
 ---
 
@@ -369,8 +375,8 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 - Backups automáticos diários (PostgreSQL)
 - Healthchecks (database, redis, app)
 - Graceful degradation (se Redis falhar, usar database sessions)
-- Error logging (Telescope, Laravel Log)
-- Monitoring (Uptime Kuma / New Relic)
+- Error logging (Winston + Sentry)
+- Monitoring (Prometheus + Grafana / New Relic)
 
 **Recovery:**
 
@@ -385,10 +391,10 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Critérios de Aceitação:**
 
-- Docker setup completo (4 containers)
+- Docker setup completo (7 containers)
 - Environment variables (.env)
-- Database migrations versionadas
-- Seeders para dados de teste
+- Prisma migrations versionadas
+- Seeders para dados de teste (seed.ts)
 - Documentação de deployment
 - CI/CD ready (GitHub Actions)
 
@@ -405,12 +411,12 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 **Versões mínimas:**
 
-- **PHP:** 8.2+
-- **PostgreSQL:** 16+
-- **Redis:** 7+
 - **Node.js:** 20 LTS
-- **Composer:** 2.x
+- **PostgreSQL:** 18+
+- **Redis:** 8.2+
 - **NPM:** 10+
+- **Docker:** 24+
+- **TypeScript:** 5.6+
 
 **Browsers suportados:**
 
@@ -494,7 +500,9 @@ Este documento especifica os requisitos funcionais (RF) e não funcionais (RNF) 
 
 ## Referências
 
-- [Laravel 11 Documentation](https://laravel.com/docs/11.x)
-- [PostgreSQL 16 Documentation](https://www.postgresql.org/docs/16/)
+- [Next.js 15 Documentation](https://nextjs.org/docs)
+- [Nest.js 11 Documentation](https://docs.nestjs.com/)
+- [Prisma 6 Documentation](https://www.prisma.io/docs/)
+- [PostgreSQL 18 Documentation](https://www.postgresql.org/docs/18/)
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)

@@ -4,32 +4,32 @@
 
 ### Software Obrigatório
 
-| Software           | Versão Mínima | Link Download                                                 | Propósito                     |
+| Software | Versão Mínima | Link Download | Propósito |
 | ------------------ | ------------- | ------------------------------------------------------------- | ----------------------------- |
-| **Git**            | 2.40+         | [git-scm.com](https://git-scm.com/)                           | Controlo de versão            |
-| **Docker Desktop** | 4.25+         | [docker.com](https://www.docker.com/products/docker-desktop/) | Containers (PostgreSQL, etc.) |
-| **Node.js**        | 20.x LTS      | [nodejs.org](https://nodejs.org/)                             | Next.js + Nest.js runtimes    |
+| **Git** | 2.40+ | [git-scm.com](https://git-scm.com/) | Controlo de versão |
+| **Docker Desktop** | 4.25+ | [docker.com](https://www.docker.com/products/docker-desktop/) | Containers (PostgreSQL, etc.) |
+| **Node.js** | 20.x LTS | [nodejs.org](https://nodejs.org/) | Next.js + Nest.js runtimes |
 
 ### Software Opcional (Recomendado)
 
-| Software                   | Propósito                          |
+| Software | Propósito |
 | -------------------------- | ---------------------------------- |
-| **Visual Studio Code**     | IDE recomendado                    |
-| **Postman**                | Testar API endpoints               |
+| **Visual Studio Code** | IDE recomendado |
+| **Postman** | Testar API endpoints |
 | **pgAdmin** ou **DBeaver** | Cliente PostgreSQL (visualizar DB) |
 
 ### Extensões VS Code Recomendadas
 
 ```json
 {
-    "recommendations": [
-        "bradlc.vscode-tailwindcss",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "editorconfig.editorconfig",
-        "ms-azuretools.vscode-docker",
-        "prisma.prisma"
-    ]
+ "recommendations": [
+ "bradlc.vscode-tailwindcss",
+ "dbaeumer.vscode-eslint",
+ "esbenp.prettier-vscode",
+ "editorconfig.editorconfig",
+ "ms-azuretools.vscode-docker",
+ "prisma.prisma"
+ ]
 }
 ```
 
@@ -132,11 +132,11 @@ docker-compose exec orionone-db psql -U postgres -d orionone -c "SELECT * FROM r
 
 **Aceder à Aplicação:**
 
--   **Frontend (Next.js):** http://localhost:3000
--   **Backend API (Nest.js):** http://localhost:3001/api
--   **API Docs (Swagger):** http://localhost:3001/api/docs
--   **PostgreSQL:** localhost:5432 (user: postgres, password: postgres, db: orionone)
--   **Mailpit (Email testing):** http://localhost:8025
+- **Frontend (Next.js):** http://localhost:3000
+- **Backend API (Nest.js):** http://localhost:3001/api
+- **API Docs (Swagger):** http://localhost:3001/api/docs
+- **PostgreSQL:** localhost:5432 (user: postgres, password: postgres, db: orionone)
+- **Mailpit (Email testing):** http://localhost:8025
 
 ---
 
@@ -177,7 +177,7 @@ docker-compose down -v
 ```bash
 # Resetar DB + re-seed
 cd nest-backend
-npx prisma migrate reset  # Warning: Apaga todos os dados!
+npx prisma migrate reset # Warning: Apaga todos os dados!
 npx prisma db seed
 cd ..
 
@@ -196,7 +196,7 @@ docker-compose exec orionone-db psql -U postgres -d orionone
 
 # Prisma Studio (visualizar DB no browser)
 cd nest-backend
-npx prisma studio  # Abre em http://localhost:5555
+npx prisma studio # Abre em http://localhost:5555
 cd ..
 ```
 
@@ -205,17 +205,17 @@ cd ..
 ```bash
 # Backend (Jest)
 cd nest-backend
-npm run test                # Testes unitários
-npm run test:watch          # Watch mode
-npm run test:cov            # Com coverage
-npm run test:e2e            # Testes E2E
+npm run test # Testes unitários
+npm run test:watch # Watch mode
+npm run test:cov # Com coverage
+npm run test:e2e # Testes E2E
 cd ..
 
 # Frontend (Vitest)
 cd next-frontend
-npm run test                # Testes unitários
-npm run test:watch          # Watch mode
-npm run test:ui             # UI interativa
+npm run test # Testes unitários
+npm run test:watch # Watch mode
+npm run test:ui # UI interativa
 cd ..
 ```
 
@@ -240,7 +240,7 @@ docker-compose up -d
 ```bash
 # Verificar logs
 cd nest-backend
-npm run start:dev  # Ver erros no terminal
+npm run start:dev # Ver erros no terminal
 
 # Reinstalar dependências
 rm -rf node_modules package-lock.json
@@ -309,29 +309,29 @@ lsof -i :3001
 
 Docker permite executar aplicações em **containers** - ambientes isolados que incluem tudo o que a aplicação precisa (código, runtime, bibliotecas, etc). No OrionOne, usamos 8 containers:
 
--   **orionone-backend** - Nest.js 10 (Node 20, porta 3001)
--   **orionone-frontend** - Next.js 15 (Node 20, porta 3000)
--   **orionone-postgres** - PostgreSQL 16 (database, porta 5432)
--   **orionone-redis** - Redis 7 (cache, sessions, queues)
--   **orionone-mailpit** - Mailpit (email testing, porta 8025)
--   **orionone-nginx** - Nginx (reverse proxy, porta 80)
+- **orionone-backend** - Nest.js 10 (Node 20, porta 3001)
+- **orionone-frontend** - Next.js 15 (Node 20, porta 3000)
+- **orionone-postgres** - PostgreSQL 16 (database, porta 5432)
+- **orionone-redis** - Redis 7 (cache, sessions, queues)
+- **orionone-mailpit** - Mailpit (email testing, porta 8025)
+- **orionone-nginx** - Nginx (reverse proxy, porta 80)
 
 **Vantagens:**
 
--   Ambiente idêntico em todos os PCs (dev = produção)
--   Não precisa instalar PostgreSQL, Redis localmente
--   Setup em 10 minutos vs 2+ horas manual
--   Isolar projetos (cada um com suas versões)
+- Ambiente idêntico em todos os PCs (dev = produção)
+- Não precisa instalar PostgreSQL, Redis localmente
+- Setup em 10 minutos vs 2+ horas manual
+- Isolar projetos (cada um com suas versões)
 
 ### Conceitos Básicos
 
-| Termo              | Explicação                             | Exemplo                      |
+| Termo | Explicação | Exemplo |
 | ------------------ | -------------------------------------- | ---------------------------- |
-| **Image**          | Template do container (como um ISO)    | `node:20-alpine`             |
-| **Container**      | Instância executável de uma image      | `orionone-backend` a correr  |
-| **Volume**         | Pasta compartilhada (host ↔ container) | `./nest-backend` ↔ `/app`    |
-| **Port Mapping**   | Expor portas do container              | `3000:3000` (host:container) |
-| **docker-compose** | Orquestra múltiplos containers         | `docker-compose.yml`         |
+| **Image** | Template do container (como um ISO) | `node:20-alpine` |
+| **Container** | Instância executável de uma image | `orionone-backend` a correr |
+| **Volume** | Pasta compartilhada (host container) | `./nest-backend` `/app` |
+| **Port Mapping** | Expor portas do container | `3000:3000` (host:container) |
+| **docker-compose** | Orquestra múltiplos containers | `docker-compose.yml` |
 
 ### Comandos Essenciais
 
@@ -345,19 +345,19 @@ docker-compose ps
 docker ps -a
 
 # Iniciar containers
-docker-compose up -d          # -d = detached (background)
+docker-compose up -d # -d = detached (background)
 
 # Parar containers
-docker-compose stop           # Apenas para (dados mantidos)
-docker-compose down           # Para E remove (volumes mantidos)
-docker-compose down -v        # Remove TUDO (incluindo dados!)
+docker-compose stop # Apenas para (dados mantidos)
+docker-compose down # Para E remove (volumes mantidos)
+docker-compose down -v # Remove TUDO (incluindo dados!)
 
 # Reiniciar um container específico
 docker-compose restart orionone-backend
 
 # Ver logs
-docker-compose logs -f                      # Todos os containers
-docker-compose logs -f orionone-backend     # Container específico
+docker-compose logs -f # Todos os containers
+docker-compose logs -f orionone-backend # Container específico
 docker-compose logs --tail=50 orionone-backend # Últimas 50 linhas
 ```
 
@@ -396,19 +396,19 @@ docker-compose exec orionone-backend ps aux
 
 ```yaml
 services:
-    orionone-backend: # Nome do serviço
-        build: # Construir de Dockerfile
-            context: ./nest-backend
-            dockerfile: Dockerfile
-        ports: # Port mapping
-            - "3001:3001" # host:container
-        volumes: # Pastas compartilhadas
-            - ./nest-backend:/app
-        environment: # Variáveis de ambiente
-            DATABASE_URL: postgresql://postgres:postgres@orionone-postgres:5432/orionone
-        depends_on: # Dependências (iniciar primeiro)
-            - orionone-postgres
-            - orionone-redis
+ orionone-backend: # Nome do serviço
+ build: # Construir de Dockerfile
+ context: ./nest-backend
+ dockerfile: Dockerfile
+ ports: # Port mapping
+ - "3001:3001" # host:container
+ volumes: # Pastas compartilhadas
+ - ./nest-backend:/app
+ environment: # Variáveis de ambiente
+ DATABASE_URL: postgresql://postgres:postgres@orionone-postgres:5432/orionone
+ depends_on: # Dependências (iniciar primeiro)
+ - orionone-postgres
+ - orionone-redis
 ```
 
 ### Troubleshooting Docker
@@ -435,7 +435,7 @@ lsof -i :3000
 
 # Parar o processo OU mudar porta no docker-compose.yml:
 ports:
-  - "3002:3001"  # Usar porta 3002 em vez de 3001
+ - "3002:3001" # Usar porta 3002 em vez de 3001
 ```
 
 #### Container reinicia constantemente (restart loop)
@@ -465,18 +465,18 @@ docker system df
 
 ### Docker vs Local (Quando usar cada um?)
 
-| Tarefa         | Usar      | Comando                                     |
+| Tarefa | Usar | Comando |
 | -------------- | --------- | ------------------------------------------- |
-| Rodar backend  | ❌ Local  | `cd nest-backend && npm run start:dev`      |
-| Rodar frontend | ❌ Local  | `cd next-frontend && npm run dev`           |
-| Migrations     | ❌ Local  | `cd nest-backend && npx prisma migrate dev` |
-| Testes         | ❌ Local  | `npm run test` (em cada projeto)            |
-| PostgreSQL     | ✅ Docker | `docker-compose up -d orionone-postgres`    |
-| Redis          | ✅ Docker | `docker-compose up -d orionone-redis`       |
-| Mailpit        | ✅ Docker | `docker-compose up -d orionone-mailpit`     |
-| Nginx          | ✅ Docker | `docker-compose up -d orionone-nginx`       |
-| Editar código  | ❌ Local  | VS Code no host                             |
-| Git            | ❌ Local  | `git` no host                               |
+| Rodar backend | Local | `cd nest-backend && npm run start:dev` |
+| Rodar frontend | Local | `cd next-frontend && npm run dev` |
+| Migrations | Local | `cd nest-backend && npx prisma migrate dev` |
+| Testes | Local | `npm run test` (em cada projeto) |
+| PostgreSQL | Docker | `docker-compose up -d orionone-postgres` |
+| Redis | Docker | `docker-compose up -d orionone-redis` |
+| Mailpit | Docker | `docker-compose up -d orionone-mailpit` |
+| Nginx | Docker | `docker-compose up -d orionone-nginx` |
+| Editar código | Local | VS Code no host |
+| Git | Local | `git` no host |
 
 **Regra de ouro:** Serviços (PostgreSQL, Redis, Mailpit) → Docker. Código (Next.js, Nest.js) → Local.
 
@@ -490,24 +490,24 @@ docker system df
 
 ### Recursos de Aprendizagem
 
--   **Docker Docs:** https://docs.docker.com/get-started/
--   **Docker Compose Docs:** https://docs.docker.com/compose/
--   **Next.js Docs:** https://nextjs.org/docs
--   **Nest.js Docs:** https://docs.nestjs.com/
--   **Prisma Docs:** https://www.prisma.io/docs
+- **Docker Docs:** https://docs.docker.com/get-started/
+- **Docker Compose Docs:** https://docs.docker.com/compose/
+- **Next.js Docs:** https://nextjs.org/docs
+- **Nest.js Docs:** https://docs.nestjs.com/
+- **Prisma Docs:** https://www.prisma.io/docs
 
 ---
 
 ## Estrutura de Containers Docker
 
-| Container           | Serviço       | Porta | Propósito                  |
+| Container | Serviço | Porta | Propósito |
 | ------------------- | ------------- | ----- | -------------------------- |
-| `orionone-backend`  | Nest.js 10    | 3001  | Backend API                |
-| `orionone-frontend` | Next.js 15    | 3000  | Frontend Application       |
-| `orionone-postgres` | PostgreSQL 16 | 5432  | Base de dados principal    |
-| `orionone-redis`    | Redis 7       | 6379  | Cache + Sessions + Queues  |
-| `orionone-mailpit`  | Mailpit       | 8025  | Email testing (dev only)   |
-| `orionone-nginx`    | Nginx         | 80    | Reverse proxy (production) |
+| `orionone-backend` | Nest.js 10 | 3001 | Backend API |
+| `orionone-frontend` | Next.js 15 | 3000 | Frontend Application |
+| `orionone-postgres` | PostgreSQL 16 | 5432 | Base de dados principal |
+| `orionone-redis` | Redis 7 | 6379 | Cache + Sessions + Queues |
+| `orionone-mailpit` | Mailpit | 8025 | Email testing (dev only) |
+| `orionone-nginx` | Nginx | 80 | Reverse proxy (production) |
 
 ---
 
@@ -515,19 +515,19 @@ docker system df
 
 ### Utilizadores Seedados
 
-| Email               | Password | Role  | Permissões           |
+| Email | Password | Role | Permissões |
 | ------------------- | -------- | ----- | -------------------- |
-| admin@orionone.test | password | admin | Todas                |
-| agent@orionone.test | password | agent | Tickets + Comments   |
-| user@orionone.test  | password | user  | Criar tickets apenas |
+| admin@orionone.test | password | admin | Todas |
+| agent@orionone.test | password | agent | Tickets + Comments |
+| user@orionone.test | password | user | Criar tickets apenas |
 
 ### Base de Dados
 
--   **Host:** localhost
--   **Porta:** 5432
--   **Database:** orionone
--   **User:** postgres
--   **Password:** postgres
+- **Host:** localhost
+- **Porta:** 5432
+- **Database:** orionone
+- **User:** postgres
+- **Password:** postgres
 
 ---
 
@@ -535,15 +535,15 @@ docker system df
 
 Para informação detalhada, consultar:
 
--   **[Migration Timeline](docs/MIGRATION-PART-4-TIMELINE.md)** - Cronograma de 10 semanas (14 Nov - 31 Jan)
--   **[Architecture](docs/architecture.md)** - Arquitetura Next.js + Nest.js (3-layer, patterns, security)
--   **[Migration Parts 1-5](docs/)** - Setup, Backend, Frontend, Timeline, Cleanup
--   **[MVP Document](docs/MVP.md)** - MVP completo com 39 features
--   **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
+- **[Migration Timeline](docs/MIGRATION-PART-4-TIMELINE.md)** - Cronograma de 10 semanas (14 Nov - 31 Jan)
+- **[Architecture](docs/architecture.md)** - Arquitetura Next.js + Nest.js (3-layer, patterns, security)
+- **[Migration Parts 1-5](docs/)** - Setup, Backend, Frontend, Timeline, Cleanup
+- **[MVP Document](docs/MVP.md)** - MVP completo com 39 features
+- **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
 
 ### Documentação Arquivada (Laravel/Vue)
 
--   **[Archive](docs/archive-laravel-vue/)** - Documentação completa da implementação Laravel 12 + Vue 3
+- **[Archive](docs/archive-laravel-vue/)** - Documentação completa da implementação Laravel 12 + Vue 3
 
 ---
 
@@ -551,7 +551,7 @@ Para informação detalhada, consultar:
 
 Seguir **[Migration Timeline](docs/MIGRATION-PART-4-TIMELINE.md)** para cronograma completo:
 
-1. **Week 0 (14-15 Nov):** Setup inicial (projects criados ✅, Docker + Nginx, Database + Prisma)
+1. **Week 0 (14-15 Nov):** Setup inicial (projects criados , Docker + Nginx, Database + Prisma)
 2. **Week 1 (18-22 Nov):** Auth & Users (JWT, CASL, Profile, Avatar)
 3. **Week 2 (25-29 Nov):** Tickets Core (CRUD, Status, Priority, Filters)
 4. **Week 3-9:** Knowledge Base, Comments, Dashboard, SLA, Teams, Assets

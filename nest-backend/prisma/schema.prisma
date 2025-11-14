@@ -1,7 +1,9 @@
 // Prisma Schema - OrionOne ITSM
 // Generated from Laravel migrations (Sprint 1-7)
-// Database: PostgreSQL 16
+// Database: PostgreSQL 18.0 (Alpine)
+// ORM: Prisma 6.19.0
 // Models: 15 (Auth, Tickets, CMDB, KB, Activity)
+// Last Updated: 13 Nov 2025
 
 generator client {
   provider = "prisma-client-js"

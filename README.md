@@ -1,479 +1,226 @@
 <div align="center">
 
+<img src="logo/OrionOne.png" alt="OrionOne Logo" width="200"/>
+
 **Modern IT Service Management Platform**
 
 [![Status](https://img.shields.io/badge/Status-In%20Development-yellow?style=flat)](https://github.com/JMSS95/OrionOne)
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Nest.js](https://img.shields.io/badge/Nest.js-10-E0234E?style=flat&logo=nestjs&logoColor=white)](https://nestjs.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat&logo=prisma&logoColor=white)](https://www.prisma.io/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Nest.js](https://img.shields.io/badge/Nest.js-11-E0234E?style=flat&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](CONTRIBUTING.md)
+[Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](CONTRIBUTING.md)
 
 </div>
 
 ---
 
-## Table of Contents
-
--   [About](#about)
--   [Features](#features)
--   [Tech Stack](#tech-stack)
--   [Quick Start](#quick-start)
--   [Development](#development)
--   [Documentation](#documentation)
--   [Roadmap](#roadmap)
--   [Contributing](#contributing)
--   [License](#license)
-
----
-
 ## About
 
-**OrionOne** é uma **plataforma ITSM (IT Service Management) completa** desenvolvida como projeto final CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação. Inspirado em soluções enterprise como ServiceNow e Jira Service Desk, OrionOne oferece gestão profissional de IT Service Management para empresas.
+**OrionOne** is a modern **ITSM (IT Service Management) platform** built with Next.js 15, Nest.js 11, and TypeScript. Designed for enterprise-grade IT operations with features inspired by ServiceNow and Jira Service Desk.
 
-> **Stack**: Next.js 15 + Nest.js 10 + PostgreSQL 16 + TypeScript
-> **Projeto Académico** • CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação
-> Centro de Formação Profissional de Évora • 2024/2026
+### Key Features
 
-### 🔄 Migração Laravel → Next.js/Nest.js
-
-Este projeto foi inicialmente desenvolvido em **Laravel 12 + Vue 3** (Sprint 1 - 18% MVP completo) e está em migração para **Next.js 15 + Nest.js 10** para:
-
--   ✅ **TypeScript Full-Stack**: Type-safety end-to-end
--   ✅ **Modern Stack**: Next.js App Router, Nest.js modular architecture
--   ✅ **Performance**: React Server Components, API otimizada
--   ✅ **Ecosystem**: npm packages mais recentes, melhor DX
-
-**Backup Laravel/Vue**: Git tag `v0.1.0-laravel` + `docs/archive-laravel-vue/`
+- **90% cost savings** compared to market leaders ($20/agent vs $200+)
+- **Rich Text Editor** with Tiptap for professional ticket descriptions
+- **AI-powered Search** with Meilisearch (typo-tolerant, instant results)
+- **Advanced SLA Management** with configurable policies
+- **Modern Stack** with Next.js 15 + Nest.js 11 + Prisma 6 + PostgreSQL 18
 
 ---
 
 ## Features
 
-### MVP (Week 10 - 31 Jan 2025)
+| Feature | Description | Status |
+| -------------------------- | -------------------------------------------------- | ----------- |
+| Authentication | Multi-role (Admin, Agent, User) with JWT + refresh | Sprint 1 |
+| User & Team Management | RBAC with granular permissions | Sprint 1 |
+| Incident Management | CRUD, priorities, status, SLA tracking | Sprint 2 |
+| Rich Text Editor | Tiptap editor for professional descriptions | Sprint 2 |
+| AI-Powered Search | Meilisearch with typo-tolerance | Sprint 2 |
+| Comments & Attachments | Real-time collaboration with file uploads | Sprint 3 |
+| Knowledge Base | Full-text search powered by Meilisearch | Sprint 4 |
+| Advanced SLA Management | Configurable SLA policies with escalation | Sprint 5 |
+| Dashboard & Analytics | Real-time metrics and team performance stats | Sprint 6 |
 
-#### 🔐 Authentication & Authorization
-
--   Multi-role authentication (Admin, Agent, User)
--   JWT token-based auth with refresh tokens
--   Password reset with email verification
--   Role-Based Access Control (RBAC) + CASL permissions
-
-#### 🎫 Ticket Management
-
--   Complete CRUD (Create, Read, Update, Delete)
--   Auto-generated ticket numbers (TKT-YYYYMMDD-0001)
--   Priority levels (Low, Medium, High, Urgent)
--   Status tracking (Open, In Progress, Resolved, Closed)
--   SLA calculation and tracking
--   Rich text editor (Tiptap) for descriptions
-
-#### 💬 Comments & Collaboration
-
--   Public and internal comments
--   File attachments (images, documents)
--   Real-time notifications (polling 30s)
--   Activity log tracking
-
-#### 📚 Knowledge Base
-
--   Articles with categories
--   Full-text search (Meilisearch)
--   Markdown editor
--   View counter
-
-#### 💼 Asset Management (CMDB)
-
--   Assets CRUD (6 types: Laptop, Desktop, Server, License, Mobile, Network)
--   Asset-Ticket linking
--   Status tracking (Available, Assigned, Maintenance, Retired)
--   Asset reports
-
-#### 👥 User & Team Management
-
--   User profiles with avatars
--   Team assignment
--   Permission management (32 permissions)
--   Activity log per user
-
-#### 📊 Dashboard & Analytics
-
--   Ticket metrics by status
--   Priority distribution
--   Team statistics
--   Recent activity feed
-
-**[Complete Roadmap →](docs/MVP.md)**
+**MVP Target:** January 31, 2025 (11 weeks) • [Complete Roadmap →](docs/DEVELOPMENT-PLAN.md)
 
 ---
 
 ## Tech Stack
 
-### Backend - Nest.js 10
+| Layer | Technology | Version | Purpose |
+| ------------ | ------------ | ------- | ------------------ |
+| **Backend** | Nest.js | 11.1.8 | RESTful API |
+| | Prisma | 6.4.0 | Type-safe ORM |
+| | PostgreSQL | 18.0 | Primary database |
+| | Redis | 8.2 | Cache & sessions |
+| | Meilisearch | 1.25 | Full-text search |
+| **Frontend** | Next.js | 15.5.6 | React 19 framework |
+| | shadcn/ui | latest | Component library |
+| | Tailwind CSS | v4 | Utility-first CSS |
+| **DevOps** | Docker | latest | Containerization |
+| | Nginx | 1.24+ | Reverse proxy |
 
--   **Nest.js 10** - Progressive Node.js framework
--   **Prisma 6** - Type-safe ORM with migrations
--   **PostgreSQL 16** - Enterprise-grade database
--   **Redis 7** - Cache, sessions, and queues
--   **JWT + Passport** - Authentication strategy
--   **CASL** - Permission-based authorization
--   **Sharp** - Image processing (WebP conversion)
--   **Winston** - Structured logging
--   **Swagger** - API documentation
-
-### Frontend - Next.js 15
-
--   **Next.js 15** - React framework with App Router
--   **React 19** - Latest React with Server Components
--   **TypeScript 5.3** - Type-safe JavaScript
--   **Tailwind CSS v4** - Utility-first CSS
--   **Shadcn-ui** - High-quality UI components
--   **Zustand** - Lightweight state management
--   **React Query** - Server state management
--   **React Hook Form + Zod** - Form validation
--   **Tiptap** - Rich text editor
--   **date-fns** - Date utilities for SLA
-
-### Infrastructure
-
--   **Docker Compose** - 8 containers (backend, frontend, postgres, redis, meilisearch, mailpit, nginx)
--   **Nginx** - Reverse proxy (/ → frontend, /api → backend)
--   **Meilisearch 1.9** - Full-text search engine
--   **Mailpit** - Email testing (dev)
--   **GitHub Actions** - CI/CD pipeline
-
-### Developer Experience
-
--   **TypeScript Strict Mode** - Maximum type safety
--   **Prisma Studio** - Database GUI
--   **Jest + Supertest** - Backend testing (Nest.js)
--   **React Testing Library** - Frontend testing (Next.js)
--   **ESLint + Prettier** - Code formatting
--   **Swagger UI** - Interactive API docs
-
-**[Complete Architecture →](docs/architecture.md)**
+ **Detailed documentation:** [TECH-STACK.md](TECH-STACK.md)
 
 ---
 
 ## Quick Start
 
-### Prerequisites
-
-**Required:**
-
--   [Git](https://git-scm.com/) (2.40+)
--   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (4.25+)
--   [Node.js](https://nodejs.org/) (20.x LTS)
-
-### Installation
-
 ```bash
-# 1. Clone repository
+# Clone and setup (10 minutes)
 git clone https://github.com/JMSS95/OrionOne.git
 cd OrionOne
+docker compose up -d
 
-# 2. Start Docker containers (8 services)
-docker-compose up -d
+# Backend setup
+cd nest-backend && npm install && npm run prisma:migrate:dev && npm run start:dev
 
-# 3. Install backend dependencies
-cd nest-backend
-npm install
-
-# 4. Run database migrations
-npx prisma migrate dev
-
-# 5. Seed database
-npx prisma db seed
-
-# 6. Install frontend dependencies
-cd ../next-frontend
-npm install
-
-# 7. Access application
-# Frontend: http://localhost
-# Backend API: http://localhost/api
-# Swagger Docs: http://localhost/api/docs
-# Mailpit: http://localhost:8025
+# Frontend setup (new terminal)
+cd next-frontend && npm install && npm run dev
 ```
 
-### Default Credentials
+** Full setup guide:** [SETUP.md](SETUP.md)
 
-```
-Admin:
-Email: admin@orionone.com
-Password: admin123
+**Access:**
 
-Agent:
-Email: agent@orionone.com
-Password: agent123
-
-User:
-Email: user@orionone.com
-Password: user123
-```
-
----
-
-## Development
-
-### Development Workflow
-
-OrionOne follows **Feature-Driven Development**:
-
-**Workflow per Feature:**
-
-1. **Planning** (30min) - User stories and acceptance criteria
-2. **Database** (1h) - Prisma schema, migrations
-3. **Backend** (3-4h) - Nest.js modules, services, controllers
-4. **Frontend** (2-3h) - Next.js pages, React components
-5. **Testing** (1-2h) - Unit + E2E tests
-6. **Commit** (15min) - Conventional commits
-
-**Code Quality:**
-
--   TypeScript Strict Mode
--   ESLint + Prettier
--   Jest + Supertest (backend)
--   React Testing Library (frontend)
--   > 80% test coverage
-
-### Architecture
-
-```
-Next.js Frontend (React Server Components)
-    ↓ HTTP/REST (Axios)
-Nest.js Backend (Controllers)
-    ↓
-Services (Business Logic)
-    ↓
-Prisma (ORM)
-    ↓
-PostgreSQL Database
-```
-
-**Layers:**
-
--   **Presentation:** Next.js pages, React components, Shadcn-ui
--   **API:** Nest.js controllers, DTOs, Swagger docs
--   **Business Logic:** Services, Guards, Interceptors
--   **Data:** Prisma models, migrations, seeders
--   **Infrastructure:** Docker, Nginx, Redis, PostgreSQL
-
-**[Complete Architecture →](docs/architecture.md)**
-
-### Project Structure
-
-```
-OrionOne/
-├─ nest-backend/         # Backend Nest.js
-│  ├─ src/
-│  │  ├─ auth/           # Authentication module
-│  │  ├─ users/          # User management
-│  │  ├─ tickets/        # Tickets CRUD
-│  │  ├─ upload/         # File uploads
-│  │  ├─ casl/           # Authorization
-│  │  ├─ prisma/         # Database
-│  │  └─ common/         # Shared code
-│  ├─ prisma/
-│  │  ├─ schema.prisma   # 15 models, 6 enums
-│  │  ├─ migrations/     # Database migrations
-│  │  └─ seed.ts         # Seed data
-│  └─ test/              # E2E tests
-├─ next-frontend/        # Frontend Next.js
-│  ├─ app/
-│  │  ├─ (auth)/         # Auth pages
-│  │  ├─ (dashboard)/    # Protected pages
-│  │  └─ api/            # Edge API routes
-│  ├─ components/
-│  │  ├─ ui/             # Shadcn-ui components
-│  │  ├─ layout/         # Layout components
-│  │  └─ tickets/        # Feature components
-│  ├─ lib/
-│  │  ├─ hooks/          # React Query hooks
-│  │  └─ stores/         # Zustand stores
-│  └─ types/             # TypeScript types
-└─ docs/                 # Technical documentation
-   ├─ architecture.md    # Architecture guide
-   ├─ MIGRATION-*.md     # Migration docs
-   └─ archive-laravel-vue/ # Laravel/Vue backup
-```
-
-### Testing
-
-**Test Strategy:**
-
-```bash
-# Backend (Nest.js)
-cd nest-backend
-npm run test        # Unit tests
-npm run test:e2e    # E2E tests
-npm run test:cov    # Coverage report
-
-# Frontend (Next.js)
-cd next-frontend
-npm run test        # Component tests
-npm run test:watch  # Watch mode
-```
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001/api
+- Login: `admin@orionone.com` / `Admin123!`
 
 ---
 
 ## Documentation
 
-### Essential
+| Document | Description |
+| -------------------------------------------------------- | ------------------------------------------ |
+| [SETUP.md](SETUP.md) | Complete setup guide (10 minutes) |
+| [TECH-STACK.md](TECH-STACK.md) | Complete technology stack details |
+| [docs/DEVELOPMENT-PLAN.md](docs/DEVELOPMENT-PLAN.md) | 6-sprint roadmap (11 weeks) |
+| [docs/SPRINT-0-SETUP.md](docs/SPRINT-0-SETUP.md) | Sprint 0 infrastructure setup |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute (workflow + conventions) |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Production deployment guide |
+| [docs/COMMANDS-REFERENCE.md](docs/COMMANDS-REFERENCE.md) | All CLI commands |
+| [docs/COMPONENTS-GUIDE.md](docs/COMPONENTS-GUIDE.md) | shadcn/ui components catalog |
 
--   **[Quick Start](SETUP.md)** - Complete setup guide
--   **[Architecture](docs/architecture.md)** - Next.js + Nest.js architecture
--   **[Database Schema](docs/database-schema.md)** - Prisma schema with 15 models
--   **[MVP Roadmap](docs/MVP.md)** - Complete roadmap and timeline
+---
 
-### Migration
+## Development
 
--   **[Migration Part 1: Setup](docs/MIGRATION-PART-1-SETUP.md)** - Infrastructure & packages (1042 lines)
--   **[Migration Part 2: Backend](docs/MIGRATION-PART-2-BACKEND.md)** - Nest.js + Prisma (1108 lines)
--   **[Migration Part 3: Frontend](docs/MIGRATION-PART-3-FRONTEND.md)** - Next.js + React (840 lines)
--   **[Migration Part 4: Timeline](docs/MIGRATION-PART-4-TIMELINE.md)** - 10-week plan (1005 lines)
--   **[Migration Part 5: Cleanup](docs/MIGRATION-PART-5-CLEANUP.md)** - Archive Laravel/Vue (1870 lines)
--   **[Migration Gaps Review](docs/MIGRATION-REVIEW-GAPS.md)** - 17 gaps analysis (1797 lines)
--   **[Migration Ready](docs/MIGRATION-READY.md)** - Executive summary (259 lines)
+### Common Commands
 
-### Laravel/Vue Archive
+```bash
+# Backend (nest-backend/)
+npm run start:dev # Dev server with watch mode
+npm run test # Run all tests
+npm run prisma:studio # Database GUI
 
--   **[Archive README](docs/archive-laravel-vue/README.md)** - Laravel 12 + Vue 3 documentation
--   **Backup Git Tag:** `v0.1.0-laravel` - Original Sprint 1 code
+# Frontend (next-frontend/)
+npm run dev # Dev server
+npm run test # Run all tests
+npm run lint # Check code quality
 
-### Business
+# Infrastructure
+docker compose up -d # Start services
+docker compose logs -f # View logs
+docker compose down # Stop services
+```
 
--   **[Requirements](docs/requirements.md)** - Functional and non-functional requirements
--   **[Business Model](docs/business-model.md)** - Business model and SWOT analysis
--   **[ITSM Stack Analysis](docs/ITSM-STACK-ANALYSIS.md)** - Comparison with ServiceNow
+### Project Structure
+
+```
+orionone/
+ nest-backend/ # Nest.js 11 API
+ prisma/ # Database schema + migrations
+ schema.prisma # 15 models (User, Ticket, Article, etc.)
+ migrations/ # Database migrations
+ seed.ts # Seed data (5 users, 8 categories, etc.)
+ src/ # Source code
+ modules/ # Feature modules (auth, users, tickets, etc.)
+ prisma/ # Prisma service
+ main.ts # Application entry point
+ test/ # E2E tests
+ next-frontend/ # Next.js 15 SPA
+ app/ # Pages (App Router)
+ layout.tsx # Root layout
+ page.tsx # Home page
+ components/ # React components (shadcn/ui)
+ lib/ # Utilities
+ public/ # Static assets
+ docs/ # Documentation
+ DEVELOPMENT-PLAN.md # 6-sprint roadmap
+ MVP.md # MVP features & status
+ TECH-STACK.md # Technology stack details
+ SPRINT-0-SETUP.md # Sprint 0 setup guide
+ guides/ # Implementation guides
+ docker/ # Docker configuration
+ logo/ # OrionOne branding
+ OrionOne.png # Logo image
+ scripts/ # Utility scripts
+ docker-compose.yml # 7-service orchestration
+ nginx.conf # Reverse proxy configuration
+ .env.example # Environment variables template
+ SETUP.md # Quick setup guide
+```
 
 ---
 
 ## Roadmap
 
-### Week 0 (13-17 Nov) - Foundation
+| Sprint | Duration | Focus Area | Status |
+| ------------ | -------------- | ---------------------------------- | ----------- |
+| **Sprint 0** | Nov 1-15 | Infrastructure Setup | Complete |
+| **Sprint 1** | Nov 16-27 (2w) | Authentication & User Management | 70% Done |
+| **Sprint 2** | Nov 28-Dec 6 | Incident + Rich Text + Meilisearch | Planned |
+| **Sprint 3** | Dec 7-17 | Comments & Attachments | Planned |
+| **Sprint 4** | Dec 18-31 | Knowledge Base + Search | Planned |
+| **Sprint 5** | Jan 1-10 | Advanced SLA Management | Planned |
+| **Sprint 6** | Jan 11-31 | Dashboard + Polish + Buffer | Planned |
 
-**Completed:**
-
--   [x] Migration decision (Laravel → Next.js/Nest.js)
--   [x] Migration documentation (5992 lines)
--   [x] Git backup (tag v0.1.0-laravel)
--   [x] Projects created (nest-backend + next-frontend)
--   [x] Environment configured (.env files, JWT_SECRET)
-
-**In Progress:**
-
--   [ ] Docker + Nginx (8 containers)
--   [ ] Prisma schema + migrations (15 models)
--   [ ] Health check + CORS
-
-### Week 1 (18-22 Nov) - Authentication
-
--   [ ] Seed data (32 permissions)
--   [ ] AuthModule (JWT + Passport)
--   [ ] CASL AbilityFactory
--   [ ] UsersModule CRUD
--   [ ] UploadModule (Sharp, WebP)
-
-### Week 2-3 (25 Nov - 6 Dec) - Tickets
-
--   [ ] TicketsModule backend
--   [ ] Tailwind CSS migration (30+ variables)
--   [ ] Tickets frontend (list, create, detail, edit)
--   [ ] Tiptap rich text editor
-
-### Week 4-10 (9 Dec - 31 Jan) - MVP Complete
-
--   [ ] Comments + Notifications
--   [ ] Knowledge Base + Meilisearch
--   [ ] Assets Management (CMDB)
--   [ ] Dashboard + Analytics
--   [ ] Teams + Announcements
--   [ ] Email (Mailpit → SMTP)
--   [ ] Logging (Winston)
--   [ ] Production deploy
-
-**Target:** 31 Jan 2025 (39 features, 100% MVP)
-
-**[Complete Timeline →](docs/MIGRATION-PART-4-TIMELINE.md)**
+**MVP Target:** January 31, 2025 (11 weeks) • [Full Development Plan →](docs/DEVELOPMENT-PLAN.md)
 
 ---
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+We follow professional industry standards with TDD (Test-Driven Development) workflow:
 
-### Commit Conventions
+1. **Fork & Clone** the repository
+2. **Create feature branch**: `git checkout -b feat/your-feature`
+3. **Follow TDD cycle**: RED → GREEN → REFACTOR
+4. **Write tests first** (Jest + Supertest for backend, React Testing Library for frontend)
+5. **Commit** with [Conventional Commits](https://www.conventionalcommits.org/)
+6. **Push & Create PR**
 
-We use [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-feat: new feature
-fix: bug fix
-docs: documentation
-refactor: code refactoring
-test: adding tests
-chore: maintenance
-```
-
-## Security
-
-OrionOne implements enterprise-grade security:
-
--   Authentication via Laravel Sanctum
--   CSRF protection on all forms
--   Password hashing with Bcrypt (cost 12)
--   SQL injection protection via Eloquent
--   XSS protection (automatic escaping)
--   Rate limiting per IP
--   Granular authorization via Policies
--   Activity logging (audit trail)
--   Soft deletes for data recovery
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
 ## License
 
-This is an academic project developed for CET - Técnico Especialista em Tecnologias e Programação de Sistemas de Informação.
-
-**Institution:** Centro de Formação Profissional de Évora
-**Academic Year:** 2024/2026
-**License:** MIT
-
-See [LICENSE](LICENSE) for more information.
+This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file.
 
 ---
 
 ## Author
 
 **João Santos**
-[GitHub](https://github.com/JMSS95) • [Email](mailto:JMSS1995@hotmail.com)
 
----
+- GitHub: [@JMSS95](https://github.com/JMSS95)
+- Project: [OrionOne](https://github.com/JMSS95/OrionOne)
 
-## Acknowledgments
-
-Built with amazing open-source technologies:
-
--   [Laravel](https://laravel.com) - PHP Framework
--   [Vue.js](https://vuejs.org) - Progressive JavaScript Framework
--   [Inertia.js](https://inertiajs.com) - Modern Monolith Approach
--   [Spatie](https://spatie.be/open-source) - Laravel Packages
--   [Tailwind CSS](https://tailwindcss.com) - Utility-First CSS
--   [Shadcn](https://ui.shadcn.com) - UI Components
--   [PostgreSQL](https://www.postgresql.org) - Advanced Database
--   Open Source Community
+> **Academic Project** • CET - Specialist Technician in Information Systems Technologies and Programming
+> Professional Training Center of Évora • 2024/2026
 
 ---
 
 <div align="center">
 
-**OrionOne** • Modern ITSM Platform • 2025
+**OrionOne ITSM Platform**
+Built with for academic excellence
 
-[Documentation](docs/README.md) • [Report Bug](https://github.com/JMSS95/OrionOne/issues) • [Request Feature](https://github.com/JMSS95/OrionOne/issues)
+[ Back to Top](#orionone-itsm)
 
 </div>

@@ -9,8 +9,7 @@ import os
 import re
 from pathlib import Path
 
-# Remove ALL emojis using Unicode ranges
-# This regex matches all emoji characters
+# Enhanced emoji pattern - catches ALL Unicode emojis
 EMOJI_PATTERN = re.compile(
     "["
     "\U0001F1E0-\U0001F1FF"  # flags (iOS)
@@ -35,6 +34,86 @@ EMOJI_PATTERN = re.compile(
     "\u231a"
     "\ufe0f"  # dingbats
     "\u3030"
+    "\u2139"  # info icon
+    "\u2194-\u2199"  # arrows
+    "\u21a9-\u21aa"  # arrows
+    "\u231b"
+    "\u2328"
+    "\u23cf"
+    "\u23e9-\u23fa"
+    "\u25aa-\u25ab"
+    "\u25b6"
+    "\u25c0"
+    "\u25fb-\u25fe"
+    "\u2600-\u2604"
+    "\u260e"
+    "\u2611"
+    "\u2614-\u2615"
+    "\u2618"
+    "\u261d"
+    "\u2620"
+    "\u2622-\u2623"
+    "\u2626"
+    "\u262a"
+    "\u262e-\u262f"
+    "\u2638-\u263a"
+    "\u2640"
+    "\u2642"
+    "\u2648-\u2653"
+    "\u265f-\u2660"
+    "\u2663"
+    "\u2665-\u2666"
+    "\u2668"
+    "\u267b"
+    "\u267e-\u267f"
+    "\u2692-\u2697"
+    "\u2699"
+    "\u269b-\u269c"
+    "\u26a0-\u26a1"
+    "\u26a7"
+    "\u26aa-\u26ab"
+    "\u26b0-\u26b1"
+    "\u26bd-\u26be"
+    "\u26c4-\u26c5"
+    "\u26c8"
+    "\u26ce-\u26cf"
+    "\u26d1"
+    "\u26d3-\u26d4"
+    "\u26e9-\u26ea"
+    "\u26f0-\u26f5"
+    "\u26f7-\u26fa"
+    "\u26fd"
+    "\u2702"
+    "\u2705"
+    "\u2708-\u270d"
+    "\u270f"
+    "\u2712"
+    "\u2714"
+    "\u2716"
+    "\u271d"
+    "\u2721"
+    "\u2728"
+    "\u2733-\u2734"
+    "\u2744"
+    "\u2747"
+    "\u274c"
+    "\u274e"
+    "\u2753-\u2755"
+    "\u2757"
+    "\u2763-\u2764"
+    "\u2795-\u2797"
+    "\u27a1"
+    "\u27b0"
+    "\u27bf"
+    "\u2934-\u2935"
+    "\u2b05-\u2b07"
+    "\u2b1b-\u2b1c"
+    "\u2b50"
+    "\u2b55"
+    "\u3030"
+    "\u303d"
+    "\u3297"
+    "\u3299"
     "]+", 
     flags=re.UNICODE
 )
@@ -91,7 +170,13 @@ def main():
     
     files_to_clean = [
         base_dir / 'README.md',
+        base_dir / 'SETUP.md',
+        base_dir / 'DEPLOYMENT.md',
+        base_dir / 'CONTRIBUTING.md',
+        base_dir / 'TECH-STACK.md',
         base_dir / '.github' / 'GITHUB_SETUP.md',
+        base_dir / 'docs' / 'DEVELOPMENT-PLAN.md',
+        base_dir / 'docs' / 'COMMANDS-REFERENCE.md',
         base_dir / 'docs' / 'implementation-checklist.md',
         base_dir / 'docs' / 'MVP.md',
         base_dir / 'docs' / 'development-guide.md',
@@ -105,6 +190,13 @@ def main():
         base_dir / 'docs' / 'architecture.md',
         base_dir / 'docs' / 'requirements.md',
         base_dir / 'docs' / 'tech-stack.md',
+        base_dir / 'docs' / 'business-model.md',
+        base_dir / 'docs' / 'guides' / 'Development-Guide.md',
+        base_dir / 'docs' / 'guides' / 'DOCKER-GUIDE.md',
+        base_dir / 'docs' / 'guides' / 'SPRINT-0-SETUP.md',
+        base_dir / 'docs' / 'guides' / 'Sprint-1-guide.md',
+        base_dir / 'docs' / 'guides' / 'Sprint-2-guide.md',
+        base_dir / 'docs' / 'guides' / 'Sprint-3-guide.md',
     ]
     
     print("Removing ALL emojis from documentation...")
