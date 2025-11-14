@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="logo/OrionOne.png" alt="OrionOne Logo width="400"/>
+<img src="logo/OrionOne.png" alt="OrionOne Logo" width="400"/>
 
 **Modern IT Service Management Platform**
 
