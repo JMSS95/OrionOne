@@ -18,9 +18,11 @@ Build a modern, cloud-native ITSM platform that competes with ServiceNow and Zen
 
 -   **90% cost savings** compared to market leaders ($20/agent vs $200+)
 -   **Superior UX** with Rich Text (Tiptap) + AI Search (Meilisearch)
--   **Professional features** with Advanced SLA Management
+-   **Professional features** with Basic SLA tracking (24/7 calculation)
 -   **Modern stack** with Next.js 15 + Nest.js 11
 -   **Target market:** 10-200 employees
+
+**MVP Focus:** Core ITSM functionality that works well. Advanced features (business hours SLA, teams, image paste) moved to post-MVP for incremental releases.
 
 ### Success Metrics
 
@@ -36,15 +38,15 @@ Build a modern, cloud-native ITSM platform that competes with ServiceNow and Zen
 
 ## Sprint Overview
 
-| Sprint       | Duration            | Focus Area                          | Status      |
-| ------------ | ------------------- | ----------------------------------- | ----------- |
-| **Sprint 0** | Nov 1-15, 2025      | Infrastructure Setup                | Complete    |
-| **Sprint 1** | Nov 16-27, 2025     | Authentication & User Management    | In Progress |
-| **Sprint 2** | Nov 28-Dec 11, 2025 | Incident + Rich Text + Meilisearch  | Planned     |
-| **Sprint 3** | Dec 12-22, 2025     | Comments & Attachments              | Planned     |
-| **Sprint 4** | Dec 23-Jan 5, 2026  | Knowledge Base + Meilisearch Search | Planned     |
-| **Sprint 5** | Jan 6-15, 2026      | Advanced SLA Management             | Planned     |
-| **Sprint 6** | Jan 16-31, 2026     | Dashboard + Polish + Buffer         | Planned     |
+| Sprint       | Duration            | Focus Area                             | Status      |
+| ------------ | ------------------- | -------------------------------------- | ----------- |
+| **Sprint 0** | Nov 1-15, 2025      | Infrastructure Setup                   | Complete    |
+| **Sprint 1** | Nov 16-27, 2025     | Authentication & User Management       | In Progress |
+| **Sprint 2** | Nov 28-Dec 11, 2025 | Incident + Rich Text (Essential)       | Planned     |
+| **Sprint 3** | Dec 12-22, 2025     | Comments & Attachments                 | Planned     |
+| **Sprint 4** | Dec 23-Jan 5, 2026  | Knowledge Base + Meilisearch (Unified) | Planned     |
+| **Sprint 5** | Jan 6-15, 2026      | Basic SLA Tracking (24/7)              | Planned     |
+| **Sprint 6** | Jan 16-31, 2026     | Dashboard + Polish + Buffer            | Planned     |
 
 ---
 
@@ -320,10 +322,11 @@ None - Infrastructure is production-ready.
 **Acceptance Criteria:**
 
 -   [ ] Create incident form with: title, description (rich text), priority, category
--   [ ] **Tiptap rich text editor** with formatting (bold, italic, lists, code, links)
+-   [ ] **Tiptap rich text editor** with essential formatting (bold, italic, lists, code, links, headings)
 -   [ ] Markdown shortcuts support (##, \*\*, --)
--   [ ] Image paste support (auto-upload to S3)
+-   [ ] Character counter + placeholder
 -   [ ] Auto-generate incident number (INC-YYYYMMDD-NNNN)
+-   [ ] **EXCLUDED (Post-MVP P2):** Image paste, tables, embeds, mentions
 -   [ ] Manual assignment to agent (dropdown)
 -   [ ] Success toast + redirect to incident detail
 
@@ -335,28 +338,26 @@ None - Infrastructure is production-ready.
 
 ---
 
-#### US2.2: Search Incidents with Meilisearch
+#### US2.2: Basic Incident Search
 
 **As a** user
-**I want to** search incidents instantly with typo tolerance
-**So that** I can quickly find relevant incidents
+**I want to** search incidents by number or title
+**So that** I can quickly find specific incidents
 
 **Acceptance Criteria:**
 
--   [ ] Search bar with as-you-type instant search (<50ms)
--   [ ] **Typo-tolerant search** (1-2 character errors)
--   [ ] Search across: title, description, incident number
--   [ ] **Search highlights** in results
--   [ ] Relevance ranking (title > description)
--   [ ] Fallback to PostgreSQL if Meilisearch unavailable
+-   [ ] Simple search input (incident number or title)
+-   [ ] PostgreSQL ILIKE search (case-insensitive)
+-   [ ] Search bar in incidents list header
+-   [ ] **EXCLUDED (Sprint 4):** Meilisearch full-text search, typo tolerance, search highlights
 
 **API Endpoints:**
 
--   `GET /api/incidents/search?q=query`
+-   `GET /api/incidents?search=query`
 
 ---
 
-#### US2.3: View Incidents List with Advanced Filters
+#### US2.3: View Incidents List with Basic Filters
 
 **As a** user
 **I want to** view and filter incidents
@@ -365,19 +366,16 @@ None - Infrastructure is production-ready.
 **Acceptance Criteria:**
 
 -   [ ] Table with columns: incident#, title, status, priority, assignee, created date
--   [ ] **Filter builder UI** (multiple conditions)
--   [ ] **Quick filters**: My Incidents, Unassigned, Overdue
--   [ ] **Saved filters** (personal + shared)
--   [ ] Filter by: status, priority, assignee, category, date range
--   [ ] Sort by: created, updated, priority, SLA breach risk
--   [ ] Pagination: cursor-based (50 per page)
+-   [ ] **Quick filters** (sidebar): All, My Incidents, Unassigned, Open, Closed
+-   [ ] **Single-select filters**: Status dropdown, Priority dropdown, Assigned To dropdown
+-   [ ] Sort by: created (desc), updated (desc), priority
+-   [ ] Pagination: offset-based (25 per page)
 -   [ ] Click row to view details
+-   [ ] **EXCLUDED (Post-MVP P3):** Saved filters, advanced filter builder, date range picker
 
 **API Endpoints:**
 
--   `GET /api/incidents?filters=...&sort=...&cursor=...`
--   `POST /api/incidents/filters` (save filter)
--   `GET /api/incidents/filters` (list saved filters)
+-   `GET /api/incidents?status=...&priority=...&assigneeId=...&sort=...&page=...`
 
 ---
 
@@ -406,14 +404,12 @@ None - Infrastructure is production-ready.
 #### Backend (Nest.js)
 
 -   [ ] Incidents module with full CRUD
--   [ ] **Meilisearch service** (index, search, sync)
--   [ ] Background job: sync incidents to Meilisearch on create/update
--   [ ] DTO validation (create, update, filters)
+-   [ ] DTO validation (create, update, basic filters)
 -   [ ] Auto-generate incident number function
--   [ ] Advanced filtering logic (query builder)
--   [ ] Saved filters CRUD
+-   [ ] Basic filtering logic (status, priority, assignee)
+-   [ ] Simple search (PostgreSQL ILIKE on title + number)
 -   [ ] Activity logging integration
--   [ ] Email notifications service
+-   [ ] Email notifications service (assigned, status changed)
 -   [ ] Unit tests (>80% coverage)
 -   [ ] E2E tests for all endpoints
 
@@ -423,11 +419,10 @@ None - Infrastructure is production-ready.
 -   [ ] Create incident page (/incidents/create)
 -   [ ] Incident detail page (/incidents/:id)
 -   [ ] Edit incident page (/incidents/:id/edit)
--   [ ] **Tiptap rich text editor component**
--   [ ] **Meilisearch instant search component**
--   [ ] Filter builder UI component
--   [ ] Quick filters sidebar
--   [ ] Saved filters dropdown
+-   [ ] **Tiptap rich text editor component** (essential formatting only)
+-   [ ] Simple search input (header)
+-   [ ] Quick filters sidebar (All, My Incidents, Unassigned, Open, Closed)
+-   [ ] Single-select filter dropdowns (Status, Priority, Assignee)
 -   [ ] Components: IncidentCard, IncidentTable, IncidentForm
 -   [ ] Status/priority badge components
 -   [ ] Tests for all components
@@ -435,34 +430,27 @@ None - Infrastructure is production-ready.
 #### Database (Prisma)
 
 -   [ ] Incident model with all fields (description as JSON for Tiptap)
--   [ ] SavedFilter model (user, name, filters JSON)
 -   [ ] Category model (Hardware, Software, Network, etc.)
 -   [ ] IncidentStatus enum (NEW, IN_PROGRESS, RESOLVED, CLOSED)
 -   [ ] IncidentPriority enum (P1, P2, P3, P4)
 -   [ ] Indexes on status, priority, assigneeId, createdAt
 -   [ ] Seed 50+ test incidents
-
-#### Meilisearch
-
--   [ ] Configure Meilisearch index: incidents
--   [ ] Searchable attributes: [title, description, incidentNumber]
--   [ ] Filterable attributes: [status, priority, categoryId, assigneeId]
--   [ ] Sortable attributes: [createdAt, updatedAt, priority]
--   [ ] Typo tolerance: 1-2 characters
--   [ ] Ranking rules: [words, typo, proximity, attribute, sort, exactness]
+-   [ ] **NOTE:** Meilisearch configuration moved to Sprint 4 (consolidated with Knowledge Base)
 
 ---
 
 ### Sprint 2 Deliverables
 
--   [ ] Full incident CRUD with **rich text editor**
--   [ ] **Meilisearch** instant search with typo tolerance
--   [ ] Advanced filters + saved filters
--   [ ] Quick filters (My Incidents, Unassigned)
+-   [ ] Full incident CRUD with **Tiptap rich text editor** (essential formatting)
+-   [ ] Simple search (PostgreSQL ILIKE on title + number)
+-   [ ] Quick filters (All, My Incidents, Unassigned, Open, Closed)
+-   [ ] Single-select filters (Status, Priority, Assignee)
+-   [ ] Manual assignment to agents
 -   [ ] Activity logging
--   [ ] Email notifications
+-   [ ] Email notifications (assigned, status changed)
 -   [ ] 80%+ test coverage
 -   [ ] Swagger API docs updated
+-   [ ] **MOVED TO POST-MVP:** Image paste (P2), Saved filters (P3), Meilisearch full-text (Sprint 4)
 
 ---
 
@@ -610,7 +598,7 @@ None - Infrastructure is production-ready.
 
 ---
 
-## Sprint 5: Advanced SLA Management (PLANNED)
+## Sprint 5: Basic SLA Tracking (PLANNED)
 
 **Status:** Planned
 **Duration:** 1.5 weeks (Jan 6-15, 2026)
@@ -618,58 +606,51 @@ None - Infrastructure is production-ready.
 
 ### User Stories
 
--   Configure SLA policies (admin UI)
--   **Business hours calendar** (Mon-Fri 9-5)
--   **Holiday calendar** (skip non-working days)
--   **Auto-escalation** at 80% breach risk
--   **Email notifications** (warning at 80%, breach alert)
--   **SLA pause/resume** (e.g., "Waiting on Customer")
--   Real-time countdown timer (WebSocket)
--   SLA dashboard (compliance %, breach risk list)
+-   **Fixed SLA targets** per priority (P1: 4h, P2: 8h, P3: 24h, P4: 72h)
+-   **24/7 calculation** (no business hours/holidays)
+-   **Visual indicators** (green/yellow/red/breached badges)
+-   **Countdown display** ("2h 30m remaining" or "Breached 1h 15m ago")
+-   **Email notifications** on breach only
+-   **Dashboard widget** showing at-risk incidents
 
 ### Technical Tasks
 
 #### Backend (Nest.js)
 
--   [ ] SLA policies module with CRUD
--   [ ] **Bull queue** for SLA background jobs
--   [ ] Business hours calculator service (exclude weekends/holidays)
--   [ ] Holiday calendar CRUD
--   [ ] Escalation engine (80% warning, 100% breach)
--   [ ] SLA pause/resume logic (status-based)
--   [ ] Email notification service (SLA warnings/breaches)
--   [ ] SLA dashboard aggregation queries
--   [ ] Unit tests (>80% coverage)
--   [ ] E2E tests for SLA calculations
+-   [ ] SLA calculation service (24/7 clock)
+-   [ ] Fixed targets: P1=4h, P2=8h, P3=24h, P4=72h
+-   [ ] Calculate `targetResolveAt` on incident creation
+-   [ ] SLA breach check (cron job every 15 minutes)
+-   [ ] Email notification on breach (to assignee + admins)
+-   [ ] SLA dashboard queries (at-risk count, breached list)
+-   [ ] Unit tests (date calculations, breach detection)
+-   [ ] E2E tests for SLA flow
 
 #### Frontend (Next.js)
 
--   [ ] SLA policies management UI (admin)
--   [ ] Business hours configuration
--   [ ] Holiday calendar UI
--   [ ] SLA dashboard with charts
--   [ ] Real-time countdown timer (WebSocket)
--   [ ] Breach risk alerts
+-   [ ] SLA badge component (color-coded: green/yellow/red/breached)
+-   [ ] Countdown display component
+-   [ ] Dashboard widget: "At Risk Incidents" (red + breached)
+-   [ ] Show SLA status on incident list + detail pages
 -   [ ] Tests with React Testing Library
 
 #### Database (Prisma)
 
--   [ ] SLAPolicy model (name, responseTime, resolutionTime)
--   [ ] BusinessHours model (start, end, timezone)
--   [ ] Holiday model (date, name, country)
--   [ ] SLAHistory model (ticketId, policyId, breachedAt)
+-   [ ] Add to Incident model: `targetResolveAt` (DateTime)
+-   [ ] Add to Incident model: `slaBreachedAt` (DateTime, nullable)
+-   [ ] Index on `targetResolveAt` for queries
 
 ### Sprint 5 Deliverables
 
--   [ ] SLA policies configuration (admin UI)
--   [ ] Business hours + holiday calendar
--   [ ] Auto-escalation at 80% breach risk
--   [ ] Email notifications (warnings + breaches)
--   [ ] SLA pause/resume functionality
--   [ ] Real-time countdown timers
--   [ ] SLA dashboard (compliance %, breach list)
+-   [ ] Basic SLA tracking (24/7 calculation)
+-   [ ] Fixed targets per priority (P1-P4)
+-   [ ] Color-coded badges (green/yellow/red/breached)
+-   [ ] Countdown display
+-   [ ] Email notification on breach
+-   [ ] Dashboard widget (at-risk incidents)
 -   [ ] 80%+ test coverage
 -   [ ] Swagger API docs updated
+-   [ ] **MOVED TO POST-MVP P1:** Business hours, holidays, auto-escalation, pause/resume, real-time WebSocket
 
 ---
 

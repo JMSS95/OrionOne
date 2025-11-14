@@ -10,13 +10,23 @@
 
 ## Executive Summary
 
-**OrionOne MVP:**
+**OrionOne MVP (Realistic Scope):**
 
--   Incident Management (Rich Text editor + AI search)
--   Comments & Attachments (file uploads)
--   Knowledge Base (Meilisearch typo-tolerant search)
--   Advanced SLA Management (configurable policies)
--   Dashboard + Email Notifications
+-   ✅ **Core ITSM**: Incident Management (CRUD + Assignment)
+-   ✅ **Rich UX**: Tiptap Rich Text Editor (essential formatting)
+-   ✅ **AI Search**: Meilisearch instant search (incidents + knowledge)
+-   ✅ **Collaboration**: Comments (plain text) + File Attachments (basic)
+-   ✅ **Knowledge**: Knowledge Base with search
+-   ✅ **SLA**: Basic SLA tracking (target times, no business hours)
+-   ✅ **Dashboard**: Essential metrics + Email notifications
+
+**Moved to Post-MVP (Priority Order):**
+
+-   🔄 **P1**: Advanced SLA (business hours, holidays, auto-escalation) - 1 week
+-   🔄 **P2**: Image paste in rich text + S3 integration - 3 days
+-   🔄 **P3**: Saved filters (personal + team) - 2 days
+-   🔄 **P4**: Activity timeline (full audit log) - 3 days
+-   🔄 **P5**: Teams & Auto-Assignment - 1 week
 
 **Value Proposition:** Professional ITSM for growing teams ($20/agent/month)
 **Differentiators:** Rich UX, AI-powered search, Modern stack, Open source
@@ -42,22 +52,27 @@
 
 **Conclusion:** Stack is PRODUCTION-READY for MVP. **ITSM Score: 9.5/10** (ServiceNow-grade platform at 10% the cost).
 
-### MVP Feature Scope
+### MVP Feature Scope (13 weeks - Nov 1, 2025 → Jan 31, 2026)
 
-| Feature                     | Status   | Priority |
-| --------------------------- | -------- | -------- |
-| **Incident Management**     | MVP      | CRITICAL |
-| **Rich Text Editor**        | MVP      | HIGH     |
-| **Meilisearch Integration** | MVP      | HIGH     |
-| **Comments & Files**        | MVP      | HIGH     |
-| **Knowledge Base**          | MVP      | MEDIUM   |
-| **Advanced SLA**            | MVP      | MEDIUM   |
-| **Dashboard**               | MVP      | MEDIUM   |
-| **Teams & Assignment**      | Post-MVP | P3       |
-| **CMDB/Assets**             | Post-MVP | P5       |
-| **Advanced Analytics**      | Post-MVP | P6       |
-| **REST API**                | Post-MVP | P4       |
-| **SSO/SAML**                | Post-MVP | P7       |
+| Feature                     | Status   | Sprint   | Priority | Effort    |
+| --------------------------- | -------- | -------- | -------- | --------- |
+| **Authentication & RBAC**   | MVP      | Sprint 1 | CRITICAL | 1.5 weeks |
+| **Incident Management**     | MVP      | Sprint 2 | CRITICAL | 2 weeks   |
+| **Tiptap Rich Text**        | MVP      | Sprint 2 | HIGH     | 2 weeks   |
+| **Comments & Attachments**  | MVP      | Sprint 3 | HIGH     | 1.5 weeks |
+| **Knowledge Base**          | MVP      | Sprint 4 | MEDIUM   | 2 weeks   |
+| **Meilisearch Search**      | MVP      | Sprint 4 | HIGH     | 2 weeks   |
+| **Basic SLA (24/7)**        | MVP      | Sprint 5 | MEDIUM   | 1.5 weeks |
+| **Dashboard & Email**       | MVP      | Sprint 6 | MEDIUM   | 2 weeks   |
+| **Advanced SLA**            | Post-MVP | P1       | HIGH     | 1 week    |
+| **Image Paste + S3**        | Post-MVP | P2       | MEDIUM   | 3 days    |
+| **Saved Filters**           | Post-MVP | P3       | MEDIUM   | 2 days    |
+| **Activity Timeline**       | Post-MVP | P4       | MEDIUM   | 3 days    |
+| **Teams & Auto-Assignment** | Post-MVP | P5       | HIGH     | 1 week    |
+| **REST API & Webhooks**     | Post-MVP | P6       | MEDIUM   | 1 week    |
+| **Advanced Analytics**      | Post-MVP | P7       | LOW      | 2 weeks   |
+| **CMDB / Assets**           | Post-MVP | P8       | LOW      | 2 weeks   |
+| **SSO / SAML**              | Post-MVP | P9       | VERY LOW | 2 weeks   |
 
 ### Current Status
 
@@ -77,7 +92,7 @@
 **Timeline:** November 1, 2025 → January 31, 2026
 **Methodology:** Agile Scrum, TDD, Feature-Driven Development
 **Goal:** Launch professional ITSM platform with rich UX
-**Focus:** Incident management + AI search + Advanced SLA
+**Focus:** Incident management + AI search + Basic SLA (24/7)
 
 ### Sprint 0: Infrastructure Setup (COMPLETE)
 
@@ -153,56 +168,69 @@
 **Duration:** 2 weeks (Nov 28 - Dec 11, 2025)
 **Status:** Planned
 **Priority:** CRITICAL
-**ServiceNow Module:** Incident Management (Professional)
+**Focus:** Core ITSM functionality with essential rich text
 
 **Features:**
 
-1. **Incident CRUD (Enhanced)**
+1. **Incident CRUD (Core)**
 
 -   Create, Read, Update, Delete incidents
 -   Auto-generate number: INC-YYYYMMDD-NNNN
 -   Fields:
--   Title (text)
--   Description (**Tiptap rich text editor**)
--   Status: New, In Progress, Resolved, Closed
--   Priority: P1, P2, P3, P4
--   Category (single level only)
--   Assigned To (user dropdown)
--   Full validation (required fields + business rules)
+    -   Title (text, required, 10-255 chars)
+    -   Description (**Tiptap rich text** - essential formatting only)
+    -   Status: New, In Progress, Resolved, Closed
+    -   Priority: P1 (Critical), P2 (High), P3 (Medium), P4 (Low)
+    -   Category (dropdown: Hardware, Software, Network, Access)
+    -   Assigned To (user dropdown - agents only)
+-   Validation: Zod schemas on backend + frontend
+-   Auto-save drafts (localStorage)
 
-2. **Rich Text Editor (Tiptap)**
+2. **Tiptap Rich Text Editor (Essential)**
 
--   WYSIWYG editor for incident descriptions
--   Formatting: **bold**, _italic_, lists, code blocks, links
--   Markdown shortcuts (##, \*\*, -, etc.)
--   Image paste support (auto-upload to S3)
--   Character counter + placeholder text
--   Mobile-responsive editor
+-   **INCLUDED:**
+    -   Formatting: **bold**, _italic_, ~~strikethrough~~
+    -   Lists: bullet lists, numbered lists
+    -   Links: insert/edit hyperlinks
+    -   Code blocks: inline code + code blocks
+    -   Headings: H2, H3 (H1 reserved for title)
+    -   Markdown shortcuts: `**`, `##`, `-`, etc.
+    -   Character counter
+    -   Placeholder text
+    -   Mobile-responsive
+-   **EXCLUDED (Post-MVP P2):**
+    -   ❌ Image paste/upload (use attachments instead)
+    -   ❌ Tables
+    -   ❌ Embeds (YouTube, etc.)
+    -   ❌ Mentions (@user)
 
-3. **Meilisearch Integration**
+3. **Basic Filtering & Search**
 
--   Typo-tolerant search (1-2 character errors)
--   Instant search as-you-type (<50ms response)
--   Search highlights in results
--   Relevance ranking (title > description > comments)
--   Index: incidents, users, knowledge articles
--   Auto-sync on create/update (background job)
+-   **Quick Filters** (sidebar buttons):
+    -   All Incidents
+    -   My Incidents (assigned to me)
+    -   Unassigned
+    -   Open (New + In Progress)
+    -   Closed (Resolved + Closed)
+-   **Simple Search**: Search by incident number or title (PostgreSQL ILIKE)
+-   **Filter by**: Status, Priority, Assigned To (single select)
+-   **Sort by**: Created (desc), Updated (desc), Priority (P1→P4)
+-   **Pagination**: Offset-based, 25 per page
+-   **EXCLUDED (Post-MVP P3):**
+    -   ❌ Saved filters (personal + team)
+    -   ❌ Advanced filter builder (multiple conditions)
+    -   ❌ Full-text search with Meilisearch (Sprint 4)
 
-4. **Advanced Filtering**
+4. **Assignment (Manual)**
 
--   Filter builder UI (multiple conditions)
--   Quick filters: My Incidents, Unassigned, Overdue
--   Saved filters (personal + team shared)
--   Filter by: Status, Priority, Assigned To, Category, Created Date
--   Sort by: Created, Updated, Priority, SLA breach risk
--   Pagination: Cursor-based (limit 50)
-
-5. **Assignment**
-
--   Manual assignment to agent (dropdown)
--   Reassignment (simple update)
--   No auto-assignment (post-MVP)
--   No teams (post-MVP)
+-   Assign incident to agent (dropdown)
+-   Reassign to different agent
+-   Unassign incident
+-   Show assignee name + avatar on incident card
+-   **EXCLUDED (Post-MVP P5):**
+    -   ❌ Teams/groups
+    -   ❌ Auto-assignment rules
+    -   ❌ Workload balancing
 
 **Tech Stack:**
 
@@ -219,35 +247,58 @@
 **Duration:** 1.5 weeks (Dec 12-22, 2025)
 **Status:** Planned
 **Priority:** HIGH
-**ServiceNow Module:** Comments + Attachments (Simplified)
+**Focus:** Essential collaboration tools
 
 **Features:**
 
-1. **Comments (Essential)**
+1. **Comments (Plain Text)**
 
--   Add comment to incident (textarea)
--   List all comments (chronological)
--   No rich text (plain text only)
--   No edit/delete (append only)
--   Show: author, timestamp, comment text
--   No @mentions (post-MVP)
--   No internal vs public (all visible to agents)
+-   Add comment to incident (textarea, 10-2000 chars)
+-   List all comments (chronological, newest first)
+-   Auto-linkify URLs (detect http/https)
+-   Show: author name + avatar, timestamp (relative: "2 hours ago"), comment text
+-   Character counter
+-   No edit/delete (append-only for audit)
+-   Email notification to assignee on new comment
+-   **EXCLUDED:**
+    -   ❌ Rich text formatting
+    -   ❌ @mentions
+    -   ❌ Internal vs public comments
+    -   ❌ Comment reactions/likes
 
 2. **File Attachments (Basic)**
 
--   Upload files: max 3 files, 5MB each
--   Allowed: jpg, png, pdf, txt, log
--   Local storage (upload/ folder - S3 post-MVP)
--   Download individual files
--   Delete file (soft delete)
--   No drag & drop (simple file input)
--   No image preview (just filename + size)
+-   Upload files: **max 2 files per comment**, **5MB each**
+-   Allowed formats: jpg, jpeg, png, pdf, txt, log, zip
+-   Local storage: `nest-backend/uploads/` folder
+-   File validation: check MIME type + file extension
+-   Display: filename, size (KB/MB), upload timestamp
+-   Download: serve via `/api/attachments/:id/download`
+-   Delete: only by file owner or admin
+-   Simple file input (no drag & drop)
+-   **EXCLUDED:**
+    -   ❌ Image preview/thumbnails (just icon + filename)
+    -   ❌ Drag & drop upload
+    -   ❌ Multiple file selection UI
+    -   ❌ S3/cloud storage (local files for MVP)
+    -   ❌ Virus scanning
 
-3. **Activity Log (Minimal)**
+3. **Simple Activity Feed**
 
--   Simple timeline: comments + status changes
--   No filtering
--   No export
+-   Show on incident detail page
+-   Events tracked:
+    -   Incident created
+    -   Status changed (with old → new value)
+    -   Priority changed
+    -   Assignee changed
+    -   Comment added
+    -   File attached
+-   Display: icon + text + timestamp + author
+-   No filtering (show all)
+-   **EXCLUDED (Post-MVP P4):**
+    -   ❌ Full audit log with filtering
+    -   ❌ Export to CSV
+    -   ❌ Field-level change tracking
 
 **Tech Stack:**
 
@@ -258,46 +309,61 @@
 
 ---
 
-### Sprint 4: Knowledge Base + Meilisearch
+### Sprint 4: Knowledge Base + Meilisearch (CONSOLIDATED)
 
 **Duration:** 2 weeks (Dec 23, 2025 - Jan 5, 2026)
 **Status:** Planned
 **Priority:** MEDIUM
-**ServiceNow Module:** Knowledge Management (Professional)
+**Focus:** Unified search for incidents + knowledge articles
 
-**Features:**
+**🔍 Meilisearch Integration (Unified Setup)**
 
-1. **Article CRUD (Enhanced)**
+-   Configure Meilisearch indexes:
+    -   `incidents` index (title, description, incident number)
+    -   `articles` index (title, body, tags)
+-   Searchable attributes: title (weight: 3), description/body (weight: 1)
+-   Filterable: status, priority, categoryId, authorId
+-   Sortable: createdAt, updatedAt, views
+-   Typo tolerance: 1-2 character errors
+-   Instant search: <50ms response time
+-   Search highlights in results
+-   Auto-sync on create/update (Prisma middleware)
+-   Global search bar (header): search both incidents + articles
 
--   Create article: title, body (**Tiptap rich text**), category
+**Features (Knowledge Base):**
+
+1. **Article CRUD (Simplified)**
+
+-   Create article: title (required, 10-200 chars), body (**Tiptap rich text**)
 -   Edit article (full editor)
--   Delete article (soft delete)
--   Publish/Unpublish (status field)
--   No approval workflow (post-MVP)
--   No versioning (post-MVP)
+-   Delete article (soft delete: deleted = true)
+-   Publish/Unpublish toggle (published: boolean)
+-   View counter (increment on article view)
+-   **EXCLUDED:**
+    -   ❌ Approval workflow
+    -   ❌ Version history
+    -   ❌ Draft auto-save
 
-2. **Meilisearch Integration**
+2. **Categories (Simple)**
 
--   Typo-tolerant search across all articles
--   Instant search as-you-type
--   Search highlights in title + body
--   Filter by category + status
--   Sort by: Relevance, Views, Created Date
--   Auto-index on publish
+-   Predefined categories: Hardware, Software, Network, Access, General
+-   Assign article to ONE category (required)
+-   No category management UI (hardcoded for MVP)
+-   **EXCLUDED:**
+    -   ❌ Subcategories/nested categories
+    -   ❌ Tags system
+    -   ❌ Custom category creation
 
-3. **Categories**
+3. **Link to Incidents**
 
--   Simple category list (single level)
--   Assign article to one category
--   No subcategories (post-MVP)
--   No tags (post-MVP)
-
-4. **Link to Incidents**
-
--   Link article to incident (many-to-many)
--   Show linked articles on incident view
--   **Smart suggestions** (Meilisearch similarity)
--   No AI suggestions (post-MVP)
+-   Manual link: select article from dropdown on incident page
+-   Many-to-many relation (incident ↔ articles)
+-   Show linked articles on incident detail
+-   Basic suggestion: show top 5 articles from same category
+-   **EXCLUDED:**
+    -   ❌ Smart suggestions (Meilisearch similarity)
+    -   ❌ AI-powered recommendations
+    -   ❌ Auto-link based on keywords
 
 **Tech Stack:**
 
@@ -306,45 +372,58 @@
 
 ---
 
-### Sprint 5: Advanced SLA Management
+### Sprint 5: Basic SLA Tracking (SIMPLIFIED)
 
 **Duration:** 1.5 weeks (Jan 6-15, 2026)
 **Status:** Planned
-**Priority:** HIGH
-**ServiceNow Module:** SLA Management (Professional)
+**Priority:** MEDIUM
+**Focus:** Essential SLA tracking without complex calculations
 
 **Features:**
 
-1. **Configurable SLA Policies**
+1. **Simple SLA Target Times (24/7 Clock)**
 
--   Admin UI to create/edit SLA policies
--   Different targets per priority + category combination
--   Example defaults:
--   P1 Critical: Resolve in 4 hours
--   P2 High: Resolve in 8 hours
--   P3 Medium: Resolve in 24 hours
--   P4 Low: Resolve in 72 hours
--   **Business hours calendar** (Mon-Fri 9am-5pm)
--   **Holiday calendar** (skip non-working days)
--   Multiple policies per organization
+-   Fixed target times per priority (no configurable policies yet):
+    -   P1 Critical: 4 hours
+    -   P2 High: 8 hours
+    -   P3 Medium: 24 hours
+    -   P4 Low: 72 hours
+-   **24/7 calculation** (no business hours/holidays)
+-   Target time starts when incident created
+-   Target time stops when incident closed/resolved
+-   Store: `targetResolveAt` (timestamp) in incident table
 
-2. **SLA Automation**
+2. **SLA Display (Visual Indicators)**
 
--   Auto-escalation on breach risk (80% elapsed)
--   Email notifications:
--   Warning at 80% (to agent + manager)
--   Breach notification (to agent + manager + admin)
--   Escalation workflow (reassign to senior agent)
--   SLA pause/resume (on hold status)
+-   Calculate remaining time: `targetResolveAt - now`
+-   Color-coded badges:
+    -   🟢 Green: >50% time remaining
+    -   🟡 Yellow: 25-50% time remaining
+    -   🔴 Red: <25% time remaining
+    -   ⚫ Breached: past target time
+-   Show countdown: "2h 30m remaining" or "Breached 1h 15m ago"
+-   Dashboard widget: "At Risk" incidents (red + breached)
+-   No real-time updates (refresh on page load)
 
-3. **SLA Display & Tracking**
+3. **Basic Email Notifications**
 
--   Real-time countdown timer (WebSocket updates)
--   Color indicators: Green (>50%), Yellow (25-50%), Red (<25%)
--   Show "Breached" with breach time
--   SLA history log (pause/resume events)
--   Dashboard widget: Breach risk incidents
--   Reports: SLA compliance % per agent/team
+-   Email on SLA breach:
+    -   To: assignee + admins
+    -   Subject: "SLA Breached: INC-20251201-0042"
+    -   Body: incident title, priority, target time, breach time
+-   Manual email send (cron job every 15 minutes)
+-   No warning emails (only breach)
+
+**EXCLUDED (Post-MVP P1 - Advanced SLA):**
+
+-   ❌ Business hours calendar (Mon-Fri 9-5)
+-   ❌ Holiday calendar
+-   ❌ Configurable SLA policies (admin UI)
+-   ❌ Auto-escalation at 80%
+-   ❌ SLA pause/resume
+-   ❌ Warning emails at 80%
+-   ❌ Real-time countdown (WebSocket)
+-   ❌ SLA history/audit log
 
 **Tech Stack:**
 
@@ -413,7 +492,7 @@
  Sprint 2: Incident + Rich Text (Nov 28-Dec 11, 2025) NEXT
  Sprint 3: Comments & Files (Dec 12-22, 2025)
  Sprint 4: Knowledge + Search (Dec 23, 2025-Jan 5, 2026)
- Sprint 5: Advanced SLA (Jan 6-15, 2026)
+ Sprint 5: Basic SLA (24/7) (Jan 6-15, 2026)
  Sprint 6: Dashboard & Polish (Jan 16-31, 2026)
 
  MVP LAUNCH: JANUARY 31, 2026
@@ -428,580 +507,405 @@
 -   Dec 11, 2025: Incident management + Rich Text operational
 -   Dec 22, 2025: Comments & attachments working
 -   Jan 5, 2026: Knowledge base + Meilisearch ready
--   Jan 15, 2026: Advanced SLA complete
+-   Jan 15, 2026: Basic SLA (24/7) complete
 -   Jan 31, 2026: **MVP LAUNCH** (Dashboard + polish complete)
 
 ---
 
 ## Post-MVP Roadmap (Priority Order)
 
-> **Nota:** Rich Text, Meilisearch e Advanced SLA já incluídos no MVP (11 semanas). Features abaixo são para v1.2+.
+> **IMPORTANT:** MVP focuses on **core ITSM functionality** that works well. Advanced features below are prioritized by **business value** and **implementation effort**. Add them incrementally after MVP launch based on user feedback.
 
 ---
 
-### PRIORITY 1: Teams & Smart Assignment (v1.2 - 1 semana extra)
+## 🔥 PRIORITY 1: Advanced SLA Management (v1.1 - 1 week)
 
-**Sprint Extra 3: Team Collaboration**
-**Impact:** MEDIUM-HIGH - Essencial para equipas >10 pessoas
-**Effort:** 1 semana
-**Business Value:** Expande target market para 50-100 employees
+**Effort:** 5-7 days
+**Business Value:** HIGH - Essential for enterprise customers (>50 agents)
+**User Demand:** HIGH - Top feature request from ITSM users
+**Technical Complexity:** HIGH
+
+**Features:**
+
+1. **Business Hours Calendar**
+
+    - Configure work schedule: Mon-Fri 9am-5pm (configurable)
+    - Timezone support (organization-level)
+    - SLA calculation excludes non-working hours
+    - Example: P1 4-hour SLA created Friday 4pm → due Monday 11am
+
+2. **Holiday Calendar**
+
+    - Admin UI to add holidays (date + name)
+    - Import standard calendars (US, UK, PT, etc.)
+    - SLA calculation skips holidays
+
+3. **Auto-Escalation**
+
+    - Warning email at 80% SLA elapsed (to agent + manager)
+    - Breach notification (to agent + manager + admin)
+    - Optional: reassign to senior agent on 80% warning
+
+4. **SLA Pause/Resume**
+
+    - Pause SLA when status = "Waiting on Customer"
+    - Resume when status changes back
+    - Track pause events in SLA history
+
+5. **Real-time Countdown**
+    - WebSocket updates every 60 seconds
+    - Live countdown on incident detail page
+
+**API Endpoints:**
+
+-   `POST /api/sla-policies` (admin create policy)
+-   `GET /api/sla-policies`
+-   `POST /api/holidays` (admin add holiday)
+-   `GET /api/holidays`
+
+**Tech Stack:**
+
+-   Backend: date-fns for complex date calculations, Bull queue for background jobs
+-   Frontend: WebSocket connection, live countdown component
+
+---
+
+## 📸 PRIORITY 2: Image Paste in Rich Text (v1.1 - 3 days)
+
+**Effort:** 2-3 days
+**Business Value:** MEDIUM-HIGH - Great UX improvement
+**User Demand:** MEDIUM - Nice to have, not critical
+**Technical Complexity:** LOW
+
+**Features:**
+
+-   Paste images directly into Tiptap editor (Ctrl+V)
+-   Auto-upload to S3 or local storage
+-   Show upload progress bar
+-   Insert image at cursor position
+-   Resize image (max width: 800px)
+-   Image lazy loading
+
+**Tech Stack:**
+
+-   Tiptap Image extension
+-   Multer for file upload
+-   AWS S3 SDK (or local uploads/)
+
+---
+
+## 💾 PRIORITY 3: Saved Filters (v1.1 - 2 days)
+
+**Effort:** 2 days
+**Business Value:** MEDIUM - Power user feature
+**User Demand:** MEDIUM
+**Technical Complexity:** LOW
+
+**Features:**
+
+-   Save current filter combination (name + filters JSON)
+-   Personal filters (user-level)
+-   Team filters (shared with team)
+-   Filter dropdown in incidents page
+-   Edit/delete saved filters
+
+**Database:**
+
+```prisma
+model SavedFilter {
+  id        String   @id @default(cuid())
+  name      String
+  filters   Json     // {status: ['OPEN'], priority: ['P1']}
+  userId    String
+  teamId    String?  // null = personal, value = team shared
+}
+```
+
+---
+
+## 📊 PRIORITY 4: Full Activity Timeline (v1.2 - 3 days)
+
+**Effort:** 3 days
+**Business Value:** MEDIUM - Audit/compliance feature
+**User Demand:** LOW-MEDIUM
+**Technical Complexity:** LOW
+
+**Features:**
+
+-   Track ALL field changes (before → after)
+-   Filter activity by: type (comments, status, assignments), user, date range
+-   Export activity log to CSV
+-   Show IP address + user agent for compliance
+
+**Database:**
+
+```prisma
+model ActivityLog {
+  id            String   @id @default(cuid())
+  incidentId    String
+  userId        String
+  action        String   // "STATUS_CHANGED", "ASSIGNED", "COMMENTED"
+  fieldName     String?  // "status", "priority"
+  oldValue      String?
+  newValue      String?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+}
+```
+
+---
+
+## 👥 PRIORITY 5: Teams & Auto-Assignment (v1.2 - 1 week)
+
+**Effort:** 5-7 days
+**Business Value:** MEDIUM-HIGH - Essential for teams >10 agents
+**User Demand:** MEDIUM - Requested by 30% of enterprise users
+**Technical Complexity:** MEDIUM
 
 **Features:**
 
 1. **Team Management**
 
--   Create/manage teams (Assignment Groups)
--   Team members + roles (manager, member)
--   Team specialization (map to categories)
--   Team capacity settings
+    - Create/edit/delete teams (admin only)
+    - Assign users to teams (one user, multiple teams)
+    - Team lead designation
+    - Team specialization: assign categories to team
 
-2. **Auto-Assignment Engine**
+2. **Auto-Assignment Rules**
 
--   Category → Team mapping
--   Priority escalation rules
--   Agent workload balancing (least busy first)
--   Round-robin within team
--   Manual override always available
+    - Round-robin: distribute evenly across team members
+    - Workload-based: assign to agent with fewest open incidents
+    - Category-based: auto-assign based on incident category → team mapping
+    - Priority rules: P1 incidents → senior agents
 
-3. **Workload Dashboard**
+3. **Team Dashboard**
+    - Team performance metrics
+    - Workload distribution chart
+    - Team open incidents count
 
--   Active incidents per agent
--   Agent capacity visualization
--   Team heatmap (busy/available)
--   Manager view
+**Database:**
 
-**Why First:** Torna o produto **escalável** para equipas maiores. Sem isto, limitado a <15 agents.
+```prisma
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  members     TeamMember[]
+  categories  String[]  // ["HARDWARE", "SOFTWARE"]
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  teamId   String
+  userId   String
+  role     String   // "MEMBER", "LEAD"
+}
+```
 
 ---
 
-### PRIORITY 2: REST API & Integrations (v1.5 - 1 semana extra)
+## 🔌 PRIORITY 6: REST API & Webhooks (v1.3 - 1 week)
 
-**Sprint Extra 4: Developer Platform**
-**Impact:** MEDIUM - Abre integrações
-**Effort:** 1 semana
-**Business Value:** Permite integrações com Slack, Teams, Jira, etc.
+**Effort:** 5-7 days
+**Business Value:** MEDIUM - Enables integrations
+**User Demand:** LOW-MEDIUM - Requested by 15% of users
+**Technical Complexity:** LOW
 
 **Features:**
 
-1. **REST API (completa)**
-
--   Swagger documentation (auto-generated)
--   API keys management (CRUD)
--   Rate limiting (1000 req/hour)
--   Webhook support (incident.created, incident.updated)
--   Postman collection export
-
-2. **Integration Ready**
-
--   Slack notifications (webhook)
--   Email ticket creation (IMAP)
--   CSV export/import (bulk operations)
--   Zapier/Make.com ready
-
-**Why Second:** API permite **network effects** - quanto mais integrações, mais valioso o produto. Mas não é essencial para MVP validation.
+-   Full REST API for all CRUD operations
+-   API key authentication
+-   Rate limiting (100 req/min per key)
+-   Swagger/OpenAPI documentation (already 90% done)
+-   Webhook support for events: incident created, status changed, commented
+-   Webhook retry logic (3 attempts)
 
 ---
 
-### PRIORITY 3: CMDB / Asset Management (v1.5 - 2 semanas extra)
+## 📊 PRIORITY 7: Advanced Analytics (v1.4 - 2 weeks)
 
-**Sprint Extra 5-6: Asset Tracking**
-**Impact:** MEDIUM - Feature diferenciadora
-**Effort:** 2 semanas
-**Business Value:** Posiciona como "Full ITSM" vs "Helpdesk"
+**Effort:** 10-12 days
+**Business Value:** MEDIUM - Business intelligence
+**User Demand:** LOW - Power user feature
+**Technical Complexity:** HIGH
 
 **Features:**
 
-1. **Asset CRUD**
-
--   Asset types: Laptop, Desktop, Server, License
--   Fields: serial, model, cost, warranty, location
--   Status: In Use, Available, Retired
--   Assign to users
-
-2. **Asset → Incident Linking**
-
--   Select affected asset on incident
--   View incident history per asset
--   Impact analysis (what breaks if asset fails)
-
-3. **CSV Import/Export**
-
--   Bulk import assets
--   Template download
--   Validation: unique serial numbers
-
-4. **Basic Reports**
-
--   Assets by status/type
--   Warranty expiration alerts (30 days)
--   Cost summary by department
-
-**Why Third:** CMDB é **nice-to-have** mas não crítico para validação. Maioria dos clientes SME não usa CMDB seriamente nos primeiros meses.
-
----
-
-### PRIORITY 4: Advanced Analytics (v2.0 - 2 semanas extra)
-
-**Sprint Extra 7-8: Business Intelligence**
-**Impact:** LOW-MEDIUM - Feature enterprise
-**Effort:** 2 semanas
-**Business Value:** Permite upsell para planos enterprise
-
-**Features:**
-
-1. **Custom Report Builder**
-
--   Drag-and-drop UI
--   Data sources: Incidents, Assets, Users
--   Filters: any field
--   Visualizations: bar, line, pie, table
--   Export: Excel, PDF
-
-2. **Scheduled Reports**
-
--   Email delivery (daily, weekly, monthly)
--   Report templates library
--   Share reports (public link)
-
-3. **Agent Performance**
-
--   Average resolution time per agent
--   CSAT score per agent
--   Incidents resolved vs assigned
--   Leaderboard
-
-**Why Fourth:** Analytics avançado é **overkill para MVP**. Clientes precisam de 3-6 meses de dados antes de analytics fazer sentido.
-
----
-
-### PRIORITY 5: SSO & Enterprise Auth (v2.0 - 2 semanas extra)
-
-**Sprint Extra 9-10: Enterprise Security**
-**Impact:** LOW - Apenas para enterprise (>100 users)
-**Effort:** 2 semanas
-**Business Value:** Requisito para Fortune 500, mas não para SME
-
-**Features:**
-
-1. **SAML 2.0**
-
--   Azure AD integration
--   Okta integration
--   OneLogin integration
--   Auto-provisioning (JIT)
-
-2. **OAuth 2.0**
-
--   Google Workspace
--   Microsoft 365
--   GitHub
-
-3. **2FA/MFA**
-
--   TOTP (Google Authenticator)
--   SMS (Twilio integration)
--   Backup codes
-
-4. **LDAP/AD**
-
--   Active Directory sync
--   Group mapping to roles
-
-**Why Last:** SSO é **apenas para enterprise** (>200 employees). JWT + Password é suficiente para 99% do target market inicial (10-50 employees).
-
----
-
-## Summary: Development Time if Available
-
-| Priority | Feature                 | Weeks | Cumulative | Target Users   |
-| -------- | ----------------------- | ----- | ---------- | -------------- |
-| P1       | Rich Text + Search      | 1     | +1 week    | All users      |
-| P2       | Advanced SLA            | 1     | +2 weeks   | >10 agents     |
-| P3       | Teams & Auto-Assignment | 1     | +3 weeks   | >20 agents     |
-| P4       | REST API                | 1     | +4 weeks   | Integrations   |
-| P5       | CMDB                    | 2     | +6 weeks   | ITSM purists   |
-| P6       | Advanced Analytics      | 2     | +8 weeks   | >50 agents     |
-| P7       | SSO/SAML                | 2     | +10 weeks  | >200 employees |
-
-**Recomendação:** Se houver tempo extra antes de Jan 10, desenvolver **P1 (Rich Text)** primeiro - tem o melhor ROI (1 semana, impacto imenso na UX).
-
-**Estratégia de lançamento:**
-
--   **v1.0 (Jan 10):** MVP básico - validar product-market fit
--   **v1.1 (Jan 17):** +P1 se houver 1 semana extra → UX melhorado
--   **v1.2 (Jan 31):** +P2+P3 se houver 3 semanas extra → Enterprise-ready
--   **v1.5 (Mar):** +P4+P5 → Full ITSM platform
--   **v2.0 (Abr):** +P6+P7 → Enterprise features
-
----
-
-## Features Post-MVP
-
-> **Note:** Rich Text (Tiptap), Meilisearch, and Advanced SLA are already included in MVP (Sprints 2, 4, 5).
-> Features below are for v1.2+ releases.
-
-### Phase 1: Enhanced Core (v1.2 - Feb 2026)
-
-**Teams & Auto-Assignment** (1 week)
-
--   Team management (Assignment Groups)
--   Auto-assignment rules engine
--   Workload balancing
--   Round-robin assignment
-
-**Duration:** 1 week
-
----
-
-### Phase 2: Enterprise Features (v1.5 - Mar 2026)
-
-**CMDB / Asset Management**
-
--   Asset CRUD (CI types)
--   Asset relationships
--   CSV import/export
--   Asset lifecycle
--   Incident Asset linking
-
-**Advanced Analytics**
-
--   Custom report builder
--   Scheduled reports
--   Agent performance metrics
--   Trend analysis
+-   Custom report builder (drag & drop)
+-   Scheduled reports (daily/weekly/monthly email)
+-   Agent performance metrics (avg resolution time, SLA compliance %)
+-   Trend analysis (incidents over time by category/priority)
 -   Export to Excel/PDF
 
-**Duration:** 4 weeks
-
 ---
 
-### Phase 3: Integration & Automation (v2.0 - Apr 2026)
+## 📦 PRIORITY 8: CMDB / Asset Management (v1.5 - 2 weeks)
 
-**REST API & Webhooks**
-
--   Full REST API
--   API documentation (Swagger)
--   Webhook support
--   API keys management
--   Rate limiting
-
-**Workflow Automation**
-
--   Workflow designer (code-based)
--   Approval workflows
--   Auto-assignments
--   Email automation
--   Custom scripts
-
-**SSO & Advanced Auth**
-
--   SAML 2.0
--   OAuth 2.0
--   LDAP integration
--   2FA/MFA
-
-**Duration:** 4 weeks
-
----
-
-2. **Agent Dashboard (ServiceNow My Work)**
-
--   Personal metrics:
--   My open incidents
--   My incidents due today
--   My SLA at risk incidents
--   My recent activity
--   Workload gauge (current capacity %)
--   Personal performance:
--   Average resolution time
--   SLA compliance rate
--   Incidents resolved this week
--   Customer feedback score
--   Quick actions: Create Incident, View My Queue
-
-3. **Manager Dashboard**
-
--   Team performance comparison
--   Agent workload heatmap
--   Top performers (most resolved, best CSAT)
--   Problem areas (most breaches, slowest resolution)
--   Resource planning insights
-
-4. **Custom Report Builder (ServiceNow-style)**
-
--   Drag-and-drop report builder
--   Data sources: Incidents, Assets, Users, SLAs
--   Filters: any field, any condition
--   Grouping: by category, priority, agent, team, date
--   Visualizations: table, bar, line, pie, gauge
--   Export: Excel, PDF, CSV
--   Schedule reports (daily, weekly, monthly email)
--   Share reports (public link, embed)
--   Saved report templates
-
-5. **Analytics Features**
-
--   Trend analysis (compare periods)
--   Peak hours/days identification
--   Category distribution
--   Mean Time to Resolve (MTTR)
--   Mean Time to Acknowledge (MTTA)
--   First Contact Resolution Rate
--   Repeat incident tracking
--   Knowledge base effectiveness
-
-**Tech Stack:**
-
--   Backend: Complex aggregation queries, report generation, caching
--   Frontend: Chart.js/Recharts, data tables, dashboard builder
--   Export: ExcelJS for XLSX, PDFKit for PDF
--   Caching: Redis for dashboard metrics (1-hour TTL)
--   Scheduler: Node-cron for scheduled reports
-
-**ServiceNow Parity:** 70% (missing: advanced analytics, predictive insights - post-MVP)
-
----
-
-### Sprint 9: Notifications & Final Polish
-
-**Duration:** 1 week (Jan 25-31, 2025)
-**Status:** Planned
-**Priority:** MEDIUM
-**ServiceNow Module:** Notification Engine + UI Polish
+**Effort:** 10-14 days
+**Business Value:** LOW-MEDIUM - Full ITSM feature
+**User Demand:** LOW - Requested by <10% of users
+**Technical Complexity:** MEDIUM
 
 **Features:**
 
-1. **Email Notifications (ServiceNow-equivalent)**
-
--   Trigger events:
--   Incident assigned to me
--   Incident updated (watched incidents)
--   New comment @mention
--   SLA breach warning (80%, 100%)
--   Approval request pending
--   Asset warranty expiring
--   Scheduled report delivery
--   Email templates (customizable):
--   Professional HTML design
--   Logo + branding
--   Actionable buttons (View Incident, Reply, Approve)
--   Plain text fallback
--   Email preferences per user:
--   Enable/disable notifications
--   Notification frequency (real-time, digest)
--   Quiet hours
--   Nodemailer integration (SMTP/SendGrid)
-
-2. **In-App Notifications (ServiceNow-style)**
-
--   Notification center (bell icon)
--   Real-time notifications (polling 30s)
--   Notification types:
--   Info (FYI)
--   Warning (action suggested)
--   Critical (action required)
--   Mark as read/unread
--   Mark all as read
--   Notification history (last 30 days)
--   Deep links (click → go to incident)
--   Desktop notifications (browser API)
-
-3. **Final Polish & Testing**
-
--   UI/UX refinements:
--   Consistent spacing, colors, typography
--   Loading states, empty states, error states
--   Responsive mobile design (iPhone, Android)
--   Dark mode support
--   Accessibility (WCAG 2.1 AA compliance)
--   Keyboard shortcuts
--   Performance optimization:
--   Code splitting (reduce bundle size)
--   Image optimization (WebP, lazy loading)
--   API response caching
--   Database query optimization
--   CDN for static assets
--   Load testing (Artillery/K6):
--   100 concurrent users
--   1000 incidents
--   <200ms API response (p95)
--   Security audit:
--   OWASP Top 10 check
--   SQL injection testing
--   XSS testing
--   CSRF protection
--   Rate limiting verification
--   Bug fixes from testing
--   Documentation updates
--   Lighthouse score >90
-
-**Tech Stack:**
-
--   Backend: Nodemailer, notification queue (Bull/BullMQ)
--   Frontend: Notification center UI, toast notifications
--   Testing: Jest, Supertest, React Testing Library, Artillery
--   Monitoring: Sentry for error tracking
-
-**ServiceNow Parity:** 80% (missing: SMS notifications, custom notification rules - post-MVP)
+-   Asset CRUD (computers, servers, licenses)
+-   Asset relationships (computer → user)
+-   Link asset to incident
+-   Warranty tracking
+-   CSV import/export
 
 ---
 
-## Timeline & Milestones
+## 🔐 PRIORITY 9: SSO & SAML (v2.0 - 2 weeks)
 
-```
- Sprint 0: Infrastructure (Nov 1-15, 2024) COMPLETE
- Sprint 1: Auth & Users (Nov 16-22, 2024) 85% DONE
- Sprint 2: Incident Mgmt (Nov 23-Dec 6) NEXT
----
+**Effort:** 10-14 days
+**Business Value:** LOW - Enterprise-only feature
+**User Demand:** VERY LOW - Requested by <5% of users
+**Technical Complexity:** HIGH
 
-## Features Post-MVP (Not for Initial Launch)
+**Features:**
 
-## MVP Exclusions (Post-MVP Features)
-
-### Live Chat Support
-
-**Decision:** NOT in MVP
-**Reason:** High complexity, low ROI
-**Post-MVP:** v2.0 (Q2 2026)
-
-### Visual Workflow Designer
-
-**Decision:** NOT in MVP
-**Reason:** Code-based rules sufficient
-**Post-MVP:** v2.0 (Q2 2026)
-
-### Mobile Native Apps
-
-**Decision:** NOT in MVP
-**Reason:** PWA sufficient (responsive design)
-**Post-MVP:** v2.0 (Q3 2026)
-
-### SSO & Advanced Auth (SAML/OAuth)
-
-**Decision:** NOT in MVP
-**Reason:** JWT + RBAC sufficient
-**Post-MVP:** v2.0 (Q2 2026)
-
-### Advanced SLA (business hours, auto-escalation)
-
-**Decision:** Simplified in MVP
-**Reason:** Basic timers sufficient for v1
-**Post-MVP:** v1.1 (Feb 2025)
-
-### CMDB / Asset Management
-
-**Decision:** NOT in MVP
-**Reason:** Complex feature, low priority
-**Post-MVP:** v1.5 (Mar 2025)
-
-### Teams & Auto-Assignment
-
-**Decision:** NOT in MVP
-**Reason:** Manual assignment sufficient
-**Post-MVP:** v1.1 (Feb 2025)
-
-### Rich Text Editor (Tiptap)
-
-**Decision:** NOT in MVP
-**Reason:** Plain text sufficient
-**Post-MVP:** v1.1 (Feb 2025)
-
-### Meilisearch Integration
-
-**Decision:** NOT in MVP
-**Reason:** PostgreSQL LIKE sufficient
-**Post-MVP:** v1.1 (Feb 2025)
+-   SAML 2.0 (Azure AD, Okta)
+-   OAuth 2.0 (Google, Microsoft)
+-   LDAP integration
+-   JIT (Just-In-Time) provisioning
 
 ---
 
-## Tech Stack Adjustments for MVP
+---
 
-| Component         | MVP Version | Post-MVP Upgrade      |
-| ----------------- | ----------- | --------------------- |
-| **Text Editor**   | Textarea    | Tiptap WYSIWYG        |
-| **Search**        | SQL LIKE    | Meilisearch 1.25      |
-| **File Storage**  | Local disk  | AWS S3 + CDN          |
-| **Charts**        | Chart.js    | Chart.js + Recharts   |
-| **Real-time**     | Polling     | WebSocket (Socket.io) |
-| **Notifications** | Email only  | Email + In-app + SMS  |
+## 📋 MVP RISK ANALYSIS
+
+### ✅ LOW RISK (Confidence: 90%+)
+
+| Sprint   | Feature        | Why Low Risk                           |
+| -------- | -------------- | -------------------------------------- |
+| Sprint 1 | Authentication | Standard JWT + Prisma, well-documented |
+| Sprint 2 | Incident CRUD  | Basic CRUD, no complex business logic  |
+| Sprint 3 | Comments       | Simple append-only data, no edge cases |
+| Sprint 3 | File Upload    | Standard Multer, local storage simple  |
+
+### ⚠️ MEDIUM RISK (Confidence: 70-80%)
+
+| Sprint   | Feature            | Risk                             | Mitigation                                 |
+| -------- | ------------------ | -------------------------------- | ------------------------------------------ |
+| Sprint 2 | Tiptap Integration | Learning curve, JSON storage     | Allocate 3 days for R&D, use official docs |
+| Sprint 4 | Meilisearch Setup  | First-time setup, indexing logic | Start early, test with small dataset first |
+| Sprint 5 | SLA Calculation    | Date math complexity             | Use date-fns library, extensive unit tests |
+| Sprint 6 | Dashboard Charts   | Aggregation queries performance  | Add database indexes, use Redis caching    |
+
+### 🔴 HIGH RISK (Confidence: 50-60%)
+
+| Item                     | Risk                      | Impact             | Mitigation                                           |
+| ------------------------ | ------------------------- | ------------------ | ---------------------------------------------------- |
+| **Timeline Pressure**    | 13 weeks is tight         | Could delay launch | 2-week buffer in Sprint 6, cut P4 features if needed |
+| **Scope Creep**          | Users requesting features | Distraction        | Strict "post-MVP" policy, document requests for v1.1 |
+| **Testing Time**         | Need 80% coverage         | Quality issues     | Write tests during development (TDD), not after      |
+| **Meilisearch Learning** | New technology            | Integration delays | Spike task in week 1 of Sprint 4 (2 days R&D)        |
+
+### 🛡️ RISK MITIGATION STRATEGIES
+
+1. **Weekly Sprint Reviews** (every Friday 4pm)
+
+    - Demo completed features
+    - Identify blockers early
+    - Adjust next week's scope if needed
+
+2. **Feature Freeze** (Jan 20, 2026)
+
+    - No new features after this date
+    - Focus 100% on: bug fixes, testing, polish
+    - Allocate 11 days for stabilization
+
+3. **Fallback Plan** (if behind schedule)
+
+    - **Option A**: Cut Sprint 5 (SLA) → Post-MVP P1
+    - **Option B**: Cut Sprint 4 (Knowledge Base) → Post-MVP P6
+    - **Option C**: Extend launch to Feb 14 (2 extra weeks)
+
+4. **Technical Spikes** (R&D tasks)
+    - Sprint 2 Week 1: Tiptap POC (1 day)
+    - Sprint 4 Week 1: Meilisearch POC (2 days)
+    - Budget 10% of each sprint for unexpected complexity
 
 ---
 
-## Summary: MVP vs ServiceNow
+## 📊 MVP vs Post-MVP SUMMARY
 
-**OrionOne MVP (v1.0 - Jan 2025):**
+### ✅ IN MVP (13 weeks)
 
--   Incident Management (CRUD + basic workflow)
--   Comments & Attachments (plain text + local files)
--   Knowledge Base (articles + simple search)
--   Basic SLA (timers + color indicators)
--   Simple Dashboard (charts + email notifications)
--   JWT Authentication + RBAC
--   Responsive UI (shadcn/ui + Tailwind)
+-   Core Incident Management (CRUD, assignment, filters)
+-   Tiptap Rich Text (essential formatting)
+-   Plain Text Comments + Basic File Attachments
+-   Knowledge Base (articles with search)
+-   Meilisearch (incidents + articles)
+-   Basic SLA (24/7 tracking, breach alerts)
+-   Dashboard (essential metrics)
+-   Email Notifications
 
-**ServiceNow Parity:** 50% (Functional MVP - enough to validate product-market fit)
+### 🔄 POST-MVP (Prioritized)
 
-**Competitive Position:** "Affordable ServiceNow Alternative for Small Teams"
+**Week 14-15 (v1.1):**
 
-**Target:** 10-50 employees, $15/agent/month (vs ServiceNow $150+)
+-   P1: Advanced SLA (business hours, holidays)
+-   P2: Image paste in rich text
+-   P3: Saved filters
 
-**Next:** v1.1 (Feb 2025) adds Teams, Auto-Assignment, Rich Text, Advanced SLA
+**Week 16-17 (v1.2):**
+
+-   P4: Full activity timeline
+-   P5: Teams & auto-assignment
+
+**Week 18+ (v1.3+):**
+
+-   P6: REST API & Webhooks
+-   P7: Advanced Analytics
+-   P8: CMDB / Assets
+-   P9: SSO / SAML
 
 ---
 
--   Nov 15: Infrastructure complete
--   Nov 22: Auth system live
--   Dec 6: Core ticketing functional
--   Dec 20: Team collaboration ready
--   Jan 3: Knowledge base operational
--   Jan 17: SLA tracking active
--   Jan 24: Asset management complete
--   Jan 31: **MVP LAUNCH**
+## 📊 QUICK REFERENCE TABLES
 
----
+### MVP Timeline Overview
 
-## Success Metrics
+| Sprint    | Duration     | Dates              | Focus Area                   | Status  |
+| --------- | ------------ | ------------------ | ---------------------------- | ------- |
+| Sprint 0  | 2 weeks      | Nov 1-15, 2025     | Infrastructure               | ✅ Done |
+| Sprint 1  | 1.5 weeks    | Nov 16-27, 2025    | Auth & RBAC                  | 🔄 70%  |
+| Sprint 2  | 2 weeks      | Nov 28-Dec 11      | Incident + Rich Text         | ⏳ Next |
+| Sprint 3  | 1.5 weeks    | Dec 12-22          | Comments & Files             | ⏳      |
+| Sprint 4  | 2 weeks      | Dec 23-Jan 5, 2026 | Knowledge Base + Search      | ⏳      |
+| Sprint 5  | 1.5 weeks    | Jan 6-15, 2026     | Basic SLA                    | ⏳      |
+| Sprint 6  | 2 weeks      | Jan 16-31, 2026    | Dashboard & Polish           | ⏳      |
+| **TOTAL** | **13 weeks** | **92 days**        | **MVP LAUNCH: Jan 31, 2026** |         |
 
-### Technical Metrics
+### Post-MVP Roadmap Summary
 
-| Metric                  | Target | Current | Status |
-| ----------------------- | ------ | ------- | ------ |
-| **Test Coverage**       | >80%   | TBD     |        |
-| **API Response (p95)**  | <200ms | TBD     |        |
-| **Frontend FCP**        | <1.5s  | TBD     |        |
-| **Frontend LCP**        | <2.5s  | TBD     |        |
-| **Lighthouse Score**    | >90    | TBD     |        |
-| **TypeScript Coverage** | 100%   | 100%    |        |
-| **Bundle Size**         | <500KB | TBD     |        |
-
-### Feature Completion
-
-| Feature              | Target MVP | Current Status |
-| -------------------- | ---------- | -------------- |
-| **Auth & RBAC**      | 100%       | 85%            |
-| **Tickets CRUD**     | 100%       | 0%             |
-| **Comments & Files** | 100%       | 0%             |
-| **Teams**            | 100%       | 0%             |
-| **Knowledge Base**   | 100%       | 0%             |
-| **Search (AI)**      | 100%       | Config         |
-| **SLA Management**   | 80%        | 0%             |
-| **Asset Management** | 100%       | 0%             |
-| **Dashboard**        | 80%        | 0%             |
-| **Notifications**    | 100%       | 0%             |
+| Version | Timeline   | Features                                   | Target Users      |
+| ------- | ---------- | ------------------------------------------ | ----------------- |
+| v1.1    | Week 14-15 | Advanced SLA, Image Paste, Saved Filters   | All users         |
+| v1.2    | Week 16-17 | Activity Timeline, Teams & Auto-Assignment | Teams >10 agents  |
+| v1.3    | Week 18-19 | REST API & Webhooks                        | Integration needs |
+| v1.4    | Week 20-21 | Advanced Analytics                         | Teams >50 agents  |
+| v1.5    | Week 22-23 | CMDB / Asset Management                    | ITSM purists      |
+| v2.0    | Week 24-25 | SSO & SAML                                 | Enterprise >200   |
 
 ### Business Goals
 
-| Goal                    | Target       | Status |
-| ----------------------- | ------------ | ------ |
-| **MVP Launch**          | Jan 31, 2026 |        |
-| **First 10 Customers**  | Feb 2026     |        |
-| **Product Hunt Launch** | Feb 2026     |        |
-| **1000 GitHub Stars**   | Q2 2026      |        |
-| **Break-even**          | Q3 2026      |        |
-| **Pricing**             | $15/agent/mo |        |
+| Metric                     | Target           | Status     |
+| -------------------------- | ---------------- | ---------- |
+| **MVP Launch**             | Jan 31, 2026     | On track   |
+| **First 10 Customers**     | Feb 2026         | -          |
+| **Product Hunt Launch**    | Feb 2026         | -          |
+| **1000 GitHub Stars**      | Q2 2026          | -          |
+| **Break-even**             | Q3 2026          | -          |
+| **Pricing**                | $20/agent/mo     | Fixed      |
+| **Target Market**          | 10-200 employees | Defined    |
+| **ServiceNow Alternative** | 10% cost         | Positioned |
 
 ---
 
-**Last Updated:** 13 November 2024
-**MVP Launch:** 10 January 2025 (8 weeks)
-**Version:** 1.0 (Minimal Viable Product)
+**Last Updated:** 14 November 2025
+**Next Review:** Every Friday 4pm (Sprint Reviews)
+**Documentation:** See DEVELOPMENT-PLAN.md for detailed sprint breakdowns

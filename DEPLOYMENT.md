@@ -8,12 +8,12 @@ Production deployment guide for Next.js 15 + Nest.js 11 + PostgreSQL 18 stack.
 
 ## Pre-Deployment Checklist
 
-- [ ] All tests passing (backend + frontend)
-- [ ] Code coverage >80%
-- [ ] Environment variables configured
-- [ ] Database backup created
-- [ ] SSL certificates ready
-- [ ] Domain DNS configured
+-   [ ] All tests passing (backend + frontend)
+-   [ ] Code coverage >80%
+-   [ ] Environment variables configured
+-   [ ] Database backup created
+-   [ ] SSL certificates ready
+-   [ ] Domain DNS configured
 
 ---
 
@@ -23,25 +23,25 @@ Production deployment guide for Next.js 15 + Nest.js 11 + PostgreSQL 18 stack.
 
 **Small Business (10-50 users):**
 
-- 2 CPU cores, 4GB RAM, 40GB SSD
+-   2 CPU cores, 4GB RAM, 40GB SSD
 
 **Medium Business (50-200 users):**
 
-- 4 CPU cores, 8GB RAM, 80GB SSD
+-   4 CPU cores, 8GB RAM, 80GB SSD
 
 **Large Business (200-500 users):**
 
-- 8 CPU cores, 16GB RAM, 160GB SSD
+-   8 CPU cores, 16GB RAM, 160GB SSD
 
 ### Software
 
-- Ubuntu 22.04 LTS
-- Node.js 20.x LTS
-- PostgreSQL 18.0
-- Redis 8.2
-- Nginx 1.24+
-- PM2 (process manager)
-- Certbot (SSL certificates)
+-   Ubuntu 22.04 LTS
+-   Node.js 20.x LTS
+-   PostgreSQL 18.0
+-   Redis 8.2
+-   Nginx 1.24+
+-   PM2 (process manager)
+-   Certbot (SSL certificates)
 
 ---
 
@@ -84,7 +84,7 @@ sudo chown -R $USER:$USER /var/www/orionone
 cd nest-backend
 npm ci --omit=dev
 cp .env.example .env
-nano .env # Configure production variables
+nano .env  # Configure production variables
 npm run build
 npm run prisma:migrate:deploy
 ```
@@ -95,7 +95,7 @@ npm run prisma:migrate:deploy
 cd next-frontend
 npm ci
 cp .env.example .env.production
-nano .env.production # Configure production variables
+nano .env.production  # Configure production variables
 npm run build
 ```
 
@@ -138,8 +138,8 @@ Create `ecosystem.config.js` in project root with backend and frontend configura
 
 **Configuration:**
 
-- Backend: 2 instances (cluster mode), 500MB memory limit, port 3000
-- Frontend: 2 instances (cluster mode), 1GB memory limit, port 3001
+-   Backend: 2 instances (cluster mode), 500MB memory limit, port 3000
+-   Frontend: 2 instances (cluster mode), 1GB memory limit, port 3001
 
 **Start applications:**
 
@@ -149,7 +149,7 @@ pm2 save
 pm2 startup
 ```
 
- **Example config:** See `deployment/ecosystem.config.example.js`
+**Example config:** See `deployment/ecosystem.config.example.js`
 
 ---
 
@@ -159,15 +159,15 @@ pm2 startup
 
 1. **Backend (API)**: Create `/etc/nginx/sites-available/orionone-api`
 
- - Upstream: `localhost:3000`
- - Server name: `api.yourdomain.com`
- - Proxy headers: X-Real-IP, X-Forwarded-For, X-Forwarded-Proto
+    - Upstream: `localhost:3000`
+    - Server name: `api.yourdomain.com`
+    - Proxy headers: X-Real-IP, X-Forwarded-For, X-Forwarded-Proto
 
 2. **Frontend (SPA)**: Create `/etc/nginx/sites-available/orionone-frontend`
 
- - Upstream: `localhost:3001`
- - Server name: `yourdomain.com www.yourdomain.com`
- - Cache static assets: `/_next/static` (60 minutes)
+    - Upstream: `localhost:3001`
+    - Server name: `yourdomain.com www.yourdomain.com`
+    - Cache static assets: `/_next/static` (60 minutes)
 
 3. **Enable sites:**
 
@@ -178,7 +178,7 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
- **Example configs:** See `deployment/nginx/` directory
+**Example configs:** See `deployment/nginx/` directory
 
 ---
 
@@ -199,11 +199,11 @@ sudo systemctl enable certbot.timer
 
 **PostgreSQL tuning** (edit `/etc/postgresql/18/main/postgresql.conf`):
 
-- `shared_buffers = 256MB` (25% of RAM)
-- `effective_cache_size = 1GB` (50% of RAM)
-- `work_mem = 16MB`
-- `maintenance_work_mem = 128MB`
-- `max_connections = 100`
+-   `shared_buffers = 256MB` (25% of RAM)
+-   `effective_cache_size = 1GB` (50% of RAM)
+-   `work_mem = 16MB`
+-   `maintenance_work_mem = 128MB`
+-   `max_connections = 100`
 
 **Apply changes:**
 
@@ -251,7 +251,7 @@ Add cron job (daily at 2 AM):
 
 ```bash
 gunzip -c /var/backups/orionone/db_20251113.dump.gz | \
- docker exec -i orionone_postgres pg_restore -U orionone -d orionone -c
+  docker exec -i orionone_postgres pg_restore -U orionone -d orionone -c
 ```
 
 ---
@@ -261,9 +261,9 @@ gunzip -c /var/backups/orionone/db_20251113.dump.gz | \
 ### PM2 Monitoring
 
 ```bash
-pm2 monit # Real-time monitoring
-pm2 logs # View logs
-pm2 status # Check status
+pm2 monit              # Real-time monitoring
+pm2 logs               # View logs
+pm2 status             # Check status
 ```
 
 ### Health Checks
@@ -280,16 +280,16 @@ curl https://yourdomain.com
 
 ## Security Checklist
 
-- [ ] Environment files secured (chmod 600)
-- [ ] SSL/HTTPS enabled
-- [ ] Firewall configured (UFW: allow 80, 443, 22)
-- [ ] Strong database passwords
-- [ ] Redis password protected
-- [ ] SSH key-based authentication only
-- [ ] Fail2ban configured
-- [ ] CORS configured
-- [ ] Rate limiting enabled
-- [ ] Regular security updates
+-   [ ] Environment files secured (chmod 600)
+-   [ ] SSL/HTTPS enabled
+-   [ ] Firewall configured (UFW: allow 80, 443, 22)
+-   [ ] Strong database passwords
+-   [ ] Redis password protected
+-   [ ] SSH key-based authentication only
+-   [ ] Fail2ban configured
+-   [ ] CORS configured
+-   [ ] Rate limiting enabled
+-   [ ] Regular security updates
 
 ---
 
@@ -339,7 +339,7 @@ pm2 restart all
 ### 502 Bad Gateway
 
 ```bash
-pm2 status # Check if apps are running
+pm2 status                # Check if apps are running
 pm2 logs orionone-backend # Check backend logs
 sudo tail -f /var/log/nginx/error.log
 ```
@@ -355,18 +355,18 @@ cat nest-backend/.env | grep DATABASE_URL
 ### High Memory Usage
 
 ```bash
-pm2 monit # Check memory usage
-pm2 restart all # Restart applications
+pm2 monit                 # Check memory usage
+pm2 restart all           # Restart applications
 ```
 
 ---
 
 ## Support
 
-- **Documentation:** [`docs/`](docs/)
-- **Tech Stack:** [`TECH-STACK.md`](TECH-STACK.md)
-- **Commands:** [`docs/COMMANDS-REFERENCE.md`](docs/COMMANDS-REFERENCE.md)
-- **Issues:** [GitHub Issues](https://github.com/JMSS95/OrionOne/issues)
+-   **Documentation:** [`docs/`](docs/)
+-   **Tech Stack:** [`TECH-STACK.md`](TECH-STACK.md)
+-   **Commands:** [`docs/COMMANDS-REFERENCE.md`](docs/COMMANDS-REFERENCE.md)
+-   **Issues:** [GitHub Issues](https://github.com/JMSS95/OrionOne/issues)
 
 ---
 

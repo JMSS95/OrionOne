@@ -2,7 +2,7 @@
 
 **Stack:** Next.js 15.5.6 + Nest.js 11.1.8 + Prisma 6.4.0 + PostgreSQL 18.0
 **Philosophy:** Feature-Driven Development + Test-Driven Development (TDD)
-**MVP Scope:** 13 weeks (6 sprints), Rich Text + Meilisearch + Advanced SLA
+**MVP Scope:** 13 weeks (6 sprints), Tiptap Rich Text + Meilisearch + Basic SLA (24/7)
 **Timeline:** Nov 1, 2025 - Jan 31, 2026
 **Last Updated:** 14 November 2025
 
@@ -70,13 +70,13 @@ As an authenticated user, I want to create an incident with rich text descriptio
 
 -   [ ] Form with fields: title, description (**Tiptap rich text**), priority (P1-P4), category
 -   [ ] Validation: title required (5-255 chars), description required (20+ chars)
--   [ ] **Rich text formatting**: bold, italic, lists, code blocks, links
--   [ ] **Image paste support** (auto-upload to S3)
+-   [ ] **Rich text formatting (essential)**: bold, italic, lists, code blocks, links, headings
 -   [ ] Markdown shortcuts (##, \*\*, --)
+-   [ ] Character counter + placeholder text
 -   [ ] Auto-generate incident number (INC-YYYYMMDD-NNNN)
 -   [ ] Manual assignment to agent (dropdown)
--   [ ] **Meilisearch indexing** on create (background job)
 -   [ ] Success toast + redirect to incident detail page
+-   [ ] **EXCLUDED (Post-MVP):** Image paste (P2), tables, embeds, mentions
 
 **API Endpoints:**
 
@@ -84,7 +84,8 @@ As an authenticated user, I want to create an incident with rich text descriptio
 -   GET /api/incidents/:id
 -   GET /api/categories
 -   GET /api/users?role=AGENT
--   GET /api/incidents/search?q=query (Meilisearch)
+
+**NOTE:** Meilisearch indexing moved to Sprint 4 (consolidated with Knowledge Base)
 ```
 
 ---

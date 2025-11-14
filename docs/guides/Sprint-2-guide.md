@@ -1,16 +1,16 @@
-# Guia de Implementação Detalhado do Sprint 2: Incidentes, Rich Text & Meilisearch
+# Guia de Implementação Detalhado do Sprint 2: Incidentes & Rich Text (Essential)
 
 ## Visão Geral do Sprint
 
 **Objetivo:**
-Implementar sistema completo de gestão de incidentes com Rich Text (Tiptap), pesquisa inteligente (Meilisearch) e filtros avançados.
+Implementar sistema completo de gestão de incidentes com Rich Text (Tiptap) e filtros básicos.
 
 **User Stories:**
 
-- [Em Curso] US2.1: Criar Incidente com Rich Text
-- [Em Curso] US2.2: Pesquisa com Meilisearch
-- [Em Curso] US2.3: Listagem com Filtros Avançados
-- [Em Curso] US2.4: Atualizar Incidente
+-   [Em Curso] US2.1: Criar Incidente com Rich Text (Essential)
+-   [Em Curso] US2.2: Pesquisa Simples (PostgreSQL ILIKE)
+-   [Em Curso] US2.3: Listagem com Filtros Básicos
+-   [Em Curso] US2.4: Atualizar Incidente
 
 **Pré-requisitos:**
 Sprint 1 completo (Autenticação funcionando, Docker containers a correr)
@@ -35,22 +35,24 @@ Adicione o modelo `Incident` com os tipos de dados apropriados.
 
 **Campos Essenciais:**
 
-- `id`, `incidentNumber` (use `@unique` e lógica customizada no backend para geração)
-- `title` (com `@db.VarChar(255)`)
-- **Rich Text:** `description` do tipo **`Json`** - crucial para preservar a estrutura do Tiptap
-- **Enums:** Crie e use os enums `IncidentStatus` (NEW, IN_PROGRESS, RESOLVED, CLOSED) e `IncidentPriority` (P1, P2, P3, P4)
-- **Relações:** Crie as relações `requester` e `assignee` com o modelo `User` (muitos-para-um) e a relação `category` com o modelo `Category` (muitos-para-um)
+-   `id`, `incidentNumber` (use `@unique` e lógica customizada no backend para geração)
+-   `title` (com `@db.VarChar(255)`)
+-   **Rich Text:** `description` do tipo **`Json`** - crucial para preservar a estrutura do Tiptap
+-   **Enums:** Crie e use os enums `IncidentStatus` (NEW, IN_PROGRESS, RESOLVED, CLOSED) e `IncidentPriority` (P1, P2, P3, P4)
+-   **Relações:** Crie as relações `requester` e `assignee` com o modelo `User` (muitos-para-um) e a relação `category` com o modelo `Category` (muitos-para-um)
 
 **Documentação:**
 [Guia Oficial do Prisma sobre Modelos de Dados, Enums e Tipos JSON](https://www.prisma.io/docs/orm/prisma-schema/data-model)
 
-#### 1.3. Definir Modelos de Suporte
+#### 1.3. Definir Modelo Category
 
 **Objetivo:**
-Crie o `model Category` (para categorização de incidentes) e o `model SavedFilter` (para a US2.3).
+Crie o `model Category` (para categorização de incidentes).
 
 **Descrição:**
-`SavedFilter` deve ter uma relação com o `User` e um campo `filters` do tipo `Json` para armazenar a configuração dos filtros aplicados pelo utilizador.
+Categoria simples com campos: `id`, `name` (Hardware, Software, Network, Access, etc.), `description`.
+
+**NOTA:** `SavedFilter` foi movido para Post-MVP P3. No MVP, usamos apenas quick filters (All, My Incidents, Unassigned, Open, Closed).
 
 #### 1.4. Executar a Migração
 
@@ -80,11 +82,28 @@ Edite o ficheiro para criar categorias iniciais e mais de 50 incidentes de teste
 **Comando:**
 
 ```bash
-nest g resource incidents
+nest g resource incidents --no-spec
 ```
 
-**DTOs:**
-Crie `CreateIncidentDto.ts` e `UpdateIncidentDto.ts`. Use `@IsString()`, `@IsEnum()`, e `@IsObject()` (para o campo Rich Text) com `class-validator`.
+**Ação:**
+Crie os ficheiros `CreateIncidentDto.ts` e `UpdateIncidentDto.ts` dentro de `nest-backend/src/incidents/dto/`.
+
+**`CreateIncidentDto.ts`:**
+Defina a estrutura de dados para criar um novo incidente. Os validadores (`class-validator`) garantem a integridade dos dados na entrada da API.
+
+-   `title`: Deve ser uma `string` e não pode estar vazio. A API deve rejeitar pedidos sem título.
+-   `description`: Deve ser um objeto JSON, preparado para receber a estrutura de dados do editor Tiptap.
+-   `priority`: Deve corresponder a um dos valores definidos no enum `IncidentPriority` do Prisma (ex: `P1`, `P2`).
+-   `categoryId`: Deve ser o ID (`string`) de uma categoria existente.
+
+**`UpdateIncidentDto.ts`:**
+Defina os campos que podem ser atualizados num incidente existente. Todos os campos devem ser opcionais, permitindo atualizações parciais.
+
+-   `title`: Opcional, para renomear o incidente.
+-   `description`: Opcional, para editar o conteúdo rich text.
+-   `status`: Opcional, para mudar o estado do incidente (ex: de `NEW` para `IN_PROGRESS`).
+-   `priority`: Opcional, para re-priorizar o incidente.
+-   `assigneeId`: Opcional, para atribuir ou reatribuir o incidente a um utilizador.
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre Validação (class-validator)](https://docs.nestjs.com/techniques/validation)
@@ -94,10 +113,23 @@ Crie `CreateIncidentDto.ts` e `UpdateIncidentDto.ts`. Use `@IsString()`, `@IsEnu
 **Ficheiro:** `nest-backend/src/incidents/incidents.service.ts`
 
 **Objetivo:**
-No `create()` do `IncidentsService`, implemente a lógica para gerar um número sequencial único (ex: `INC-YYYYMMDD-0001`).
+No método `create()` do `IncidentsService`, implementar a lógica para gerar um número de incidente sequencial e único, formatado como `INC-YYYYMMDD-NNNN`.
 
-**Descrição:**
-Isto requer uma transação ou uma consulta que obtenha a última contagem do dia.
+**Descrição da Lógica:**
+
+1.  **Encontrar o Último Incidente do Dia:**
+    -   Antes de criar o novo incidente, faça uma consulta à base de dados para encontrar o último incidente registado no dia corrente.
+    -   Isto pode ser feito com uma query que filtra os registos por `createdAt` (maior ou igual ao início do dia e menor que o fim do dia) e ordena por data de criação descendente.
+2.  **Calcular o Novo Número Sequencial:**
+    -   Se não houver incidentes registados hoje, o novo número sequencial é `1`.
+    -   Se existirem, extraia o número sequencial do `incidentNumber` do último incidente (ex: de `INC-20251114-0005` extrai `5`), e incremente esse valor.
+3.  **Formatar o `incidentNumber`:**
+    -   Construa o número final juntando o prefixo "INC-", a data no formato `YYYYMMDD`, e o novo número sequencial formatado com 4 dígitos (ex: `0001`, `0012`).
+4.  **Criar o Incidente:**
+    -   Execute a operação de criação na base de dados, passando todos os dados do DTO e o `incidentNumber` recém-gerado.
+
+**Documentação:**
+[Guia Oficial do Prisma sobre Consultas Avançadas](https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting)
 
 #### 2.3. Implementar Listagem e Paginação (US2.3)
 
@@ -110,25 +142,17 @@ Construa dinamicamente o objeto `where` do Prisma e aplique a paginação basead
 **Documentação:**
 [Guia Oficial do Prisma sobre Filtragem e Paginação por Cursor](https://www.prisma.io/docs/orm/prisma-client/queries/pagination#cursor-based-pagination)
 
-#### 2.4. Implementar Filtros Salvos (US2.3)
+#### 2.4. Implementar Filtros Básicos (US2.3)
 
 **Objetivo:**
-Implemente o CRUD para o modelo `SavedFilter` (criar, listar por utilizador, apagar) no `IncidentsService`.
-
-#### 2.5. Implementar o Upload de Imagens (US2.1)
-
-**Endpoint:** `POST /api/incidents/upload-image`
-
-**Objetivo:**
-Crie um endpoint que gera **URLs pré-assinadas** para o S3.
+Implemente **quick filters** (All, My Incidents, Unassigned, Open, Closed) e **single-select filters** (Status, Priority, Assignee).
 
 **Descrição:**
-Este endpoint _não_ carrega a imagem. Ele devolve uma URL temporária onde o frontend _irá_ carregar a imagem diretamente. Isto descarrega o backend. Utilize o SDK da AWS.
+No `findAll()`, aceite query params: `status`, `priority`, `assigneeId`, `search`. Construa o objeto `where` do Prisma dinamicamente.
 
-**Documentação:**
-[Guia Oficial da AWS SDK sobre URLs Pré-Assinadas (S3)](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-presigned-urls.html)
+**NOTA:** Saved filters (persistir filtros personalizados) movido para Post-MVP P3.
 
-#### 2.6. Configurar o IncidentsController
+#### 2.5. Configurar o IncidentsController
 
 **Ficheiro:** `nest-backend/src/incidents/incidents.controller.ts`
 
@@ -146,34 +170,29 @@ Proteja _todos_ os endpoints com o `JwtAuthGuard` (do Sprint 1).
 
 ```typescript
 describe("IncidentsService - CRUD", () => {
- it("deve criar incidente com número único", async () => {
- const dto = {
- title: "Test Incident",
- description: { type: "doc", content: [] },
- priority: "P3",
- categoryId: "cat-123",
- };
- const result = await service.create(dto, "user-123");
- expect(result.incidentNumber).toMatch(/^INC-\d{8}-\d{4}$/);
- });
+    it("deve criar incidente com número único", async () => {
+        const dto = {
+            title: "Test Incident",
+            description: { type: "doc", content: [] },
+            priority: "P3",
+            categoryId: "cat-123",
+        };
+        const result = await service.create(dto, "user-123");
+        expect(result.incidentNumber).toMatch(/^INC-\d{8}-\d{4}$/);
+    });
 
- it("deve sincronizar com Meilisearch após criar", async () => {
- const incident = await service.create(dto, "user-123");
- expect(meilisearchService.syncIncident).toHaveBeenCalledWith(incident);
- });
-
- it("deve aplicar filtros corretamente", async () => {
- const filters = { status: ["NEW", "IN_PROGRESS"], priority: ["P1"] };
- await service.findAll(filters);
- expect(prisma.incident.findMany).toHaveBeenCalledWith(
- expect.objectContaining({
- where: expect.objectContaining({
- status: { in: ["NEW", "IN_PROGRESS"] },
- priority: { in: ["P1"] },
- }),
- })
- );
- });
+    it("deve aplicar filtros básicos corretamente", async () => {
+        const filters = { status: ["NEW", "IN_PROGRESS"], priority: ["P1"] };
+        await service.findAll(filters);
+        expect(prisma.incident.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({
+                    status: { in: ["NEW", "IN_PROGRESS"] },
+                    priority: { in: ["P1"] },
+                }),
+            })
+        );
+    });
 });
 ```
 
@@ -195,11 +214,13 @@ npm run test -- incidents.service.spec.ts
 **Comando:**
 
 ```bash
-npm install @tiptap/react @tiptap/starter-kit
+npm install @tiptap/react @tiptap/starter-kit @tiptap/extension-link
 ```
 
 **Objetivo:**
-Instale o Tiptap e as extensões necessárias (Image, Link, etc.).
+Instale o Tiptap e as extensões **essenciais** para o MVP.
+
+**NOTA:** Extensões de imagem (`@tiptap/extension-image`) serão adicionadas no Post-MVP P2.
 
 **Documentação:**
 [Guia Oficial do Tiptap sobre Instalação (React)](https://tiptap.dev/docs/editor/installation/react)
@@ -209,7 +230,15 @@ Instale o Tiptap e as extensões necessárias (Image, Link, etc.).
 **Ficheiro:** `components/ui/rich-text-editor.tsx`
 
 **Objetivo:**
-Crie um componente de cliente (`"use client";`) para o editor.
+Crie um componente de cliente (`"use client";`) para o editor com formatação **essencial**.
+
+**Extensões a Incluir:**
+
+-   Bold, Italic, Strike (StarterKit)
+-   BulletList, OrderedList (StarterKit)
+-   Link (extensão separada)
+-   CodeBlock, Heading (StarterKit)
+-   Placeholder
 
 **Integração com Formulário:**
 Use o componente **`Controller`** do `React Hook Form` para ligar o estado complexo do Tiptap ao estado simples do formulário.
@@ -217,22 +246,7 @@ Use o componente **`Controller`** do `React Hook Form` para ligar o estado compl
 **Documentação:**
 [Guia Oficial do React Hook Form sobre o componente `Controller`](https://react-hook-form.com/get-started#IntegratingwithUIlibraries)
 
-#### 3.3. Implementar o Upload de Imagens no Editor
-
-**Objetivo:**
-Configure a extensão de imagem do Tiptap para intercetar o evento de "paste" (colar) ou "drop" (arrastar).
-
-**Fluxo:**
-
-1. Obter o ficheiro colado/arrastado
-2. Chamar o backend para obter a URL pré-assinada (passo 2 da Fase 2)
-3. Fazer um `PUT` (upload direto) para o S3 usando a URL pré-assinada
-4. Inserir a URL final da imagem no Tiptap
-
-**Documentação:**
-[Guia Oficial do Tiptap sobre Upload de Ficheiros](https://tiptap.dev/docs/editor/storage-and-collaboration/file-upload)
-
-#### 3.4. Criar a Página de Listagem (US2.3)
+#### 3.3. Criar a Página de Listagem (US2.3)
 
 **Ficheiro:** `next-frontend/app/incidents/page.tsx`
 
@@ -240,68 +254,83 @@ Configure a extensão de imagem do Tiptap para intercetar o evento de "paste" (c
 Use a biblioteca **`TanStack Query`** (`useQuery`) para gerir o estado de carregamento, cache e erro da listagem.
 
 **Tabela e Filtros:**
-Use a **`DataTable`** (shadcn/ui) e crie uma UI de filtros avançada. O estado dos filtros (status, assignee, priority) deve ser gerido no frontend e incluído na `queryKey` do `TanStack Query` para que a tabela atualize automaticamente quando os filtros mudarem.
+Use a **`DataTable`** (shadcn/ui) e crie uma UI de filtros **básicos**:
+
+-   **Quick filters** (sidebar): All, My Incidents, Unassigned, Open, Closed
+-   **Single-select filters**: Status dropdown, Priority dropdown, Assignee dropdown
+-   **Simple search**: Input para buscar por número ou título
+
+O estado dos filtros deve ser gerido no frontend e incluído na `queryKey` do `TanStack Query` para que a tabela atualize automaticamente quando os filtros mudarem.
 
 **Documentação:**
 [Guia Oficial do TanStack Query (Query Keys)](https://tanstack.com/query/latest/docs/react/guides/query-keys)
 
-#### 3.5. Testar o Fluxo Completo
+#### 3.4. Testar o Fluxo Completo
 
 **Testes Manuais:**
 
 1. **Criar Incidente:**
 
- - Navegue para `http://localhost:3000/incidents/create`
- - Preencha título, selecione categoria e prioridade
- - Use Rich Text Editor:
- - Adicione texto formatado (bold, italic, listas)
- - Cole uma imagem → deve fazer upload para S3
- - Adicione link
- - Submeta → verifique PostgreSQL: incident criado
- - Verifique Meilisearch: documento indexado
+-   Navegue para `http://localhost:3000/incidents/create`
+-   Preencha título, selecione categoria e prioridade
+-   Use Rich Text Editor:
+    -   Adicione texto formatado (bold, italic, listas)
+    -   Adicione heading (H2, H3)
+    -   Adicione link (selecione texto, clique link, cole URL)
+    -   Adicione code block
+-   Submeta → verifique PostgreSQL: incident criado
+-   **NOTA:** Image paste será testado em Post-MVP P2
 
-2. **Testar Upload de Imagens:**
+2. **Testar Pesquisa Simples:**
 
- - No editor, arraste uma imagem
- - Verifique console: presigned URL gerada
- - Verifique S3: imagem guardada
- - Imagem deve aparecer no editor com URL do S3
+-   Navegue para `/incidents`
+-   Digite número de incidente na search bar → deve filtrar
+-   Digite parte do título → deve buscar (case-insensitive)
+-   Verifique: PostgreSQL ILIKE funcionando
+-   **NOTA:** Meilisearch (typo tolerance, highlights) será testado em Sprint 4
 
-3. **Testar Filtros:**
+3. **Testar Filtros Básicos:**
 
- - Navegue para `/incidents`
- - Aplique filtro de status (NEW, IN_PROGRESS)
- - Aplique filtro de prioridade (P1)
- - Tabela deve atualizar automaticamente
- - URL deve refletir filtros: `?status=NEW,IN_PROGRESS&priority=P1`
+-   Navegue para `/incidents`
+-   **Quick filters** (sidebar):
+    -   Clique "My Incidents" → deve mostrar apenas seus incidents
+    -   Clique "Unassigned" → deve mostrar incidents sem assignee
+    -   Clique "Open" → deve mostrar NEW + IN_PROGRESS
+-   **Single-select filters**:
+    -   Selecione status (dropdown) → tabela atualiza
+    -   Selecione prioridade (dropdown) → tabela atualiza
+    -   Selecione assignee (dropdown) → tabela atualiza
+-   URL deve refletir filtros: `?status=NEW&priority=P1&assigneeId=user-123`
+-   **NOTA:** Saved filters serão testados em Post-MVP P3
 
-4. **Guardar Filtros:**
- - Com filtros aplicados, clique "Save Filter"
- - Dê nome ao filtro
- - Verifique BD: SavedFilter criado
- - Recarregue página → filtro salvo deve aparecer no dropdown
+4. **Testar Atualização:**
+
+-   Abra um incident existente
+-   Edite título, descrição (rich text), status, priority
+-   Verifique: activity log registra mudanças
+-   Verifique: email enviado (se assignee mudou ou status mudou)
 
 **Teste E2E (Opcional):**
 
 ```typescript
 // next-frontend/e2e/incidents/create.spec.ts
 test("criar incidente com rich text", async ({ page }) => {
- await page.goto("/incidents/create");
+    await page.goto("/incidents/create");
 
- await page.fill('[name="title"]', "Test Incident");
+    await page.fill('[name="title"]', "Test Incident");
 
- // Rich text
- const editor = page.locator(".tiptap");
- await editor.click();
- await editor.type("This is a **bold** test");
+    // Rich text
+    const editor = page.locator(".tiptap");
+    await editor.click();
+    await editor.type("This is a **bold** test");
 
- await page.selectOption('[name="priority"]', "P2");
- await page.selectOption('[name="categoryId"]', { label: "Hardware" });
+    await page.selectOption('[name="priority"]', "P2");
+    await page.selectOption('[name="categoryId"]', { label: "Hardware" });
 
- await page.click('button[type="submit"]');
+    await page.click('button[type="submit"]');
 
- await expect(page.getByText(/incident created/i)).toBeVisible();
- await expect(page).toHaveURL(/\/incidents\/INC-\d{8}-\d{4}/);
+    await expect(page.getByText(/incident created/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/incidents\/INC-\d{8}-\d{4}/);
 });
 ```
 
@@ -310,305 +339,114 @@ test("criar incidente com rich text", async ({ page }) => {
 
 ---
 
-## Funcionalidade 2.2: Integração da Pesquisa Meilisearch
+## Funcionalidade 2.2: Pesquisa Simples (PostgreSQL)
 
-### Fase 1: Backend (Nest.js)
+**NOTA:** A integração completa do Meilisearch foi movida para o Sprint 4.
 
-#### 1.1. Instalar e Configurar o Cliente
+### Fase 1: Backend - Pesquisa Simples
 
-**Comando:**
+#### 1.1. Atualizar o FilterDto
 
-```bash
-npm install meilisearch
-```
+**Ficheiro:** `nest-backend/src/incidents/dto/filter.dto.ts`
 
 **Objetivo:**
-Crie um `MeilisearchModule` e `MeilisearchService` (Singleton) e injete o cliente (inicializado com as variáveis de ambiente do seu Docker).
-
-**Documentação:**
-[Guia Oficial do Meilisearch sobre SDKs (Quick Start)](https://www.meilisearch.com/docs/learn/getting_started/quick_start)
-
-#### 1.2. Configurar o Índice
-
-**Ficheiro:** `nest-backend/src/meilisearch/meilisearch.service.ts`
-
-**Objetivo:**
-Defina as configurações iniciais do índice `incidents`.
+Adicione o campo `search` ao DTO de filtros.
 
 **Descrição:**
-Defina `searchableAttributes` (ex: `title`, `incidentNumber`, `description`) e `filterableAttributes` (ex: `status`, `priority`) para otimizar a pesquisa.
+
+-   Adicione a propriedade `search?: string` (opcional)
+-   Use o decorador `@IsOptional()` e `@IsString()`
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Configuração de Índice](https://www.meilisearch.com/docs/learn/configuration/settings)
+[Class Validator - Validação de DTOs](https://github.com/typestack/class-validator)
 
-#### 1.3. Implementar a Sincronização
+#### 1.2. Implementar Pesquisa no IncidentsService
+
+**Ficheiro:** `nest-backend/src/incidents/incidents.service.ts`
 
 **Objetivo:**
-Implemente a função `syncIncident(incident)` no `MeilisearchService`.
+No método `findAll()`, adicione suporte para o parâmetro `search` que busca por Incident Number e Title.
 
 **Descrição:**
-Esta função deve:
 
-1. Receber o objeto `Incident` (que inclui a `description` como JSON)
-2. **Conversão de Dados:** Converter o Tiptap JSON para **texto simples** antes de o enviar para o Meilisearch
-3. Chamar `meilisearchClient.index('incidents').addDocuments([documento])`
-4. No `IncidentsService`, chame `this.meilisearchService.syncIncident(novoIncidente)` nas funções `create` e `update`. Para ser um "background job", faça a chamada de forma assíncrona ("fire-and-forget") para não bloquear o utilizador
+-   Se `filters.search` existir, adicione ao objeto `where` do Prisma:
+    -   `OR` com dois critérios:
+        -   `incidentNumber` contains search term
+        -   `title` contains search term (mode: 'insensitive')
+-   Mantenha os filtros existentes (status, priority, assigneeId)
+-   Use `orderBy: { createdAt: 'desc' }` para resultados mais recentes primeiro
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Adicionar Documentos](https://www.meilisearch.com/docs/learn/indexation/documents)
+[Prisma - Filtering and Sorting](https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting)
 
-#### 1.4. Criar o Endpoint de Pesquisa
+#### 1.3. Atualizar o Endpoint GET /incidents
 
-**Endpoint:** `GET /api/incidents/search`
+**Ficheiro:** `nest-backend/src/incidents/incidents.controller.ts`
 
 **Objetivo:**
-Recebe a query do utilizador (`?q=termo`). Chama o `MeilisearchService.search(query)` para aproveitar a **typo-tolerance** e a **pesquisa instantânea**.
+Certifique-se que o endpoint aceita o query parameter `search`.
 
 **Descrição:**
-Ative a opção de **highlights** para realçar os termos encontrados nos resultados.
+
+-   O decorador `@Query()` já deve mapear automaticamente `?search=termo`
+-   Valide que o `FilterDto` está a ser usado corretamente
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Pesquisa (Typo-Tolerance e Highlights)](https://www.meilisearch.com/docs/learn/search/search_parameters)
-
-#### 1.5. Testar Meilisearch (TDD)
-
-**Ficheiro:** `nest-backend/src/meilisearch/meilisearch.service.spec.ts`
-
-**Testes Essenciais:**
-
-```typescript
-describe("MeilisearchService", () => {
- it("deve sincronizar incidente com Meilisearch", async () => {
- const incident = {
- id: "inc-123",
- incidentNumber: "INC-20241114-0001",
- title: "Test Incident",
- description: {
- type: "doc",
- content: [
- {
- type: "paragraph",
- content: [{ type: "text", text: "Test description" }],
- },
- ],
- },
- };
-
- await service.syncIncident(incident);
-
- expect(meilisearchClient.index).toHaveBeenCalledWith("incidents");
- expect(addDocuments).toHaveBeenCalledWith([
- expect.objectContaining({
- id: "inc-123",
- description: "Test description", // Convertido para texto
- }),
- ]);
- });
-
- it("deve pesquisar com typo tolerance", async () => {
- // Mock de resultados
- mockSearch.mockResolvedValue({
- hits: [
- {
- id: "inc-123",
- title: "Hardware Issue",
- _formatted: {
- title: "<mark>Hardware</mark> Issue",
- },
- },
- ],
- });
-
- const result = await service.search("hardwre"); // typo
-
- expect(mockSearch).toHaveBeenCalledWith(
- "hardwre",
- expect.objectContaining({
- attributesToHighlight: ["title", "description"],
- })
- );
- expect(result.hits).toHaveLength(1);
- });
-
- it("deve converter Tiptap JSON para texto simples", () => {
- const json = {
- type: "doc",
- content: [
- {
- type: "paragraph",
- content: [
- { type: "text", text: "Hello " },
- {
- type: "text",
- marks: [{ type: "bold" }],
- text: "world",
- },
- ],
- },
- ],
- };
-
- const text = service.tiptapToPlainText(json);
- expect(text).toBe("Hello world");
- });
-});
-```
-
-**Executar:**
-
-```bash
-npm run test -- meilisearch.service.spec.ts
-```
+[NestJS - Controllers](https://docs.nestjs.com/controllers)
 
 ---
 
-### Fase 2: Frontend (Next.js)
+### Fase 2: Frontend - Barra de Pesquisa
 
-#### 2.1. Instalar Clientes de Pesquisa
+#### 2.1. Criar o Componente de Pesquisa
 
-**Comando:**
-
-```bash
-npm install @meilisearch/instant-meilisearch react-instantsearch-hooks-web
-```
+**Ficheiro:** `next-frontend/components/search-bar.tsx`
 
 **Objetivo:**
-Instalar bibliotecas recomendadas para melhor UX de pesquisa.
-
-#### 2.2. Criar o Componente de Pesquisa Global
-
-**Ficheiro:** `components/global-search.tsx`
-
-**Objetivo:**
-Crie um componente de barra de pesquisa centralizado.
-
-**UX:**
-Use o componente `Command` do `shadcn/ui` para criar uma experiência de pesquisa rápida (tipo barra de comando).
-
-#### 2.3. Implementar a Lógica de Pesquisa Instantânea
-
-**Objetivo:**
-Ligue a sua UI de pesquisa ao Meilisearch.
+Criar uma barra de pesquisa simples na lista de incidentes.
 
 **Descrição:**
-Use os hooks do `react-instantsearch-hooks-web` (ex: `useSearchBox`, `useHits`) para gerir o estado de pesquisa. Esta biblioteca gere o _debounce_ e a latência de forma otimizada para obter resultados em menos de **50ms**.
+
+-   Use o componente `Input` do shadcn/ui
+-   Implemente debounce de 300ms para evitar chamadas excessivas à API
+-   Ao digitar, faça fetch para `GET /api/incidents?search=termo`
+-   Atualize a lista de incidentes com os resultados
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Integração Frontend (React InstantSearch)](https://www.meilisearch.com/docs/learn/front_end_integration/react)
+[shadcn/ui - Input Component](https://ui.shadcn.com/docs/components/input)
 
-#### 2.4. Renderizar Resultados com Highlights
+#### 2.2. Integrar na Página de Incidentes
+
+**Ficheiro:** `next-frontend/app/incidents/page.tsx`
 
 **Objetivo:**
-Apresente os resultados da pesquisa.
+Adicione a barra de pesquisa acima da tabela de incidentes.
 
 **Descrição:**
-Os resultados do InstantSearch incluem os campos formatados (`_formatted`). Renderize os snippets de texto do Meilisearch que contêm as tags de destaque, garantindo que o utilizador vê exatamente onde o termo de pesquisa foi encontrado.
 
-#### 2.5. Testar Pesquisa Instantânea
-
-**Testes Manuais:**
-
-1. **Pesquisa Básica:**
-
- - Navegue para `/incidents`
- - Digite na search box: "hardware"
- - Resultados devem aparecer em <50ms
- - Termos encontrados devem estar destacados (highlights)
-
-2. **Typo Tolerance:**
-
- - Digite: "hardwre" (falta 'a')
- - Deve retornar resultados de "hardware"
- - Digite: "sofware" (falta 't')
- - Deve retornar resultados de "software"
-
-3. **Pesquisa por Número:**
-
- - Digite: "INC-20241114-0001"
- - Deve retornar incidente exato
- - Digite apenas: "0001"
- - Deve retornar incidentes com esse número
-
-4. **Search + Filtros:**
-
- - Digite: "issue"
- - Aplique filtro: status=NEW
- - Resultados devem combinar pesquisa + filtro
-
-5. **Verificar Highlights:**
- - Pesquise: "network problem"
- - Verifique HTML: `<mark>network</mark>` e `<mark>problem</mark>`
- - Highlights devem ter estilo visual (background amarelo)
-
-**Teste E2E (Opcional):**
-
-```typescript
-// next-frontend/e2e/incidents/search.spec.ts
-test("pesquisa com typo tolerance", async ({ page }) => {
- await page.goto("/incidents");
-
- const searchBox = page.locator('[placeholder*="Search"]');
- await searchBox.fill("hardwre"); // typo: "hardware"
-
- // Esperar debounce
- await page.waitForTimeout(300);
-
- // Verificar resultados
- await expect(page.locator(".search-result").first()).toBeVisible();
-
- // Verificar highlights
- const highlights = page.locator("mark");
- await expect(highlights).toHaveCount({ gte: 1 });
-
- // Verificar texto destacado contém termo similar
- const firstHighlight = await highlights.first().textContent();
- expect(firstHighlight.toLowerCase()).toContain("hardw");
-});
-
-test("pesquisa instantânea (<50ms)", async ({ page }) => {
- await page.goto("/incidents");
-
- const searchBox = page.locator('[placeholder*="Search"]');
-
- const startTime = Date.now();
- await searchBox.fill("test");
- await page.waitForSelector(".search-result", { timeout: 100 });
- const endTime = Date.now();
-
- const responseTime = endTime - startTime;
- expect(responseTime).toBeLessThan(100); // <100ms (inclui debounce)
-});
-```
+-   Posicione o componente `SearchBar` no topo da página
+-   Gerencie o estado de pesquisa (search term, loading, resultados)
+-   Mostre loading state durante a pesquisa
+-   Combine pesquisa com filtros existentes
 
 **Documentação:**
-[Playwright Performance Testing](https://playwright.dev/docs/clock)
+[Next.js - Data Fetching](https://nextjs.org/docs/app/building-your-application/data-fetching)
 
 ---
 
-## Conclusão do Sprint
+## Funcionalidade 2.3: Filtros Básicos de Incidentes
 
-> **Nota:** Testes práticos devem ser integrados em cada fase durante o desenvolvimento (TDD).
-
-### Comandos Úteis
-
-**Backend:**
-
-```bash
-# Unit tests
-npm run test
-
-# Specific file
-npm run test -- incidents.service.spec.ts
-
-# Watch mode
 npm run test:watch
 
 # Coverage
+
 npm run test:cov
 
 # E2E
+
 npm run test:e2e
-```
+
+````
 
 **Frontend:**
 
@@ -621,14 +459,14 @@ npm run test:e2e
 
 # E2E com UI
 npm run test:e2e -- --ui
-```
+````
 
 ### Coverage Mínimo Recomendado
 
-- **Backend Services:** > 80%
-- **Backend Controllers:** > 70%
-- **Frontend Components:** > 70%
-- **E2E Critical Flows:** 100% (Criar Incidente, Pesquisa)
+-   **Backend Services:** > 80%
+-   **Backend Controllers:** > 70%
+-   **Frontend Components:** > 70%
+-   **E2E Critical Flows:** 100% (Criar Incidente, Pesquisa)
 
 ### Estrutura de Testes
 
@@ -658,53 +496,53 @@ next-frontend/
 
 ```typescript
 describe("IncidentsService", () => {
- let service: IncidentsService;
- let prisma: PrismaService;
- let meilisearch: MeilisearchService;
+    let service: IncidentsService;
+    let prisma: PrismaService;
+    let meilisearch: MeilisearchService;
 
- beforeEach(async () => {
- const module = await Test.createTestingModule({
- providers: [
- IncidentsService,
- { provide: PrismaService, useValue: mockPrisma },
- { provide: MeilisearchService, useValue: mockMeilisearch },
- ],
- }).compile();
+    beforeEach(async () => {
+        const module = await Test.createTestingModule({
+            providers: [
+                IncidentsService,
+                { provide: PrismaService, useValue: mockPrisma },
+                { provide: MeilisearchService, useValue: mockMeilisearch },
+            ],
+        }).compile();
 
- service = module.get<IncidentsService>(IncidentsService);
- prisma = module.get<PrismaService>(PrismaService);
- meilisearch = module.get<MeilisearchService>(MeilisearchService);
- });
+        service = module.get<IncidentsService>(IncidentsService);
+        prisma = module.get<PrismaService>(PrismaService);
+        meilisearch = module.get<MeilisearchService>(MeilisearchService);
+    });
 
- it("deve criar incidente com número único", async () => {
- // Arrange
- const dto = {
- title: "Test Incident",
- description: { type: "doc", content: [] },
- priority: "P3",
- categoryId: "cat-123",
- };
+    it("deve criar incidente com número único", async () => {
+        // Arrange
+        const dto = {
+            title: "Test Incident",
+            description: { type: "doc", content: [] },
+            priority: "P3",
+            categoryId: "cat-123",
+        };
 
- // Act
- const result = await service.create(dto, "user-123");
+        // Act
+        const result = await service.create(dto, "user-123");
 
- // Assert
- expect(result.incidentNumber).toMatch(/^INC-\d{8}-\d{4}$/);
- expect(meilisearch.syncIncident).toHaveBeenCalledWith(result);
- });
+        // Assert
+        expect(result.incidentNumber).toMatch(/^INC-\d{8}-\d{4}$/);
+        expect(meilisearch.syncIncident).toHaveBeenCalledWith(result);
+    });
 
- it("deve filtrar incidentes por status", async () => {
- // Arrange
- const filters = { status: "NEW" };
+    it("deve filtrar incidentes por status", async () => {
+        // Arrange
+        const filters = { status: "NEW" };
 
- // Act
- const result = await service.findAll(filters);
+        // Act
+        const result = await service.findAll(filters);
 
- // Assert
- expect(prisma.incident.findMany).toHaveBeenCalledWith(
- expect.objectContaining({ where: { status: "NEW" } })
- );
- });
+        // Assert
+        expect(prisma.incident.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({ where: { status: "NEW" } })
+        );
+    });
 });
 ```
 
@@ -712,54 +550,54 @@ describe("IncidentsService", () => {
 
 ```typescript
 describe("Incidents API (e2e)", () => {
- let app: INestApplication;
- let accessToken: string;
+    let app: INestApplication;
+    let accessToken: string;
 
- beforeAll(async () => {
- const moduleFixture = await Test.createTestingModule({
- imports: [AppModule],
- }).compile();
+    beforeAll(async () => {
+        const moduleFixture = await Test.createTestingModule({
+            imports: [AppModule],
+        }).compile();
 
- app = moduleFixture.createNestApplication();
- await app.init();
+        app = moduleFixture.createNestApplication();
+        await app.init();
 
- // Login to get token
- const loginResponse = await request(app.getHttpServer())
- .post("/auth/login")
- .send({ email: "test@example.com", password: "Test123!@" });
+        // Login to get token
+        const loginResponse = await request(app.getHttpServer())
+            .post("/auth/login")
+            .send({ email: "test@example.com", password: "Test123!@" });
 
- accessToken = loginResponse.body.accessToken;
- });
+        accessToken = loginResponse.body.accessToken;
+    });
 
- it("POST /incidents - deve criar incidente", () => {
- return request(app.getHttpServer())
- .post("/incidents")
- .set("Authorization", `Bearer ${accessToken}`)
- .send({
- title: "Test Incident",
- description: { type: "doc", content: [] },
- priority: "P3",
- categoryId: "cat-123",
- })
- .expect(201)
- .expect((res) => {
- expect(res.body.incidentNumber).toBeDefined();
- });
- });
+    it("POST /incidents - deve criar incidente", () => {
+        return request(app.getHttpServer())
+            .post("/incidents")
+            .set("Authorization", `Bearer ${accessToken}`)
+            .send({
+                title: "Test Incident",
+                description: { type: "doc", content: [] },
+                priority: "P3",
+                categoryId: "cat-123",
+            })
+            .expect(201)
+            .expect((res) => {
+                expect(res.body.incidentNumber).toBeDefined();
+            });
+    });
 
- it("GET /incidents/search - deve pesquisar com typo tolerance", () => {
- return request(app.getHttpServer())
- .get("/incidents/search?q=tset") // typo: "test"
- .set("Authorization", `Bearer ${accessToken}`)
- .expect(200)
- .expect((res) => {
- expect(res.body.hits).toBeDefined();
- });
- });
+    it("GET /incidents/search - deve pesquisar com typo tolerance", () => {
+        return request(app.getHttpServer())
+            .get("/incidents/search?q=tset") // typo: "test"
+            .set("Authorization", `Bearer ${accessToken}`)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.hits).toBeDefined();
+            });
+    });
 
- afterAll(async () => {
- await app.close();
- });
+    afterAll(async () => {
+        await app.close();
+    });
 });
 ```
 
@@ -770,59 +608,59 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { RichTextEditor } from "./rich-text-editor";
 
 describe("RichTextEditor", () => {
- it("deve renderizar toolbar com botões de formatação", () => {
- render(<RichTextEditor value="" onChange={() => {}} />);
+    it("deve renderizar toolbar com botões de formatação", () => {
+        render(<RichTextEditor value="" onChange={() => {}} />);
 
- expect(
- screen.getByRole("button", { name: /bold/i })
- ).toBeInTheDocument();
- expect(
- screen.getByRole("button", { name: /italic/i })
- ).toBeInTheDocument();
- expect(
- screen.getByRole("button", { name: /heading/i })
- ).toBeInTheDocument();
- });
+        expect(
+            screen.getByRole("button", { name: /bold/i })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /italic/i })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /heading/i })
+        ).toBeInTheDocument();
+    });
 
- it("deve aplicar formatação bold ao texto selecionado", async () => {
- const onChange = jest.fn();
- render(<RichTextEditor value="" onChange={onChange} />);
+    it("deve aplicar formatação bold ao texto selecionado", async () => {
+        const onChange = jest.fn();
+        render(<RichTextEditor value="" onChange={onChange} />);
 
- const editor = screen.getByRole("textbox");
- fireEvent.input(editor, { target: { textContent: "test text" } });
+        const editor = screen.getByRole("textbox");
+        fireEvent.input(editor, { target: { textContent: "test text" } });
 
- // Simular seleção e click no bold
- const boldButton = screen.getByRole("button", { name: /bold/i });
- fireEvent.click(boldButton);
+        // Simular seleção e click no bold
+        const boldButton = screen.getByRole("button", { name: /bold/i });
+        fireEvent.click(boldButton);
 
- await waitFor(() => {
- expect(onChange).toHaveBeenCalled();
- });
- });
+        await waitFor(() => {
+            expect(onChange).toHaveBeenCalled();
+        });
+    });
 
- it("deve fazer upload de imagem por drag & drop", async () => {
- const mockUpload = jest
- .fn()
- .mockResolvedValue({ url: "https://s3.amazonaws.com/image.jpg" });
- render(
- <RichTextEditor
- value=""
- onChange={() => {}}
- onImageUpload={mockUpload}
- />
- );
+    it("deve fazer upload de imagem por drag & drop", async () => {
+        const mockUpload = jest
+            .fn()
+            .mockResolvedValue({ url: "https://s3.amazonaws.com/image.jpg" });
+        render(
+            <RichTextEditor
+                value=""
+                onChange={() => {}}
+                onImageUpload={mockUpload}
+            />
+        );
 
- const editor = screen.getByRole("textbox");
- const file = new File(["image"], "test.jpg", { type: "image/jpeg" });
+        const editor = screen.getByRole("textbox");
+        const file = new File(["image"], "test.jpg", { type: "image/jpeg" });
 
- fireEvent.drop(editor, {
- dataTransfer: { files: [file] },
- });
+        fireEvent.drop(editor, {
+            dataTransfer: { files: [file] },
+        });
 
- await waitFor(() => {
- expect(mockUpload).toHaveBeenCalledWith(file);
- });
- });
+        await waitFor(() => {
+            expect(mockUpload).toHaveBeenCalledWith(file);
+        });
+    });
 });
 ```
 
@@ -832,79 +670,79 @@ describe("RichTextEditor", () => {
 import { test, expect } from "@playwright/test";
 
 test.describe("Criar Incidente", () => {
- test.beforeEach(async ({ page }) => {
- // Login
- await page.goto("/login");
- await page.fill('[name="email"]', "test@example.com");
- await page.fill('[name="password"]', "Test123!@");
- await page.click('button[type="submit"]');
- await expect(page).toHaveURL("/dashboard");
- });
+    test.beforeEach(async ({ page }) => {
+        // Login
+        await page.goto("/login");
+        await page.fill('[name="email"]', "test@example.com");
+        await page.fill('[name="password"]', "Test123!@");
+        await page.click('button[type="submit"]');
+        await expect(page).toHaveURL("/dashboard");
+    });
 
- test("deve criar incidente com rich text", async ({ page }) => {
- await page.goto("/incidents/create");
+    test("deve criar incidente com rich text", async ({ page }) => {
+        await page.goto("/incidents/create");
 
- // Preencher formulário
- await page.fill('[name="title"]', "Test Incident");
+        // Preencher formulário
+        await page.fill('[name="title"]', "Test Incident");
 
- // Rich text editor
- const editor = page.locator(".tiptap");
- await editor.click();
- await editor.type("This is a **bold** description");
+        // Rich text editor
+        const editor = page.locator(".tiptap");
+        await editor.click();
+        await editor.type("This is a **bold** description");
 
- // Selecionar prioridade
- await page.selectOption('[name="priority"]', "P2");
+        // Selecionar prioridade
+        await page.selectOption('[name="priority"]', "P2");
 
- // Selecionar categoria
- await page.selectOption('[name="categoryId"]', { label: "Hardware" });
+        // Selecionar categoria
+        await page.selectOption('[name="categoryId"]', { label: "Hardware" });
 
- // Submeter
- await page.click('button[type="submit"]');
+        // Submeter
+        await page.click('button[type="submit"]');
 
- // Verificar sucesso
- await expect(page.getByText(/incident created/i)).toBeVisible();
- await expect(page).toHaveURL(/\/incidents\/INC-\d{8}-\d{4}/);
- });
+        // Verificar sucesso
+        await expect(page.getByText(/incident created/i)).toBeVisible();
+        await expect(page).toHaveURL(/\/incidents\/INC-\d{8}-\d{4}/);
+    });
 
- test("deve pesquisar incidentes com typo tolerance", async ({ page }) => {
- await page.goto("/incidents");
+    test("deve pesquisar incidentes com typo tolerance", async ({ page }) => {
+        await page.goto("/incidents");
 
- // Pesquisar com typo
- const searchBox = page.locator('[placeholder*="Search"]');
- await searchBox.fill("hardwre"); // typo: "hardware"
+        // Pesquisar com typo
+        const searchBox = page.locator('[placeholder*="Search"]');
+        await searchBox.fill("hardwre"); // typo: "hardware"
 
- // Esperar resultados
- await page.waitForTimeout(300); // debounce
+        // Esperar resultados
+        await page.waitForTimeout(300); // debounce
 
- // Verificar highlights
- await expect(page.locator(".search-result").first()).toBeVisible();
- await expect(page.locator("mark")).toHaveCount({ gte: 1 }); // highlights
- });
+        // Verificar highlights
+        await expect(page.locator(".search-result").first()).toBeVisible();
+        await expect(page.locator("mark")).toHaveCount({ gte: 1 }); // highlights
+    });
 
- test("deve aplicar filtros avançados", async ({ page }) => {
- await page.goto("/incidents");
+    test("deve aplicar filtros avançados", async ({ page }) => {
+        await page.goto("/incidents");
 
- // Abrir filtros
- await page.click('button:has-text("Filters")');
+        // Abrir filtros
+        await page.click('button:has-text("Filters")');
 
- // Aplicar filtro de status
- await page.check('[value="NEW"]');
- await page.check('[value="IN_PROGRESS"]');
+        // Aplicar filtro de status
+        await page.check('[value="NEW"]');
+        await page.check('[value="IN_PROGRESS"]');
 
- // Aplicar filtro de prioridade
- await page.check('[value="P1"]');
+        // Aplicar filtro de prioridade
+        await page.check('[value="P1"]');
 
- // Fechar modal
- await page.click('button:has-text("Apply")');
+        // Fechar modal
+        await page.click('button:has-text("Apply")');
 
- // Verificar URL atualizada
- await expect(page).toHaveURL(/status=NEW,IN_PROGRESS/);
- await expect(page).toHaveURL(/priority=P1/);
+        // Verificar URL atualizada
+        await expect(page).toHaveURL(/status=NEW,IN_PROGRESS/);
+        await expect(page).toHaveURL(/priority=P1/);
 
- // Verificar resultados filtrados
- const statusBadges = page.locator(".status-badge");
- await expect(statusBadges.first()).toHaveText(/NEW|IN_PROGRESS/);
- });
+        // Verificar resultados filtrados
+        const statusBadges = page.locator(".status-badge");
+        await expect(statusBadges.first()).toHaveText(/NEW|IN_PROGRESS/);
+    });
 });
 ```
 
@@ -946,9 +784,9 @@ FRONTEND_URL="http://localhost:3000"
 
 **Importante:**
 
-- **Meilisearch:** `MEILISEARCH_HOST` deve apontar para o container Docker (localhost:7700 em dev)
-- **AWS S3:** Configurar credenciais IAM com permissões S3 (PutObject, GetObject)
-- **Presigned URLs:** Expiram em 1 hora por segurança
+-   **Meilisearch:** `MEILISEARCH_HOST` deve apontar para o container Docker (localhost:7700 em dev)
+-   **AWS S3:** Configurar credenciais IAM com permissões S3 (PutObject, GetObject)
+-   **Presigned URLs:** Expiram em 1 hora por segurança
 
 ---
 
@@ -975,8 +813,8 @@ NEXT_PUBLIC_ALLOWED_IMAGE_TYPES="image/jpeg,image/png,image/webp"
 
 **Importante:**
 
-- **Meilisearch no Frontend:** Permite pesquisa instantânea direta do browser
-- **Security:** Em produção, use API key com permissões limitadas (search-only)
+-   **Meilisearch no Frontend:** Permite pesquisa instantânea direta do browser
+-   **Security:** Em produção, use API key com permissões limitadas (search-only)
 
 ---
 
@@ -992,131 +830,131 @@ import { MeiliSearch } from "meilisearch";
 
 @Injectable()
 export class MeilisearchService implements OnModuleInit {
- private client: MeiliSearch;
- private readonly indexName = "incidents";
+    private client: MeiliSearch;
+    private readonly indexName = "incidents";
 
- constructor() {
- this.client = new MeiliSearch({
- host: process.env.MEILISEARCH_HOST,
- apiKey: process.env.MEILISEARCH_KEY,
- });
- }
+    constructor() {
+        this.client = new MeiliSearch({
+            host: process.env.MEILISEARCH_HOST,
+            apiKey: process.env.MEILISEARCH_KEY,
+        });
+    }
 
- async onModuleInit() {
- // Criar índice se não existir
- try {
- await this.client.getIndex(this.indexName);
- } catch {
- await this.client.createIndex(this.indexName, { primaryKey: "id" });
- }
+    async onModuleInit() {
+        // Criar índice se não existir
+        try {
+            await this.client.getIndex(this.indexName);
+        } catch {
+            await this.client.createIndex(this.indexName, { primaryKey: "id" });
+        }
 
- // Configurar índice
- const index = this.client.index(this.indexName);
+        // Configurar índice
+        const index = this.client.index(this.indexName);
 
- await index.updateSettings({
- searchableAttributes: [
- "incidentNumber",
- "title",
- "description", // texto simples convertido do JSON
- ],
- filterableAttributes: [
- "status",
- "priority",
- "categoryId",
- "assigneeId",
- "createdAt",
- ],
- sortableAttributes: ["createdAt", "updatedAt", "priority"],
- rankingRules: [
- "words",
- "typo",
- "proximity",
- "attribute",
- "sort",
- "exactness",
- ],
- typoTolerance: {
- enabled: true,
- minWordSizeForTypos: {
- oneTypo: 5,
- twoTypos: 9,
- },
- },
- });
- }
+        await index.updateSettings({
+            searchableAttributes: [
+                "incidentNumber",
+                "title",
+                "description", // texto simples convertido do JSON
+            ],
+            filterableAttributes: [
+                "status",
+                "priority",
+                "categoryId",
+                "assigneeId",
+                "createdAt",
+            ],
+            sortableAttributes: ["createdAt", "updatedAt", "priority"],
+            rankingRules: [
+                "words",
+                "typo",
+                "proximity",
+                "attribute",
+                "sort",
+                "exactness",
+            ],
+            typoTolerance: {
+                enabled: true,
+                minWordSizeForTypos: {
+                    oneTypo: 5,
+                    twoTypos: 9,
+                },
+            },
+        });
+    }
 
- async syncIncident(incident: any) {
- // Converter Tiptap JSON para texto simples
- const description = this.tiptapToPlainText(incident.description);
+    async syncIncident(incident: any) {
+        // Converter Tiptap JSON para texto simples
+        const description = this.tiptapToPlainText(incident.description);
 
- const document = {
- id: incident.id,
- incidentNumber: incident.incidentNumber,
- title: incident.title,
- description,
- status: incident.status,
- priority: incident.priority,
- categoryId: incident.categoryId,
- assigneeId: incident.assigneeId,
- createdAt: incident.createdAt.toISOString(),
- updatedAt: incident.updatedAt.toISOString(),
- };
+        const document = {
+            id: incident.id,
+            incidentNumber: incident.incidentNumber,
+            title: incident.title,
+            description,
+            status: incident.status,
+            priority: incident.priority,
+            categoryId: incident.categoryId,
+            assigneeId: incident.assigneeId,
+            createdAt: incident.createdAt.toISOString(),
+            updatedAt: incident.updatedAt.toISOString(),
+        };
 
- const index = this.client.index(this.indexName);
- await index.addDocuments([document]);
- }
+        const index = this.client.index(this.indexName);
+        await index.addDocuments([document]);
+    }
 
- async search(query: string, filters?: any) {
- const index = this.client.index(this.indexName);
+    async search(query: string, filters?: any) {
+        const index = this.client.index(this.indexName);
 
- const searchParams: any = {
- attributesToHighlight: ["title", "description"],
- highlightPreTag: "<mark>",
- highlightPostTag: "</mark>",
- limit: 20,
- };
+        const searchParams: any = {
+            attributesToHighlight: ["title", "description"],
+            highlightPreTag: "<mark>",
+            highlightPostTag: "</mark>",
+            limit: 20,
+        };
 
- if (filters) {
- searchParams.filter = this.buildFilters(filters);
- }
+        if (filters) {
+            searchParams.filter = this.buildFilters(filters);
+        }
 
- return index.search(query, searchParams);
- }
+        return index.search(query, searchParams);
+    }
 
- private tiptapToPlainText(json: any): string {
- if (!json || !json.content) return "";
+    private tiptapToPlainText(json: any): string {
+        if (!json || !json.content) return "";
 
- return json.content
- .map((node: any) => {
- if (node.type === "paragraph" && node.content) {
- return node.content.map((c: any) => c.text || "").join("");
- }
- return "";
- })
- .join(" ");
- }
+        return json.content
+            .map((node: any) => {
+                if (node.type === "paragraph" && node.content) {
+                    return node.content.map((c: any) => c.text || "").join("");
+                }
+                return "";
+            })
+            .join(" ");
+    }
 
- private buildFilters(filters: any): string {
- const conditions = [];
+    private buildFilters(filters: any): string {
+        const conditions = [];
 
- if (filters.status) {
- conditions.push(
- `status IN [${filters.status
- .map((s: string) => `"${s}"`)
- .join(",")}]`
- );
- }
+        if (filters.status) {
+            conditions.push(
+                `status IN [${filters.status
+                    .map((s: string) => `"${s}"`)
+                    .join(",")}]`
+            );
+        }
 
- if (filters.priority) {
- conditions.push(
- `priority IN [${filters.priority
- .map((p: string) => `"${p}"`)
- .join(",")}]`
- );
- }
+        if (filters.priority) {
+            conditions.push(
+                `priority IN [${filters.priority
+                    .map((p: string) => `"${p}"`)
+                    .join(",")}]`
+            );
+        }
 
- return conditions.join(" AND ");
- }
+        return conditions.join(" AND ");
+    }
 }
 ```
 
@@ -1142,40 +980,40 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 @Injectable()
 export class UploadService {
- private s3Client: S3Client;
- private bucketName: string;
+    private s3Client: S3Client;
+    private bucketName: string;
 
- constructor() {
- this.s3Client = new S3Client({
- region: process.env.AWS_REGION,
- credentials: {
- accessKeyId: process.env.AWS_ACCESS_KEY_ID,
- secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
- },
- });
- this.bucketName = process.env.AWS_S3_BUCKET;
- }
+    constructor() {
+        this.s3Client = new S3Client({
+            region: process.env.AWS_REGION,
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            },
+        });
+        this.bucketName = process.env.AWS_S3_BUCKET;
+    }
 
- async getPresignedUploadUrl(
- filename: string,
- contentType: string
- ): Promise<{ uploadUrl: string; fileUrl: string }> {
- const key = `incidents/${Date.now()}-${filename}`;
+    async getPresignedUploadUrl(
+        filename: string,
+        contentType: string
+    ): Promise<{ uploadUrl: string; fileUrl: string }> {
+        const key = `incidents/${Date.now()}-${filename}`;
 
- const command = new PutObjectCommand({
- Bucket: this.bucketName,
- Key: key,
- ContentType: contentType,
- });
+        const command = new PutObjectCommand({
+            Bucket: this.bucketName,
+            Key: key,
+            ContentType: contentType,
+        });
 
- const uploadUrl = await getSignedUrl(this.s3Client, command, {
- expiresIn: parseInt(process.env.AWS_S3_PRESIGNED_URL_EXPIRES),
- });
+        const uploadUrl = await getSignedUrl(this.s3Client, command, {
+            expiresIn: parseInt(process.env.AWS_S3_PRESIGNED_URL_EXPIRES),
+        });
 
- const fileUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+        const fileUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 
- return { uploadUrl, fileUrl };
- }
+        return { uploadUrl, fileUrl };
+    }
 }
 ```
 
@@ -1269,29 +1107,29 @@ async getPresignedUploadUrl(filename: string, contentType: string) {
 
 ```typescript
 export function handleApiError(error: any): string {
- if (error.response) {
- const message = error.response.data?.message;
+    if (error.response) {
+        const message = error.response.data?.message;
 
- if (Array.isArray(message)) {
- return message.join(", ");
- }
+        if (Array.isArray(message)) {
+            return message.join(", ");
+        }
 
- // Erros específicos do Sprint 2
- switch (error.response.status) {
- case 413:
- return "Ficheiro demasiado grande. Máximo: 5MB";
- case 415:
- return "Tipo de ficheiro não suportado. Use: JPG, PNG, WEBP";
- case 503:
- return "Pesquisa temporariamente indisponível. Tente novamente.";
- default:
- return message || "Erro no servidor";
- }
- } else if (error.request) {
- return "Servidor não responde. Verifique a ligação.";
- } else {
- return error.message || "Erro desconhecido";
- }
+        // Erros específicos do Sprint 2
+        switch (error.response.status) {
+            case 413:
+                return "Ficheiro demasiado grande. Máximo: 5MB";
+            case 415:
+                return "Tipo de ficheiro não suportado. Use: JPG, PNG, WEBP";
+            case 503:
+                return "Pesquisa temporariamente indisponível. Tente novamente.";
+            default:
+                return message || "Erro no servidor";
+        }
+    } else if (error.request) {
+        return "Servidor não responde. Verifique a ligação.";
+    } else {
+        return error.message || "Erro desconhecido";
+    }
 }
 ```
 
@@ -1301,54 +1139,54 @@ export function handleApiError(error: any): string {
 // next-frontend/components/rich-text-editor.tsx
 
 const handleImageUpload = async (file: File) => {
- try {
- // Validar tamanho
- if (file.size > parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE)) {
- toast({
- title: "Erro",
- description: "Imagem demasiado grande (máx: 5MB)",
- variant: "destructive",
- });
- return null;
- }
+    try {
+        // Validar tamanho
+        if (file.size > parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE)) {
+            toast({
+                title: "Erro",
+                description: "Imagem demasiado grande (máx: 5MB)",
+                variant: "destructive",
+            });
+            return null;
+        }
 
- // Validar tipo
- const allowedTypes =
- process.env.NEXT_PUBLIC_ALLOWED_IMAGE_TYPES.split(",");
- if (!allowedTypes.includes(file.type)) {
- toast({
- title: "Erro",
- description: "Tipo de ficheiro não suportado",
- variant: "destructive",
- });
- return null;
- }
+        // Validar tipo
+        const allowedTypes =
+            process.env.NEXT_PUBLIC_ALLOWED_IMAGE_TYPES.split(",");
+        if (!allowedTypes.includes(file.type)) {
+            toast({
+                title: "Erro",
+                description: "Tipo de ficheiro não suportado",
+                variant: "destructive",
+            });
+            return null;
+        }
 
- // 1. Obter presigned URL
- const { uploadUrl, fileUrl } = await api.post("/incidents/upload-url", {
- filename: file.name,
- contentType: file.type,
- });
+        // 1. Obter presigned URL
+        const { uploadUrl, fileUrl } = await api.post("/incidents/upload-url", {
+            filename: file.name,
+            contentType: file.type,
+        });
 
- // 2. Upload direto para S3
- await fetch(uploadUrl, {
- method: "PUT",
- body: file,
- headers: {
- "Content-Type": file.type,
- },
- });
+        // 2. Upload direto para S3
+        await fetch(uploadUrl, {
+            method: "PUT",
+            body: file,
+            headers: {
+                "Content-Type": file.type,
+            },
+        });
 
- return fileUrl;
- } catch (error) {
- const errorMessage = handleApiError(error);
- toast({
- title: "Erro no upload",
- description: errorMessage,
- variant: "destructive",
- });
- return null;
- }
+        return fileUrl;
+    } catch (error) {
+        const errorMessage = handleApiError(error);
+        toast({
+            title: "Erro no upload",
+            description: errorMessage,
+            variant: "destructive",
+        });
+        return null;
+    }
 };
 ```
 
@@ -1360,8 +1198,8 @@ const handleImageUpload = async (file: File) => {
 
 **Sintomas:**
 
-- Pesquisa não retorna resultados
-- Console: "MeiliSearchApiError: Index not found"
+-   Pesquisa não retorna resultados
+-   Console: "MeiliSearchApiError: Index not found"
 
 **Diagnóstico:**
 
@@ -1381,23 +1219,24 @@ curl http://localhost:7700/indexes \
 
 1. **Container não está a correr:**
 
- ```bash
- docker-compose up -d orionone-meilisearch
- ```
+```bash
+docker-compose up -d orionone-meilisearch
+```
 
 2. **Índice não foi criado:**
 
- ```bash
- # Reiniciar backend para executar onModuleInit
- cd nest-backend
- npm run start:dev
- ```
+```bash
+# Reiniciar backend para executar onModuleInit
+cd nest-backend
+npm run start:dev
+```
 
 3. **Master key errada:**
- ```env
- # nest-backend/.env
- MEILISEARCH_KEY=masterKey
- ```
+
+```env
+# nest-backend/.env
+MEILISEARCH_KEY=masterKey
+```
 
 ---
 
@@ -1405,8 +1244,8 @@ curl http://localhost:7700/indexes \
 
 **Sintomas:**
 
-- Erro 403 Forbidden ao fazer upload
-- Imagens não aparecem no editor
+-   Erro 403 Forbidden ao fazer upload
+-   Imagens não aparecem no editor
 
 **Diagnóstico:**
 
@@ -1424,31 +1263,32 @@ curl -X PUT "PRESIGNED_URL" \
 
 1. **Credenciais AWS inválidas:**
 
- ```env
- # nest-backend/.env
- AWS_ACCESS_KEY_ID="your-valid-key"
- AWS_SECRET_ACCESS_KEY="your-valid-secret"
- ```
+```env
+# nest-backend/.env
+AWS_ACCESS_KEY_ID="your-valid-key"
+AWS_SECRET_ACCESS_KEY="your-valid-secret"
+```
 
 2. **Bucket não existe:**
 
- ```bash
- aws s3 mb s3://orionone-uploads --region eu-west-1
- ```
+```bash
+aws s3 mb s3://orionone-uploads --region eu-west-1
+```
 
 3. **CORS do S3 não configurado:**
- ```json
- {
- "CORSRules": [
- {
- "AllowedOrigins": ["http://localhost:3000"],
- "AllowedMethods": ["PUT", "GET"],
- "AllowedHeaders": ["*"],
- "MaxAgeSeconds": 3000
- }
- ]
- }
- ```
+
+```json
+{
+    "CORSRules": [
+        {
+            "AllowedOrigins": ["http://localhost:3000"],
+            "AllowedMethods": ["PUT", "GET"],
+            "AllowedHeaders": ["*"],
+            "MaxAgeSeconds": 3000
+        }
+    ]
+}
+```
 
 ---
 
@@ -1456,8 +1296,8 @@ curl -X PUT "PRESIGNED_URL" \
 
 **Sintomas:**
 
-- Editor funciona mas ao guardar perde formatação
-- JSON retornado está vazio
+-   Editor funciona mas ao guardar perde formatação
+-   JSON retornado está vazio
 
 **Diagnóstico:**
 
@@ -1470,29 +1310,30 @@ console.log(JSON.stringify(editor.getJSON(), null, 2));
 
 1. **Controller não aceita Json:**
 
- ```typescript
- // CreateIncidentDto
- @IsObject()
- description: any; // Aceita qualquer JSON
- ```
+```typescript
+// CreateIncidentDto
+@IsObject()
+description: any; // Aceita qualquer JSON
+```
 
 2. **Prisma não reconhece Json:**
 
- ```prisma
- // schema.prisma
- description Json // Não String!
- ```
+```prisma
+// schema.prisma
+description Json // Não String!
+```
 
 3. **Frontend não usa Controller do React Hook Form:**
- ```tsx
- <Controller
- name="description"
- control={control}
- render={({ field }) => (
- <RichTextEditor value={field.value} onChange={field.onChange} />
- )}
- />
- ```
+
+```tsx
+<Controller
+    name="description"
+    control={control}
+    render={({ field }) => (
+        <RichTextEditor value={field.value} onChange={field.onChange} />
+    )}
+/>
+```
 
 ---
 
@@ -1500,8 +1341,8 @@ console.log(JSON.stringify(editor.getJSON(), null, 2));
 
 **Sintomas:**
 
-- Selecionar filtros não atualiza tabela
-- URL não muda quando aplica filtros
+-   Selecionar filtros não atualiza tabela
+-   URL não muda quando aplica filtros
 
 **Diagnóstico:**
 
@@ -1514,32 +1355,33 @@ console.log(queryKey); // ['incidents', { status: 'NEW', priority: 'P1' }]
 
 1. **QueryKey não inclui filtros:**
 
- ```tsx
- const { data } = useQuery({
- queryKey: ["incidents", filters], // ← Importante!
- queryFn: () => fetchIncidents(filters),
- });
- ```
+```tsx
+const { data } = useQuery({
+    queryKey: ["incidents", filters], // ← Importante!
+    queryFn: () => fetchIncidents(filters),
+});
+```
 
 2. **Estado dos filtros não atualiza:**
 
- ```tsx
- const [filters, setFilters] = useState({});
+```tsx
+const [filters, setFilters] = useState({});
 
- // Atualizar filtros
- const handleFilterChange = (newFilters) => {
- setFilters((prev) => ({ ...prev, ...newFilters }));
- };
- ```
+// Atualizar filtros
+const handleFilterChange = (newFilters) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+};
+```
 
 3. **Backend não processa filtros:**
- ```typescript
- // incidents.controller.ts
- @Get()
- async findAll(@Query() query: FilterIncidentsDto) {
- return this.incidentsService.findAll(query);
- }
- ```
+
+```typescript
+// incidents.controller.ts
+@Get()
+async findAll(@Query() query: FilterIncidentsDto) {
+return this.incidentsService.findAll(query);
+}
+```
 
 ---
 
@@ -1547,8 +1389,8 @@ console.log(queryKey); // ['incidents', { status: 'NEW', priority: 'P1' }]
 
 **Sintomas:**
 
-- Delay visível ao digitar na search box
-- Meilisearch retorna resultados mas demora
+-   Delay visível ao digitar na search box
+-   Meilisearch retorna resultados mas demora
 
 **Diagnóstico:**
 
@@ -1565,32 +1407,33 @@ curl http://localhost:7700/indexes/incidents/stats \
 
 1. **Demasiados documentos:**
 
- ```typescript
- // Implementar paginação
- const searchParams = {
- limit: 20, // ← Reduzir
- offset: page * 20,
- };
- ```
+```typescript
+// Implementar paginação
+const searchParams = {
+    limit: 20, // ← Reduzir
+    offset: page * 20,
+};
+```
 
 2. **searchableAttributes muito extensos:**
 
- ```typescript
- // Reduzir campos pesquisáveis
- searchableAttributes: [
- "title", // ← Manter
- "incidentNumber", // ← Manter
- // 'description', // ← Remover se muito grande
- ];
- ```
+```typescript
+// Reduzir campos pesquisáveis
+searchableAttributes: [
+    "title", // ← Manter
+    "incidentNumber", // ← Manter
+    // 'description', // ← Remover se muito grande
+];
+```
 
 3. **Ranking rules desnecessários:**
- ```typescript
- rankingRules: [
- "words",
- "typo",
- "proximity", // ← Remover se não necessário
- ];
- ```
+
+```typescript
+rankingRules: [
+    "words",
+    "typo",
+    "proximity", // ← Remover se não necessário
+];
+```
 
 ---

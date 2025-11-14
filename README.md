@@ -22,27 +22,27 @@
 
 ### Key Features
 
-- **90% cost savings** compared to market leaders ($20/agent vs $200+)
-- **Rich Text Editor** with Tiptap for professional ticket descriptions
-- **AI-powered Search** with Meilisearch (typo-tolerant, instant results)
-- **Advanced SLA Management** with configurable policies
-- **Modern Stack** with Next.js 15 + Nest.js 11 + Prisma 6 + PostgreSQL 18
+-   **90% cost savings** compared to market leaders ($20/agent vs $200+)
+-   **Rich Text Editor** with Tiptap for professional ticket descriptions
+-   **AI-powered Search** with Meilisearch (typo-tolerant, instant results)
+-   **Advanced SLA Management** with configurable policies
+-   **Modern Stack** with Next.js 15 + Nest.js 11 + Prisma 6 + PostgreSQL 18
 
 ---
 
 ## Features
 
-| Feature | Description | Status |
-| -------------------------- | -------------------------------------------------- | ----------- |
-| Authentication | Multi-role (Admin, Agent, User) with JWT + refresh | Sprint 1 |
-| User & Team Management | RBAC with granular permissions | Sprint 1 |
-| Incident Management | CRUD, priorities, status, SLA tracking | Sprint 2 |
-| Rich Text Editor | Tiptap editor for professional descriptions | Sprint 2 |
-| AI-Powered Search | Meilisearch with typo-tolerance | Sprint 2 |
-| Comments & Attachments | Real-time collaboration with file uploads | Sprint 3 |
-| Knowledge Base | Full-text search powered by Meilisearch | Sprint 4 |
-| Advanced SLA Management | Configurable SLA policies with escalation | Sprint 5 |
-| Dashboard & Analytics | Real-time metrics and team performance stats | Sprint 6 |
+| Feature                 | Description                                        | Status   |
+| ----------------------- | -------------------------------------------------- | -------- |
+| Authentication          | Multi-role (Admin, Agent, User) with JWT + refresh | Sprint 1 |
+| User & Team Management  | RBAC with granular permissions                     | Sprint 1 |
+| Incident Management     | CRUD, priorities, status, SLA tracking             | Sprint 2 |
+| Rich Text Editor        | Tiptap editor for professional descriptions        | Sprint 2 |
+| AI-Powered Search       | Meilisearch with typo-tolerance                    | Sprint 2 |
+| Comments & Attachments  | Real-time collaboration with file uploads          | Sprint 3 |
+| Knowledge Base          | Full-text search powered by Meilisearch            | Sprint 4 |
+| Advanced SLA Management | Configurable SLA policies with escalation          | Sprint 5 |
+| Dashboard & Analytics   | Real-time metrics and team performance stats       | Sprint 6 |
 
 **MVP Target:** January 31, 2026 (13 weeks) • [Complete Roadmap →](docs/DEVELOPMENT-PLAN.md)
 
@@ -50,20 +50,20 @@
 
 ## Tech Stack
 
-| Layer | Technology | Version | Purpose |
+| Layer        | Technology   | Version | Purpose            |
 | ------------ | ------------ | ------- | ------------------ |
-| **Backend** | Nest.js | 11.1.8 | RESTful API |
-| | Prisma | 6.4.0 | Type-safe ORM |
-| | PostgreSQL | 18.0 | Primary database |
-| | Redis | 8.2 | Cache & sessions |
-| | Meilisearch | 1.25 | Full-text search |
-| **Frontend** | Next.js | 15.5.6 | React 19 framework |
-| | shadcn/ui | latest | Component library |
-| | Tailwind CSS | v4 | Utility-first CSS |
-| **DevOps** | Docker | latest | Containerization |
-| | Nginx | 1.24+ | Reverse proxy |
+| **Backend**  | Nest.js      | 11.1.8  | RESTful API        |
+|              | Prisma       | 6.4.0   | Type-safe ORM      |
+|              | PostgreSQL   | 18.0    | Primary database   |
+|              | Redis        | 8.2     | Cache & sessions   |
+|              | Meilisearch  | 1.25    | Full-text search   |
+| **Frontend** | Next.js      | 15.5.6  | React 19 framework |
+|              | shadcn/ui    | latest  | Component library  |
+|              | Tailwind CSS | v4      | Utility-first CSS  |
+| **DevOps**   | Docker       | latest  | Containerization   |
+|              | Nginx        | 1.24+   | Reverse proxy      |
 
- **Detailed documentation:** [TECH-STACK.md](TECH-STACK.md)
+**Detailed documentation:** [TECH-STACK.md](TECH-STACK.md)
 
 ---
 
@@ -86,24 +86,24 @@ cd next-frontend && npm install && npm run dev
 
 **Access:**
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:3001/api
-- Login: `admin@orionone.com` / `Admin123!`
+-   Frontend: http://localhost:3000
+-   Backend API: http://localhost:3001/api
+-   Login: `admin@orionone.com` / `Admin123!`
 
 ---
 
 ## Documentation
 
-| Document | Description |
+| Document                                                 | Description                                |
 | -------------------------------------------------------- | ------------------------------------------ |
-| [SETUP.md](SETUP.md) | Complete setup guide (10 minutes) |
-| [TECH-STACK.md](TECH-STACK.md) | Complete technology stack details |
-| [docs/DEVELOPMENT-PLAN.md](docs/DEVELOPMENT-PLAN.md) | 6-sprint roadmap (13 weeks) |
-| [docs/SPRINT-0-SETUP.md](docs/SPRINT-0-SETUP.md) | Sprint 0 infrastructure setup |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute (workflow + conventions) |
-| [DEPLOYMENT.md](DEPLOYMENT.md) | Production deployment guide |
-| [docs/COMMANDS-REFERENCE.md](docs/COMMANDS-REFERENCE.md) | All CLI commands |
-| [docs/COMPONENTS-GUIDE.md](docs/COMPONENTS-GUIDE.md) | shadcn/ui components catalog |
+| [SETUP.md](SETUP.md)                                     | Complete setup guide (10 minutes)          |
+| [TECH-STACK.md](TECH-STACK.md)                           | Complete technology stack details          |
+| [docs/DEVELOPMENT-PLAN.md](docs/DEVELOPMENT-PLAN.md)     | 6-sprint roadmap (13 weeks)                |
+| [docs/SPRINT-0-SETUP.md](docs/SPRINT-0-SETUP.md)         | Sprint 0 infrastructure setup              |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                       | How to contribute (workflow + conventions) |
+| [DEPLOYMENT.md](DEPLOYMENT.md)                           | Production deployment guide                |
+| [docs/COMMANDS-REFERENCE.md](docs/COMMANDS-REFERENCE.md) | All CLI commands                           |
+| [docs/COMPONENTS-GUIDE.md](docs/COMPONENTS-GUIDE.md)     | shadcn/ui components catalog               |
 
 ---
 
@@ -169,15 +169,15 @@ orionone/
 
 ## Roadmap
 
-| Sprint | Duration | Focus Area | Status |
-| ------------ | -------------- | ---------------------------------- | ----------- |
-| **Sprint 0** | Nov 1-15 | Infrastructure Setup | Complete |
-| **Sprint 1** | Nov 16-27 (2w) | Authentication & User Management | 70% Done |
-| **Sprint 2** | Nov 28-Dec 6 | Incident + Rich Text + Meilisearch | Planned |
-| **Sprint 3** | Dec 7-17 | Comments & Attachments | Planned |
-| **Sprint 4** | Dec 18-31 | Knowledge Base + Search | Planned |
-| **Sprint 5** | Jan 1-10 | Advanced SLA Management | Planned |
-| **Sprint 6** | Jan 11-31 | Dashboard + Polish + Buffer | Planned |
+| Sprint       | Duration       | Focus Area                         | Status   |
+| ------------ | -------------- | ---------------------------------- | -------- |
+| **Sprint 0** | Nov 1-15       | Infrastructure Setup               | Complete |
+| **Sprint 1** | Nov 16-27 (2w) | Authentication & User Management   | 70% Done |
+| **Sprint 2** | Nov 28-Dec 6   | Incident + Rich Text + Meilisearch | Planned  |
+| **Sprint 3** | Dec 7-17       | Comments & Attachments             | Planned  |
+| **Sprint 4** | Dec 18-31      | Knowledge Base + Search            | Planned  |
+| **Sprint 5** | Jan 1-10       | Advanced SLA Management            | Planned  |
+| **Sprint 6** | Jan 11-31      | Dashboard + Polish + Buffer        | Planned  |
 
 **MVP Target:** January 31, 2026 (13 weeks) • [Full Development Plan →](docs/DEVELOPMENT-PLAN.md)
 
@@ -208,8 +208,8 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 
 **João Santos**
 
-- GitHub: [@JMSS95](https://github.com/JMSS95)
-- Project: [OrionOne](https://github.com/JMSS95/OrionOne)
+-   GitHub: [@JMSS95](https://github.com/JMSS95)
+-   Project: [OrionOne](https://github.com/JMSS95/OrionOne)
 
 > **Academic Project** • CET - Specialist Technician in Information Systems Technologies and Programming
 > Professional Training Center of Évora • 2024/2026
