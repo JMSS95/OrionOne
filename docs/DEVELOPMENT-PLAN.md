@@ -79,10 +79,13 @@ Build a modern, cloud-native ITSM platform that competes with ServiceNow and Zen
 
 - Project structure with modules (auth, users, tickets, etc.)
 - Prisma 6.4.0 configured with PostgreSQL
-- JWT authentication setup
-- Swagger API documentation
-- Winston logging
-- Jest testing framework
+- JWT authentication setup (@nestjs/jwt, passport-jwt)
+- **Swagger API documentation (@nestjs/swagger 11.2.1 configured)**
+  - SwaggerModule setup in main.ts
+  - Base path: /api/docs
+  - API info, version, authentication scheme documented
+- Winston logging (configured, not implemented)
+- Jest testing framework (30.0.0 + ts-jest 29.2.5)
 
  **Frontend (Next.js):**
 
@@ -508,11 +511,38 @@ None - Infrastructure is production-ready.
 
 ### Technical Tasks
 
-- [ ] Comments model (Prisma)
-- [ ] Attachments model (Prisma)
-- [ ] File upload service (local storage)
-- [ ] Activity log for comments
-- [ ] Tests for comments/attachments
+#### Backend (Nest.js)
+
+- [ ] Comments module with CRUD operations
+- [ ] Attachments module with file upload
+- [ ] File upload service (Multer + local/S3 storage)
+- [ ] File validation service (mime type, size, virus scan)
+- [ ] Activity log for comments/attachments
+- [ ] Unit tests (>80% coverage)
+- [ ] E2E tests for all endpoints
+
+#### Frontend (Next.js)
+
+- [ ] Comment list/form components
+- [ ] File upload component with drag & drop
+- [ ] File preview component
+- [ ] Tests with React Testing Library
+
+#### Database (Prisma)
+
+- [ ] Comment model (ticketId, userId, body, isInternal, createdAt)
+- [ ] Attachment model (ticketId, commentId, filename, path, size, mimeType)
+- [ ] Indexes on ticketId, createdAt
+
+### Sprint 3 Deliverables
+
+- [ ] Comments CRUD with rich text (Tiptap)
+- [ ] File upload with drag & drop
+- [ ] Internal notes (agent-only)
+- [ ] Email notifications on comments
+- [ ] @mentions autocomplete
+- [ ] 80%+ test coverage
+- [ ] Swagger API docs updated
 
 ---
 
@@ -533,13 +563,50 @@ None - Infrastructure is production-ready.
 
 ### Technical Tasks
 
-- [ ] Articles model (Prisma) with body as JSON
-- [ ] **Meilisearch integration** for articles
-- [ ] Background job: sync articles to Meilisearch
-- [ ] Similarity search for suggestions
-- [ ] Article-Incident linking (many-to-many)
-- [ ] **Tiptap editor** frontend component
-- [ ] Tests
+#### Backend (Nest.js)
+
+- [ ] Articles module with full CRUD
+- [ ] **Meilisearch service** for articles (index, search, sync)
+- [ ] Background job: sync articles to Meilisearch on create/update
+- [ ] Similarity search algorithm (Meilisearch semantic search)
+- [ ] Article-Incident linking (many-to-many relation)
+- [ ] Category hierarchy management
+- [ ] Version control for articles (draft/published)
+- [ ] Unit tests (>80% coverage)
+- [ ] E2E tests for all endpoints
+
+#### Frontend (Next.js)
+
+- [ ] Articles list page with Meilisearch instant search
+- [ ] Create/edit article page with **Tiptap rich text editor**
+- [ ] Article detail page with suggestions
+- [ ] Category tree navigation
+- [ ] Link article to incident UI
+- [ ] Tests with React Testing Library
+
+#### Database (Prisma)
+
+- [ ] Article model (title, body JSON, categoryId, status, views)
+- [ ] ArticleTag model (many-to-many)
+- [ ] ArticleVersion model (versioning history)
+- [ ] Indexes on categoryId, status, createdAt
+
+#### Meilisearch
+
+- [ ] Configure articles index
+- [ ] Searchable: [title, body, tags]
+- [ ] Filterable: [categoryId, status, authorId]
+- [ ] Sortable: [views, createdAt, updatedAt]
+
+### Sprint 4 Deliverables
+
+- [ ] Knowledge base with rich text editor
+- [ ] Meilisearch instant search with typo tolerance
+- [ ] Smart article suggestions (similarity)
+- [ ] Article versioning (draft/published)
+- [ ] Link articles to incidents
+- [ ] 80%+ test coverage
+- [ ] Swagger API docs updated
 
 ---
 
@@ -562,14 +629,47 @@ None - Infrastructure is production-ready.
 
 ### Technical Tasks
 
-- [ ] SLA policies CRUD
+#### Backend (Nest.js)
+
+- [ ] SLA policies module with CRUD
 - [ ] **Bull queue** for SLA background jobs
-- [ ] Complex date calculation (business hours)
-- [ ] Escalation logic service
-- [ ] Email notification templates
-- [ ] SLA dashboard aggregations
-- [ ] Real-time countdown component
-- [ ] Tests
+- [ ] Business hours calculator service (exclude weekends/holidays)
+- [ ] Holiday calendar CRUD
+- [ ] Escalation engine (80% warning, 100% breach)
+- [ ] SLA pause/resume logic (status-based)
+- [ ] Email notification service (SLA warnings/breaches)
+- [ ] SLA dashboard aggregation queries
+- [ ] Unit tests (>80% coverage)
+- [ ] E2E tests for SLA calculations
+
+#### Frontend (Next.js)
+
+- [ ] SLA policies management UI (admin)
+- [ ] Business hours configuration
+- [ ] Holiday calendar UI
+- [ ] SLA dashboard with charts
+- [ ] Real-time countdown timer (WebSocket)
+- [ ] Breach risk alerts
+- [ ] Tests with React Testing Library
+
+#### Database (Prisma)
+
+- [ ] SLAPolicy model (name, responseTime, resolutionTime)
+- [ ] BusinessHours model (start, end, timezone)
+- [ ] Holiday model (date, name, country)
+- [ ] SLAHistory model (ticketId, policyId, breachedAt)
+
+### Sprint 5 Deliverables
+
+- [ ] SLA policies configuration (admin UI)
+- [ ] Business hours + holiday calendar
+- [ ] Auto-escalation at 80% breach risk
+- [ ] Email notifications (warnings + breaches)
+- [ ] SLA pause/resume functionality
+- [ ] Real-time countdown timers
+- [ ] SLA dashboard (compliance %, breach list)
+- [ ] 80%+ test coverage
+- [ ] Swagger API docs updated
 
 ---
 
@@ -700,65 +800,6 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ## Project Metrics Tracking
 
-- Real-time notifications (WebSocket)
-- Email notifications (templated)
-- Push notifications (optional)
-- Notification preferences
-- Mark as read/unread
-
-### Technical Tasks
-
-- [ ] WebSocket gateway (Nest.js)
-- [ ] Notifications model (Prisma)
-- [ ] Email templates
-- [ ] Real-time updates on frontend
-- [ ] Tests for notifications
-
----
-
-## Sprint 8: Polish, Testing & Deployment (PLANNED)
-
-**Status:** Planned
-**Duration:** 2 weeks (Feb 19 - Mar 5)
-
-### Focus Areas
-
-**Quality:**
-
-- [ ] Increase test coverage to >90%
-- [ ] Performance testing (load tests)
-- [ ] Security audit
-- [ ] Accessibility (WCAG 2.1 AA)
-- [ ] Browser testing (Chrome, Firefox, Safari)
-
-**UI/UX:**
-
-- [ ] Dark mode implementation
-- [ ] Mobile responsiveness
-- [ ] Loading states everywhere
-- [ ] Error handling improvements
-- [ ] Onboarding tutorial
-
-**DevOps:**
-
-- [ ] Production Docker images
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Database backups
-- [ ] Monitoring (Grafana + Prometheus)
-- [ ] Error tracking (Sentry)
-
-**Documentation:**
-
-- [ ] User manual
-- [ ] Admin guide
-- [ ] API documentation complete
-- [ ] Deployment guide
-- [ ] Video tutorials
-
----
-
-## Project Metrics Tracking
-
 ### Code Quality
 
 | Metric | Target | Current | Status |
@@ -791,22 +832,72 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ---
 
+## Test Strategy
+
+### Test Coverage Targets
+
+| Test Type | Target | Scope |
+|-----------|--------|-------|
+| **Unit Tests** | >80% | Services, utilities, pure functions |
+| **Integration Tests** | 100% | All API endpoints (request/response) |
+| **E2E Tests** | Critical paths | User authentication, ticket CRUD, search |
+| **Component Tests** | >70% | React components (rendering, interactions) |
+
+### Test Types by Sprint
+
+**Every Sprint Must Include:**
+
+1. **Backend Tests (Nest.js + Jest + Supertest)**
+   - Unit tests for services/controllers (>80% coverage)
+   - Integration tests for all new API endpoints
+   - E2E tests for critical user flows
+   - Mock external dependencies (Meilisearch, email service)
+
+2. **Frontend Tests (React Testing Library + Jest)**
+   - Component tests (rendering, user interactions)
+   - Form validation tests
+   - API client mocking tests
+   - Accessibility tests (@testing-library/jest-dom)
+
+3. **API Documentation (Swagger)**
+   - All endpoints documented with @ApiOperation()
+   - Request DTOs with @ApiProperty() decorators
+   - Response schemas with @ApiResponse()
+   - Authentication scheme documented
+   - Example requests/responses provided
+
+4. **Security Validation**
+   - npm audit clean (0 vulnerabilities)
+   - CVE check for all dependencies
+   - OWASP Top 10 validation
+   - Input validation tests (SQL injection, XSS)
+
+### Test Execution
+
+- **CI Pipeline:** Run all tests on every PR
+- **Coverage Report:** Generate coverage report on main branch
+- **E2E Tests:** Run on staging environment before production
+- **Performance Tests:** Run weekly (Sprint 6 onwards)
+
+---
+
 ## Definition of Done (DoD)
 
 ### For Each User Story
 
 - [ ] Code implemented and peer-reviewed
-- [ ] Unit tests written (>80% coverage)
-- [ ] Integration tests passing
-- [ ] E2E tests passing (critical paths)
-- [ ] Code linted and formatted
-- [ ] TypeScript strict mode passing
-- [ ] API documented in Swagger
-- [ ] Manual testing completed
-- [ ] Accessibility checked
-- [ ] Responsive design verified
-- [ ] Performance benchmarks met
-- [ ] Documentation updated
+- [ ] **Unit tests written (>80% coverage per module)**
+- [ ] **Integration tests passing (all API endpoints)**
+- [ ] **E2E tests passing (critical user paths)**
+- [ ] Code linted and formatted (ESLint + Prettier)
+- [ ] TypeScript strict mode passing (no any types)
+- [ ] **Swagger API docs updated (request/response schemas, examples)**
+- [ ] **Security validated (no CVE vulnerabilities, npm audit clean)**
+- [ ] Manual testing completed (happy path + edge cases)
+- [ ] Accessibility checked (WCAG 2.1 AA: keyboard, screen reader, contrast)
+- [ ] Responsive design verified (mobile 375px, tablet 768px, desktop 1920px)
+- [ ] Performance benchmarks met (API <200ms p95, Lighthouse >90)
+- [ ] Documentation updated (README, guides, inline comments)
 - [ ] Deployed to staging environment
 - [ ] Product owner approval
 
