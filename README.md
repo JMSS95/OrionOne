@@ -44,7 +44,7 @@
 | Advanced SLA Management | Configurable SLA policies with escalation | Sprint 5 |
 | Dashboard & Analytics | Real-time metrics and team performance stats | Sprint 6 |
 
-**MVP Target:** January 31, 2025 (11 weeks) • [Complete Roadmap →](docs/DEVELOPMENT-PLAN.md)
+**MVP Target:** January 31, 2026 (13 weeks) • [Complete Roadmap →](docs/DEVELOPMENT-PLAN.md)
 
 ---
 
@@ -98,7 +98,7 @@ cd next-frontend && npm install && npm run dev
 | -------------------------------------------------------- | ------------------------------------------ |
 | [SETUP.md](SETUP.md) | Complete setup guide (10 minutes) |
 | [TECH-STACK.md](TECH-STACK.md) | Complete technology stack details |
-| [docs/DEVELOPMENT-PLAN.md](docs/DEVELOPMENT-PLAN.md) | 6-sprint roadmap (11 weeks) |
+| [docs/DEVELOPMENT-PLAN.md](docs/DEVELOPMENT-PLAN.md) | 6-sprint roadmap (13 weeks) |
 | [docs/SPRINT-0-SETUP.md](docs/SPRINT-0-SETUP.md) | Sprint 0 infrastructure setup |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute (workflow + conventions) |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Production deployment guide |
@@ -179,7 +179,7 @@ orionone/
 | **Sprint 5** | Jan 1-10 | Advanced SLA Management | Planned |
 | **Sprint 6** | Jan 11-31 | Dashboard + Polish + Buffer | Planned |
 
-**MVP Target:** January 31, 2025 (11 weeks) • [Full Development Plan →](docs/DEVELOPMENT-PLAN.md)
+**MVP Target:** January 31, 2026 (13 weeks) • [Full Development Plan →](docs/DEVELOPMENT-PLAN.md)
 
 ---
 

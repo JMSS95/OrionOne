@@ -114,14 +114,14 @@ EMOJI_PATTERN = re.compile(
     "\u303d"
     "\u3297"
     "\u3299"
-    "]+", 
+    "]+",
     flags=re.UNICODE
 )
 
 def clean_file(filepath: Path) -> tuple[bool, int]:
     """
     Clean emojis from a single file.
-    
+
     Returns:
         (changed: bool, replacements: int)
     """
@@ -129,45 +129,45 @@ def clean_file(filepath: Path) -> tuple[bool, int]:
         # Read file with UTF-8 encoding
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
-        
+
         original_content = content
-        
+
         # Count emojis before removal
         emojis_found = EMOJI_PATTERN.findall(content)
         replacements = len(emojis_found)
-        
+
         if replacements > 0:
             # Show sample of emojis found
             unique_emojis = set(emojis_found)
             print(f"  - Found {replacements} emojis: {' '.join(list(unique_emojis)[:10])}")
-        
+
         # Remove ALL emojis
         content = EMOJI_PATTERN.sub('', content)
-        
+
         # Clean up multiple spaces that might result from emoji removal
         content = re.sub(r'  +', ' ', content)
-        
+
         # Clean up empty lines with just spaces
         content = re.sub(r'^\s+$', '', content, flags=re.MULTILINE)
-        
+
         # Write back only if changed
         if content != original_content:
             with open(filepath, 'w', encoding='utf-8', newline='\n') as f:
                 f.write(content)
             return True, replacements
-        
+
         return False, 0
-        
+
     except Exception as e:
         print(f"  Error processing {filepath}: {e}")
         return False, 0
 
 def main():
     """Main function to process all documentation files."""
-    
+
     # Define paths to clean
     base_dir = Path(__file__).parent.parent
-    
+
     files_to_clean = [
         base_dir / 'README.md',
         base_dir / 'SETUP.md',
@@ -198,23 +198,23 @@ def main():
         base_dir / 'docs' / 'guides' / 'Sprint-2-guide.md',
         base_dir / 'docs' / 'guides' / 'Sprint-3-guide.md',
     ]
-    
+
     print("Removing ALL emojis from documentation...")
     print(f"Base directory: {base_dir}")
     print(f"Using Unicode emoji pattern matcher")
     print()
-    
+
     total_files_changed = 0
     total_replacements = 0
-    
+
     for filepath in files_to_clean:
         if not filepath.exists():
             print(f"Skipping {filepath.name} (not found)")
             continue
-        
+
         print(f"Processing {filepath.name}...")
         changed, replacements = clean_file(filepath)
-        
+
         if changed:
             total_files_changed += 1
             total_replacements += replacements
@@ -222,7 +222,7 @@ def main():
         else:
             print(f"  {filepath.name} - no emojis found")
         print()
-    
+
     print("=" * 60)
     print(f"Done!")
     print(f"Files changed: {total_files_changed}")
