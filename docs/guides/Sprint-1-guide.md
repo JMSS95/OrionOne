@@ -7,11 +7,11 @@ Implementar sistema completo de autenticação com gestão de utilizadores e RBA
 
 **User Stories:**
 
-- [Completa] US1.1: Registo de Utilizador
-- [Completa] US1.2: Login de Utilizador
-- [Em Curso] US1.3: Reset de Password
-- [Em Curso] US1.4: Gestão de Perfil
-- [Em Curso] US1.5: Controlo de Acesso Baseado em Roles (RBAC)
+-   [Completa] US1.1: Registo de Utilizador
+-   [Completa] US1.2: Login de Utilizador
+-   [Em Curso] US1.3: Reset de Password
+-   [Em Curso] US1.4: Gestão de Perfil
+-   [Em Curso] US1.5: Controlo de Acesso Baseado em Roles (RBAC)
 
 **Pré-requisitos:**
 Sprint 0 completo (Docker a funcionar, Next.js + Nest.js inicializados)
@@ -40,14 +40,14 @@ Escrever a definição do `model User` que irá mapear diretamente para uma tabe
 
 **Campos Obrigatórios:**
 
-- `email` - use `@unique` para garantir que não há duplicados
-- `password` - será armazenada como hash
-- `name` - nome do utilizador
+-   `email` - use `@unique` para garantir que não há duplicados
+-   `password` - será armazenada como hash
+-   `name` - nome do utilizador
 
 **Campos de Suporte:**
 
-- `role` - Para o RBAC (US1.5). Crie um `enum Role` com valores `ADMIN`, `AGENT`, `USER`
-- `isActive` - `Boolean` com `@default(false)` para controlar a ativação da conta após verificação do email
+-   `role` - Para o RBAC (US1.5). Crie um `enum Role` com valores `ADMIN`, `AGENT`, `USER`
+-   `isActive` - `Boolean` com `@default(false)` para controlar a ativação da conta após verificação do email
 
 **Documentação:**
 [Guia Oficial do Prisma sobre Modelos de Dados e Tipos](https://www.prisma.io/docs/orm/prisma-schema/data-model)
@@ -59,10 +59,10 @@ Criar modelo `VerificationToken` crucial para US1.1 (verificação de email) e U
 
 **Campos Necessários:**
 
-- `token` - único, identificador do token
-- `email` - ou uma relação com o `User`
-- `expiresAt` - `DateTime` para controlar expiração
-- `type` - enum `TokenType` com `EMAIL_VERIFICATION` e `PASSWORD_RESET`
+-   `token` - único, identificador do token
+-   `email` - ou uma relação com o `User`
+-   `expiresAt` - `DateTime` para controlar expiração
+-   `type` - enum `TokenType` com `EMAIL_VERIFICATION` e `PASSWORD_RESET`
 
 **Documentação:**
 [Guia Oficial do Prisma sobre Relações](https://www.prisma.io/docs/orm/prisma-schema/data-model/relations)
@@ -122,23 +122,25 @@ Definir a "forma" dos dados que o endpoint de registo espera. É a primeira cama
 
 **Validação Necessária:**
 
-- `@IsEmail()` - valida formato do email
-- `@IsString()` - valida tipo string
-- `@MinLength(8)` - password mínima de 8 caracteres
-- `@Matches()` - força da password (maiúscula, minúscula, número)
+-   `@IsEmail()` - valida formato do email
+-   `@IsString()` - valida tipo string
+-   `@MinLength(8)` - password mínima de 8 caracteres
+-   `@Matches()` - força da password (maiúscula, minúscula, número)
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre Validação](https://docs.nestjs.com/techniques/validation)
 
-#### 2.3. Implementar o Hashing de Password
+#### 2.3. Implementar o Hashing e Logging
 
 **Ficheiro:** `nest-backend/src/auth/auth.service.ts`
 
 **Ação:**
 
-1. Injete o `PrismaService` para comunicar com a BD
-2. Implemente a função `register()`
-3. Use a biblioteca `bcrypt` para fazer hash da password antes de guardar
+1.  Injete o `PrismaService` para comunicar com a BD.
+2.  Injete o `Logger` (`@Inject(WINSTON_MODULE_NEST_PROVIDER)`) para usar o Winston.
+3.  Implemente a função `register()`.
+4.  Use a biblioteca `bcrypt` para fazer hash da password antes de guardar.
+5.  Adicione logs com Winston para sucesso (`.info()`) e falha (`.error()`) no registo.
 
 **Nota:**
 O `AuthService` é o local correto para esta lógica de negócio.
@@ -149,20 +151,22 @@ O `AuthService` é o local correto para esta lógica de negócio.
 #### 2.4. Implementar o Serviço de Email
 
 **Configuração:**
-Configure o `NodemailerModule` (@nestjs/nodemailer) no `AppModule`.
+O `ConfigModule` já está global. Use o `ConfigService` para obter as credenciais do email a partir do `.env`.
 
 **Implementação:**
 
-1. Injete o `MailerService` no `AuthService`
-2. Crie função privada `sendVerificationEmail` que:
- - Gera token aleatório seguro (`crypto.randomBytes`)
- - Guarda token na tabela `VerificationToken`
- - Envia email com link de verificação (`http://localhost:3000/verify-email?token=...`)
+1.  Injete o `MailerService` e o `ConfigService` no `AuthService`.
+2.  Crie uma função privada `sendVerificationEmail` que:
+    -   Gera um token aleatório seguro (`crypto.randomBytes`).
+    -   Guarda o token na tabela `VerificationToken`.
+    -   Envia um email com um link de verificação (`http://localhost:3000/verify-email?token=...`).
+    -   Regista o envio do email com o Winston para auditoria.
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre Email](https://docs.nestjs.com/techniques/email)
+[Guia Oficial do Nest.js sobre Configuração](https://docs.nestjs.com/techniques/configuration)
 
-#### 2.5. Criar o Endpoint de Registo
+#### 2.5. Criar e Documentar o Endpoint de Registo
 
 **Rota:** `POST /api/auth/register`
 
@@ -170,12 +174,14 @@ Configure o `NodemailerModule` (@nestjs/nodemailer) no `AppModule`.
 
 **Implementação:**
 
-- Use decorador `@Body()` para receber `RegisterUserDto`
-- O `ValidationPipe` (em `main.ts`) valida automaticamente o body
-- Se válido, chama `this.authService.register(dto)`
+-   Adicione decoradores do Swagger para documentar o endpoint: `@ApiTags`, `@ApiOperation`, `@ApiResponse`.
+-   Use o decorador `@Body()` para receber o `RegisterUserDto`.
+-   O `ValidationPipe` (configurado globalmente em `main.ts`) valida automaticamente o body.
+-   Se a validação for bem-sucedida, o controller chama o método `register` do `AuthService`.
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre Controllers](https://docs.nestjs.com/controllers)
+[Guia Oficial do Nest.js sobre OpenAPI (Swagger)](https://docs.nestjs.com/openapi/introduction)
 
 #### 2.6. Criar o Endpoint de Verificação
 
@@ -200,24 +206,24 @@ Configure o `NodemailerModule` (@nestjs/nodemailer) no `AppModule`.
 
 ```typescript
 describe("AuthService - Registo", () => {
- it("deve criar utilizador com dados válidos", async () => {
- const dto = {
- email: "test@example.com",
- password: "Test123!@",
- name: "Test",
- };
- const result = await service.register(dto);
- expect(result.userId).toBeDefined();
- });
+    it("deve criar utilizador com dados válidos", async () => {
+        const dto = {
+            email: "test@example.com",
+            password: "Test123!@",
+            name: "Test",
+        };
+        const result = await service.register(dto);
+        expect(result.userId).toBeDefined();
+    });
 
- it("deve lançar ConflictException se email existe", async () => {
- // Criar user primeiro
- await expect(service.register(dto)).rejects.toThrow(ConflictException);
- });
+    it("deve lançar ConflictException se email existe", async () => {
+        // Criar user primeiro
+        await expect(service.register(dto)).rejects.toThrow(ConflictException);
+    });
 
- it("deve fazer hash da password", async () => {
- // Verificar que password guardada != password original
- });
+    it("deve fazer hash da password", async () => {
+        // Verificar que password guardada != password original
+    });
 });
 ```
 
@@ -240,10 +246,10 @@ npm run test -- auth.service.spec.ts
 
 **Estrutura:**
 
-- Esta é uma Rota do App Router por defeito
-- O formulário TEM de ser um Componente de Cliente
-- Crie ficheiro separado `register-form.tsx` com `"use client";` no topo
-- Importe-o na `page.tsx`
+-   Esta é uma Rota do App Router por defeito
+-   O formulário TEM de ser um Componente de Cliente
+-   Crie ficheiro separado `register-form.tsx` com `"use client";` no topo
+-   Importe-o na `page.tsx`
 
 **Documentação:**
 [Guia Oficial do Next.js sobre Componentes de Cliente vs. Servidor](https://nextjs.org/docs/app/building-your-application/rendering/client-components)
@@ -280,12 +286,12 @@ Validação instantânea no browser, melhorando UX antes de qualquer chamada à 
 
 **Componentes Necessários:**
 
-- `Form` - wrapper do formulário
-- `FormField` - campo individual (integra com React Hook Form)
-- `FormControl` - controlo do input
-- `FormMessage` - mensagens de erro
-- `Input` - campos de texto
-- `Button` - botão de submissão
+-   `Form` - wrapper do formulário
+-   `FormField` - campo individual (integra com React Hook Form)
+-   `FormControl` - controlo do input
+-   `FormMessage` - mensagens de erro
+-   `Input` - campos de texto
+-   `Button` - botão de submissão
 
 **Documentação:**
 [Guia Oficial do shadcn/ui sobre Form](https://ui.shadcn.com/docs/components/form)
@@ -327,30 +333,35 @@ try {
 
 1. Navegue para `http://localhost:3000/register`
 2. Teste validações:
- - Submeta formulário vazio → deve mostrar erros
- - Email inválido → erro de formato
- - Password fraca → erro de requisitos
+
+-   Submeta formulário vazio → deve mostrar erros
+-   Email inválido → erro de formato
+-   Password fraca → erro de requisitos
+
 3. Registo válido:
- - Preencha todos os campos corretamente
- - Submeta → mensagem de sucesso
- - Verifique PostgreSQL: user criado com `isActive: false`
- - Console backend: token de verificação
+
+-   Preencha todos os campos corretamente
+-   Submeta → mensagem de sucesso
+-   Verifique PostgreSQL: user criado com `isActive: false`
+-   Console backend: token de verificação
+
 4. Verificação:
- - Copie URL de verificação do console
- - Abra no browser
- - Verifique BD: `isActive: true`
+
+-   Copie URL de verificação do console
+-   Abra no browser
+-   Verifique BD: `isActive: true`
 
 **Teste E2E (Opcional):**
 
 ```typescript
 // next-frontend/e2e/register.spec.ts
 test("fluxo completo de registo", async ({ page }) => {
- await page.goto("/register");
- await page.fill('[name="name"]', "Test User");
- await page.fill('[name="email"]', `test-${Date.now()}@example.com`);
- await page.fill('[name="password"]', "Test123!@");
- await page.click('button[type="submit"]');
- await expect(page.getByText(/check your email/i)).toBeVisible();
+    await page.goto("/register");
+    await page.fill('[name="name"]', "Test User");
+    await page.fill('[name="email"]', `test-${Date.now()}@example.com`);
+    await page.fill('[name="password"]', "Test123!@");
+    await page.click('button[type="submit"]');
+    await expect(page.getByText(/check your email/i)).toBeVisible();
 });
 ```
 
@@ -406,36 +417,45 @@ npm install @nestjs/passport @nestjs/jwt passport passport-local passport-jwt
 **Documentação:**
 [Guia Oficial do Nest.js sobre Autenticação](https://docs.nestjs.com/security/authentication)
 
-#### 2.2. Implementar a LocalStrategy
+#### 2.2. Implementar a LocalStrategy com Rate Limiting
 
 **Ficheiro:** `nest-backend/src/auth/strategies/local.strategy.ts`
 
 **Implementação:**
 
-1. Injete o `AuthService`
-2. Implemente função `validate()`
-3. Recebe `email` e `password`
-4. Procura utilizador e usa `bcrypt.compare()` para verificar password
-5. Se válida, retorna objeto `user`
+1.  Injete o `AuthService`.
+2.  Implemente a função `validate()`.
+3.  Recebe `email` e `password`.
+4.  Procura o utilizador e usa `bcrypt.compare()` para verificar a password.
+5.  Se a password for válida, retorna o objeto `user`.
+6.  Adicione logging com Winston para registar tentativas de login (sucesso e falha).
+
+**Proteção Adicional (Rate Limiting):**
+No `auth.controller.ts`, aplique o decorador `@Throttle({ default: { limit: 3, ttl: 60000 } })` ao endpoint de login para prevenir ataques de força bruta, limitando a 3 tentativas por minuto.
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre LocalStrategy](https://docs.nestjs.com/security/authentication#implementing-localstrategy)
+[Guia Oficial do Nest.js sobre Rate Limiting](https://docs.nestjs.com/security/rate-limiting)
 
-#### 2.3. Implementar a JwtStrategy
+#### 2.3. Implementar a JwtStrategy com Segurança
 
 **Ficheiro:** `nest-backend/src/auth/strategies/jwt.strategy.ts`
 
 **Responsabilidade:**
-Ler e validar JWT em TODOS os pedidos futuros.
+Ler e validar o JWT em TODOS os pedidos futuros, garantindo que apenas utilizadores autenticados acedem a rotas protegidas.
 
 **Fluxo:**
 
-1. Extrai token do cookie `httpOnly`
-2. Valida assinatura e expiração
-3. Anexa payload (`userId`, `role`) ao `request.user`
+1.  Extrai o token do cookie `httpOnly`.
+2.  Usa o `JWT_SECRET` do `.env` (através do `ConfigService`) para validar a assinatura e a expiração do token.
+3.  Anexa o payload do token (`userId`, `role`) ao objeto `request.user`, tornando-o disponível em todos os controllers.
+
+**Segurança Adicional (Helmet):**
+O Helmet, já configurado globalmente em `main.ts`, adiciona uma camada de segurança essencial ao proteger os cabeçalhos HTTP, prevenindo ataques comuns como XSS e clickjacking.
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre JwtStrategy](https://docs.nestjs.com/security/authentication#implementing-jwt)
+[Guia Oficial do Nest.js sobre Helmet](https://docs.nestjs.com/security/helmet)
 
 #### 2.4. Atualizar o AuthService (Login)
 
@@ -448,8 +468,10 @@ Depois da `LocalStrategy` ser bem-sucedida.
 
 1. Recebe objeto `user`
 2. Gera tokens JWT:
- - `accessToken` - 15 minutos
- - `refreshToken` - 7-30 dias
+
+-   `accessToken` - 15 minutos
+-   `refreshToken` - 7-30 dias
+
 3. Guarda `refreshToken` na tabela `Session`
 
 #### 2.5. Criar o Endpoint de Login
@@ -494,45 +516,46 @@ Depois da `LocalStrategy` ser bem-sucedida.
 
 1. **POST** `/auth/login`
 
- - Body: `{ "email": "admin@orionone.com", "password": "Admin123!" }`
- - Verificar: cookies `access_token` e `refresh_token` definidos
- - Status: 200
+-   Body: `{ "email": "admin@orionone.com", "password": "Admin123!" }`
+-   Verificar: cookies `access_token` e `refresh_token` definidos
+-   Status: 200
 
 2. **GET** `/auth/me`
 
- - Usar cookies do passo anterior
- - Verificar: dados do utilizador retornados
- - Status: 200
+-   Usar cookies do passo anterior
+-   Verificar: dados do utilizador retornados
+-   Status: 200
 
 3. **GET** `/auth/me` (sem cookies)
- - Não enviar cookies
- - Verificar: erro de autenticação
- - Status: 401
+
+-   Não enviar cookies
+-   Verificar: erro de autenticação
+-   Status: 401
 
 **Testes Automatizados:**
 
 ```typescript
 // auth.service.spec.ts
 describe("AuthService - Login", () => {
- it("deve validar credenciais corretas", async () => {
- const user = await service.validateUser(
- "admin@orionone.com",
- "Admin123!"
- );
- expect(user).toBeDefined();
- expect(user.email).toBe("admin@orionone.com");
- });
+    it("deve validar credenciais corretas", async () => {
+        const user = await service.validateUser(
+            "admin@orionone.com",
+            "Admin123!"
+        );
+        expect(user).toBeDefined();
+        expect(user.email).toBe("admin@orionone.com");
+    });
 
- it("deve retornar null para password incorreta", async () => {
- const user = await service.validateUser("admin@orionone.com", "wrong");
- expect(user).toBeNull();
- });
+    it("deve retornar null para password incorreta", async () => {
+        const user = await service.validateUser("admin@orionone.com", "wrong");
+        expect(user).toBeNull();
+    });
 
- it("deve gerar tokens JWT", async () => {
- const tokens = await service.login(mockUser);
- expect(tokens.accessToken).toBeDefined();
- expect(tokens.refreshToken).toBeDefined();
- });
+    it("deve gerar tokens JWT", async () => {
+        const tokens = await service.login(mockUser);
+        expect(tokens.accessToken).toBeDefined();
+        expect(tokens.refreshToken).toBeDefined();
+    });
 });
 ```
 
@@ -547,11 +570,11 @@ describe("AuthService - Login", () => {
 **Processo:**
 Siga EXATAMENTE o mesmo processo da Funcionalidade 1.1 (passos 3.1-3.6):
 
-- "use client"
-- Schema Zod
-- React Hook Form
-- shadcn/ui
-- Função `onSubmit` que faz `POST` para `/api/auth/login`
+-   "use client"
+-   Schema Zod
+-   React Hook Form
+-   shadcn/ui
+-   Função `onSubmit` que faz `POST` para `/api/auth/login`
 
 #### 3.2. Configurar o Cliente Axios (CRÍTICO)
 
@@ -578,9 +601,9 @@ Gerir estado global da autenticação.
 
 **Estados:**
 
-- `user` - objeto com dados do utilizador
-- `isAuthenticated` - boolean
-- `isLoading` - boolean
+-   `user` - objeto com dados do utilizador
+-   `isAuthenticated` - boolean
+-   `isLoading` - boolean
 
 **Documentação:**
 [Guia Oficial do React sobre Context](https://react.dev/reference/react/createContext)
@@ -603,9 +626,9 @@ Gerir estado global da autenticação.
 
 **Lógica:**
 
-- Se `isLoading` → mostra spinner
-- Se `!isAuthenticated` e `!isLoading` → redireciona para `/login`
-- Se `isAuthenticated` → renderiza `children`
+-   Se `isLoading` → mostra spinner
+-   Se `!isAuthenticated` e `!isLoading` → redireciona para `/login`
+-   Se `isAuthenticated` → renderiza `children`
 
 **Alternativa:**
 Use Middleware do Next.js para verificação no servidor.
@@ -619,35 +642,36 @@ Use Middleware do Next.js para verificação no servidor.
 
 1. **Login bem-sucedido:**
 
- - Aceda a `/login`
- - Use credenciais do seed (admin@orionone.com / Admin123!)
- - Verifique redirecionamento para dashboard
- - Console: cookies definidos
+-   Aceda a `/login`
+-   Use credenciais do seed (admin@orionone.com / Admin123!)
+-   Verifique redirecionamento para dashboard
+-   Console: cookies definidos
 
 2. **AuthContext funcionando:**
 
- - Após login, verifique `user` no React DevTools
- - `isAuthenticated` deve ser `true`
- - `isLoading` deve ser `false`
+-   Após login, verifique `user` no React DevTools
+-   `isAuthenticated` deve ser `true`
+-   `isLoading` deve ser `false`
 
 3. **Rotas protegidas:**
 
- - Tente aceder `/dashboard` sem login
- - Deve redirecionar para `/login`
- - Após login, `/dashboard` deve ser acessível
+-   Tente aceder `/dashboard` sem login
+-   Deve redirecionar para `/login`
+-   Após login, `/dashboard` deve ser acessível
 
 4. **Logout:**
 
- - Clique botão logout
- - Cookies devem ser limpos (ver DevTools > Application > Cookies)
- - Deve redirecionar para `/login`
- - Tentar aceder `/dashboard` → redireciona novamente
+-   Clique botão logout
+-   Cookies devem ser limpos (ver DevTools > Application > Cookies)
+-   Deve redirecionar para `/login`
+-   Tentar aceder `/dashboard` → redireciona novamente
 
 5. **Token expirado:**
- - Login
- - Espere 16+ minutos (accessToken expira)
- - Tente aceder recurso protegido
- - Deve redirecionar para login (ou renovar com refresh token)
+
+-   Login
+-   Espere 16+ minutos (accessToken expira)
+-   Tente aceder recurso protegido
+-   Deve redirecionar para login (ou renovar com refresh token)
 
 ---
 
@@ -663,8 +687,8 @@ Siga o mesmo padrão vertical para as restantes funcionalidades do sprint.
 
 Endpoints:
 
-- `POST /api/auth/forgot-password` - gera token
-- `POST /api/auth/reset-password/:token` - valida e altera password
+-   `POST /api/auth/forgot-password` - gera token
+-   `POST /api/auth/reset-password/:token` - valida e altera password
 
 Fluxo idêntico à verificação de email, mas usa tipo `PASSWORD_RESET` no `VerificationToken`.
 
@@ -672,8 +696,8 @@ Fluxo idêntico à verificação de email, mas usa tipo `PASSWORD_RESET` no `Ver
 
 Páginas:
 
-- `app/forgot-password/page.tsx` - formulário para pedir reset
-- `app/reset-password/[token]/page.tsx` - formulário para nova password
+-   `app/forgot-password/page.tsx` - formulário para pedir reset
+-   `app/reset-password/[token]/page.tsx` - formulário para nova password
 
 ---
 
@@ -683,8 +707,8 @@ Páginas:
 
 Endpoints protegidos por JWT:
 
-- `PATCH /api/users/me` - atualiza nome/timezone
-- `PATCH /api/users/me/password` - altera password
+-   `PATCH /api/users/me` - atualiza nome/timezone
+-   `PATCH /api/users/me/password` - altera password
 
 Importante: Endpoint de mudança de password deve verificar `oldPassword` com `bcrypt.compare()`
 
@@ -692,35 +716,35 @@ Importante: Endpoint de mudança de password deve verificar `oldPassword` com `b
 
 Página:
 
-- `app/profile/page.tsx` - interface com Tabs (shadcn/ui)
-- Separar "Perfil" de "Segurança"
+-   `app/profile/page.tsx` - interface com Tabs (shadcn/ui)
+-   Separar "Perfil" de "Segurança"
 
 ---
 
-### US1.5: Controlo de Acesso Baseado em Roles (RBAC)
+### US1.5: Controlo de Acesso Baseado em Roles (RBAC) com CASL
 
 **Backend:**
 
-Implementação:
+**Implementação com CASL:**
+A biblioteca CASL, já configurada no Sprint 0, oferece uma forma mais poderosa e flexível de gerir permissões do que um simples `RolesGuard`.
 
-1. Crie `RolesGuard`
-2. Lê metadados (ex: `@Roles('ADMIN')`)
-3. Compara com `request.user.role` (injetado pela `JwtStrategy`)
-4. Proteja endpoints: `@UseGuards(JwtAuthGuard, RolesGuard)` e `@Roles('ADMIN')`
+1.  **Definir Habilidades:** No `casl-ability.factory.ts`, defina o que cada role (`ADMIN`, `AGENT`, `USER`) pode fazer (`Action`) em cada recurso (`Subject`).
+2.  **Criar um `PoliciesGuard`:** Este guarda irá verificar as permissões do utilizador contra a ação necessária para um determinado endpoint.
+3.  **Proteger Endpoints:** Use o `PoliciesGuard` em conjunto com um decorador `@CheckPolicies` para proteger rotas específicas, verificando se o utilizador tem a permissão necessária para a ação.
 
 **Documentação:**
-[Guia Oficial do Nest.js sobre RBAC](https://docs.nestjs.com/security/authorization#basic-rbac-implementation)
+[Guia Oficial do CASL com Nest.js](https://casl.js.org/v6/en/package/casl-nestjs)
 
 **Frontend:**
 
-Implementação:
+**Implementação:**
 
-1. Exponha `user.role` no `AuthContext`
-2. Renderização condicional de elementos UI
-3. Exemplo: mostrar link "Admin" apenas se `user.role === 'ADMIN'`
+1.  Exponha o `user.role` no `AuthContext`.
+2.  Crie um hook `usePermissions` que utilize a biblioteca `@casl/ability` no frontend para verificar permissões de forma reativa e centralizada.
+3.  Renderize componentes da UI (como botões de edição ou links de administração) condicionalmente, com base nas permissões do utilizador atual.
 
 **Documentação:**
-[Guia Oficial do React sobre Renderização Condicional](https://react.dev/learn/conditional-rendering)
+[Guia Oficial do CASL com React](https://casl.js.org/v6/en/package/casl-react)
 
 ---
 
@@ -728,10 +752,10 @@ Implementação:
 
 > **Nota:** Testes práticos estão integrados em cada fase:
 >
-> - **US1.1 Backend:** Fase 2.7 (Unit tests)
-> - **US1.1 Frontend:** Fase 3.7 (Validação manual + E2E)
-> - **US1.2 Backend:** Fase 2.8 (Testes de endpoints)
-> - **US1.2 Frontend:** Fase 3.6 (Validação de autenticação)
+> -   **US1.1 Backend:** Fase 2.7 (Unit tests)
+> -   **US1.1 Frontend:** Fase 3.7 (Validação manual + E2E)
+> -   **US1.2 Backend:** Fase 2.8 (Testes de endpoints)
+> -   **US1.2 Frontend:** Fase 3.6 (Validação de autenticação)
 
 ### Comandos Úteis
 
@@ -769,10 +793,10 @@ npm run test:e2e -- --ui
 
 ### Coverage Mínimo Recomendado
 
-- **Backend Services:** > 80%
-- **Backend Controllers:** > 70%
-- **Frontend Components:** > 70%
-- **E2E Critical Flows:** 100% (Login, Registo)
+-   **Backend Services:** > 80%
+-   **Backend Controllers:** > 70%
+-   **Frontend Components:** > 70%
+-   **E2E Critical Flows:** 100% (Login, Registo)
 
 ### Estrutura de Testes
 
@@ -800,35 +824,35 @@ next-frontend/
 
 ```typescript
 describe("AuthService", () => {
- let service: AuthService;
- let prisma: PrismaService;
+    let service: AuthService;
+    let prisma: PrismaService;
 
- beforeEach(async () => {
- const module = await Test.createTestingModule({
- providers: [
- AuthService,
- { provide: PrismaService, useValue: mockPrisma },
- ],
- }).compile();
+    beforeEach(async () => {
+        const module = await Test.createTestingModule({
+            providers: [
+                AuthService,
+                { provide: PrismaService, useValue: mockPrisma },
+            ],
+        }).compile();
 
- service = module.get<AuthService>(AuthService);
- prisma = module.get<PrismaService>(PrismaService);
- });
+        service = module.get<AuthService>(AuthService);
+        prisma = module.get<PrismaService>(PrismaService);
+    });
 
- it("deve criar utilizador", async () => {
- // Arrange
- const dto = {
- email: "test@example.com",
- password: "Test123!@",
- name: "Test",
- };
+    it("deve criar utilizador", async () => {
+        // Arrange
+        const dto = {
+            email: "test@example.com",
+            password: "Test123!@",
+            name: "Test",
+        };
 
- // Act
- const result = await service.register(dto);
+        // Act
+        const result = await service.register(dto);
 
- // Assert
- expect(result.userId).toBeDefined();
- });
+        // Assert
+        expect(result.userId).toBeDefined();
+    });
 });
 ```
 
@@ -836,31 +860,31 @@ describe("AuthService", () => {
 
 ```typescript
 describe("Auth API (e2e)", () => {
- let app: INestApplication;
+    let app: INestApplication;
 
- beforeAll(async () => {
- const moduleFixture = await Test.createTestingModule({
- imports: [AppModule],
- }).compile();
+    beforeAll(async () => {
+        const moduleFixture = await Test.createTestingModule({
+            imports: [AppModule],
+        }).compile();
 
- app = moduleFixture.createNestApplication();
- await app.init();
- });
+        app = moduleFixture.createNestApplication();
+        await app.init();
+    });
 
- it("POST /auth/register", () => {
- return request(app.getHttpServer())
- .post("/auth/register")
- .send({
- email: "test@example.com",
- password: "Test123!@",
- name: "Test",
- })
- .expect(201);
- });
+    it("POST /auth/register", () => {
+        return request(app.getHttpServer())
+            .post("/auth/register")
+            .send({
+                email: "test@example.com",
+                password: "Test123!@",
+                name: "Test",
+            })
+            .expect(201);
+    });
 
- afterAll(async () => {
- await app.close();
- });
+    afterAll(async () => {
+        await app.close();
+    });
 });
 ```
 
@@ -871,15 +895,15 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { RegisterForm } from "./register-form";
 
 describe("RegisterForm", () => {
- it("deve mostrar erros de validação", async () => {
- render(<RegisterForm />);
+    it("deve mostrar erros de validação", async () => {
+        render(<RegisterForm />);
 
- fireEvent.click(screen.getByRole("button", { name: /register/i }));
+        fireEvent.click(screen.getByRole("button", { name: /register/i }));
 
- await waitFor(() => {
- expect(screen.getByText(/email is required/i)).toBeInTheDocument();
- });
- });
+        await waitFor(() => {
+            expect(screen.getByText(/email is required/i)).toBeInTheDocument();
+        });
+    });
 });
 ```
 
@@ -889,15 +913,15 @@ describe("RegisterForm", () => {
 import { test, expect } from "@playwright/test";
 
 test("fluxo de registo completo", async ({ page }) => {
- await page.goto("/register");
+    await page.goto("/register");
 
- await page.fill('[name="email"]', "test@example.com");
- await page.fill('[name="password"]', "Test123!@");
- await page.fill('[name="name"]', "Test User");
+    await page.fill('[name="email"]', "test@example.com");
+    await page.fill('[name="password"]', "Test123!@");
+    await page.fill('[name="name"]', "Test User");
 
- await page.click('button[type="submit"]');
+    await page.click('button[type="submit"]');
 
- await expect(page.getByText(/check your email/i)).toBeVisible();
+    await expect(page.getByText(/check your email/i)).toBeVisible();
 });
 ```
 
@@ -938,9 +962,9 @@ CORS_ORIGIN="http://localhost:3000"
 
 **Importante:**
 
-- NUNCA commitar `.env` para Git
-- Usar `.env.example` como template
-- Em produção, usar Azure Key Vault ou similar
+-   NUNCA commitar `.env` para Git
+-   Usar `.env.example` como template
+-   Em produção, usar Azure Key Vault ou similar
 
 ---
 
@@ -965,26 +989,26 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
 ```typescript
 async function bootstrap() {
- const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule);
 
- // CORS crítico para cookies httpOnly
- app.enableCors({
- origin: process.env.CORS_ORIGIN || "http://localhost:3000",
- credentials: true, // IMPORTANTE!
- methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
- allowedHeaders: ["Content-Type", "Authorization"],
- });
+    // CORS crítico para cookies httpOnly
+    app.enableCors({
+        origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+        credentials: true, // IMPORTANTE!
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    });
 
- // Global Validation Pipe
- app.useGlobalPipes(
- new ValidationPipe({
- whitelist: true,
- forbidNonWhitelisted: true,
- transform: true,
- })
- );
+    // Global Validation Pipe
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true,
+        })
+    );
 
- await app.listen(process.env.PORT || 8000);
+    await app.listen(process.env.PORT || 8000);
 }
 ```
 
@@ -999,25 +1023,25 @@ async function bootstrap() {
 ```typescript
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
- catch(exception: HttpException, host: ArgumentsHost) {
- const ctx = host.switchToHttp();
- const response = ctx.getResponse();
- const status = exception.getStatus();
- const exceptionResponse = exception.getResponse();
+    catch(exception: HttpException, host: ArgumentsHost) {
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse();
+        const status = exception.getStatus();
+        const exceptionResponse = exception.getResponse();
 
- const error = {
- statusCode: status,
- timestamp: new Date().toISOString(),
- message:
- typeof exceptionResponse === "string"
- ? exceptionResponse
- : (exceptionResponse as any).message ||
- "Internal server error",
- errors: (exceptionResponse as any).errors || [],
- };
+        const error = {
+            statusCode: status,
+            timestamp: new Date().toISOString(),
+            message:
+                typeof exceptionResponse === "string"
+                    ? exceptionResponse
+                    : (exceptionResponse as any).message ||
+                      "Internal server error",
+            errors: (exceptionResponse as any).errors || [],
+        };
 
- response.status(status).json(error);
- }
+        response.status(status).json(error);
+    }
 }
 ```
 
@@ -1035,22 +1059,22 @@ app.useGlobalFilters(new HttpExceptionFilter());
 
 ```typescript
 export function handleApiError(error: any): string {
- if (error.response) {
- // Backend retornou erro
- const message = error.response.data?.message;
+    if (error.response) {
+        // Backend retornou erro
+        const message = error.response.data?.message;
 
- if (Array.isArray(message)) {
- return message.join(", ");
- }
+        if (Array.isArray(message)) {
+            return message.join(", ");
+        }
 
- return message || "Erro no servidor";
- } else if (error.request) {
- // Pedido feito mas sem resposta
- return "Servidor não responde. Verifique a ligação.";
- } else {
- // Erro ao configurar pedido
- return error.message || "Erro desconhecido";
- }
+        return message || "Erro no servidor";
+    } else if (error.request) {
+        // Pedido feito mas sem resposta
+        return "Servidor não responde. Verifique a ligação.";
+    } else {
+        // Erro ao configurar pedido
+        return error.message || "Erro desconhecido";
+    }
 }
 ```
 
@@ -1058,9 +1082,9 @@ export function handleApiError(error: any): string {
 
 ```typescript
 try {
- await registerAction(data);
+    await registerAction(data);
 } catch (err) {
- const errorMessage = handleApiError(err);
- toast({ title: "Erro", description: errorMessage, variant: "destructive" });
+    const errorMessage = handleApiError(err);
+    toast({ title: "Erro", description: errorMessage, variant: "destructive" });
 }
 ```

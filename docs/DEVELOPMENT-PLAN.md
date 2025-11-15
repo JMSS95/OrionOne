@@ -16,37 +16,37 @@
 
 Build a modern, cloud-native ITSM platform that competes with ServiceNow and Zendesk, offering:
 
-- **90% cost savings** compared to market leaders ($20/agent vs $200+)
-- **Superior UX** with Rich Text (Tiptap) + AI Search (Meilisearch)
-- **Professional features** with Basic SLA tracking (24/7 calculation)
-- **Modern stack** with Next.js 15 + Nest.js 11
-- **Target market:** 10-200 employees
+-   **90% cost savings** compared to market leaders ($20/agent vs $200+)
+-   **Superior UX** with Rich Text (Tiptap) + AI Search (Meilisearch)
+-   **Professional features** with Basic SLA tracking (24/7 calculation)
+-   **Modern stack** with Next.js 15 + Nest.js 11
+-   **Target market:** 10-200 employees
 
 **MVP Focus:** Core ITSM functionality that works well. Advanced features (business hours SLA, teams, image paste) moved to post-MVP for incremental releases.
 
 ### Success Metrics
 
-| Metric | Target | Status |
+| Metric                   | Target         | Status |
 | ------------------------ | -------------- | ------ |
-| **Code Coverage** | >80% | TBD |
-| **API Response Time** | <200ms (p95) | TBD |
-| **Frontend Performance** | Lighthouse >90 | TBD |
-| **Uptime** | 99.9% | TBD |
-| **User Satisfaction** | NPS >50 | TBD |
+| **Code Coverage**        | >80%           | TBD    |
+| **API Response Time**    | <200ms (p95)   | TBD    |
+| **Frontend Performance** | Lighthouse >90 | TBD    |
+| **Uptime**               | 99.9%          | TBD    |
+| **User Satisfaction**    | NPS >50        | TBD    |
 
 ---
 
 ## Sprint Overview
 
-| Sprint | Duration | Focus Area | Status |
+| Sprint       | Duration            | Focus Area                             | Status      |
 | ------------ | ------------------- | -------------------------------------- | ----------- |
-| **Sprint 0** | Nov 1-15, 2025 | Infrastructure Setup | Complete |
-| **Sprint 1** | Nov 16-27, 2025 | Authentication & User Management | In Progress |
-| **Sprint 2** | Nov 28-Dec 11, 2025 | Incident + Rich Text (Essential) | Planned |
-| **Sprint 3** | Dec 12-22, 2025 | Comments & Attachments | Planned |
-| **Sprint 4** | Dec 23-Jan 5, 2026 | Knowledge Base + Meilisearch (Unified) | Planned |
-| **Sprint 5** | Jan 6-15, 2026 | Basic SLA Tracking (24/7) | Planned |
-| **Sprint 6** | Jan 16-31, 2026 | Dashboard + Polish + Buffer | Planned |
+| **Sprint 0** | Nov 1-15, 2025      | Infrastructure Setup                   | Complete    |
+| **Sprint 1** | Nov 16-27, 2025     | Authentication & User Management       | In Progress |
+| **Sprint 2** | Nov 28-Dec 11, 2025 | Incident + Rich Text (Essential)       | Planned     |
+| **Sprint 3** | Dec 12-22, 2025     | Comments & Attachments                 | Planned     |
+| **Sprint 4** | Dec 23-Jan 5, 2026  | Knowledge Base + Meilisearch (Unified) | Planned     |
+| **Sprint 5** | Jan 6-15, 2026      | Basic SLA Tracking (24/7)              | Planned     |
+| **Sprint 6** | Jan 16-31, 2026     | Dashboard + Polish + Buffer            | Planned     |
 
 ---
 
@@ -58,53 +58,80 @@ Build a modern, cloud-native ITSM platform that competes with ServiceNow and Zen
 
 ### Objectives
 
-- [x] Setup Docker development environment
-- [x] Configure PostgreSQL 18.0 with extensions
-- [x] Setup Redis 8.2 for caching/sessions
-- [x] Configure Meilisearch 1.25 for search
-- [x] Initialize Nest.js backend project
-- [x] Initialize Next.js frontend project
-- [x] Setup Prisma ORM with PostgreSQL
-- [x] Configure environment variables
-- [x] Setup Git repository and branching strategy
+-   [x] Setup Docker development environment
+-   [x] Configure PostgreSQL 18.0 with extensions
+-   [x] Setup Redis 8.2 for caching/sessions
+-   [x] Configure Meilisearch 1.25 for search
+-   [x] Initialize Nest.js backend project
+-   [x] Initialize Next.js frontend project
+-   [x] Setup Prisma ORM with PostgreSQL
+-   [x] Configure environment variables
+-   [x] Setup Git repository and branching strategy
 
 ### Deliverables
 
 **Infrastructure:**
 
-- Docker Compose with 5 services (app, postgres, redis, meilisearch, nginx)
-- PostgreSQL 18.0 with pgcrypto, pg_trgm, pg_stat_statements extensions
-- Redis 8.2 configured for sessions + queues
-- Meilisearch 1.25 with master key
+-   Docker Compose with 5 services (app, postgres, redis, meilisearch, nginx)
+-   PostgreSQL 18.0 with pgcrypto, pg_trgm, pg_stat_statements extensions
+-   Redis 8.2 configured for sessions + queues
+-   Meilisearch 1.25 with master key
 
- **Backend (Nest.js):**
+    **Backend (Nest.js):**
 
-- Project structure with modules (auth, users, tickets, etc.)
-- Prisma 6.4.0 configured with PostgreSQL
-- JWT authentication setup (@nestjs/jwt, passport-jwt)
-- **Swagger API documentation (@nestjs/swagger 11.2.1 configured)**
- - SwaggerModule setup in main.ts
- - Base path: /api/docs
- - API info, version, authentication scheme documented
-- Winston logging (configured, not implemented)
-- Jest testing framework (30.0.0 + ts-jest 29.2.5)
+-   Project structure with modules (auth, users, tickets, etc.)
+-   Prisma 6.4.0 configured with PostgreSQL
+-   JWT authentication setup (@nestjs/jwt, passport-jwt)
+-   **Swagger API documentation (@nestjs/swagger 11.2.1)
+-   SwaggerModule setup in main.ts at `/api/docs`
+-   DocumentBuilder with API info, tags, Bearer auth
+-   Example: http://localhost:3001/api/docs
+-   **Winston logging 
+-   Structured logging with file rotation (error.log, combined.log)
+-   Custom transports (console, file, exceptions, rejections)
+-   Log levels: error, warn, info, http, verbose, debug
+-   Integration via WINSTON_MODULE_NEST_PROVIDER
+-   **Helmet security headers 
+-   CSP, X-Frame-Options, X-Content-Type-Options
+-   HSTS, X-DNS-Prefetch-Control
+-   Applied globally in main.ts
+-   **Compression middleware 
+-   Gzip/Deflate for all responses (~60-80% reduction)
+-   Automatic content negotiation
+-   **Rate limiting (@nestjs/throttler) 
+-   Global: 10 requests/minute
+-   Per-route override available
+-   Protection against brute-force attacks
+-   **Environment config (@nestjs/config) 
+-   Global ConfigModule with .env support
+-   ConfigService for type-safe access
+-   .env.example template provided
+-   **CASL authorization 
+-   Role-based permissions (ADMIN, AGENT, USER)
+-   AbilityFactory pattern for dynamic permissions
+-   4 subjects: Incident, User, KnowledgeBase, Comment
+-   **Validation Pipe 
+-   Global validation with class-validator
+-   whitelist, forbidNonWhitelisted, transform enabled
+-   Automatic DTO validation
+-   Jest testing framework (30.0.0 + ts-jest 29.2.5)
 
- **Frontend (Next.js):**
+    **Frontend (Next.js):**
 
-- Next.js 15.5.6 with App Router
-- React 19.2.0
-- Tailwind CSS v4
-- shadcn/ui configuration
-- Axios 1.13.2 for API calls
-- React Hook Form + Zod validation
+-   Next.js 15.5.6 with App Router
+-   React 19.2.0
+-   Tailwind CSS v4
+-   shadcn/ui configuration
+-   Axios 1.13.2 for API calls
+-   React Hook Form + Zod validation
 
- **Documentation:**
+    **Documentation:**
 
-- SETUP.md - Quick start guide
-- COMMANDS-REFERENCE.md - All commands documented
-- TECHNOLOGY-AUDIT-2025.md - Tech stack analysis
-- database-schema.md - Database design
-- architecture.md - System architecture
+-   SETUP.md - Quick start guide
+-   COMMANDS-REFERENCE.md - All commands documented
+-   TECHNOLOGY-AUDIT-2025.md - Tech stack analysis
+-   database-schema.md - Database design
+-   architecture.md - System architecture
 
 ### Technical Debt
 
@@ -128,23 +155,23 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Registration form with email, password, name
-- [ ] Email validation (format + unique)
-- [ ] Password strength requirements (min 8 chars, uppercase, lowercase, number)
-- [ ] Email verification link sent
-- [ ] Account activated after email verification
-- [ ] Success toast + redirect to login
+-   [ ] Registration form with email, password, name
+-   [ ] Email validation (format + unique)
+-   [ ] Password strength requirements (min 8 chars, uppercase, lowercase, number)
+-   [ ] Email verification link sent
+-   [ ] Account activated after email verification
+-   [ ] Success toast + redirect to login
 
 **API Endpoints:**
 
-- `POST /api/auth/register`
-- `POST /api/auth/verify-email/:token`
+-   `POST /api/auth/register`
+-   `POST /api/auth/verify-email/:token`
 
 **Tests:**
 
-- [ ] Unit: Password hashing
-- [ ] Integration: Registration flow
-- [ ] E2E: Full registration + verification
+-   [ ] Unit: Password hashing
+-   [ ] Integration: Registration flow
+-   [ ] E2E: Full registration + verification
 
 ---
 
@@ -156,24 +183,24 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Login form with email + password
-- [ ] JWT token returned on success
-- [ ] Token stored in httpOnly cookie
-- [ ] Invalid credentials show error message
-- [ ] Redirect to dashboard after login
-- [ ] Remember me option (30-day token)
+-   [ ] Login form with email + password
+-   [ ] JWT token returned on success
+-   [ ] Token stored in httpOnly cookie
+-   [ ] Invalid credentials show error message
+-   [ ] Redirect to dashboard after login
+-   [ ] Remember me option (30-day token)
 
 **API Endpoints:**
 
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-- `GET /api/auth/me`
+-   `POST /api/auth/login`
+-   `POST /api/auth/logout`
+-   `GET /api/auth/me`
 
 **Tests:**
 
-- [ ] Unit: JWT token generation
-- [ ] Integration: Login/logout flow
-- [ ] E2E: Login + access protected route
+-   [ ] Unit: JWT token generation
+-   [ ] Integration: Login/logout flow
+-   [ ] E2E: Login + access protected route
 
 ---
 
@@ -185,16 +212,16 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Forgot password form with email
-- [ ] Reset link sent to email (expires in 1 hour)
-- [ ] Reset password form with new password
-- [ ] Password updated + confirmation email
-- [ ] Old tokens invalidated
+-   [ ] Forgot password form with email
+-   [ ] Reset link sent to email (expires in 1 hour)
+-   [ ] Reset password form with new password
+-   [ ] Password updated + confirmation email
+-   [ ] Old tokens invalidated
 
 **API Endpoints:**
 
-- `POST /api/auth/forgot-password`
-- `POST /api/auth/reset-password/:token`
+-   `POST /api/auth/forgot-password`
+-   `POST /api/auth/reset-password/:token`
 
 ---
 
@@ -206,18 +233,18 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] View profile page with avatar, name, email, role
-- [ ] Edit profile form (name, avatar, timezone, language)
-- [ ] Change password form
-- [ ] Upload avatar (max 2MB, jpg/png)
-- [ ] Success notification on update
+-   [ ] View profile page with avatar, name, email, role
+-   [ ] Edit profile form (name, avatar, timezone, language)
+-   [ ] Change password form
+-   [ ] Upload avatar (max 2MB, jpg/png)
+-   [ ] Success notification on update
 
 **API Endpoints:**
 
-- `GET /api/users/me`
-- `PATCH /api/users/me`
-- `POST /api/users/me/avatar`
-- `PATCH /api/users/me/password`
+-   `GET /api/users/me`
+-   `PATCH /api/users/me`
+-   `POST /api/users/me/avatar`
+-   `PATCH /api/users/me/password`
 
 ---
 
@@ -229,17 +256,17 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Roles: ADMIN, AGENT, USER (defined in Prisma)
-- [ ] Permissions: VIEW_TICKETS, CREATE_TICKETS, ASSIGN_TICKETS, etc.
-- [ ] Guards on API routes (check roles)
-- [ ] Frontend shows/hides UI based on permissions
-- [ ] Unauthorized access returns 403
+-   [ ] Roles: ADMIN, AGENT, USER (defined in Prisma)
+-   [ ] Permissions: VIEW_TICKETS, CREATE_TICKETS, ASSIGN_TICKETS, etc.
+-   [ ] Guards on API routes (check roles)
+-   [ ] Frontend shows/hides UI based on permissions
+-   [ ] Unauthorized access returns 403
 
 **API Endpoints:**
 
-- `GET /api/roles`
-- `GET /api/permissions`
-- `POST /api/users/:id/roles`
+-   `GET /api/roles`
+-   `GET /api/permissions`
+-   `POST /api/users/:id/roles`
 
 ---
 
@@ -247,36 +274,36 @@ None - Infrastructure is production-ready.
 
 #### Backend (Nest.js)
 
-- [x] Auth module with JWT strategy
-- [x] Users module with CRUD operations
-- [ ] Password hashing with bcrypt v6
-- [ ] Email service with Nodemailer
-- [ ] Guards: JwtAuthGuard, RolesGuard
-- [ ] Decorators: @CurrentUser(), @Roles()
-- [ ] DTOs: RegisterDto, LoginDto, UpdateProfileDto
-- [ ] Unit tests for AuthService, UsersService
-- [ ] E2E tests for auth endpoints
+-   [x] Auth module with JWT strategy
+-   [x] Users module with CRUD operations
+-   [ ] Password hashing with bcrypt v6
+-   [ ] Email service with Nodemailer
+-   [ ] Guards: JwtAuthGuard, RolesGuard
+-   [ ] Decorators: @CurrentUser(), @Roles()
+-   [ ] DTOs: RegisterDto, LoginDto, UpdateProfileDto
+-   [ ] Unit tests for AuthService, UsersService
+-   [ ] E2E tests for auth endpoints
 
 #### Frontend (Next.js)
 
-- [ ] Auth context provider
-- [ ] Login page (/login)
-- [ ] Register page (/register)
-- [ ] Forgot password page (/forgot-password)
-- [ ] Reset password page (/reset-password/:token)
-- [ ] Profile page (/profile)
-- [ ] Protected route wrapper (RequireAuth)
-- [ ] API client with token refresh
-- [ ] Form validation with Zod
-- [ ] Tests with React Testing Library
+-   [ ] Auth context provider
+-   [ ] Login page (/login)
+-   [ ] Register page (/register)
+-   [ ] Forgot password page (/forgot-password)
+-   [ ] Reset password page (/reset-password/:token)
+-   [ ] Profile page (/profile)
+-   [ ] Protected route wrapper (RequireAuth)
+-   [ ] API client with token refresh
+-   [ ] Form validation with Zod
+-   [ ] Tests with React Testing Library
 
 #### Database (Prisma)
 
-- [x] User model with fields: id, email, password, name, avatar, role
-- [x] Role enum: ADMIN, AGENT, USER
-- [x] Sessions table for refresh tokens
-- [x] Password reset tokens table
-- [ ] Seed admin user + test users
+-   [x] User model with fields: id, email, password, name, avatar, role
+-   [x] Role enum: ADMIN, AGENT, USER
+-   [x] Sessions table for refresh tokens
+-   [x] Password reset tokens table
+-   [ ] Seed admin user + test users
 
 ---
 
@@ -284,24 +311,57 @@ None - Infrastructure is production-ready.
 
 **Backend:**
 
-- JWT authentication working
-- User CRUD endpoints
-- Email verification
-- Password reset flow
-- RBAC implementation
-- 80%+ test coverage
+-   JWT authentication working
+-   User CRUD endpoints
+-   Email verification
+-   Password reset flow
+-   RBAC implementation
+-   80%+ test coverage
 
 **Frontend:**
 
-- Authentication pages (login, register, reset)
-- Profile management page
-- Protected routes
-- Auth context + token management
+-   Authentication pages (login, register, reset)
+-   Profile management page
+-   Protected routes
+-   Auth context + token management
 
 **Documentation:**
 
-- API docs updated (Swagger)
-- User guide for authentication
+-   API docs updated (Swagger)
+-   User guide for authentication
+
+**Technologies Used in Sprint 1:**
+
+| Technology       | Usage                       | Implementation Details                                              |
+| ---------------- | --------------------------- | ------------------------------------------------------------------- |
+| **Swagger**      | Document all auth endpoints | Add @ApiTags('auth'), @ApiOperation, @ApiResponse to AuthController |
+| **Winston**      | Log authentication events   | Log login attempts, password resets, email verifications            |
+| **Helmet**       | Secure auth endpoints       | Already active globally, protects against XSS/CSRF                  |
+| **Throttler**    | Rate limit login attempts   | Apply @Throttle({ limit: 3, ttl: 60000 }) to POST /auth/login       |
+| **CASL**         | Implement RBAC              | Define abilities for ADMIN, AGENT, USER roles                       |
+| **Validation**   | Validate auth DTOs          | Use @IsEmail(), @MinLength(8), @IsEnum() in RegisterDto, LoginDto   |
+| **ConfigModule** | Manage JWT secrets          | Access JWT_SECRET, JWT_EXPIRES_IN via ConfigService                 |
+| **Bcrypt**       | Hash passwords              | Hash with 12 rounds on registration, compare on login               |
+
+**Code Examples:**
+
+```typescript
+// Throttle login attempts (AuthController)
+@Post('login')
+@Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 attempts/minute
+@ApiOperation({ summary: 'Login user' })
+async login(@Body() dto: LoginDto) {}
+
+// Log authentication events (AuthService)
+this.logger.log(`User ${user.email} logged in`, 'AuthService');
+this.logger.error(`Failed login attempt: ${email}`, 'AuthService');
+
+// CASL permissions check
+const ability = this.casl.createForUser(user);
+if (!ability.can(Action.Update, 'User')) {
+  throw new ForbiddenException();
+}
+```
 
 ---
 
@@ -321,20 +381,20 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Create incident form with: title, description (rich text), priority, category
-- [ ] **Tiptap rich text editor** with essential formatting (bold, italic, lists, code, links, headings)
-- [ ] Markdown shortcuts support (##, \*\*, --)
-- [ ] Character counter + placeholder
-- [ ] Auto-generate incident number (INC-YYYYMMDD-NNNN)
-- [ ] **EXCLUDED (Post-MVP P2):** Image paste, tables, embeds, mentions
-- [ ] Manual assignment to agent (dropdown)
-- [ ] Success toast + redirect to incident detail
+-   [ ] Create incident form with: title, description (rich text), priority, category
+-   [ ] **Tiptap rich text editor** with essential formatting (bold, italic, lists, code, links, headings)
+-   [ ] Markdown shortcuts support (##, \*\*, --)
+-   [ ] Character counter + placeholder
+-   [ ] Auto-generate incident number (INC-YYYYMMDD-NNNN)
+-   [ ] **EXCLUDED (Post-MVP P2):** Image paste, tables, embeds, mentions
+-   [ ] Manual assignment to agent (dropdown)
+-   [ ] Success toast + redirect to incident detail
 
 **API Endpoints:**
 
-- `POST /api/incidents`
-- `GET /api/categories`
-- `GET /api/users?role=AGENT`
+-   `POST /api/incidents`
+-   `GET /api/categories`
+-   `GET /api/users?role=AGENT`
 
 ---
 
@@ -346,14 +406,14 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Simple search input (incident number or title)
-- [ ] PostgreSQL ILIKE search (case-insensitive)
-- [ ] Search bar in incidents list header
-- [ ] **EXCLUDED (Sprint 4):** Meilisearch full-text search, typo tolerance, search highlights
+-   [ ] Simple search input (incident number or title)
+-   [ ] PostgreSQL ILIKE search (case-insensitive)
+-   [ ] Search bar in incidents list header
+-   [ ] **EXCLUDED (Sprint 4):** Meilisearch full-text search, typo tolerance, search highlights
 
 **API Endpoints:**
 
-- `GET /api/incidents?search=query`
+-   `GET /api/incidents?search=query`
 
 ---
 
@@ -365,17 +425,17 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Table with columns: incident#, title, status, priority, assignee, created date
-- [ ] **Quick filters** (sidebar): All, My Incidents, Unassigned, Open, Closed
-- [ ] **Single-select filters**: Status dropdown, Priority dropdown, Assigned To dropdown
-- [ ] Sort by: created (desc), updated (desc), priority
-- [ ] Pagination: offset-based (25 per page)
-- [ ] Click row to view details
-- [ ] **EXCLUDED (Post-MVP P3):** Saved filters, advanced filter builder, date range picker
+-   [ ] Table with columns: incident#, title, status, priority, assignee, created date
+-   [ ] **Quick filters** (sidebar): All, My Incidents, Unassigned, Open, Closed
+-   [ ] **Single-select filters**: Status dropdown, Priority dropdown, Assigned To dropdown
+-   [ ] Sort by: created (desc), updated (desc), priority
+-   [ ] Pagination: offset-based (25 per page)
+-   [ ] Click row to view details
+-   [ ] **EXCLUDED (Post-MVP P3):** Saved filters, advanced filter builder, date range picker
 
 **API Endpoints:**
 
-- `GET /api/incidents?status=...&priority=...&assigneeId=...&sort=...&page=...`
+-   `GET /api/incidents?status=...&priority=...&assigneeId=...&sort=...&page=...`
 
 ---
 
@@ -387,15 +447,15 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Edit form for title, description (rich text), status, priority, assignee
-- [ ] Status workflow: New → In Progress → Resolved → Closed
-- [ ] Activity log records all changes
-- [ ] Email notification on status change
-- [ ] Optimistic UI updates
+-   [ ] Edit form for title, description (rich text), status, priority, assignee
+-   [ ] Status workflow: New → In Progress → Resolved → Closed
+-   [ ] Activity log records all changes
+-   [ ] Email notification on status change
+-   [ ] Optimistic UI updates
 
 **API Endpoints:**
 
-- `PATCH /api/incidents/:id`
+-   `PATCH /api/incidents/:id`
 
 ---
 
@@ -403,54 +463,93 @@ None - Infrastructure is production-ready.
 
 #### Backend (Nest.js)
 
-- [ ] Incidents module with full CRUD
-- [ ] DTO validation (create, update, basic filters)
-- [ ] Auto-generate incident number function
-- [ ] Basic filtering logic (status, priority, assignee)
-- [ ] Simple search (PostgreSQL ILIKE on title + number)
-- [ ] Activity logging integration
-- [ ] Email notifications service (assigned, status changed)
-- [ ] Unit tests (>80% coverage)
-- [ ] E2E tests for all endpoints
+-   [ ] Incidents module with full CRUD
+-   [ ] DTO validation (create, update, basic filters)
+-   [ ] Auto-generate incident number function
+-   [ ] Basic filtering logic (status, priority, assignee)
+-   [ ] Simple search (PostgreSQL ILIKE on title + number)
+-   [ ] Activity logging integration
+-   [ ] Email notifications service (assigned, status changed)
+-   [ ] Unit tests (>80% coverage)
+-   [ ] E2E tests for all endpoints
 
 #### Frontend (Next.js)
 
-- [ ] Incidents list page (/incidents)
-- [ ] Create incident page (/incidents/create)
-- [ ] Incident detail page (/incidents/:id)
-- [ ] Edit incident page (/incidents/:id/edit)
-- [ ] **Tiptap rich text editor component** (essential formatting only)
-- [ ] Simple search input (header)
-- [ ] Quick filters sidebar (All, My Incidents, Unassigned, Open, Closed)
-- [ ] Single-select filter dropdowns (Status, Priority, Assignee)
-- [ ] Components: IncidentCard, IncidentTable, IncidentForm
-- [ ] Status/priority badge components
-- [ ] Tests for all components
+-   [ ] Incidents list page (/incidents)
+-   [ ] Create incident page (/incidents/create)
+-   [ ] Incident detail page (/incidents/:id)
+-   [ ] Edit incident page (/incidents/:id/edit)
+-   [ ] **Tiptap rich text editor component** (essential formatting only)
+-   [ ] Simple search input (header)
+-   [ ] Quick filters sidebar (All, My Incidents, Unassigned, Open, Closed)
+-   [ ] Single-select filter dropdowns (Status, Priority, Assignee)
+-   [ ] Components: IncidentCard, IncidentTable, IncidentForm
+-   [ ] Status/priority badge components
+-   [ ] Tests for all components
 
 #### Database (Prisma)
 
-- [ ] Incident model with all fields (description as JSON for Tiptap)
-- [ ] Category model (Hardware, Software, Network, etc.)
-- [ ] IncidentStatus enum (NEW, IN_PROGRESS, RESOLVED, CLOSED)
-- [ ] IncidentPriority enum (P1, P2, P3, P4)
-- [ ] Indexes on status, priority, assigneeId, createdAt
-- [ ] Seed 50+ test incidents
-- [ ] **NOTE:** Meilisearch configuration moved to Sprint 4 (consolidated with Knowledge Base)
+-   [ ] Incident model with all fields (description as JSON for Tiptap)
+-   [ ] Category model (Hardware, Software, Network, etc.)
+-   [ ] IncidentStatus enum (NEW, IN_PROGRESS, RESOLVED, CLOSED)
+-   [ ] IncidentPriority enum (P1, P2, P3, P4)
+-   [ ] Indexes on status, priority, assigneeId, createdAt
+-   [ ] Seed 50+ test incidents
+-   [ ] **NOTE:** Meilisearch configuration moved to Sprint 4 (consolidated with Knowledge Base)
+
+**Technologies Used in Sprint 2:**
+
+| Technology       | Usage                             | Implementation Details                                          |
+| ---------------- | --------------------------------- | --------------------------------------------------------------- |
+| **Swagger**      | Document incident CRUD endpoints  | @ApiTags('incidents'), document filters, pagination, search     |
+| **Winston**      | Log incident operations           | Log create, update, status changes, search queries              |
+| **Validation**   | Validate incident DTOs            | @IsString(), @IsEnum(), @IsOptional() for filters               |
+| **CASL**         | Authorize incident operations     | Check user.can(Action.Update, 'Incident') before allowing edits |
+| **Tiptap**       | Rich text editor for descriptions | Implement Tiptap with StarterKit + Markdown shortcuts           |
+| **Compression**  | Compress incident list responses  | Already active, reduces large JSON payloads by ~70%             |
+| **ConfigModule** | Manage incident settings          | Configure max incidents per page, search timeout                |
+
+**Code Examples:**
+
+```typescript
+// Document incident endpoints (IncidentsController)
+@ApiTags("incidents")
+@ApiBearerAuth()
+@Controller("incidents")
+export class IncidentsController {
+    @Get()
+    @ApiOperation({ summary: "List incidents with filters" })
+    @ApiQuery({ name: "status", enum: IncidentStatus, required: false })
+    @ApiQuery({ name: "priority", enum: IncidentPriority, required: false })
+    async findAll(@Query() filters: FilterIncidentsDto) {}
+}
+
+// Log incident creation (IncidentsService)
+this.logger.log(
+    `Incident ${incident.number} created by ${user.email}`,
+    "IncidentsService"
+);
+
+// Authorization check
+if (!ability.can(Action.Update, "Incident")) {
+    throw new ForbiddenException("Cannot update incident");
+}
+```
 
 ---
 
 ### Sprint 2 Deliverables
 
-- [ ] Full incident CRUD with **Tiptap rich text editor** (essential formatting)
-- [ ] Simple search (PostgreSQL ILIKE on title + number)
-- [ ] Quick filters (All, My Incidents, Unassigned, Open, Closed)
-- [ ] Single-select filters (Status, Priority, Assignee)
-- [ ] Manual assignment to agents
-- [ ] Activity logging
-- [ ] Email notifications (assigned, status changed)
-- [ ] 80%+ test coverage
-- [ ] Swagger API docs updated
-- [ ] **MOVED TO POST-MVP:** Image paste (P2), Saved filters (P3), Meilisearch full-text (Sprint 4)
+-   [ ] Full incident CRUD with **Tiptap rich text editor** (essential formatting)
+-   [ ] Simple search (PostgreSQL ILIKE on title + number)
+-   [ ] Quick filters (All, My Incidents, Unassigned, Open, Closed)
+-   [ ] Single-select filters (Status, Priority, Assignee)
+-   [ ] Manual assignment to agents
+-   [ ] Activity logging
+-   [ ] Email notifications (assigned, status changed)
+-   [ ] 80%+ test coverage
+-   [ ] Swagger API docs updated
+-   [ ] **MOVED TO POST-MVP:** Image paste (P2), Saved filters (P3), Meilisearch full-text (Sprint 4)
 
 ---
 
@@ -470,12 +569,12 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Comment form on ticket detail page
-- [ ] Rich text editor (Tiptap)
-- [ ] @mentions with autocomplete
-- [ ] Internal notes (visible to agents only)
-- [ ] Email notification on new comment
-- [ ] Real-time comment updates (optional)
+-   [ ] Comment form on ticket detail page
+-   [ ] Rich text editor (Tiptap)
+-   [ ] @mentions with autocomplete
+-   [ ] Internal notes (visible to agents only)
+-   [ ] Email notification on new comment
+-   [ ] Real-time comment updates (optional)
 
 ---
 
@@ -487,13 +586,13 @@ None - Infrastructure is production-ready.
 
 **Acceptance Criteria:**
 
-- [ ] Drag & drop file upload
-- [ ] Multiple files (max 5 per upload)
-- [ ] File size limit (10MB per file)
-- [ ] Allowed formats: jpg, png, pdf, txt, log, zip
-- [ ] Preview images inline
-- [ ] Download button for files
-- [ ] Delete attachment (with confirmation)
+-   [ ] Drag & drop file upload
+-   [ ] Multiple files (max 5 per upload)
+-   [ ] File size limit (10MB per file)
+-   [ ] Allowed formats: jpg, png, pdf, txt, log, zip
+-   [ ] Preview images inline
+-   [ ] Download button for files
+-   [ ] Delete attachment (with confirmation)
 
 ---
 
@@ -501,36 +600,72 @@ None - Infrastructure is production-ready.
 
 #### Backend (Nest.js)
 
-- [ ] Comments module with CRUD operations
-- [ ] Attachments module with file upload
-- [ ] File upload service (Multer + local/S3 storage)
-- [ ] File validation service (mime type, size, virus scan)
-- [ ] Activity log for comments/attachments
-- [ ] Unit tests (>80% coverage)
-- [ ] E2E tests for all endpoints
+-   [ ] Comments module with CRUD operations
+-   [ ] Attachments module with file upload
+-   [ ] File upload service (Multer + local/S3 storage)
+-   [ ] File validation service (mime type, size, virus scan)
+-   [ ] Activity log for comments/attachments
+-   [ ] Unit tests (>80% coverage)
+-   [ ] E2E tests for all endpoints
 
 #### Frontend (Next.js)
 
-- [ ] Comment list/form components
-- [ ] File upload component with drag & drop
-- [ ] File preview component
-- [ ] Tests with React Testing Library
+-   [ ] Comment list/form components
+-   [ ] File upload component with drag & drop
+-   [ ] File preview component
+-   [ ] Tests with React Testing Library
 
 #### Database (Prisma)
 
-- [ ] Comment model (ticketId, userId, body, isInternal, createdAt)
-- [ ] Attachment model (ticketId, commentId, filename, path, size, mimeType)
-- [ ] Indexes on ticketId, createdAt
+-   [ ] Comment model (ticketId, userId, body, isInternal, createdAt)
+-   [ ] Attachment model (ticketId, commentId, filename, path, size, mimeType)
+-   [ ] Indexes on ticketId, createdAt
 
 ### Sprint 3 Deliverables
 
-- [ ] Comments CRUD with rich text (Tiptap)
-- [ ] File upload with drag & drop
-- [ ] Internal notes (agent-only)
-- [ ] Email notifications on comments
-- [ ] @mentions autocomplete
-- [ ] 80%+ test coverage
-- [ ] Swagger API docs updated
+-   [ ] Comments CRUD with rich text (Tiptap)
+-   [ ] File upload with drag & drop
+-   [ ] Internal notes (agent-only)
+-   [ ] Email notifications on comments
+-   [ ] @mentions autocomplete
+-   [ ] 80%+ test coverage
+-   [ ] Swagger API docs updated
+
+**Technologies Used in Sprint 3:**
+
+| Technology      | Usage                              | Implementation Details                                |
+| --------------- | ---------------------------------- | ----------------------------------------------------- |
+| **Swagger**     | Document comments/attachments APIs | @ApiConsumes('multipart/form-data') for file uploads  |
+| **Winston**     | Log file operations                | Log uploads, downloads, deletions with file size/type |
+| **Validation**  | Validate file uploads              | Custom validators for file size, mime type            |
+| **Multer**      | Handle file uploads                | Configure storage (local/S3), filename sanitization   |
+| **Tiptap**      | Rich text in comments              | Reuse editor component from incidents                 |
+| **CASL**        | Authorize comment/attachment ops   | Check user.can(Action.Create, 'Comment')              |
+| **Compression** | Compress comment list responses    | Already active, helps with large comment threads      |
+
+**Code Examples:**
+
+```typescript
+// Document file upload (AttachmentsController)
+@Post('upload')
+@ApiConsumes('multipart/form-data')
+@ApiBody({
+  schema: {
+    type: 'object',
+    properties: {
+      files: { type: 'array', items: { type: 'string', format: 'binary' } }
+    }
+  }
+})
+@UseInterceptors(FilesInterceptor('files', 5))
+async upload(@UploadedFiles() files: Express.Multer.File[]) {}
+
+// Log file uploads (AttachmentsService)
+this.logger.log(
+  `User ${user.id} uploaded ${files.length} files (${totalSize} bytes)`,
+  'AttachmentsService'
+);
+```
 
 ---
 
@@ -542,59 +677,113 @@ None - Infrastructure is production-ready.
 
 ### User Stories
 
-- Create knowledge articles with **Tiptap rich text**
-- **Meilisearch** typo-tolerant search
-- Link articles to incidents
-- Smart article suggestions (Meilisearch similarity)
-- Category organization
-- Draft/Published status
+-   Create knowledge articles with **Tiptap rich text**
+-   **Meilisearch** typo-tolerant search
+-   Link articles to incidents
+-   Smart article suggestions (Meilisearch similarity)
+-   Category organization
+-   Draft/Published status
 
 ### Technical Tasks
 
 #### Backend (Nest.js)
 
-- [ ] Articles module with full CRUD
-- [ ] **Meilisearch service** for articles (index, search, sync)
-- [ ] Background job: sync articles to Meilisearch on create/update
-- [ ] Similarity search algorithm (Meilisearch semantic search)
-- [ ] Article-Incident linking (many-to-many relation)
-- [ ] Category hierarchy management
-- [ ] Version control for articles (draft/published)
-- [ ] Unit tests (>80% coverage)
-- [ ] E2E tests for all endpoints
+-   [ ] Articles module with full CRUD
+-   [ ] **Meilisearch service** for articles (index, search, sync)
+-   [ ] Background job: sync articles to Meilisearch on create/update
+-   [ ] Similarity search algorithm (Meilisearch semantic search)
+-   [ ] Article-Incident linking (many-to-many relation)
+-   [ ] Category hierarchy management
+-   [ ] Version control for articles (draft/published)
+-   [ ] Unit tests (>80% coverage)
+-   [ ] E2E tests for all endpoints
 
 #### Frontend (Next.js)
 
-- [ ] Articles list page with Meilisearch instant search
-- [ ] Create/edit article page with **Tiptap rich text editor**
-- [ ] Article detail page with suggestions
-- [ ] Category tree navigation
-- [ ] Link article to incident UI
-- [ ] Tests with React Testing Library
+-   [ ] Articles list page with Meilisearch instant search
+-   [ ] Create/edit article page with **Tiptap rich text editor**
+-   [ ] Article detail page with suggestions
+-   [ ] Category tree navigation
+-   [ ] Link article to incident UI
+-   [ ] Tests with React Testing Library
 
 #### Database (Prisma)
 
-- [ ] Article model (title, body JSON, categoryId, status, views)
-- [ ] ArticleTag model (many-to-many)
-- [ ] ArticleVersion model (versioning history)
-- [ ] Indexes on categoryId, status, createdAt
+-   [ ] Article model (title, body JSON, categoryId, status, views)
+-   [ ] ArticleTag model (many-to-many)
+-   [ ] ArticleVersion model (versioning history)
+-   [ ] Indexes on categoryId, status, createdAt
 
 #### Meilisearch
 
-- [ ] Configure articles index
-- [ ] Searchable: [title, body, tags]
-- [ ] Filterable: [categoryId, status, authorId]
-- [ ] Sortable: [views, createdAt, updatedAt]
+-   [ ] Configure articles index
+-   [ ] Searchable: [title, body, tags]
+-   [ ] Filterable: [categoryId, status, authorId]
+-   [ ] Sortable: [views, createdAt, updatedAt]
 
 ### Sprint 4 Deliverables
 
-- [ ] Knowledge base with rich text editor
-- [ ] Meilisearch instant search with typo tolerance
-- [ ] Smart article suggestions (similarity)
-- [ ] Article versioning (draft/published)
-- [ ] Link articles to incidents
-- [ ] 80%+ test coverage
-- [ ] Swagger API docs updated
+-   [ ] Knowledge base with rich text editor
+-   [ ] Meilisearch instant search with typo tolerance
+-   [ ] Smart article suggestions (similarity)
+-   [ ] Article versioning (draft/published)
+-   [ ] Link articles to incidents
+-   [ ] 80%+ test coverage
+-   [ ] Swagger API docs updated
+
+**Technologies Used in Sprint 4:**
+
+| Technology       | Usage                   | Implementation Details                                                                    |
+| ---------------- | ----------------------- | ----------------------------------------------------------------------------------------- |
+| **Meilisearch**  | Full-text search        | Configure articles index with typo-tolerance, instant search (<50ms), semantic similarity |
+| **Swagger**      | Document search APIs    | Document Meilisearch query params, filters, pagination with @ApiQuery                     |
+| **Winston**      | Log search analytics    | Track search queries, zero-results, article views, indexing operations                    |
+| **Validation**   | Validate search inputs  | @IsString(), @IsOptional(), @IsEnum() for search query DTOs                               |
+| **CASL**         | Authorize KB operations | ADMIN can manage all articles, AGENT can create/edit own, USER can only read published    |
+| **Tiptap**       | Rich text in articles   | Use Tiptap for article body with extensions (links, headings, code blocks, lists)         |
+| **Compression**  | Compress search results | Gzip large article bodies in search responses                                             |
+| **ConfigModule** | Configure Meilisearch   | MEILISEARCH_HOST, MEILISEARCH_KEY, index name from .env                                   |
+
+**Example: Meilisearch Integration**
+
+```typescript
+// src/meilisearch/meilisearch.service.ts
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { MeiliSearch } from "meilisearch";
+
+@Injectable()
+export class MeilisearchService {
+    private client: MeiliSearch;
+    private readonly logger = new Logger(MeilisearchService.name);
+
+    constructor(private configService: ConfigService) {
+        this.client = new MeiliSearch({
+            host: this.configService.get("MEILISEARCH_HOST"),
+            apiKey: this.configService.get("MEILISEARCH_KEY"),
+        });
+    }
+
+    async indexArticle(article: any) {
+        const index = this.client.index("articles");
+        await index.addDocuments([article]);
+        this.logger.log(`Indexed article ${article.id}`);
+    }
+
+    async searchArticles(query: string, filters?: any) {
+        const index = this.client.index("articles");
+        const results = await index.search(query, {
+            filter: filters,
+            limit: 20,
+            attributesToHighlight: ["title", "body"],
+        });
+        this.logger.log(
+            `Search "${query}" returned ${results.hits.length} results`
+        );
+        return results;
+    }
+}
+```
 
 ---
 
@@ -606,51 +795,87 @@ None - Infrastructure is production-ready.
 
 ### User Stories
 
-- **Fixed SLA targets** per priority (P1: 4h, P2: 8h, P3: 24h, P4: 72h)
-- **24/7 calculation** (no business hours/holidays)
-- **Visual indicators** (green/yellow/red/breached badges)
-- **Countdown display** ("2h 30m remaining" or "Breached 1h 15m ago")
-- **Email notifications** on breach only
-- **Dashboard widget** showing at-risk incidents
+-   **Fixed SLA targets** per priority (P1: 4h, P2: 8h, P3: 24h, P4: 72h)
+-   **24/7 calculation** (no business hours/holidays)
+-   **Visual indicators** (green/yellow/red/breached badges)
+-   **Countdown display** ("2h 30m remaining" or "Breached 1h 15m ago")
+-   **Email notifications** on breach only
+-   **Dashboard widget** showing at-risk incidents
 
 ### Technical Tasks
 
 #### Backend (Nest.js)
 
-- [ ] SLA calculation service (24/7 clock)
-- [ ] Fixed targets: P1=4h, P2=8h, P3=24h, P4=72h
-- [ ] Calculate `targetResolveAt` on incident creation
-- [ ] SLA breach check (cron job every 15 minutes)
-- [ ] Email notification on breach (to assignee + admins)
-- [ ] SLA dashboard queries (at-risk count, breached list)
-- [ ] Unit tests (date calculations, breach detection)
-- [ ] E2E tests for SLA flow
+-   [ ] SLA calculation service (24/7 clock)
+-   [ ] Fixed targets: P1=4h, P2=8h, P3=24h, P4=72h
+-   [ ] Calculate `targetResolveAt` on incident creation
+-   [ ] SLA breach check (cron job every 15 minutes)
+-   [ ] Email notification on breach (to assignee + admins)
+-   [ ] SLA dashboard queries (at-risk count, breached list)
+-   [ ] Unit tests (date calculations, breach detection)
+-   [ ] E2E tests for SLA flow
 
 #### Frontend (Next.js)
 
-- [ ] SLA badge component (color-coded: green/yellow/red/breached)
-- [ ] Countdown display component
-- [ ] Dashboard widget: "At Risk Incidents" (red + breached)
-- [ ] Show SLA status on incident list + detail pages
-- [ ] Tests with React Testing Library
+-   [ ] SLA badge component (color-coded: green/yellow/red/breached)
+-   [ ] Countdown display component
+-   [ ] Dashboard widget: "At Risk Incidents" (red + breached)
+-   [ ] Show SLA status on incident list + detail pages
+-   [ ] Tests with React Testing Library
 
 #### Database (Prisma)
 
-- [ ] Add to Incident model: `targetResolveAt` (DateTime)
-- [ ] Add to Incident model: `slaBreachedAt` (DateTime, nullable)
-- [ ] Index on `targetResolveAt` for queries
+-   [ ] Add to Incident model: `targetResolveAt` (DateTime)
+-   [ ] Add to Incident model: `slaBreachedAt` (DateTime, nullable)
+-   [ ] Index on `targetResolveAt` for queries
 
 ### Sprint 5 Deliverables
 
-- [ ] Basic SLA tracking (24/7 calculation)
-- [ ] Fixed targets per priority (P1-P4)
-- [ ] Color-coded badges (green/yellow/red/breached)
-- [ ] Countdown display
-- [ ] Email notification on breach
-- [ ] Dashboard widget (at-risk incidents)
-- [ ] 80%+ test coverage
-- [ ] Swagger API docs updated
-- [ ] **MOVED TO POST-MVP P1:** Business hours, holidays, auto-escalation, pause/resume, real-time WebSocket
+-   [ ] Basic SLA tracking (24/7 calculation)
+-   [ ] Fixed targets per priority (P1-P4)
+-   [ ] Color-coded badges (green/yellow/red/breached)
+-   [ ] Countdown display
+-   [ ] Email notification on breach
+-   [ ] Dashboard widget (at-risk incidents)
+-   [ ] 80%+ test coverage
+-   [ ] Swagger API docs updated
+-   [ ] **MOVED TO POST-MVP P1:** Business hours, holidays, auto-escalation, pause/resume, real-time WebSocket
+
+**Technologies Used in Sprint 5:**
+
+| Technology       | Usage                  | Implementation Details                                    |
+| ---------------- | ---------------------- | --------------------------------------------------------- |
+| **Swagger**      | Document SLA endpoints | Document SLA calculation logic, breach detection          |
+| **Winston**      | Log SLA events         | Log SLA breaches, warnings (80% threshold), calculations  |
+| **Redis**        | Cache SLA calculations | Cache countdown timers, at-risk incident lists (1min TTL) |
+| **ConfigModule** | Manage SLA settings    | Configure P1-P4 timeouts, warning thresholds (80%)        |
+| **CASL**         | Authorize SLA config   | Only ADMIN can configure SLA policies                     |
+| **Validation**   | Validate SLA settings  | @Min(1), @Max(72) for hour-based timeouts                 |
+
+**Code Examples:**
+
+```typescript
+// Log SLA events (SlaService)
+this.logger.warn(
+    `Incident ${incident.number} reached 80% of SLA (${remaining}h left)`,
+    "SlaService"
+);
+this.logger.error(
+    `SLA BREACH: Incident ${incident.number} exceeded ${target}h target`,
+    "SlaService"
+);
+
+// Cache SLA countdown (Redis)
+await this.redis.setex(
+    `sla:${incidentId}:countdown`,
+    60, // 1 minute TTL
+    JSON.stringify({ remaining, status: "at-risk" })
+);
+
+// Configure SLA timeouts
+this.config.get<number>("SLA_P1_HOURS"); // 4 hours
+this.config.get<number>("SLA_P2_HOURS"); // 8 hours
+```
 
 ---
 
@@ -664,19 +889,19 @@ None - Infrastructure is production-ready.
 
 #### User Stories
 
-- Dashboard with: total incidents, by status (pie), by priority (bar), SLA compliance (gauge)
-- Top 10 breach risk incidents (table)
-- Date range filters (last 7/30/90 days)
-- Auto-refresh every 5 minutes
-- Email notifications: incident assigned, new comment, SLA warning, SLA breach
+-   Dashboard with: total incidents, by status (pie), by priority (bar), SLA compliance (gauge)
+-   Top 10 breach risk incidents (table)
+-   Date range filters (last 7/30/90 days)
+-   Auto-refresh every 5 minutes
+-   Email notifications: incident assigned, new comment, SLA warning, SLA breach
 
 #### Technical Tasks
 
-- [ ] Dashboard aggregation queries
-- [ ] **Recharts** interactive charts
-- [ ] Email notification templates
-- [ ] Auto-refresh logic
-- [ ] Tests
+-   [ ] Dashboard aggregation queries
+-   [ ] **Recharts** interactive charts
+-   [ ] Email notification templates
+-   [ ] Auto-refresh logic
+-   [ ] Tests
 
 ---
 
@@ -686,44 +911,92 @@ None - Infrastructure is production-ready.
 
 **Quality:**
 
-- [ ] Increase test coverage to >90%
-- [ ] **Playwright E2E tests** for critical paths
-- [ ] Security audit (OWASP Top 10)
-- [ ] **Accessibility (WCAG 2.1 AA)**: keyboard navigation, screen readers, color contrast
-- [ ] Browser testing (Chrome, Firefox, Safari, Edge)
+-   [ ] Increase test coverage to >90%
+-   [ ] **Playwright E2E tests** for critical paths
+-   [ ] Security audit (OWASP Top 10)
+-   [ ] **Accessibility (WCAG 2.1 AA)**: keyboard navigation, screen readers, color contrast
+-   [ ] Browser testing (Chrome, Firefox, Safari, Edge)
 
 **UI/UX:**
 
-- [ ] Responsive design check (mobile, tablet, desktop)
-- [ ] Loading states everywhere
-- [ ] Error handling improvements
-- [ ] Form validation UX
-- [ ] Empty states
-- [ ] Toast notifications consistency
+-   [ ] Responsive design check (mobile, tablet, desktop)
+-   [ ] Loading states everywhere
+-   [ ] Error handling improvements
+-   [ ] Form validation UX
+-   [ ] Empty states
+-   [ ] Toast notifications consistency
 
 **Performance:**
 
-- [ ] Lighthouse score >90
-- [ ] Bundle size optimization
-- [ ] API response time <200ms (p95)
-- [ ] Database query optimization
-- [ ] Meilisearch response time <50ms
+-   [ ] Lighthouse score >90
+-   [ ] Bundle size optimization
+-   [ ] API response time <200ms (p95)
+-   [ ] Database query optimization
+-   [ ] Meilisearch response time <50ms
+-   [ ] Verify Compression is reducing payload sizes (~70%)
+-   [ ] Check Winston log rotation is working properly
 
 **DevOps:**
 
-- [ ] Production Docker images
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Database backups
-- [ ] Monitoring (Grafana + Prometheus)
-- [ ] Error tracking (Sentry)
+-   [ ] Production Docker images
+-   [ ] CI/CD pipeline (GitHub Actions)
+-   [ ] Database backups
+-   [ ] Monitoring (Grafana + Prometheus)
+-   [ ] Error tracking (Sentry)
 
 **Documentation:**
 
-- [ ] User manual (how to create incident, search, etc.)
-- [ ] Admin guide (how to configure SLA policies)
-- [ ] API documentation complete (Swagger)
-- [ ] Deployment guide
-- [ ] README.md updated
+-   [ ] User manual (how to create incident, search, etc.)
+-   [ ] Admin guide (how to configure SLA policies)
+-   [ ] API documentation complete (Swagger)
+-   [ ] Deployment guide
+-   [ ] README.md updated
+
+**Technologies Used in Sprint 6:**
+
+| Technology       | Usage                       | Implementation Details                                          |
+| ---------------- | --------------------------- | --------------------------------------------------------------- |
+| **Swagger**      | Complete API documentation  | Review all endpoints have examples, schemas, error responses    |
+| **Winston**      | Dashboard analytics logging | Log dashboard queries, chart data generation, export operations |
+| **Nodemailer**   | Email notifications         | Configure SMTP, send incident updates, SLA alerts, assignments  |
+| **Helmet**       | Security audit              | Verify all headers are set correctly, CSP policy tuning         |
+| **Throttler**    | Performance tuning          | Adjust rate limits based on load testing results                |
+| **Compression**  | Performance validation      | Verify 60-80% reduction in response sizes with load tests       |
+| **Redis**        | Dashboard caching           | Cache dashboard metrics (5min TTL), active user sessions        |
+| **ConfigModule** | Email/dashboard settings    | Configure SMTP credentials, dashboard refresh intervals         |
+| **CASL**         | Dashboard permissions       | Different dashboard views for ADMIN vs AGENT vs USER            |
+| **Validation**   | Final DTOs audit            | Ensure all DTOs have proper validation decorators               |
+
+**Code Examples:**
+
+```typescript
+// Dashboard metrics with caching (DashboardService)
+async getMetrics() {
+  const cached = await this.redis.get('dashboard:metrics');
+  if (cached) {
+    this.logger.log('Dashboard metrics served from cache', 'DashboardService');
+    return JSON.parse(cached);
+  }
+
+  const metrics = await this.calculateMetrics();
+  await this.redis.setex('dashboard:metrics', 300, JSON.stringify(metrics)); // 5min
+  this.logger.log('Dashboard metrics calculated and cached', 'DashboardService');
+  return metrics;
+}
+
+// Email notification (EmailService)
+async sendIncidentAssigned(incident: Incident, assignee: User) {
+  await this.mailer.sendMail({
+    to: assignee.email,
+    subject: `Incident ${incident.number} assigned to you`,
+    html: this.templates.incidentAssigned({ incident, assignee }),
+  });
+  this.logger.log(
+    `Email sent: Incident ${incident.number} assigned to ${assignee.email}`,
+    'EmailService'
+  );
+}
+```
 
 ---
 
@@ -731,10 +1004,44 @@ None - Infrastructure is production-ready.
 
 **Final Buffer Week (Jan 25-31):**
 
-- Bug fixes from testing
-- Final adjustments based on feedback
-- Production deployment preparation
-- Team training/onboarding materials
+-   Bug fixes from testing
+-   Final adjustments based on feedback
+-   Production deployment preparation
+-   Team training/onboarding materials
+
+---
+
+## Post-MVP Roadmap (v1.2+)
+
+### Key Technologies Implementation Timeline
+
+| Technology          | Category       | Implemented In | Status      | Purpose                               |
+| ------------------- | -------------- | -------------- | ----------- | ------------------------------------- |
+| **Swagger/OpenAPI** | Documentation  | Sprint 0       | Complete    | Interactive API docs at /api/docs     |
+| **Winston**         | Logging        | Sprint 0       | Complete    | Structured logging with file rotation |
+| **Helmet**          | Security       | Sprint 0       | Complete    | HTTP security headers (CSP, XSS)      |
+| **Compression**     | Performance    | Sprint 0       | Complete    | Gzip/Deflate response compression     |
+| **Throttler**       | Security       | Sprint 0       | Complete    | Rate limiting (10 req/min default)    |
+| **ConfigModule**    | Configuration  | Sprint 0       | Complete    | Environment variables management      |
+| **CASL**            | Authorization  | Sprint 0       | Complete    | Role-based access control (RBAC)      |
+| **ValidationPipe**  | Validation     | Sprint 0       | Complete    | Automatic DTO validation              |
+| **JWT + Passport**  | Authentication | Sprint 1       | In Progress | Stateless token-based auth            |
+| **Bcrypt**          | Security       | Sprint 1       | In Progress | Password hashing (12 rounds)          |
+| **Prisma ORM**      | Database       | Sprint 1-6     | In Progress | Type-safe database access             |
+| **Tiptap Editor**   | Rich Text      | Sprint 2       | Planned     | WYSIWYG editor for incidents          |
+| **Multer**          | File Upload    | Sprint 3       | Planned     | Handle file attachments               |
+| **Meilisearch**     | Search         | Sprint 4       | Planned     | Typo-tolerant full-text search        |
+| **Redis**           | Caching        | Sprint 5       | Planned     | Session storage + job queues          |
+| **Nodemailer**      | Email          | Sprint 6       | Planned     | SMTP email notifications              |
+| **PostgreSQL 18**   | Database       | Sprint 0       | Complete    | Primary data store                      |
+| **Docker Compose**  | DevOps         | Sprint 0       | Complete    | 7-service orchestration                 |
+| **Nginx**           | Proxy          | Sprint 0       | Complete    | Reverse proxy + load balancing        |
+
+**Legend:**
+
+-   Complete = Fully configured and documented
+-   In Progress = Currently being implemented
+-   Planned = Scheduled for future sprint
 
 ---
 
@@ -744,38 +1051,38 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ### Priority 1: Teams & Auto-Assignment (v1.2 - 1 week)
 
-- Create/manage teams (Assignment Groups)
-- Team specialization (category mapping)
-- Auto-assignment engine (workload balancing, round-robin)
-- Workload dashboard
+-   Create/manage teams (Assignment Groups)
+-   Team specialization (category mapping)
+-   Auto-assignment engine (workload balancing, round-robin)
+-   Workload dashboard
 
 ### Priority 2: REST API & Integrations (v1.5 - 1 week)
 
-- Full REST API with Swagger docs
-- API keys management
-- Rate limiting
-- Webhook support
-- Slack/Email integrations
+-   Full REST API with Swagger docs
+-   API keys management
+-   Rate limiting
+-   Webhook support
+-   Slack/Email integrations
 
 ### Priority 3: CMDB / Asset Management (v1.5 - 2 weeks)
 
-- Asset CRUD (laptops, servers, licenses)
-- Asset → Incident linking
-- Warranty tracking
-- CSV import/export
+-   Asset CRUD (laptops, servers, licenses)
+-   Asset → Incident linking
+-   Warranty tracking
+-   CSV import/export
 
 ### Priority 4: Advanced Analytics (v2.0 - 2 weeks)
 
-- Custom report builder
-- Scheduled reports (email delivery)
-- Agent performance metrics
-- CSAT surveys
+-   Custom report builder
+-   Scheduled reports (email delivery)
+-   Agent performance metrics
+-   CSAT surveys
 
 ### Priority 5: SSO & Enterprise Auth (v2.0 - 2 weeks)
 
-- SAML 2.0 (Azure AD, Okta)
-- OAuth 2.0 (Google, Microsoft)
-- LDAP integration
+-   SAML 2.0 (Azure AD, Okta)
+-   OAuth 2.0 (Google, Microsoft)
+-   LDAP integration
 
 ---
 
@@ -783,33 +1090,33 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ### Code Quality
 
-| Metric | Target | Current | Status |
+| Metric                   | Target | Current | Status |
 | ------------------------ | ------ | ------- | ------ |
-| Backend Test Coverage | >80% | TBD | |
-| Frontend Test Coverage | >70% | TBD | |
-| ESLint Errors | 0 | 0 | |
-| TypeScript Errors | 0 | 0 | |
-| Security Vulnerabilities | 0 | 0 | |
+| Backend Test Coverage    | >80%   | TBD     |        |
+| Frontend Test Coverage   | >70%   | TBD     |        |
+| ESLint Errors            | 0      | 0       |        |
+| TypeScript Errors        | 0      | 0       |        |
+| Security Vulnerabilities | 0      | 0       |        |
 
 ### Performance
 
-| Metric | Target | Current | Status |
+| Metric                  | Target | Current | Status |
 | ----------------------- | ------ | ------- | ------ |
-| API Response Time (p95) | <200ms | TBD | |
-| Frontend FCP | <1.5s | TBD | |
-| Frontend LCP | <2.5s | TBD | |
-| Lighthouse Score | >90 | TBD | |
-| Bundle Size | <500KB | TBD | |
+| API Response Time (p95) | <200ms | TBD     |        |
+| Frontend FCP            | <1.5s  | TBD     |        |
+| Frontend LCP            | <2.5s  | TBD     |        |
+| Lighthouse Score        | >90    | TBD     |        |
+| Bundle Size             | <500KB | TBD     |        |
 
 ### Business
 
-| Metric | Target | Current | Status |
+| Metric            | Target | Current | Status |
 | ----------------- | ------ | ------- | ------ |
-| Features Complete | 100% | 15% | |
-| Bugs (Critical) | 0 | 0 | |
-| Bugs (High) | <5 | TBD | |
-| Documentation | 100% | 60% | |
-| User Acceptance | >90% | TBD | |
+| Features Complete | 100%   | 15%     |        |
+| Bugs (Critical)   | 0      | 0       |        |
+| Bugs (High)       | <5     | TBD     |        |
+| Documentation     | 100%   | 60%     |        |
+| User Acceptance   | >90%   | TBD     |        |
 
 ---
 
@@ -817,12 +1124,12 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ### Test Coverage Targets
 
-| Test Type | Target | Scope |
+| Test Type             | Target         | Scope                                      |
 | --------------------- | -------------- | ------------------------------------------ |
-| **Unit Tests** | >80% | Services, utilities, pure functions |
-| **Integration Tests** | 100% | All API endpoints (request/response) |
-| **E2E Tests** | Critical paths | User authentication, ticket CRUD, search |
-| **Component Tests** | >70% | React components (rendering, interactions) |
+| **Unit Tests**        | >80%           | Services, utilities, pure functions        |
+| **Integration Tests** | 100%           | All API endpoints (request/response)       |
+| **E2E Tests**         | Critical paths | User authentication, ticket CRUD, search   |
+| **Component Tests**   | >70%           | React components (rendering, interactions) |
 
 ### Test Types by Sprint
 
@@ -830,38 +1137,39 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 1. **Backend Tests (Nest.js + Jest + Supertest)**
 
- - Unit tests for services/controllers (>80% coverage)
- - Integration tests for all new API endpoints
- - E2E tests for critical user flows
- - Mock external dependencies (Meilisearch, email service)
+-   Unit tests for services/controllers (>80% coverage)
+-   Integration tests for all new API endpoints
+-   E2E tests for critical user flows
+-   Mock external dependencies (Meilisearch, email service)
 
 2. **Frontend Tests (React Testing Library + Jest)**
 
- - Component tests (rendering, user interactions)
- - Form validation tests
- - API client mocking tests
- - Accessibility tests (@testing-library/jest-dom)
+-   Component tests (rendering, user interactions)
+-   Form validation tests
+-   API client mocking tests
+-   Accessibility tests (@testing-library/jest-dom)
 
 3. **API Documentation (Swagger)**
 
- - All endpoints documented with @ApiOperation()
- - Request DTOs with @ApiProperty() decorators
- - Response schemas with @ApiResponse()
- - Authentication scheme documented
- - Example requests/responses provided
+-   All endpoints documented with @ApiOperation()
+-   Request DTOs with @ApiProperty() decorators
+-   Response schemas with @ApiResponse()
+-   Authentication scheme documented
+-   Example requests/responses provided
 
 4. **Security Validation**
- - npm audit clean (0 vulnerabilities)
- - CVE check for all dependencies
- - OWASP Top 10 validation
- - Input validation tests (SQL injection, XSS)
+
+-   npm audit clean (0 vulnerabilities)
+-   CVE check for all dependencies
+-   OWASP Top 10 validation
+-   Input validation tests (SQL injection, XSS)
 
 ### Test Execution
 
-- **CI Pipeline:** Run all tests on every PR
-- **Coverage Report:** Generate coverage report on main branch
-- **E2E Tests:** Run on staging environment before production
-- **Performance Tests:** Run weekly (Sprint 6 onwards)
+-   **CI Pipeline:** Run all tests on every PR
+-   **Coverage Report:** Generate coverage report on main branch
+-   **E2E Tests:** Run on staging environment before production
+-   **Performance Tests:** Run weekly (Sprint 6 onwards)
 
 ---
 
@@ -869,30 +1177,30 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ### For Each User Story
 
-- [ ] Code implemented and peer-reviewed
-- [ ] **Unit tests written (>80% coverage per module)**
-- [ ] **Integration tests passing (all API endpoints)**
-- [ ] **E2E tests passing (critical user paths)**
-- [ ] Code linted and formatted (ESLint + Prettier)
-- [ ] TypeScript strict mode passing (no any types)
-- [ ] **Swagger API docs updated (request/response schemas, examples)**
-- [ ] **Security validated (no CVE vulnerabilities, npm audit clean)**
-- [ ] Manual testing completed (happy path + edge cases)
-- [ ] Accessibility checked (WCAG 2.1 AA: keyboard, screen reader, contrast)
-- [ ] Responsive design verified (mobile 375px, tablet 768px, desktop 1920px)
-- [ ] Performance benchmarks met (API <200ms p95, Lighthouse >90)
-- [ ] Documentation updated (README, guides, inline comments)
-- [ ] Deployed to staging environment
-- [ ] Product owner approval
+-   [ ] Code implemented and peer-reviewed
+-   [ ] **Unit tests written (>80% coverage per module)**
+-   [ ] **Integration tests passing (all API endpoints)**
+-   [ ] **E2E tests passing (critical user paths)**
+-   [ ] Code linted and formatted (ESLint + Prettier)
+-   [ ] TypeScript strict mode passing (no any types)
+-   [ ] **Swagger API docs updated (request/response schemas, examples)**
+-   [ ] **Security validated (no CVE vulnerabilities, npm audit clean)**
+-   [ ] Manual testing completed (happy path + edge cases)
+-   [ ] Accessibility checked (WCAG 2.1 AA: keyboard, screen reader, contrast)
+-   [ ] Responsive design verified (mobile 375px, tablet 768px, desktop 1920px)
+-   [ ] Performance benchmarks met (API <200ms p95, Lighthouse >90)
+-   [ ] Documentation updated (README, guides, inline comments)
+-   [ ] Deployed to staging environment
+-   [ ] Product owner approval
 
 ### For Each Sprint
 
-- [ ] All user stories meet DoD
-- [ ] Sprint demo completed
-- [ ] Retrospective conducted
-- [ ] Backlog refined for next sprint
-- [ ] Bugs triaged and prioritized
-- [ ] Technical debt documented
+-   [ ] All user stories meet DoD
+-   [ ] Sprint demo completed
+-   [ ] Retrospective conducted
+-   [ ] Backlog refined for next sprint
+-   [ ] Bugs triaged and prioritized
+-   [ ] Technical debt documented
 
 ---
 
@@ -900,21 +1208,21 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ### High Risks
 
-| Risk | Impact | Probability | Mitigation |
+| Risk                          | Impact | Probability | Mitigation                             |
 | ----------------------------- | ------ | ----------- | -------------------------------------- |
-| **Scope Creep** | HIGH | MEDIUM | Strict sprint planning, prioritization |
-| **Tech Stack Learning Curve** | MEDIUM | LOW | Pair programming, documentation |
-| **Third-party Dependencies** | MEDIUM | LOW | Vendor lock-in analysis, alternatives |
-| **Performance Issues** | HIGH | MEDIUM | Early load testing, optimization |
-| **Security Vulnerabilities** | HIGH | LOW | Security audits, penetration testing |
+| **Scope Creep**               | HIGH   | MEDIUM      | Strict sprint planning, prioritization |
+| **Tech Stack Learning Curve** | MEDIUM | LOW         | Pair programming, documentation        |
+| **Third-party Dependencies**  | MEDIUM | LOW         | Vendor lock-in analysis, alternatives  |
+| **Performance Issues**        | HIGH   | MEDIUM      | Early load testing, optimization       |
+| **Security Vulnerabilities**  | HIGH   | LOW         | Security audits, penetration testing   |
 
 ### Medium Risks
 
-| Risk | Impact | Probability | Mitigation |
+| Risk                      | Impact | Probability | Mitigation                        |
 | ------------------------- | ------ | ----------- | --------------------------------- |
-| **API Rate Limits** | MEDIUM | LOW | Caching, rate limiting |
-| **Database Scaling** | MEDIUM | MEDIUM | Connection pooling, read replicas |
-| **Browser Compatibility** | MEDIUM | LOW | Progressive enhancement |
+| **API Rate Limits**       | MEDIUM | LOW         | Caching, rate limiting            |
+| **Database Scaling**      | MEDIUM | MEDIUM      | Connection pooling, read replicas |
+| **Browser Compatibility** | MEDIUM | LOW         | Progressive enhancement           |
 
 ---
 
@@ -922,41 +1230,41 @@ Features moved to post-MVP (not included in 11-week timeline):
 
 ### Team Structure
 
-| Role | Count | Responsibility |
+| Role                   | Count | Responsibility                       |
 | ---------------------- | ----- | ------------------------------------ |
-| **Product Owner** | 1 | Requirements, priorities, acceptance |
-| **Scrum Master** | 1 | Facilitate sprints, remove blockers |
-| **Tech Lead** | 1 | Architecture, code review, mentoring |
-| **Backend Developer** | 2 | Nest.js, Prisma, API development |
-| **Frontend Developer** | 2 | Next.js, React, UI/UX |
-| **QA Engineer** | 1 | Testing, quality assurance |
-| **DevOps Engineer** | 1 | Infrastructure, CI/CD, monitoring |
+| **Product Owner**      | 1     | Requirements, priorities, acceptance |
+| **Scrum Master**       | 1     | Facilitate sprints, remove blockers  |
+| **Tech Lead**          | 1     | Architecture, code review, mentoring |
+| **Backend Developer**  | 2     | Nest.js, Prisma, API development     |
+| **Frontend Developer** | 2     | Next.js, React, UI/UX                |
+| **QA Engineer**        | 1     | Testing, quality assurance           |
+| **DevOps Engineer**    | 1     | Infrastructure, CI/CD, monitoring    |
 
 ### Communication
 
-- **Daily Standup:** 9:00 AM (15 min)
-- **Sprint Planning:** First Monday (2 hours)
-- **Sprint Review:** Last Friday (1 hour)
-- **Sprint Retrospective:** Last Friday (30 min)
-- **Backlog Refinement:** Mid-sprint Wednesday (1 hour)
+-   **Daily Standup:** 9:00 AM (15 min)
+-   **Sprint Planning:** First Monday (2 hours)
+-   **Sprint Review:** Last Friday (1 hour)
+-   **Sprint Retrospective:** Last Friday (30 min)
+-   **Backlog Refinement:** Mid-sprint Wednesday (1 hour)
 
 ### Tools
 
-- **Project Management:** Jira / Linear
-- **Code Repository:** GitHub
-- **CI/CD:** GitHub Actions
-- **Communication:** Slack / Discord
-- **Documentation:** Notion / Confluence
-- **Design:** Figma
+-   **Project Management:** Jira / Linear
+-   **Code Repository:** GitHub
+-   **CI/CD:** GitHub Actions
+-   **Communication:** Slack / Discord
+-   **Documentation:** Notion / Confluence
+-   **Design:** Figma
 
 ---
 
 ## Change Log
 
-| Date | Sprint | Change | Reason |
+| Date       | Sprint | Change           | Reason              |
 | ---------- | ------ | ---------------- | ------------------- |
-| 2025-11-13 | 0 | Project kickoff | Initial planning |
-| 2025-11-13 | 1 | Auth in progress | Started development |
+| 2025-11-13 | 0      | Project kickoff  | Initial planning    |
+| 2025-11-13 | 1      | Auth in progress | Started development |
 
 ---
 

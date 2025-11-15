@@ -17,6 +17,78 @@ Implementar um sistema de rastreamento de Service Level Agreement (SLA) que calc
 
 ---
 
+## Aplicando as Tecnologias Fundamentais
+
+Neste sprint, o foco é a implementação do rastreamento de SLAs, uma funcionalidade crítica para a gestão de serviços. Vamos utilizar as tecnologias da nossa stack para garantir que os cálculos são precisos, performáticos e bem geridos.
+
+### 1. Cache de Cálculos com Redis
+
+**Objetivo:** Melhorar a performance ao evitar cálculos repetitivos e dispendiosos do tempo restante do SLA.
+
+**Ações:**
+
+-   **Instalação:** Se ainda não estiver configurado, instale e configure o `nestjs-redis` ou um cliente Redis similar no `nest-backend`.
+-   **Cache Service:** Crie um `SlaCacheService` ou adicione a lógica ao `SlaService`.
+-   **Lógica de Cache:**
+    -   Após calcular o tempo restante de um SLA, armazene o resultado no Redis com um TTL (Time-To-Live) curto (ex: 1 minuto). A chave pode ser algo como `sla:incident-id:countdown`.
+    -   Antes de recalcular, verifique sempre se o valor existe na cache. Se existir, retorne o valor da cache.
+    -   Invalide a cache de um incidente sempre que o seu estado de SLA mudar (ex: quando é pausado ou resolvido).
+
+**Documentação:**
+[Documentação Oficial do Redis](https://redis.io/docs/)
+[Guia Oficial do Nest.js sobre Caching](https://docs.nestjs.com/techniques/caching)
+
+### 2. Gestão de Configuração de SLA com ConfigModule
+
+**Objetivo:** Permitir que os tempos de SLA e limiares de aviso sejam facilmente configuráveis através de variáveis de ambiente.
+
+**Ações:**
+
+-   **Variáveis de Ambiente:** Adicione as configurações de tempo para cada prioridade no ficheiro `.env` (ex: `SLA_P1_RESOLUTION_HOURS=4`, `SLA_P2_RESOLUTION_HOURS=8`). Adicione também um limiar para avisos (ex: `SLA_WARNING_THRESHOLD=0.8` para 80%).
+-   **Acesso via ConfigService:** No `SlaService`, injete o `ConfigService` para obter estes valores, em vez de os ter "hardcoded" no código. Isto permite ajustes rápidos sem necessidade de um novo deploy.
+
+**Documentação:**
+[Guia Oficial do Nest.js sobre Configuration](https://docs.nestjs.com/techniques/configuration)
+
+### 3. Logging de Eventos de SLA com Winston
+
+**Objetivo:** Manter um registo detalhado de todos os eventos de SLA para fins de auditoria e análise de performance.
+
+**Ações:**
+
+-   No `SlaService`, injete o `LoggerService` (Winston).
+-   **Eventos a Registar:**
+    -   `SLA BREACH`: Quando um SLA de resposta ou resolução é violado. Registe o ID do incidente e por quanto tempo foi violado.
+    -   `SLA WARNING`: Quando um incidente atinge o limiar de aviso (ex: 80% do tempo de SLA).
+    -   `SLA CALCULATION`: Opcionalmente, registe os cálculos para depuração.
+
+**Documentação:**
+[Guia Oficial do `nest-winston`](https://github.com/gremo/nest-winston)
+
+### 4. Autorização de Configuração de SLA com CASL
+
+**Objetivo:** Garantir que apenas administradores podem criar ou modificar as políticas de SLA.
+
+**Ações:**
+
+-   **Definir Habilidades:** No `casl-ability.factory.ts`, defina as permissões para o `subject` 'SlaPolicy'. Apenas o role `ADMIN` deve ter a ação `manage`.
+-   **Proteger Endpoints:** No `slapolicies.controller.ts`, proteja os endpoints de criação (`POST`), atualização (`PATCH`) e eliminação (`DELETE`) com um `RolesGuard` ou verificando a permissão diretamente no service.
+
+**Documentação:**
+[Guia Oficial do CASL](https://casl.js.org/v6/en/guide/intro)
+[Integração do CASL com Nest.js](https://docs.nestjs.com/security/authorization#casl)
+
+### 5. Validação e Documentação
+
+-   **Validação:** Use `class-validator` nos DTOs de `SlaPolicy` para garantir que os tempos inseridos são números válidos e dentro de um intervalo razoável (ex: `@Min(1)`, `@Max(168)` para horas).
+-   **Swagger:** Documente os endpoints de gestão de SLA no `slapolicies.controller.ts` e explique a lógica de cálculo nos `descriptions` do `@ApiOperation`.
+
+**Documentação:**
+[Guia Oficial do Nest.js sobre Validação](https://docs.nestjs.com/techniques/validation)
+[Guia Oficial do Nest.js sobre OpenAPI (Swagger)](https://docs.nestjs.com/openapi/introduction)
+
+---
+
 ## Funcionalidade 5.1 & 5.2: Gestão e Aplicação de Políticas de SLA
 
 **Objetivo:** Implementar um "vertical slice" para criar políticas de SLA e aplicá-las automaticamente aos incidentes com base na sua prioridade.

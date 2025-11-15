@@ -177,8 +177,8 @@ npm run dev # Runs on http://localhost:3000
 
 After running the seed script (development only):
 
-| Role  | Email             | Password       |
-| ----- | ----------------- | -------------- |
+| Role  | Email             | Password      |
+| ----- | ----------------- | ------------- |
 | Admin | admin@orionone.io | See .env file |
 | Agent | agent@orionone.io | See .env file |
 | User  | user@orionone.io  | See .env file |
