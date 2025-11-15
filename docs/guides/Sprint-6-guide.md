@@ -1,102 +1,108 @@
-# Guia de Implementação - Sprint 6
+# Guia de Implementação do Sprint 6: Dashboard, Notificações e Polimento
 
-**Sprint:** 6
 **Período:** 16 de Janeiro a 31 de Janeiro de 2026
-**Foco:** Dashboard de Métricas, Notificações por Email e Polimento Geral
-**Status:** Planeado
+**Foco:** Dashboard, Notificações por Email, Polimento de UI/UX e Testes Finais
+
+## Visão Geral
+
+Este sprint final é dedicado à criação de um dashboard central para visualização de métricas, à implementação de um sistema de notificações por email, ao polimento geral da interface e experiência do utilizador, e à realização de testes E2E para garantir a estabilidade da plataforma para o lançamento.
 
 ---
 
-## 1. Visão Geral
+## Aplicando as Tecnologias Fundamentais
 
-Este sprint final do MVP concentra-se em fornecer visibilidade sobre as operações de ITSM e em melhorar a comunicação da equipa através de duas features principais: um **Dashboard de Métricas** e **Notificações por Email**.
+### 1. **Dashboard com Agregação de Dados (Backend)**
 
-O **Dashboard** fornecerá aos gestores e agentes uma visão geral e em tempo real das principais métricas de incidentes, como o número de incidentes abertos, a distribuição por prioridade e o estado atual. Utilizaremos gráficos e cartões de estatísticas para uma visualização clara e eficaz.
+-   **Objetivo:** Criar endpoints eficientes que agreguem os dados necessários para os widgets do dashboard, utilizando as capacidades do Prisma.
+-   **Ações:**
+    -   No `nest-backend`, crie um novo módulo `dashboard`.
+    -   Implemente um `DashboardService` que utilize o `PrismaService` para executar consultas de agregação (`_count`, `groupBy`) no modelo `Incident` para calcular métricas como total de incidentes, incidentes por status e por prioridade.
+    -   Crie um `DashboardController` com um endpoint `GET /api/dashboard/summary` que retorne os dados agregados.
+-   **Documentação:**
+    -   [Prisma: Aggregation, Grouping, and Summarizing](https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-and-summarizing)
 
-As **Notificações por Email** garantirão que as partes interessadas sejam informadas sobre eventos importantes, como a criação de um novo incidente, a atribuição a um agente ou a adição de um novo comentário.
+### 2. **Cache de Dados do Dashboard com Redis (Backend)**
 
-Adicionalmente, este sprint inclui um período de **polimento e buffer** para refinar a UX/UI geral da aplicação, corrigir bugs menores e garantir que a plataforma está estável e pronta para o lançamento.
+-   **Objetivo:** Utilizar o Redis para armazenar em cache as respostas dos endpoints do dashboard, melhorando a performance e reduzindo a carga na base de dados.
+-   **Ações:**
+    -   Injete o serviço de cache (previamente configurado com `nestjs-redis` ou o `@nestjs/cache-manager`) no `DashboardService`.
+    -   Antes de executar as consultas de agregação, verifique se os dados já existem no cache.
+    -   Se os dados não estiverem no cache, execute a consulta e armazene o resultado no Redis com um TTL (Time-To-Live) apropriado (ex: 60 segundos).
+    -   Se os dados existirem, retorne-os diretamente do cache.
+-   **Documentação:**
+    -   [NestJS Caching](https://docs.nestjs.com/techniques/caching)
+    -   [Redis Documentation](https://redis.io/docs/)
 
-## 2. User Stories / Requisitos
+### 3. **Notificações por Email com Nodemailer (Backend)**
 
-### Dashboard de Métricas
+-   **Objetivo:** Implementar um sistema de notificações por email para eventos críticos, como atribuição de incidentes e novos comentários.
+-   **Ações:**
+    -   Crie um `EmailModule` e `EmailService` utilizando o `@nestjs-modules/mailer` (que usa Nodemailer por baixo).
+    -   Configure o transporte SMTP através do `ConfigModule` para carregar as credenciais de um ficheiro `.env` (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS).
+    -   Crie templates de email (usando Handlebars, por exemplo) para os diferentes tipos de notificação (incidente atribuído, novo comentário, alerta de SLA, violação de SLA).
+    -   Injete o `EmailService` nos serviços relevantes (ex: `IncidentsService`, `CommentsService`) para disparar os emails nos momentos apropriados (ex: após a atribuição de um incidente).
+-   **Documentação:**
+    -   [@nestjs-modules/mailer](https://github.com/nest-modules/mailer)
+    -   [Nodemailer Documentation](https://nodemailer.com/about/)
+    -   [NestJS Configuration](https://docs.nestjs.com/techniques/configuration)
 
--   **[Em Curso] US6.1:** Como gestor de TI, quero ver um dashboard com as principais métricas de incidentes (total, abertos, fechados, por prioridade, por estado) para poder avaliar rapidamente a carga de trabalho e o estado das operações.
--   **[Em Curso] US6.2:** Como agente de suporte, quero ter acesso a um dashboard para visualizar os incidentes que me foram atribuídos e a sua prioridade, para que eu possa gerir o meu trabalho de forma mais eficiente.
--   **[Em Curso] US6.3:** Como gestor, quero ver um gráfico de barras ou circular que mostre a distribuição de incidentes por prioridade e por estado, para identificar tendências e alocar recursos adequadamente.
--   **[Em Curso] US6.4:** Como gestor, quero ver uma lista dos 5 incidentes atualizados mais recentemente no dashboard, para acompanhar a atividade recente da equipa.
+### 4. **Visualização de Dados com Recharts (Frontend)**
 
-### Notificações por Email
+-   **Objetivo:** Implementar os widgets do dashboard no frontend utilizando gráficos para uma visualização de dados clara e intuitiva.
+-   **Ações:**
+    -   No `next-frontend`, instale a biblioteca `recharts`.
+    -   Crie componentes reutilizáveis para os gráficos de barras (`BarChart.tsx`) e de pizza (`PieChart.tsx`).
+    -   Na página do dashboard (`/dashboard`), utilize os dados do endpoint `/api/dashboard/summary` para popular os gráficos.
+    -   Configure as opções dos gráficos para corresponder ao design da aplicação (cores, legendas, tooltips).
+-   **Documentação:**
+    -   [Recharts Documentation](https://recharts.org/en-US/guide)
 
--   **[Em Curso] US6.5:** Como agente, quero receber uma notificação por email quando um novo incidente me for atribuído, para que eu possa começar a trabalhar nele o mais rápido possível.
--   **[Em Curso] US6.6:** Como criador de um incidente, quero receber um email de confirmação quando o meu incidente for registado, para saber que o meu pedido foi recebido.
--   **[Em Curso] US6.7:** Como participante de um incidente (criador ou atribuído), quero receber uma notificação por email quando um novo comentário for adicionado, para me manter atualizado sobre a discussão.
--   **[Em Curso] US6.8:** Como utilizador, quero que os emails de notificação tenham um formato profissional e incluam links diretos para os incidentes, para facilitar o acesso rápido.
+### 5. **Polimento, Validação e Segurança (Backend & Frontend)**
 
-**Pré-requisitos:**
-
--   Sprints 1 a 5 completos (autenticação, incidentes, comentários, anexos, KB e SLA).
--   Configuração de SMTP disponível para envio de emails.
-
-## 3. Plano de Implementação
-
-A implementação será dividida em fases, começando pelo backend para expor os dados e a lógica de notificação, seguido pelo frontend para visualização. Este sprint não requer alterações na base de dados, pois utilizaremos os modelos existentes.
+-   **Objetivo:** Realizar uma revisão final da aplicação para garantir a qualidade, segurança e consistência antes do lançamento.
+-   **Ações:**
+    -   **Swagger:** Revise todos os controllers e DTOs para garantir que a documentação da API está completa e correta, com exemplos e descrições claras.
+    -   **Winston:** Adicione logs específicos no `DashboardService` para monitorizar a performance das queries e o uso do cache (cache hit/miss).
+    -   **Helmet & Throttler:** Audite as configurações de segurança. Verifique se o `Helmet` está a aplicar os cabeçalhos corretos e ajuste os limites do `Throttler` em endpoints críticos se necessário, com base em testes de carga.
+    -   **CASL:** Implemente a lógica de autorização para o dashboard. Defina `Abilities` para que diferentes `Roles` (ADMIN, AGENT) vejam diferentes métricas.
+    -   **Validation:** Faça uma auditoria final em todos os DTOs da aplicação para garantir que todas as entradas de utilizador estão a ser devidamente validadas.
+    -   **Compression:** Verifique se a compressão está a reduzir o tamanho das respostas em 60-80%, especialmente nos endpoints do dashboard que retornam grandes volumes de dados.
+    -   **UI/UX (Frontend):** Implemente `skeletons` de carregamento (`shadcn/ui`) para o dashboard e outras áreas de dados. Padronize o uso de `toasts` para feedback ao utilizador.
+-   **Documentação:**
+    -   [NestJS OpenAPI (Swagger)](https://docs.nestjs.com/openapi/introduction)
+    -   [NestJS Security (Helmet)](https://docs.nestjs.com/security/helmet)
+    -   [NestJS Rate Limiting (Throttler)](https://docs.nestjs.com/security/rate-limiting)
+    -   [Winston Logging](https://github.com/winstonjs/winston)
+    -   [CASL Authorization](https://casl.js.org/v6/en/guide/intro)
+    -   [Class Validator](https://github.com/typestack/class-validator)
+    -   [NestJS Compression](https://docs.nestjs.com/techniques/compression)
+    -   [shadcn/ui Skeleton](https://ui.shadcn.com/docs/components/skeleton)
+    -   [shadcn/ui Toast](https://ui.shadcn.com/docs/components/toast)
 
 ---
 
-## Funcionalidade 6.1 & 6.2: Dashboard de Métricas e Notificações por Email
+## Plano de Ação
 
-**Objetivo:** Implementar um dashboard com métricas em tempo real e um sistema de notificações por email para melhorar a visibilidade e comunicação da equipa.
+1.  **Backend:**
 
----
+    -   Criar o `DashboardModule`, `Service` e `Controller`.
+    -   Implementar as consultas de agregação e a lógica de cache com Redis.
+    -   Criar o `EmailModule` e integrar o envio de notificações.
+    -   Realizar a auditoria final de documentação (Swagger), segurança (Helmet, CASL) e logs (Winston).
 
-### **Fase 1: Backend (Nest.js)**
+2.  **Frontend:**
 
-A implementação do backend será focada em duas áreas: criar um endpoint para servir os dados do dashboard e configurar um serviço para enviar notificações por email.
+    -   Instalar `recharts` e desenvolver os componentes de gráficos.
+    -   Construir a página do dashboard e consumir os dados da API.
+    -   Implementar os estados de carregamento (skeletons) e as notificações (toasts).
+    -   Realizar uma auditoria geral de acessibilidade e responsividade.
 
-#### **3.1. Módulo de Dashboard**
+3.  **QA & DevOps:**
+    -   Executar a suite completa de testes E2E (Playwright).
+    -   Priorizar e corrigir os bugs identificados.
+    -   Preparar o ambiente de produção e finalizar o pipeline de CI/CD.
 
-Primeiro, vamos criar a estrutura para o novo módulo de dashboard.
-
-1.  **Gerar Módulo, Controller e Service:**
-    Use o Nest CLI para gerar os ficheiros necessários.
-
-    ```bash
-    nest generate module dashboard
-    nest generate controller dashboard --no-spec
-    nest generate service dashboard --no-spec
-    ```
-
-2.  **Definir o DTO de Resposta (`DashboardStatsDto`)**
-
-    **Ficheiro:** `nest-backend/src/dashboard/dto/dashboard-stats.dto.ts`
-
-    **Objetivo:**
-    Definir a estrutura de dados que o nosso endpoint de estatísticas irá retornar. Este DTO não necessita de validações do `class-validator`, pois é apenas um contrato de resposta (não aceita input do utilizador).
-
-    **Campos do `DashboardStatsDto`:**
-
-    -   `totalIncidents`: `number` - O número total de incidentes no sistema, independentemente do estado.
-    -   `openIncidents`: `number` - O número de incidentes que não estão nos estados `CLOSED` ou `RESOLVED`. Esta métrica ajuda a identificar a carga de trabalho atual.
-    -   `closedIncidents`: `number` - O número de incidentes fechados ou resolvidos. Calculado como `totalIncidents - openIncidents`.
-    -   `incidentsByStatus`: `Array<{ status: string; count: number }>` - Uma lista de objetos, cada um contendo um `status` (ex: OPEN, IN_PROGRESS, etc.) e a contagem de incidentes nesse estado. Útil para gráficos de distribuição.
-    -   `incidentsByPriority`: `Array<{ priority: string; count: number }>` - Uma lista de objetos, cada um contendo uma `priority` (P1, P2, P3, P4) e a contagem de incidentes nessa prioridade. Permite identificar quais prioridades têm mais volume.
-    -   `recentlyUpdated`: `Array<{ id: string; title: string; updatedAt: Date }>` - Uma lista dos 5 incidentes atualizados mais recentemente. Fornece visibilidade sobre a atividade recente da equipa.
-
-    **Documentação:**
-    [Guia Oficial do Nest.js sobre DTOs](https://docs.nestjs.com/openapi/types-and-parameters)
-
-3.  **Implementar a Lógica no `DashboardService`**
-    O serviço será responsável por consultar o banco de dados e agregar as métricas.
-
-    -   **`getStats()`**:
-        -   Use `this.prisma.incident.count()` para obter o `totalIncidents`.
-        -   Use `this.prisma.incident.count({ where: { status: { notIn: [Status.CLOSED, Status.RESOLVED] } } })` para obter `openIncidents`.
-        -   Calcule `closedIncidents` subtraindo `openIncidents` de `totalIncidents`.
-        -   Use `this.prisma.incident.groupBy({ by: ['status'], _count: { id: true } })` para agregar incidentes por estado. Mapeie o resultado para o formato esperado.
-        -   Use `this.prisma.incident.groupBy({ by: ['priority'], _count: { id: true } })` para agregar incidentes por prioridade. Mapeie o resultado.
-        -   Use `this.prisma.incident.findMany({ orderBy: { updatedAt: 'desc' }, take: 5 })` para obter os 5 incidentes atualizados mais recentemente.
-        -   Retorne o objeto `DashboardStatsDto` completo.
+Ao final deste sprint, a plataforma OrionOne deve estar funcional, estável, polida e pronta para o lançamento da sua versão MVP.
 
 4.  **Expor o Endpoint no `DashboardController`**
     Crie um endpoint `GET /api/dashboard/stats` que seja protegido e chame o serviço.

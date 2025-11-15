@@ -4,32 +4,32 @@
 
 ### Software Obrigatório
 
-| Software | Versão Mínima | Link Download | Propósito |
+| Software           | Versão Mínima | Link Download                                                 | Propósito                     |
 | ------------------ | ------------- | ------------------------------------------------------------- | ----------------------------- |
-| **Git** | 2.40+ | [git-scm.com](https://git-scm.com/) | Controlo de versão |
-| **Docker Desktop** | 4.25+ | [docker.com](https://www.docker.com/products/docker-desktop/) | Containers (PostgreSQL, etc.) |
-| **Node.js** | 20.x LTS | [nodejs.org](https://nodejs.org/) | Next.js + Nest.js runtimes |
+| **Git**            | 2.40+         | [git-scm.com](https://git-scm.com/)                           | Controlo de versão            |
+| **Docker Desktop** | 4.25+         | [docker.com](https://www.docker.com/products/docker-desktop/) | Containers (PostgreSQL, etc.) |
+| **Node.js**        | 20.x LTS      | [nodejs.org](https://nodejs.org/)                             | Next.js + Nest.js runtimes    |
 
 ### Software Opcional (Recomendado)
 
-| Software | Propósito |
+| Software                   | Propósito                          |
 | -------------------------- | ---------------------------------- |
-| **Visual Studio Code** | IDE recomendado |
-| **Postman** | Testar API endpoints |
+| **Visual Studio Code**     | IDE recomendado                    |
+| **Postman**                | Testar API endpoints               |
 | **pgAdmin** ou **DBeaver** | Cliente PostgreSQL (visualizar DB) |
 
 ### Extensões VS Code Recomendadas
 
 ```json
 {
- "recommendations": [
- "bradlc.vscode-tailwindcss",
- "dbaeumer.vscode-eslint",
- "esbenp.prettier-vscode",
- "editorconfig.editorconfig",
- "ms-azuretools.vscode-docker",
- "prisma.prisma"
- ]
+    "recommendations": [
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "editorconfig.editorconfig",
+        "ms-azuretools.vscode-docker",
+        "prisma.prisma"
+    ]
 }
 ```
 
@@ -132,11 +132,11 @@ docker-compose exec orionone-db psql -U postgres -d orionone -c "SELECT * FROM r
 
 **Aceder à Aplicação:**
 
-- **Frontend (Next.js):** http://localhost:3000
-- **Backend API (Nest.js):** http://localhost:3001/api
-- **API Docs (Swagger):** http://localhost:3001/api/docs
-- **PostgreSQL:** localhost:5432 (user: postgres, password: postgres, db: orionone)
-- **Mailpit (Email testing):** http://localhost:8025
+-   **Frontend (Next.js):** http://localhost:3000
+-   **Backend API (Nest.js):** http://localhost:3001/api
+-   **API Docs (Swagger):** http://localhost:3001/api/docs
+-   **PostgreSQL:** localhost:5432 (user: postgres, password: postgres, db: orionone)
+-   **Mailpit (Email testing):** http://localhost:8025
 
 ---
 
@@ -309,29 +309,29 @@ lsof -i :3001
 
 Docker permite executar aplicações em **containers** - ambientes isolados que incluem tudo o que a aplicação precisa (código, runtime, bibliotecas, etc). No OrionOne, usamos 8 containers:
 
-- **orionone-backend** - Nest.js 10 (Node 20, porta 3001)
-- **orionone-frontend** - Next.js 15 (Node 20, porta 3000)
-- **orionone-postgres** - PostgreSQL 16 (database, porta 5432)
-- **orionone-redis** - Redis 7 (cache, sessions, queues)
-- **orionone-mailpit** - Mailpit (email testing, porta 8025)
-- **orionone-nginx** - Nginx (reverse proxy, porta 80)
+-   **orionone-backend** - Nest.js 10 (Node 20, porta 3001)
+-   **orionone-frontend** - Next.js 15 (Node 20, porta 3000)
+-   **orionone-postgres** - PostgreSQL 16 (database, porta 5432)
+-   **orionone-redis** - Redis 7 (cache, sessions, queues)
+-   **orionone-mailpit** - Mailpit (email testing, porta 8025)
+-   **orionone-nginx** - Nginx (reverse proxy, porta 80)
 
 **Vantagens:**
 
-- Ambiente idêntico em todos os PCs (dev = produção)
-- Não precisa instalar PostgreSQL, Redis localmente
-- Setup em 10 minutos vs 2+ horas manual
-- Isolar projetos (cada um com suas versões)
+-   Ambiente idêntico em todos os PCs (dev = produção)
+-   Não precisa instalar PostgreSQL, Redis localmente
+-   Setup em 10 minutos vs 2+ horas manual
+-   Isolar projetos (cada um com suas versões)
 
 ### Conceitos Básicos
 
-| Termo | Explicação | Exemplo |
-| ------------------ | -------------------------------------- | ---------------------------- |
-| **Image** | Template do container (como um ISO) | `node:20-alpine` |
-| **Container** | Instância executável de uma image | `orionone-backend` a correr |
-| **Volume** | Pasta compartilhada (host container) | `./nest-backend` `/app` |
-| **Port Mapping** | Expor portas do container | `3000:3000` (host:container) |
-| **docker-compose** | Orquestra múltiplos containers | `docker-compose.yml` |
+| Termo              | Explicação                           | Exemplo                      |
+| ------------------ | ------------------------------------ | ---------------------------- |
+| **Image**          | Template do container (como um ISO)  | `node:20-alpine`             |
+| **Container**      | Instância executável de uma image    | `orionone-backend` a correr  |
+| **Volume**         | Pasta compartilhada (host container) | `./nest-backend` `/app`      |
+| **Port Mapping**   | Expor portas do container            | `3000:3000` (host:container) |
+| **docker-compose** | Orquestra múltiplos containers       | `docker-compose.yml`         |
 
 ### Comandos Essenciais
 
@@ -396,19 +396,19 @@ docker-compose exec orionone-backend ps aux
 
 ```yaml
 services:
- orionone-backend: # Nome do serviço
- build: # Construir de Dockerfile
- context: ./nest-backend
- dockerfile: Dockerfile
- ports: # Port mapping
- - "3001:3001" # host:container
- volumes: # Pastas compartilhadas
- - ./nest-backend:/app
- environment: # Variáveis de ambiente
- DATABASE_URL: postgresql://postgres:postgres@orionone-postgres:5432/orionone
- depends_on: # Dependências (iniciar primeiro)
- - orionone-postgres
- - orionone-redis
+    orionone-backend: # Nome do serviço
+    build: # Construir de Dockerfile
+    context: ./nest-backend
+    dockerfile: Dockerfile
+    ports: # Port mapping
+        - "3001:3001" # host:container
+    volumes: # Pastas compartilhadas
+        - ./nest-backend:/app
+    environment: # Variáveis de ambiente
+    DATABASE_URL: postgresql://postgres:postgres@orionone-postgres:5432/orionone
+    depends_on: # Dependências (iniciar primeiro)
+        - orionone-postgres
+        - orionone-redis
 ```
 
 ### Troubleshooting Docker
@@ -465,18 +465,18 @@ docker system df
 
 ### Docker vs Local (Quando usar cada um?)
 
-| Tarefa | Usar | Comando |
-| -------------- | --------- | ------------------------------------------- |
-| Rodar backend | Local | `cd nest-backend && npm run start:dev` |
-| Rodar frontend | Local | `cd next-frontend && npm run dev` |
-| Migrations | Local | `cd nest-backend && npx prisma migrate dev` |
-| Testes | Local | `npm run test` (em cada projeto) |
-| PostgreSQL | Docker | `docker-compose up -d orionone-postgres` |
-| Redis | Docker | `docker-compose up -d orionone-redis` |
-| Mailpit | Docker | `docker-compose up -d orionone-mailpit` |
-| Nginx | Docker | `docker-compose up -d orionone-nginx` |
-| Editar código | Local | VS Code no host |
-| Git | Local | `git` no host |
+| Tarefa         | Usar   | Comando                                     |
+| -------------- | ------ | ------------------------------------------- |
+| Rodar backend  | Local  | `cd nest-backend && npm run start:dev`      |
+| Rodar frontend | Local  | `cd next-frontend && npm run dev`           |
+| Migrations     | Local  | `cd nest-backend && npx prisma migrate dev` |
+| Testes         | Local  | `npm run test` (em cada projeto)            |
+| PostgreSQL     | Docker | `docker-compose up -d orionone-postgres`    |
+| Redis          | Docker | `docker-compose up -d orionone-redis`       |
+| Mailpit        | Docker | `docker-compose up -d orionone-mailpit`     |
+| Nginx          | Docker | `docker-compose up -d orionone-nginx`       |
+| Editar código  | Local  | VS Code no host                             |
+| Git            | Local  | `git` no host                               |
 
 **Regra de ouro:** Serviços (PostgreSQL, Redis, Mailpit) → Docker. Código (Next.js, Nest.js) → Local.
 
@@ -490,24 +490,24 @@ docker system df
 
 ### Recursos de Aprendizagem
 
-- **Docker Docs:** https://docs.docker.com/get-started/
-- **Docker Compose Docs:** https://docs.docker.com/compose/
-- **Next.js Docs:** https://nextjs.org/docs
-- **Nest.js Docs:** https://docs.nestjs.com/
-- **Prisma Docs:** https://www.prisma.io/docs
+-   **Docker Docs:** https://docs.docker.com/get-started/
+-   **Docker Compose Docs:** https://docs.docker.com/compose/
+-   **Next.js Docs:** https://nextjs.org/docs
+-   **Nest.js Docs:** https://docs.nestjs.com/
+-   **Prisma Docs:** https://www.prisma.io/docs
 
 ---
 
 ## Estrutura de Containers Docker
 
-| Container | Serviço | Porta | Propósito |
+| Container           | Serviço       | Porta | Propósito                  |
 | ------------------- | ------------- | ----- | -------------------------- |
-| `orionone-backend` | Nest.js 10 | 3001 | Backend API |
-| `orionone-frontend` | Next.js 15 | 3000 | Frontend Application |
-| `orionone-postgres` | PostgreSQL 16 | 5432 | Base de dados principal |
-| `orionone-redis` | Redis 7 | 6379 | Cache + Sessions + Queues |
-| `orionone-mailpit` | Mailpit | 8025 | Email testing (dev only) |
-| `orionone-nginx` | Nginx | 80 | Reverse proxy (production) |
+| `orionone-backend`  | Nest.js 10    | 3001  | Backend API                |
+| `orionone-frontend` | Next.js 15    | 3000  | Frontend Application       |
+| `orionone-postgres` | PostgreSQL 16 | 5432  | Base de dados principal    |
+| `orionone-redis`    | Redis 7       | 6379  | Cache + Sessions + Queues  |
+| `orionone-mailpit`  | Mailpit       | 8025  | Email testing (dev only)   |
+| `orionone-nginx`    | Nginx         | 80    | Reverse proxy (production) |
 
 ---
 
@@ -515,19 +515,439 @@ docker system df
 
 ### Utilizadores Seedados
 
-| Email | Password | Role | Permissões |
-| ------------------- | ------------ | ----- | -------------------- |
-| admin@orionone.test | your_password | admin | Todas |
-| agent@orionone.test | your_password | agent | Tickets + Comments |
-| user@orionone.test | your_password | user | Criar tickets apenas |
+| Email               | Password      | Role  | Permissões           |
+| ------------------- | ------------- | ----- | -------------------- |
+| admin@orionone.test | your_password | admin | Todas                |
+| agent@orionone.test | your_password | agent | Tickets + Comments   |
+| user@orionone.test  | your_password | user  | Criar tickets apenas |
 
 ### Base de Dados
 
-- **Host:** localhost
-- **Porta:** 5432
-- **Database:** orionone
-- **User:** postgres
-- **Password:** your_db_password
+-   **Host:** localhost
+-   **Porta:** 5432
+-   **Database:** orionone
+-   **User:** postgres
+-   **Password:** your_db_password
+
+---
+
+## Configuração de Tecnologias
+
+### Winston Logging
+
+**Status:** ✅ Configurado
+
+Winston está configurado como sistema de logging estruturado no backend.
+
+**Ficheiros criados:**
+
+-   `nest-backend/src/config/logger.config.ts` - Configuração Winston
+-   `nest-backend/logs/` - Diretório de logs (ignorado no Git)
+
+**Níveis de log:**
+
+-   `error` - Erros críticos
+-   `warn` - Avisos
+-   `info` - Informação geral (default)
+-   `http` - Requisições HTTP
+-   `verbose` - Detalhes adicionais
+-   `debug` - Debug mode
+
+**Logs gerados:**
+
+```
+logs/
+├── combined.log      # Todos os logs (JSON format)
+├── error.log         # Apenas erros
+├── exceptions.log    # Uncaught exceptions
+└── rejections.log    # Unhandled promise rejections
+```
+
+**Uso em serviços:**
+
+```typescript
+import { Inject, LoggerService } from "@nestjs/common";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+
+@Injectable()
+export class YourService {
+    constructor(
+        @Inject(WINSTON_MODULE_NEST_PROVIDER)
+        private readonly logger: LoggerService
+    ) {}
+
+    async someMethod() {
+        this.logger.log("Action performed", "YourService");
+        this.logger.error("Error occurred", error.stack, "YourService");
+    }
+}
+```
+
+**Configurar nível de log:**
+
+```bash
+# .env
+LOG_LEVEL=info  # production
+LOG_LEVEL=debug # development
+```
+
+---
+
+### Swagger/OpenAPI Documentation
+
+**Status:** ✅ Configurado em `/api/docs`
+
+API documentation interativa disponível em `http://localhost:3001/api/docs`
+
+**Decorators disponíveis:**
+
+```typescript
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+} from "@nestjs/swagger";
+
+@ApiTags("incidents")
+@Controller("incidents")
+@ApiBearerAuth()
+export class IncidentsController {
+    @Post()
+    @ApiOperation({ summary: "Create incident" })
+    @ApiResponse({ status: 201, description: "Created" })
+    @ApiResponse({ status: 400, description: "Bad Request" })
+    async create(@Body() dto: CreateIncidentDto) {}
+}
+```
+
+**Documentar DTOs:**
+
+```typescript
+import { ApiProperty } from "@nestjs/swagger";
+
+export class CreateIncidentDto {
+    @ApiProperty({ example: "Server Down", description: "Incident title" })
+    title: string;
+
+    @ApiProperty({ enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"] })
+    priority: string;
+}
+```
+
+---
+
+### Helmet Security Headers
+
+**Status:** ✅ Configurado globalmente
+
+Helmet está ativo e configura headers HTTP seguros automaticamente.
+
+**Headers configurados:**
+
+-   `Content-Security-Policy` - Previne XSS
+-   `X-DNS-Prefetch-Control` - Controla DNS prefetch
+-   `X-Frame-Options` - Previne clickjacking
+-   `X-Content-Type-Options` - Previne MIME sniffing
+-   `Strict-Transport-Security` - Force HTTPS
+
+**Verificar headers:**
+
+```bash
+curl -I http://localhost:3001/api/health
+```
+
+---
+
+### Compression (Gzip/Deflate)
+
+**Status:** ✅ Configurado globalmente
+
+Todas as respostas HTTP são comprimidas automaticamente (redução ~60-80%).
+
+**Testar compressão:**
+
+```bash
+curl -H "Accept-Encoding: gzip" http://localhost:3001/api/health -v
+# Verificar header: Content-Encoding: gzip
+```
+
+---
+
+### Rate Limiting (Throttler)
+
+**Status:** ✅ Configurado (10 req/min global)
+
+Proteção contra brute-force e abuso de API.
+
+**Configuração global:**
+
+-   10 requisições por minuto (padrão)
+-   Ajustável em `app.module.ts`
+
+**Override por rota:**
+
+```typescript
+import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
+
+@Controller("auth")
+@UseGuards(ThrottlerGuard)
+export class AuthController {
+    @Post("login")
+    @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 tentativas/min
+    async login() {}
+}
+```
+
+**Ajustar limites globais:**
+
+```typescript
+// app.module.ts
+ThrottlerModule.forRoot([
+    {
+        ttl: 60000, // 60 segundos
+        limit: 20, // 20 requisições
+    },
+]);
+```
+
+---
+
+### Environment Variables (ConfigModule)
+
+**Status:** ✅ Configurado globalmente
+
+Variáveis de ambiente geridas pelo `@nestjs/config`.
+
+**Ficheiros:**
+
+-   `.env.example` - Template (commit)
+-   `.env` - Valores reais (NÃO commit)
+
+**Variáveis disponíveis:**
+
+```bash
+# Environment
+NODE_ENV=development
+PORT=3001
+LOG_LEVEL=info
+
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/orionone
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_EXPIRES_IN=7d
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Meilisearch
+MEILISEARCH_HOST=http://localhost:7700
+MEILISEARCH_KEY=masterKey
+
+# CORS
+FRONTEND_URL=http://localhost:3000
+
+# Email (Mailpit dev)
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_FROM=noreply@orionone.local
+```
+
+**Uso em serviços:**
+
+```typescript
+import { ConfigService } from "@nestjs/config";
+
+@Injectable()
+export class AuthService {
+    constructor(private config: ConfigService) {}
+
+    getSecret(): string {
+        return this.config.get<string>("JWT_SECRET");
+    }
+}
+```
+
+---
+
+### CASL Authorization
+
+**Status:** ✅ Configurado com 3 roles
+
+Sistema de autorização baseado em roles (RBAC).
+
+**Roles disponíveis:**
+
+-   `ADMIN` - Acesso total
+-   `AGENT` - Gestão de incidents e knowledge base
+-   `USER` - Criar e ver próprios incidents
+
+**Permissions matrix:**
+
+```typescript
+// ADMIN
+can(Action.Manage, "all");
+
+// AGENT
+can(Action.Read, "all");
+can(Action.Create, "Incident");
+can(Action.Update, "Incident");
+can(Action.Create, "Comment");
+can(Action.Create, "KnowledgeBase");
+
+// USER
+can(Action.Read, "Incident");
+can(Action.Create, "Incident");
+can(Action.Update, "Incident"); // apenas próprios
+```
+
+**Uso em serviços:**
+
+```typescript
+import { CaslAbilityFactory, Action } from "./casl/casl-ability.factory";
+
+@Injectable()
+export class IncidentsService {
+    constructor(private casl: CaslAbilityFactory) {}
+
+    async update(user: User, incident: Incident) {
+        const ability = this.casl.createForUser(user);
+
+        if (!ability.can(Action.Update, "Incident")) {
+            throw new ForbiddenException();
+        }
+        // proceder com update
+    }
+}
+```
+
+---
+
+### Validation Pipe
+
+**Status:** ✅ Configurado globalmente
+
+Validação automática de DTOs usando `class-validator`.
+
+**Configuração:**
+
+-   `whitelist: true` - Remove propriedades não definidas
+-   `forbidNonWhitelisted: true` - Rejeita se tiver extras
+-   `transform: true` - Transforma tipos automaticamente
+
+**Criar DTO validado:**
+
+```typescript
+import {
+    IsString,
+    IsEmail,
+    IsEnum,
+    MinLength,
+    MaxLength,
+} from "class-validator";
+
+export class CreateUserDto {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    @MinLength(8)
+    @MaxLength(128)
+    password: string;
+
+    @IsEnum(["ADMIN", "AGENT", "USER"])
+    role: string;
+}
+```
+
+**Erros de validação:**
+
+```json
+{
+    "statusCode": 400,
+    "message": [
+        "email must be an email",
+        "password must be longer than or equal to 8 characters"
+    ],
+    "error": "Bad Request"
+}
+```
+
+---
+
+### Docker Configuration
+
+**Status:** ✅ Configurado com 7 services
+
+**Services running:**
+
+```yaml
+services:
+    postgres: # PostgreSQL 18
+    redis: # Redis 7-alpine
+    meilisearch: # Meilisearch v1.25
+    mailpit: # Email testing
+    backend: # Nest.js (development mode)
+    frontend: # Next.js (development mode)
+    nginx: # Reverse proxy
+```
+
+**Comandos úteis:**
+
+```bash
+# Iniciar tudo
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Restart um serviço
+docker-compose restart backend
+
+# Parar tudo
+docker-compose down
+
+# Parar e remover volumes (CUIDADO: perde dados!)
+docker-compose down -v
+
+# Ver status
+docker-compose ps
+
+# Entrar num container
+docker exec -it orionone-backend sh
+docker exec -it orionone-postgres psql -U orionone -d orionone
+```
+
+**Health checks:**
+
+```bash
+# PostgreSQL
+docker exec orionone-postgres pg_isready -U orionone
+
+# Redis
+docker exec orionone-redis redis-cli ping
+
+# Backend API
+curl http://localhost:3001/api/health
+
+# Frontend
+curl http://localhost:3000
+```
+
+**Volumes criados:**
+
+-   `postgres_data` - Dados PostgreSQL (persistente)
+-   `redis_data` - Dados Redis (persistente)
+-   `meilisearch_data` - Índices Meilisearch (persistente)
+-   `backend_node_modules` - Dependências backend
+-   `backend_uploads` - Ficheiros enviados
+-   `frontend_node_modules` - Dependências frontend
+-   `frontend_next` - Cache Next.js build
 
 ---
 
@@ -535,15 +955,15 @@ docker system df
 
 Para informação detalhada, consultar:
 
-- **[Migration Timeline](docs/MIGRATION-PART-4-TIMELINE.md)** - Cronograma de 10 semanas (14 Nov - 31 Jan)
-- **[Architecture](docs/architecture.md)** - Arquitetura Next.js + Nest.js (3-layer, patterns, security)
-- **[Migration Parts 1-5](docs/)** - Setup, Backend, Frontend, Timeline, Cleanup
-- **[MVP Document](docs/MVP.md)** - MVP completo com 39 features
-- **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
+-   **[Migration Timeline](docs/MIGRATION-PART-4-TIMELINE.md)** - Cronograma de 10 semanas (14 Nov - 31 Jan)
+-   **[Architecture](docs/architecture.md)** - Arquitetura Next.js + Nest.js (3-layer, patterns, security)
+-   **[Migration Parts 1-5](docs/)** - Setup, Backend, Frontend, Timeline, Cleanup
+-   **[MVP Document](docs/MVP.md)** - MVP completo com 39 features
+-   **[Requirements](docs/requirements.md)** - Requisitos funcionais e não-funcionais
 
 ### Documentação Arquivada (Laravel/Vue)
 
-- **[Archive](docs/archive-laravel-vue/)** - Documentação completa da implementação Laravel 12 + Vue 3
+-   **[Archive](docs/archive-laravel-vue/)** - Documentação completa da implementação Laravel 12 + Vue 3
 
 ---
 

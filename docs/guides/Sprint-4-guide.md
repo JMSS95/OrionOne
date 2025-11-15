@@ -18,6 +18,90 @@ Implementar uma Knowledge Base (KB) para artigos de autoajuda e integrar o Meili
 
 ---
 
+## Aplicando as Tecnologias Fundamentais
+
+Neste sprint, o foco é a criação da Knowledge Base e a sua integração com um motor de pesquisa avançado. Vamos aplicar as tecnologias da nossa stack para construir esta funcionalidade de forma robusta.
+
+### 1. Pesquisa Avançada com Meilisearch
+
+**Objetivo:** Implementar uma pesquisa full-text rápida e com tolerância a erros de digitação para os artigos da Knowledge Base.
+
+**Ações:**
+
+-   **Configuração:** Crie um `MeilisearchModule` e um `MeilisearchService` no `nest-backend`.
+-   **Indexação:** Configure um índice `articles` no Meilisearch. O serviço deve ser responsável por adicionar, atualizar e remover artigos do índice sempre que um artigo é criado, atualizado ou apagado na base de dados.
+-   **Pesquisa:** O `MeilisearchService` deve expor um método `search` que executa a pesquisa no índice `articles`, permitindo filtros por categoria, status, etc.
+
+**Documentação:**
+[Documentação Oficial do Meilisearch](https://www.meilisearch.com/docs/learn/getting_started/quick_start)
+[SDK JavaScript do Meilisearch](https://github.com/meilisearch/meilisearch-js)
+
+### 2. Gestão de Configuração com ConfigModule
+
+**Objetivo:** Gerir as credenciais e o endereço do Meilisearch de forma segura.
+
+**Ações:**
+
+-   Adicione `MEILISEARCH_HOST` e `MEILISEARCH_KEY` ao seu ficheiro `.env`.
+-   No `MeilisearchModule` ou `MeilisearchService`, use o `ConfigService` do Nest.js para aceder a estas variáveis de ambiente, evitando hardcoding de credenciais.
+
+**Documentação:**
+[Guia Oficial do Nest.js sobre Configuration](https://docs.nestjs.com/techniques/configuration)
+
+### 3. Logging de Pesquisa com Winston
+
+**Objetivo:** Registar e analisar o comportamento de pesquisa dos utilizadores.
+
+**Ações:**
+
+-   No `MeilisearchService`, injete o `LoggerService` (Winston).
+-   Registe cada pesquisa efetuada (`query`), o número de resultados encontrados e, crucialmente, as pesquisas que não retornam resultados. Isto é valioso para identificar lacunas de conteúdo na Knowledge Base.
+
+**Documentação:**
+[Guia Oficial do `nest-winston`](https://github.com/gremo/nest-winston)
+
+### 4. Documentação da API de Pesquisa com Swagger
+
+**Objetivo:** Documentar claramente como utilizar o endpoint de pesquisa.
+
+**Ações:**
+
+-   No `articles.controller.ts` (ou num `search.controller.ts` dedicado), documente o endpoint de pesquisa.
+-   Use `@ApiQuery` para detalhar todos os parâmetros de pesquisa disponíveis: `query`, `filter`, `sort`, `limit`, etc.
+
+**Documentação:**
+[Guia Oficial do Nest.js sobre OpenAPI (Swagger)](https://docs.nestjs.com/openapi/introduction)
+
+### 5. Autorização com CASL
+
+**Objetivo:** Definir quem pode criar, editar, publicar e ler artigos.
+
+**Ações:**
+
+-   No `casl-ability.factory.ts`, defina as permissões para o `subject` 'Article'.
+    -   `ADMIN` pode gerir (`manage`) todos os artigos.
+    -   `AGENT` pode criar e editar artigos, mas talvez não publicar.
+    -   `USER` pode apenas ler (`read`) artigos com o status `PUBLISHED`.
+-   Aplique estas regras nos métodos do `articles.service.ts`.
+
+**Documentação:**
+[Guia Oficial do CASL](https://casl.js.org/v6/en/guide/intro)
+[Integração do CASL com Nest.js](https://docs.nestjs.com/security/authorization#casl)
+
+### 6. Reutilização do Tiptap e Validação
+
+-   **Tiptap:** Reutilize o componente de Rich Text do frontend para o corpo (`content`) dos artigos, garantindo uma experiência de edição consistente.
+-   **Validação:** Use `class-validator` nos DTOs de pesquisa para garantir que os parâmetros (como `query`) são do tipo correto e não estão malformados.
+
+**Documentação:**
+[Guia Oficial do Nest.js sobre Validação](https://docs.nestjs.com/techniques/validation)
+
+### 7. Compressão
+
+-   **Compressão:** A compressão global continua a ser importante, especialmente ao retornar o conteúdo de múltiplos artigos nos resultados da pesquisa, reduzindo o tamanho do payload.
+
+---
+
 ## Funcionalidade 4.1: CRUD de Artigos da Knowledge Base
 
 **Objetivo:** Implementar um "vertical slice" para a gestão de artigos, utilizando o mesmo editor Rich Text (Tiptap) dos incidentes.
