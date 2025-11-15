@@ -1515,5 +1515,4 @@ rankingRules: [
     "proximity", // ← Remover se não necessário
 ];
 ```
-
 ---

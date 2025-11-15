@@ -12,10 +12,10 @@
 
 ### Software Opcional (Recomendado)
 
-| Software                   | Propósito                          |
+| Software | Propósito |
 | -------------------------- | ---------------------------------- |
-| **Visual Studio Code**     | IDE recomendado                    |
-| **Postman**                | Testar API endpoints               |
+| **Visual Studio Code** | IDE recomendado |
+| **Postman** | Testar API endpoints |
 | **pgAdmin** ou **DBeaver** | Cliente PostgreSQL (visualizar DB) |
 
 ### Extensões VS Code Recomendadas
@@ -535,7 +535,7 @@ docker system df
 
 ### Winston Logging
 
-**Status:** ✅ Configurado
+**Status:** Configurado
 
 Winston está configurado como sistema de logging estruturado no backend.
 
@@ -595,7 +595,7 @@ LOG_LEVEL=debug # development
 
 ### Swagger/OpenAPI Documentation
 
-**Status:** ✅ Configurado em `/api/docs`
+**Status:** Configurado em `/api/docs`
 
 API documentation interativa disponível em `http://localhost:3001/api/docs`
 
@@ -639,7 +639,7 @@ export class CreateIncidentDto {
 
 ### Helmet Security Headers
 
-**Status:** ✅ Configurado globalmente
+**Status:** Configurado globalmente
 
 Helmet está ativo e configura headers HTTP seguros automaticamente.
 
@@ -661,7 +661,7 @@ curl -I http://localhost:3001/api/health
 
 ### Compression (Gzip/Deflate)
 
-**Status:** ✅ Configurado globalmente
+**Status:** Configurado globalmente
 
 Todas as respostas HTTP são comprimidas automaticamente (redução ~60-80%).
 
@@ -676,7 +676,7 @@ curl -H "Accept-Encoding: gzip" http://localhost:3001/api/health -v
 
 ### Rate Limiting (Throttler)
 
-**Status:** ✅ Configurado (10 req/min global)
+**Status:** Configurado (10 req/min global)
 
 Proteção contra brute-force e abuso de API.
 
@@ -715,7 +715,7 @@ ThrottlerModule.forRoot([
 
 ### Environment Variables (ConfigModule)
 
-**Status:** ✅ Configurado globalmente
+**Status:** Configurado globalmente
 
 Variáveis de ambiente geridas pelo `@nestjs/config`.
 
@@ -776,7 +776,7 @@ export class AuthService {
 
 ### CASL Authorization
 
-**Status:** ✅ Configurado com 3 roles
+**Status:** Configurado com 3 roles
 
 Sistema de autorização baseado em roles (RBAC).
 
@@ -829,7 +829,7 @@ export class IncidentsService {
 
 ### Validation Pipe
 
-**Status:** ✅ Configurado globalmente
+**Status:** Configurado globalmente
 
 Validação automática de DTOs usando `class-validator`.
 
@@ -881,7 +881,7 @@ export class CreateUserDto {
 
 ### Docker Configuration
 
-**Status:** ✅ Configurado com 7 services
+**Status:** Configurado com 7 services
 
 **Services running:**
 
