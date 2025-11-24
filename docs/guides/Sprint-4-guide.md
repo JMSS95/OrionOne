@@ -18,6 +18,23 @@ Implementar uma Knowledge Base (KB) para artigos de autoajuda e integrar o Meili
 
 ---
 
+## Instalação de Dependências
+
+### Backend (Nest.js)
+
+```bash
+npm install meilisearch slugify
+npm install --save-dev @types/slugify
+```
+
+### Frontend (Next.js)
+
+```bash
+npm install @meilisearch/instant-meilisearch-client
+```
+
+---
+
 ## Aplicando as Tecnologias Fundamentais
 
 Neste sprint, o foco é a criação da Knowledge Base e a sua integração com um motor de pesquisa avançado. Vamos aplicar as tecnologias da nossa stack para construir esta funcionalidade de forma robusta.
@@ -475,8 +492,8 @@ Extender o serviço para indexar e pesquisar múltiplos tipos de documentos (inc
     -   Chame este método quando um artigo for apagado ou quando mudar de PUBLISHED para DRAFT.
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Multi-Search](https://docs.meilisearch.com/reference/api/multi_search.html)
-[Guia Oficial do Meilisearch sobre Configuração de Índices](https://docs.meilisearch.com/learn/core_concepts/indexes.html)
+[Guia Oficial do Meilisearch sobre Multi-Search](https://www.meilisearch.com/docs/reference/api/multi_search)
+[Guia Oficial do Meilisearch sobre Configuração de Índices](https://www.meilisearch.com/docs/learn/core_concepts/indexes)
 
 #### 1.2. Criar um Endpoint de Pesquisa Unificada
 
@@ -536,7 +553,7 @@ return {
 ```
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Multi-Search](https://docs.meilisearch.com/reference/api/multi_search.html)
+[Guia Oficial do Meilisearch sobre Multi-Search](https://www.meilisearch.com/docs/reference/api/multi_search)
 
 #### 1.3. Escrever Testes (TDD)
 
@@ -692,7 +709,7 @@ Exibir os resultados da pesquisa de forma clara, organizada e visualmente apelat
     -   Esc para fechar o popover.
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Highlighting](https://docs.meilisearch.com/learn/advanced/highlighting.html)
+[Guia Oficial do Meilisearch sobre Highlighting](https://www.meilisearch.com/docs/learn/advanced/highlighting)
 
 #### 2.3. Testar o Fluxo de Pesquisa Unificada
 

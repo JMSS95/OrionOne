@@ -598,7 +598,7 @@ Vamos integrar o `nodemailer` para o envio de emails transacionais.
 
 -   **Nest.js Mailer:** [https://docs.nestjs.com/techniques/mailer](https://docs.nestjs.com/techniques/mailer)
 -   **Nodemailer:** [https://nodemailer.com/](https://nodemailer.com/)
--   **Prisma `groupBy`:** [https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#groupby](https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#groupby)
+-   **Prisma `groupBy`:** [https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-and-summarizing#group-by](https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-and-summarizing#group-by)
 -   **shadcn/charts:** [https://ui.shadcn.com/charts](https://ui.shadcn.com/charts)
 -   **TanStack Query (React):** [https://tanstack.com/query/latest/docs/react/overview](https://tanstack.com/query/latest/docs/react/overview)
 -   **Playwright Mocking:** [https://playwright.dev/docs/mocking](https://playwright.dev/docs/mocking)
