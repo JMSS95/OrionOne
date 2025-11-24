@@ -56,11 +56,11 @@ async function bootstrap() {
 
     const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
     logger.log(
-        `🚀 Backend running on http://localhost:${port}/api`,
+        `Backend running on http://localhost:${port}/api`,
         'Bootstrap',
     );
     logger.log(
-        `📚 API Documentation available at http://localhost:${port}/api/docs`,
+        `API Documentation available at http://localhost:${port}/api/docs`,
         'Bootstrap',
     );
 }

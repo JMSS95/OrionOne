@@ -9,31 +9,31 @@ import { winstonConfig } from './config/logger.config';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [
-    // Configuration Module
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-    }),
+    imports: [
+        // Configuration Module
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: '.env',
+        }),
 
-    // Rate Limiting
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000, // 60 seconds
-        limit: 10, // 10 requests per minute
-      },
-    ]),
+        // Rate Limiting
+        ThrottlerModule.forRoot([
+            {
+                ttl: 60000, // 60 seconds
+                limit: 10, // 10 requests per minute
+            },
+        ]),
 
-    // Logging
-    WinstonModule.forRoot(winstonConfig),
+        // Logging
+        WinstonModule.forRoot(winstonConfig),
 
-    // Database
-    PrismaModule,
+        // Database
+        PrismaModule,
 
-    // Authorization
-    CaslModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+        // Authorization
+        CaslModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule {}

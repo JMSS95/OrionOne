@@ -10,14 +10,12 @@
 | **Docker Desktop** | 4.25+         | [docker.com](https://www.docker.com/products/docker-desktop/) | Containers (PostgreSQL, etc.) |
 | **Node.js**        | 20.x LTS      | [nodejs.org](https://nodejs.org/)                             | Next.js + Nest.js runtimes    |
 
-> **Verificar versão instalada:** `node -v` (deve retornar v20.x.x)
-
 ### Software Opcional (Recomendado)
 
-| Software                   | Propósito                          |
+| Software | Propósito |
 | -------------------------- | ---------------------------------- |
-| **Visual Studio Code**     | IDE recomendado                    |
-| **Postman**                | Testar API endpoints               |
+| **Visual Studio Code** | IDE recomendado |
+| **Postman** | Testar API endpoints |
 | **pgAdmin** ou **DBeaver** | Cliente PostgreSQL (visualizar DB) |
 
 ### Extensões VS Code Recomendadas
@@ -37,25 +35,6 @@
 
 ---
 
-## Opções de Setup
-
-### Opção 1: GitHub Codespaces (Recomendado - Zero Setup!)
-
-Setup automático no browser em ~5 minutos, sem instalações locais necessárias.
-
-**Ver guia completo:** [`.devcontainer/CODESPACE-SETUP-GUIDE.md`](.devcontainer/CODESPACE-SETUP-GUIDE.md)
-
-**Passos rápidos:**
-
-1. Acede ao repositório no GitHub
-2. Clica "Code" → "Codespaces" → "Create codespace"
-3. Aguarda ~5 min (tudo instala automaticamente)
-4. Codespace pronto com todos os serviços a correr!
-
-### Opção 2: Setup Local (Manual)
-
----
-
 ## Setup Inicial (Primeira Vez)
 
 ### 1. Clonar Repositório
@@ -68,43 +47,38 @@ cd OrionOne
 ### 2. Configurar Ambiente
 
 ```bash
-# Ficheiro .env na RAIZ do projeto
-cp .env.example .env
-# Editar .env se necessário (valores padrão funcionam para desenvolvimento)
-
-# Backend também tem .env.example próprio (opcional)
+# Backend (Nest.js)
 cd nest-backend
 cp .env.example .env
+# Editar .env: DATABASE_URL, JWT_SECRET, etc.
 cd ..
 
-# Frontend (Next.js) - NÃO tem .env por padrão
-# Variáveis ambiente do frontend vêm do docker-compose.yml
+# Frontend (Next.js)
+cd next-frontend
+cp .env.local.example .env.local
+# Editar .env.local: NEXT_PUBLIC_API_URL, etc.
+cd ..
 ```
 
 ### 3. Iniciar Docker
 
 ```bash
-# Iniciar containers (PostgreSQL + Redis + Meilisearch + Mailpit + Backend + Frontend + Nginx)
+# Iniciar containers (PostgreSQL + Redis + Mailpit + Nginx)
 docker-compose up -d
 
-# Verificar se containers estão a correr (devem aparecer 7 containers)
+# Verificar se containers estão a correr
 docker-compose ps
-
-# Verificar logs se algum falhar
-docker-compose logs -f
 ```
 
 ### 4. Instalar Dependências
 
-> **Nota:** Se estás a usar Docker para rodar backend/frontend (recomendado), as dependências são instaladas automaticamente nos containers. Este passo é apenas se quiseres rodar localmente.
-
 ```bash
-# Backend (Nest.js) - apenas se rodar localmente
+# Backend (Nest.js)
 cd nest-backend
 npm install
 cd ..
 
-# Frontend (Next.js) - apenas se rodar localmente
+# Frontend (Next.js)
 cd next-frontend
 npm install
 cd ..
@@ -153,20 +127,16 @@ npm run test
 cd ..
 
 # Verificar dados seedados (opcional)
-docker-compose exec postgres psql -U orionone -d orionone -c "SELECT * FROM \"Role\";"
+docker-compose exec orionone-db psql -U postgres -d orionone -c "SELECT * FROM roles;"
 ```
 
 **Aceder à Aplicação:**
 
--   **Nginx (Proxy):** http://localhost:80
 -   **Frontend (Next.js):** http://localhost:3000
 -   **Backend API (Nest.js):** http://localhost:3001/api
 -   **API Docs (Swagger):** http://localhost:3001/api/docs
--   **PostgreSQL:** localhost:5432 (user: **orionone**, password: **secret**, db: orionone)
--   **Redis:** localhost:6379
--   **Meilisearch:** http://localhost:7700 (master key: **masterKeyForDevelopment123**)
+-   **PostgreSQL:** localhost:5432 (user: postgres, password: postgres, db: orionone)
 -   **Mailpit (Email testing):** http://localhost:8025
--   **Prisma Studio:** http://localhost:5555 (quando executar `npx prisma studio`)
 
 ---
 
@@ -222,7 +192,7 @@ npx prisma migrate deploy
 cd ..
 
 # Aceder ao PostgreSQL (psql)
-docker-compose exec postgres psql -U orionone -d orionone
+docker-compose exec orionone-db psql -U postgres -d orionone
 
 # Prisma Studio (visualizar DB no browser)
 cd nest-backend
@@ -302,35 +272,16 @@ cat .env.local
 docker-compose ps
 
 # Ver logs do PostgreSQL
-docker-compose logs postgres
+docker-compose logs orionone-db
 
 # Recriar base de dados
-docker-compose exec postgres psql -U orionone -c "DROP DATABASE IF EXISTS orionone WITH (FORCE);"
-docker-compose exec postgres psql -U orionone -c "CREATE DATABASE orionone;"
+docker-compose exec orionone-db psql -U postgres -c "DROP DATABASE IF EXISTS orionone;"
+docker-compose exec orionone-db psql -U postgres -c "CREATE DATABASE orionone;"
 
 # Executar migrations novamente
 cd nest-backend
 npx prisma migrate dev
 cd ..
-```
-
-### Meilisearch não conecta
-
-```bash
-# Verificar se Meilisearch está a correr
-docker-compose ps | grep meilisearch
-
-# Ver logs
-docker-compose logs meilisearch
-
-# Testar conexão
-curl http://localhost:7700/health
-
-# Verificar master key está correta no .env
-cat .env | grep MEILISEARCH_KEY
-
-# Reiniciar Meilisearch
-docker-compose restart meilisearch
 ```
 
 ### Erro de porta já em uso
@@ -356,15 +307,14 @@ lsof -i :3001
 
 ### O que é Docker?
 
-Docker permite executar aplicações em **containers** - ambientes isolados que incluem tudo o que a aplicação precisa (código, runtime, bibliotecas, etc). No OrionOne, usamos **7 containers**:
+Docker permite executar aplicações em **containers** - ambientes isolados que incluem tudo o que a aplicação precisa (código, runtime, bibliotecas, etc). No OrionOne, usamos 8 containers:
 
--   **orionone-backend** - NestJS 11.1.8 (Node 20, porta 3001)
--   **orionone-frontend** - Next.js 15.5.6 (Node 20, porta 3000)
--   **orionone-postgres** - PostgreSQL 18 (database, porta 5432)
--   **orionone-redis** - Redis 7 (cache, sessions, porta 6379)
--   **orionone-meilisearch** - Meilisearch v1.25 (search engine, porta 7700)
+-   **orionone-backend** - Nest.js 10 (Node 20, porta 3001)
+-   **orionone-frontend** - Next.js 15 (Node 20, porta 3000)
+-   **orionone-postgres** - PostgreSQL 16 (database, porta 5432)
+-   **orionone-redis** - Redis 7 (cache, sessions, queues)
 -   **orionone-mailpit** - Mailpit (email testing, porta 8025)
--   **orionone-nginx** - Nginx alpine (reverse proxy, porta 80)
+-   **orionone-nginx** - Nginx (reverse proxy, porta 80)
 
 **Vantagens:**
 
@@ -395,8 +345,7 @@ docker-compose ps
 docker ps -a
 
 # Iniciar containers
-docker-compose up      # Modo attached (logs no terminal, Ctrl+C para parar)
-docker-compose up -d   # Modo detached (background, continua a correr)
+docker-compose up -d # -d = detached (background)
 
 # Parar containers
 docker-compose stop # Apenas para (dados mantidos)
@@ -418,19 +367,13 @@ docker-compose logs --tail=50 orionone-backend # Últimas 50 linhas
 # Sintaxe: docker-compose exec <container> <comando>
 
 # PostgreSQL commands
-docker-compose exec postgres psql -U orionone -d orionone
+docker-compose exec orionone-postgres psql -U postgres -d orionone
 
 # Redis CLI
-docker-compose exec redis redis-cli
-
-# Meilisearch - verificar health
-curl http://localhost:7700/health
-
-# Meilisearch - listar índices
-curl -H "Authorization: Bearer masterKeyForDevelopment123" http://localhost:7700/indexes
+docker-compose exec orionone-redis redis-cli
 
 # Abrir shell dentro do container
-docker-compose exec backend sh
+docker-compose exec orionone-backend sh
 ```
 
 #### Debugging
@@ -557,46 +500,34 @@ docker system df
 
 ## Estrutura de Containers Docker
 
-| Container              | Serviço           | Porta(s)   | Propósito                     |
-| ---------------------- | ----------------- | ---------- | ----------------------------- |
-| `orionone-backend`     | NestJS 11.1.8     | 3001       | Backend API                   |
-| `orionone-frontend`    | Next.js 15.5.6    | 3000       | Frontend Application          |
-| `orionone-postgres`    | PostgreSQL 18     | 5432       | Base de dados principal       |
-| `orionone-redis`       | Redis 7           | 6379       | Cache + Sessions + Queues     |
-| `orionone-meilisearch` | Meilisearch v1.25 | 7700       | Search Engine                 |
-| `orionone-mailpit`     | Mailpit           | 1025, 8025 | Email testing (SMTP + Web UI) |
-| `orionone-nginx`       | Nginx Alpine      | 80         | Reverse proxy                 |
+| Container           | Serviço       | Porta | Propósito                  |
+| ------------------- | ------------- | ----- | -------------------------- |
+| `orionone-backend`  | Nest.js 10    | 3001  | Backend API                |
+| `orionone-frontend` | Next.js 15    | 3000  | Frontend Application       |
+| `orionone-postgres` | PostgreSQL 16 | 5432  | Base de dados principal    |
+| `orionone-redis`    | Redis 7       | 6379  | Cache + Sessions + Queues  |
+| `orionone-mailpit`  | Mailpit       | 8025  | Email testing (dev only)   |
+| `orionone-nginx`    | Nginx         | 80    | Reverse proxy (production) |
 
 ---
 
 ## Credenciais Padrão (Desenvolvimento)
 
-### Utilizadores Seedados (após `npx prisma db seed`)
+### Utilizadores Seedados
 
-| Email               | Password    | Role  | Permissões           |
-| ------------------- | ----------- | ----- | -------------------- |
-| admin@orionone.test | password123 | ADMIN | Todas                |
-| agent@orionone.test | password123 | AGENT | Tickets + Comments   |
-| user@orionone.test  | password123 | USER  | Criar tickets apenas |
+| Email               | Password      | Role  | Permissões           |
+| ------------------- | ------------- | ----- | -------------------- |
+| admin@orionone.test | your_password | admin | Todas                |
+| agent@orionone.test | your_password | agent | Tickets + Comments   |
+| user@orionone.test  | your_password | user  | Criar tickets apenas |
 
-### Base de Dados (PostgreSQL)
+### Base de Dados
 
--   **Host:** localhost (ou `postgres` dentro de containers)
+-   **Host:** localhost
 -   **Porta:** 5432
 -   **Database:** orionone
--   **User:** orionone
--   **Password:** secret
-
-### Meilisearch
-
--   **Host:** http://localhost:7700
--   **Master Key:** masterKeyForDevelopment123
-
-### Redis
-
--   **Host:** localhost (ou `redis` dentro de containers)
--   **Porta:** 6379
--   **Password:** (nenhuma em desenvolvimento)
+-   **User:** postgres
+-   **Password:** your_db_password
 
 ---
 
@@ -626,10 +557,10 @@ Winston está configurado como sistema de logging estruturado no backend.
 
 ```
 logs/
- combined.log # Todos os logs (JSON format)
- error.log # Apenas erros
- exceptions.log # Uncaught exceptions
- rejections.log # Unhandled promise rejections
+├── combined.log      # Todos os logs (JSON format)
+├── error.log         # Apenas erros
+├── exceptions.log    # Uncaught exceptions
+└── rejections.log    # Unhandled promise rejections
 ```
 
 **Uso em serviços:**
@@ -656,7 +587,7 @@ export class YourService {
 
 ```bash
 # .env
-LOG_LEVEL=info # production
+LOG_LEVEL=info  # production
 LOG_LEVEL=debug # development
 ```
 
@@ -815,7 +746,7 @@ REDIS_PORT=6379
 
 # Meilisearch
 MEILISEARCH_HOST=http://localhost:7700
-MEILISEARCH_KEY=masterKeyForDevelopment123
+MEILISEARCH_KEY=masterKey
 
 # CORS
 FRONTEND_URL=http://localhost:3000
@@ -1033,14 +964,6 @@ Para informação detalhada, consultar:
 ### Documentação Arquivada (Laravel/Vue)
 
 -   **[Archive](docs/archive-laravel-vue/)** - Documentação completa da implementação Laravel 12 + Vue 3
-
----
-
-## Alternativa: GitHub Codespaces
-
-**Não queres fazer setup manual?** Usa GitHub Codespaces para ambiente completo em ~5 minutos!
-
-**[Guia Completo de Codespaces](.devcontainer/CODESPACE-SETUP-GUIDE.md)**
 
 ---
 
