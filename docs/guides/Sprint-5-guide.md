@@ -17,6 +17,16 @@ Implementar um sistema de rastreamento de Service Level Agreement (SLA) que calc
 
 ---
 
+## Instalação de Dependências
+
+### Backend (Nest.js)
+
+```bash
+npm install @nestjs/schedule
+```
+
+---
+
 ## Aplicando as Tecnologias Fundamentais
 
 Neste sprint, o foco é a implementação do rastreamento de SLAs, uma funcionalidade crítica para a gestão de serviços. Vamos utilizar as tecnologias da nossa stack para garantir que os cálculos são precisos, performáticos e bem geridos.
@@ -64,6 +74,22 @@ Neste sprint, o foco é a implementação do rastreamento de SLAs, uma funcional
 
 **Documentação:**
 [Guia Oficial do `nest-winston`](https://github.com/gremo/nest-winston)
+
+### 3.1. Cron Jobs para Monitoramento Contínuo de SLA
+
+**Objetivo:** Implementar tarefas agendadas que monitorizam continuamente o status dos SLAs e atualizam o estado dos incidentes.
+
+**Ações:**
+
+-   **Instalar Dependência:** Adicione `@nestjs/schedule` ao projeto.
+-   **Criar SlaCronService:** Implemente um serviço dedicado para as tarefas de SLA.
+-   **Tarefas a Implementar:**
+    -   `@Cron('0 */5 * * * *')` - A cada 5 minutos, verificar incidentes abertos e atualizar o status de SLA (breach/warning).
+    -   `@Cron('0 0 */1 * * *')` - A cada hora, gerar relatórios de SLA para análise.
+    -   Atualizar automaticamente incidentes quando o SLA é violado.
+
+**Documentação:**
+[Guia Oficial do Nest.js sobre Scheduling](https://docs.nestjs.com/techniques/task-scheduling)
 
 ### 4. Autorização de Configuração de SLA com CASL
 
