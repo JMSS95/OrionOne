@@ -150,7 +150,19 @@ Guarda o schema, gera o ficheiro SQL com as alterações e aplica-o à base de d
 
 ### Fase 2: Backend (Nest.js)
 
-#### 2.1. Gerar o Recurso `articles`
+#### 2.1. Instalar Dependências
+
+**Comando:**
+
+```bash
+cd nest-backend
+npm install slugify
+```
+
+**Objetivo:**
+A biblioteca `slugify` será usada para gerar URLs amigáveis a partir dos títulos dos artigos (ex: "Como Resetar Password" → "como-resetar-password").
+
+#### 2.2. Gerar o Recurso `articles`
 
 **Comando:**
 
@@ -188,6 +200,526 @@ Define os campos que podem ser atualizados num artigo existente. Todos os campos
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre Validação (class-validator)](https://docs.nestjs.com/techniques/validation)
+
+---
+
+### 💻 Exemplo de Código: CRUD de Artigos da KB
+
+#### Backend - Prisma Schema
+
+```prisma
+// nest-backend/prisma/schema.prisma
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model KbCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  articles    Article[]
+}
+
+model Article {
+  id         String        @id @default(cuid())
+  title      String
+  slug       String        @unique
+  content    Json          // Tiptap rich text
+  status     ArticleStatus @default(DRAFT)
+  authorId   String
+  categoryId String
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  author     User          @relation(fields: [authorId], references: [id])
+  category   KbCategory    @relation(fields: [categoryId], references: [id])
+
+  @@index([status, categoryId])
+  @@index([slug])
+}
+```
+
+#### Backend - DTOs
+
+```typescript
+// nest-backend/src/articles/dto/create-article.dto.ts
+import { IsString, IsNotEmpty, IsObject, IsUUID } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+
+export class CreateArticleDto {
+    @ApiProperty({ example: "Como Resetar Password" })
+    @IsString()
+    @IsNotEmpty()
+    title: string;
+
+    @ApiProperty({
+        example: {
+            type: "doc",
+            content: [
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Conteúdo..." }],
+                },
+            ],
+        },
+        description: "Conteúdo rich text do Tiptap",
+    })
+    @IsObject()
+    content: any;
+
+    @ApiProperty({ example: "cat-123" })
+    @IsUUID()
+    categoryId: string;
+}
+
+// nest-backend/src/articles/dto/update-article.dto.ts
+import { PartialType } from "@nestjs/swagger";
+import { IsEnum, IsOptional } from "class-validator";
+import { ArticleStatus } from "@prisma/client";
+
+export class UpdateArticleDto extends PartialType(CreateArticleDto) {
+    @IsOptional()
+    @IsEnum(ArticleStatus)
+    status?: ArticleStatus;
+}
+```
+
+#### Backend - Service
+
+```typescript
+// nest-backend/src/articles/articles.service.ts
+import { Injectable, NotFoundException, Inject } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { WINSTON_MODULE_PROVIDER } from "nest-winston";
+import { Logger } from "winston";
+import slugify from "slugify";
+
+@Injectable()
+export class ArticlesService {
+    constructor(
+        private prisma: PrismaService,
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    ) {}
+
+    async create(dto: CreateArticleDto, userId: string) {
+        // Generate unique slug
+        let slug = slugify(dto.title, { lower: true, strict: true });
+        let counter = 2;
+
+        while (await this.prisma.article.findUnique({ where: { slug } })) {
+            slug = `${slugify(dto.title, {
+                lower: true,
+                strict: true,
+            })}-${counter}`;
+            counter++;
+        }
+
+        const article = await this.prisma.article.create({
+            data: {
+                title: dto.title,
+                slug,
+                content: dto.content,
+                authorId: userId,
+                categoryId: dto.categoryId,
+                status: "DRAFT",
+            },
+            include: { author: true, category: true },
+        });
+
+        this.logger.info("KB article created", {
+            articleId: article.id,
+            slug,
+            userId,
+        });
+        return article;
+    }
+
+    async findAll(filters?: { status?: string; categoryId?: string }) {
+        return this.prisma.article.findMany({
+            where: {
+                ...(filters?.status && { status: filters.status as any }),
+                ...(filters?.categoryId && { categoryId: filters.categoryId }),
+            },
+            include: {
+                author: { select: { name: true, email: true } },
+                category: true,
+            },
+            orderBy: { createdAt: "desc" },
+        });
+    }
+
+    async findOne(slug: string) {
+        const article = await this.prisma.article.findUnique({
+            where: { slug },
+            include: {
+                author: { select: { name: true, email: true } },
+                category: true,
+            },
+        });
+
+        if (!article) {
+            throw new NotFoundException(
+                `Article with slug "${slug}" not found`
+            );
+        }
+
+        return article;
+    }
+
+    async update(slug: string, dto: UpdateArticleDto) {
+        const article = await this.findOne(slug);
+
+        // Regenerate slug if title changed
+        let newSlug = slug;
+        if (dto.title && dto.title !== article.title) {
+            newSlug = slugify(dto.title, { lower: true, strict: true });
+            let counter = 2;
+            while (
+                await this.prisma.article.findUnique({
+                    where: { slug: newSlug },
+                })
+            ) {
+                newSlug = `${slugify(dto.title, {
+                    lower: true,
+                    strict: true,
+                })}-${counter}`;
+                counter++;
+            }
+        }
+
+        const updated = await this.prisma.article.update({
+            where: { slug },
+            data: {
+                ...(dto.title && { title: dto.title, slug: newSlug }),
+                ...(dto.content && { content: dto.content }),
+                ...(dto.status && { status: dto.status }),
+                ...(dto.categoryId && { categoryId: dto.categoryId }),
+            },
+            include: { author: true, category: true },
+        });
+
+        this.logger.info("KB article updated", {
+            articleId: updated.id,
+            slug: newSlug,
+        });
+        return updated;
+    }
+
+    async remove(slug: string) {
+        await this.findOne(slug); // Check exists
+        await this.prisma.article.delete({ where: { slug } });
+        this.logger.info("KB article deleted", { slug });
+        return { message: "Article deleted successfully" };
+    }
+}
+```
+
+#### Backend - Controller
+
+```typescript
+// nest-backend/src/articles/articles.controller.ts
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    UseGuards,
+    Request,
+    Query,
+} from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiBearerAuth } from "@nestjs/swagger";
+import { ArticlesService } from "./articles.service";
+import { CreateArticleDto, UpdateArticleDto } from "./dto";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+
+@ApiTags("articles")
+@Controller("articles")
+export class ArticlesController {
+    constructor(private readonly articlesService: ArticlesService) {}
+
+    @Post()
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: "Create new KB article" })
+    create(@Body() createArticleDto: CreateArticleDto, @Request() req) {
+        return this.articlesService.create(createArticleDto, req.user.id);
+    }
+
+    @Get()
+    @ApiOperation({
+        summary: "List all articles (filterable by status/category)",
+    })
+    findAll(
+        @Query("status") status?: string,
+        @Query("categoryId") categoryId?: string
+    ) {
+        return this.articlesService.findAll({ status, categoryId });
+    }
+
+    @Get(":slug")
+    @ApiOperation({ summary: "Get article by slug" })
+    findOne(@Param("slug") slug: string) {
+        return this.articlesService.findOne(slug);
+    }
+
+    @Patch(":slug")
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: "Update article" })
+    update(
+        @Param("slug") slug: string,
+        @Body() updateArticleDto: UpdateArticleDto
+    ) {
+        return this.articlesService.update(slug, updateArticleDto);
+    }
+
+    @Delete(":slug")
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: "Delete article" })
+    remove(@Param("slug") slug: string) {
+        return this.articlesService.remove(slug);
+    }
+}
+```
+
+#### Frontend - Formulário de Criação
+
+```typescript
+// next-frontend/app/admin/kb/create/page.tsx
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { RichTextEditor } from "@/components/editor/rich-text-editor";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { apiClient } from "@/lib/api-client";
+
+const articleSchema = z.object({
+    title: z.string().min(3, "Título deve ter pelo menos 3 caracteres"),
+    content: z.any(),
+    categoryId: z.string().uuid("Selecione uma categoria válida"),
+});
+
+export default function CreateArticlePage() {
+    const router = useRouter();
+    const {
+        register,
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(articleSchema),
+    });
+
+    // Fetch categories
+    const { data: categories } = useQuery({
+        queryKey: ["kb-categories"],
+        queryFn: () => apiClient.get("/kb-categories").then((res) => res.data),
+    });
+
+    const createMutation = useMutation({
+        mutationFn: (data: z.infer<typeof articleSchema>) =>
+            apiClient.post("/articles", data),
+        onSuccess: (response) => {
+            router.push(`/kb/${response.data.slug}`);
+        },
+    });
+
+    const publishMutation = useMutation({
+        mutationFn: async (data: z.infer<typeof articleSchema>) => {
+            const created = await apiClient.post("/articles", data);
+            return apiClient.patch(`/articles/${created.data.slug}`, {
+                status: "PUBLISHED",
+            });
+        },
+        onSuccess: (response) => {
+            router.push(`/kb/${response.data.slug}`);
+        },
+    });
+
+    const onSaveDraft = handleSubmit((data) => createMutation.mutate(data));
+    const onPublish = handleSubmit((data) => publishMutation.mutate(data));
+
+    return (
+        <div className="max-w-4xl mx-auto p-6">
+            <h1 className="text-3xl font-bold mb-6">
+                Criar Artigo da Knowledge Base
+            </h1>
+
+            <form className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium mb-2">
+                        Título
+                    </label>
+                    <Input
+                        {...register("title")}
+                        placeholder="Como configurar VPN..."
+                    />
+                    {errors.title && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.title.message as string}
+                        </p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">
+                        Categoria
+                    </label>
+                    <select
+                        {...register("categoryId")}
+                        className="w-full border rounded p-2"
+                    >
+                        <option value="">Selecione...</option>
+                        {categories?.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                                {cat.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.categoryId && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.categoryId.message as string}
+                        </p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">
+                        Conteúdo
+                    </label>
+                    <Controller
+                        name="content"
+                        control={control}
+                        render={({ field }) => (
+                            <RichTextEditor
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="Escreva o conteúdo do artigo..."
+                            />
+                        )}
+                    />
+                </div>
+
+                <div className="flex gap-4">
+                    <Button
+                        type="button"
+                        onClick={onSaveDraft}
+                        disabled={createMutation.isPending}
+                        variant="outline"
+                    >
+                        Guardar como Rascunho
+                    </Button>
+                    <Button
+                        type="button"
+                        onClick={onPublish}
+                        disabled={publishMutation.isPending}
+                    >
+                        Publicar
+                    </Button>
+                </div>
+            </form>
+        </div>
+    );
+}
+```
+
+#### Frontend - Página de Visualização
+
+```typescript
+// next-frontend/app/kb/[slug]/page.tsx
+import { notFound } from "next/navigation";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+
+async function getArticle(slug: string) {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/articles/${slug}`,
+        {
+            next: { revalidate: 60 }, // ISR cache
+        }
+    );
+    if (!res.ok) return null;
+    return res.json();
+}
+
+export default async function ArticlePage({
+    params,
+}: {
+    params: { slug: string };
+}) {
+    const article = await getArticle(params.slug);
+
+    if (!article || article.status !== "PUBLISHED") {
+        notFound();
+    }
+
+    return (
+        <div className="max-w-4xl mx-auto p-6">
+            <nav className="text-sm text-gray-600 mb-4">
+                <a href="/kb" className="hover:underline">
+                    Knowledge Base
+                </a>{" "}
+                /
+                <a
+                    href={`/kb?category=${article.category.slug}`}
+                    className="hover:underline"
+                >
+                    {article.category.name}
+                </a>
+            </nav>
+
+            <article className="prose prose-lg max-w-none">
+                <h1>{article.title}</h1>
+
+                <div className="text-sm text-gray-600 mb-6">
+                    Escrito por {article.author.name} •{" "}
+                    {new Date(article.createdAt).toLocaleDateString()}
+                </div>
+
+                <ArticleContent content={article.content} />
+            </article>
+        </div>
+    );
+}
+
+// Client component for Tiptap
+("use client");
+function ArticleContent({ content }: { content: any }) {
+    const editor = useEditor({
+        extensions: [StarterKit, Link],
+        content,
+        editable: false,
+    });
+
+    return <EditorContent editor={editor} />;
+}
+```
+
+#### Fluxo de Execução End-to-End
+
+1. Um administrador navega até `/admin/kb/create`, preenche o formulário e submete. O formulário chama `POST /articles`, que gera o `slug`, guarda o artigo como `DRAFT` e regista o evento nos logs.
+2. Quando o administrador clica em **Publicar**, o frontend envia um `PATCH /articles/:slug` para mudar o `status` para `PUBLISHED`. O serviço aplica CASL para validar permissões, sincroniza o artigo no Meilisearch e devolve o estado final.
+3. A página `/kb/[slug]` executa `fetch` no servidor (Next.js server component) para `GET /articles/:slug`, valida se está publicado e renderiza o conteúdo com o editor Tiptap em modo read-only.
+4. Qualquer edição subsequente repete o ciclo: atualiza o conteúdo, regenera o `slug` se necessário e aciona a reindexação, garantindo que o artigo e a pesquisa estão sempre alinhados.
+
+---
 
 #### 2.3. Implementar o `ArticlesService`
 
@@ -475,8 +1007,322 @@ Extender o serviço para indexar e pesquisar múltiplos tipos de documentos (inc
     -   Chame este método quando um artigo for apagado ou quando mudar de PUBLISHED para DRAFT.
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Multi-Search](https://docs.meilisearch.com/reference/api/multi_search.html)
-[Guia Oficial do Meilisearch sobre Configuração de Índices](https://docs.meilisearch.com/learn/core_concepts/indexes.html)
+[Guia Oficial do Meilisearch sobre Multi-Search](https://www.meilisearch.com/docs/reference/api/multi_search)
+[Guia Oficial do Meilisearch sobre Configuração de Índices](https://www.meilisearch.com/docs/learn/core_concepts/indexes)
+
+---
+
+### 💻 Exemplo de Código: Integração Meilisearch
+
+#### Backend - Meilisearch Service
+
+```typescript
+// nest-backend/src/meilisearch/meilisearch.service.ts
+import { Injectable, OnModuleInit, Inject } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { MeiliSearch } from "meilisearch";
+import { WINSTON_MODULE_PROVIDER } from "nest-winston";
+import { Logger } from "winston";
+
+@Injectable()
+export class MeilisearchService implements OnModuleInit {
+    private client: MeiliSearch;
+
+    constructor(
+        private config: ConfigService,
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    ) {
+        this.client = new MeiliSearch({
+            host:
+                this.config.get("MEILISEARCH_HOST") || "http://localhost:7700",
+            apiKey: this.config.get("MEILISEARCH_KEY"),
+        });
+    }
+
+    async onModuleInit() {
+        // Configure articles index
+        const articlesIndex = this.client.index("articles");
+        await articlesIndex.updateSettings({
+            searchableAttributes: ["title", "content", "category.name"],
+            filterableAttributes: ["status", "categoryId", "authorId"],
+            sortableAttributes: ["createdAt", "updatedAt"],
+        });
+
+        // Configure incidents index
+        const incidentsIndex = this.client.index("incidents");
+        await incidentsIndex.updateSettings({
+            searchableAttributes: ["title", "description", "incidentNumber"],
+            filterableAttributes: ["status", "priority", "assigneeId"],
+            sortableAttributes: ["createdAt", "updatedAt"],
+        });
+
+        this.logger.info("Meilisearch indexes configured");
+    }
+
+    async syncArticle(article: any) {
+        if (article.status !== "PUBLISHED") return;
+
+        const plainTextContent = this.extractTextFromTiptap(article.content);
+        const document = {
+            id: article.id,
+            title: article.title,
+            slug: article.slug,
+            content: plainTextContent,
+            status: article.status,
+            categoryId: article.categoryId,
+            category: article.category,
+        };
+
+        await this.client.index("articles").addDocuments([document]);
+        this.logger.info("Article synced to Meilisearch", {
+            articleId: article.id,
+        });
+    }
+
+    async deleteArticle(articleId: string) {
+        await this.client.index("articles").deleteDocument(articleId);
+    }
+
+    async multiSearch(query: string) {
+        const results = await this.client.multiSearch({
+            queries: [
+                {
+                    indexUid: "incidents",
+                    q: query,
+                    limit: 10,
+                    attributesToHighlight: ["title", "description"],
+                },
+                {
+                    indexUid: "articles",
+                    q: query,
+                    filter: "status = PUBLISHED",
+                    limit: 10,
+                    attributesToHighlight: ["title", "content"],
+                },
+            ],
+        });
+
+        return {
+            incidents: results.results[0].hits,
+            articles: results.results[1].hits,
+            totalHits:
+                results.results[0].estimatedTotalHits +
+                results.results[1].estimatedTotalHits,
+        };
+    }
+
+    private extractTextFromTiptap(content: any): string {
+        if (!content?.content) return "";
+        const extractText = (node: any): string => {
+            if (node.type === "text") return node.text || "";
+            if (node.content) return node.content.map(extractText).join(" ");
+            return "";
+        };
+        return extractText(content);
+    }
+}
+```
+
+#### Backend - Search Controller
+
+```typescript
+// nest-backend/src/search/search.controller.ts
+import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import {
+    ApiTags,
+    ApiOperation,
+    ApiBearerAuth,
+    ApiQuery,
+} from "@nestjs/swagger";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { MeilisearchService } from "../meilisearch/meilisearch.service";
+
+@ApiTags("search")
+@Controller("search")
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
+export class SearchController {
+    constructor(private readonly meilisearchService: MeilisearchService) {}
+
+    @Get()
+    @ApiOperation({ summary: "Unified search across incidents and articles" })
+    @ApiQuery({ name: "q", required: true, description: "Search query" })
+    async search(@Query("q") query: string) {
+        return this.meilisearchService.multiSearch(query);
+    }
+}
+```
+
+#### Frontend - Barra de Pesquisa Global
+
+```typescript
+// next-frontend/components/layout/global-search-bar.tsx
+"use client";
+
+import { useState, useEffect } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { useQuery } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { SearchResults } from "./search-results";
+import { Search } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
+
+export function GlobalSearchBar() {
+    const [open, setOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const debouncedSearch = useDebounce(searchTerm, 300);
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["search", debouncedSearch],
+        queryFn: () =>
+            apiClient
+                .get(`/search?q=${debouncedSearch}`)
+                .then((res) => res.data),
+        enabled: debouncedSearch.length >= 3,
+    });
+
+    // Keyboard shortcut: Ctrl+K
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+                e.preventDefault();
+                setOpen(true);
+            }
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <div className="relative w-full max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                        placeholder="Pesquisar... (Ctrl+K)"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+            </PopoverTrigger>
+            {debouncedSearch.length >= 3 && (
+                <PopoverContent className="w-[600px] p-0" align="start">
+                    <SearchResults
+                        data={data}
+                        isLoading={isLoading}
+                        onSelectResult={() => setOpen(false)}
+                    />
+                </PopoverContent>
+            )}
+        </Popover>
+    );
+}
+```
+
+#### Frontend - Resultados de Pesquisa
+
+```typescript
+// next-frontend/components/layout/search-results.tsx
+"use client";
+
+import { useRouter } from "next/navigation";
+import { Ticket, BookOpen } from "lucide-react";
+
+export function SearchResults({ data, isLoading, onSelectResult }: any) {
+    const router = useRouter();
+
+    if (isLoading) return <div className="p-4">Pesquisando...</div>;
+    if (!data || data.totalHits === 0)
+        return (
+            <div className="p-4 text-gray-500">Nenhum resultado encontrado</div>
+        );
+
+    const handleClick = (type: "incident" | "article", id: string) => {
+        router.push(type === "incident" ? `/incidents/${id}` : `/kb/${id}`);
+        onSelectResult();
+    };
+
+    return (
+        <div className="max-h-[500px] overflow-y-auto">
+            {data.incidents?.length > 0 && (
+                <div className="p-4 border-b">
+                    <h3 className="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+                        <Ticket className="h-4 w-4" /> Incidentes (
+                        {data.incidents.length})
+                    </h3>
+                    {data.incidents.map((incident: any) => (
+                        <div
+                            key={incident.id}
+                            onClick={() => handleClick("incident", incident.id)}
+                            className="p-3 hover:bg-gray-100 rounded cursor-pointer"
+                        >
+                            <div
+                                className="font-medium text-sm"
+                                dangerouslySetInnerHTML={{
+                                    __html:
+                                        incident._formatted?.title ||
+                                        incident.title,
+                                }}
+                            />
+                            <div
+                                className="text-xs text-gray-600 mt-1 line-clamp-2"
+                                dangerouslySetInnerHTML={{
+                                    __html: incident._formatted?.description,
+                                }}
+                            />
+                            <div className="text-xs text-gray-500 mt-1">
+                                {incident.incidentNumber} • {incident.status}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {data.articles?.length > 0 && (
+                <div className="p-4">
+                    <h3 className="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+                        <BookOpen className="h-4 w-4" /> Artigos KB (
+                        {data.articles.length})
+                    </h3>
+                    {data.articles.map((article: any) => (
+                        <div
+                            key={article.id}
+                            onClick={() => handleClick("article", article.slug)}
+                            className="p-3 hover:bg-gray-100 rounded cursor-pointer"
+                        >
+                            <div
+                                className="font-medium text-sm"
+                                dangerouslySetInnerHTML={{
+                                    __html:
+                                        article._formatted?.title ||
+                                        article.title,
+                                }}
+                            />
+                            <div
+                                className="text-xs text-gray-600 mt-1 line-clamp-2"
+                                dangerouslySetInnerHTML={{
+                                    __html: article._formatted?.content,
+                                }}
+                            />
+                            <div className="text-xs text-gray-500 mt-1">
+                                {article.category?.name}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+```
+
+---
 
 #### 1.2. Criar um Endpoint de Pesquisa Unificada
 
@@ -536,7 +1382,7 @@ return {
 ```
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Multi-Search](https://docs.meilisearch.com/reference/api/multi_search.html)
+[Guia Oficial do Meilisearch sobre Multi-Search](https://www.meilisearch.com/docs/reference/api/multi_search)
 
 #### 1.3. Escrever Testes (TDD)
 
@@ -692,7 +1538,7 @@ Exibir os resultados da pesquisa de forma clara, organizada e visualmente apelat
     -   Esc para fechar o popover.
 
 **Documentação:**
-[Guia Oficial do Meilisearch sobre Highlighting](https://docs.meilisearch.com/learn/advanced/highlighting.html)
+[Guia Oficial do Meilisearch sobre Highlighting](https://www.meilisearch.com/docs/learn/fine_tuning_results/search_preview)
 
 #### 2.3. Testar o Fluxo de Pesquisa Unificada
 

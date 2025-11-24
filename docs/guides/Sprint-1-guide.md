@@ -136,17 +136,17 @@ Definir a "forma" dos dados que o endpoint de registo espera. É a primeira cama
 
 **Ação:**
 
-1.  Injete o `PrismaService` para comunicar com a BD.
-2.  Injete o `Logger` (`@Inject(WINSTON_MODULE_NEST_PROVIDER)`) para usar o Winston.
-3.  Implemente a função `register()`.
-4.  Use a biblioteca `bcrypt` para fazer hash da password antes de guardar.
-5.  Adicione logs com Winston para sucesso (`.info()`) e falha (`.error()`) no registo.
+1. Injete o `PrismaService` para comunicar com a BD.
+2. Injete o `Logger` (`@Inject(WINSTON_MODULE_NEST_PROVIDER)`) para usar o Winston.
+3. Implemente a função `register()`.
+4. Use a biblioteca `bcrypt` para fazer hash da password antes de guardar.
+5. Adicione logs com Winston para sucesso (`.info()`) e falha (`.error()`) no registo.
 
 **Nota:**
 O `AuthService` é o local correto para esta lógica de negócio.
 
 **Documentação:**
-[Guia Oficial do Nest.js sobre Hashing](https://docs.nestjs.com/security/authentication#implementing-hashing)
+[Guia Oficial do Nest.js sobre Encryption e Hashing](https://docs.nestjs.com/security/encryption-and-hashing)
 
 #### 2.4. Implementar o Serviço de Email
 
@@ -155,12 +155,13 @@ O `ConfigModule` já está global. Use o `ConfigService` para obter as credencia
 
 **Implementação:**
 
-1.  Injete o `MailerService` e o `ConfigService` no `AuthService`.
-2.  Crie uma função privada `sendVerificationEmail` que:
-    -   Gera um token aleatório seguro (`crypto.randomBytes`).
-    -   Guarda o token na tabela `VerificationToken`.
-    -   Envia um email com um link de verificação (`http://localhost:3000/verify-email?token=...`).
-    -   Regista o envio do email com o Winston para auditoria.
+1. Injete o `MailerService` e o `ConfigService` no `AuthService`.
+2. Crie uma função privada `sendVerificationEmail` que:
+
+-   Gera um token aleatório seguro (`crypto.randomBytes`).
+-   Guarda o token na tabela `VerificationToken`.
+-   Envia um email com um link de verificação (`http://localhost:3000/verify-email?token=...`).
+-   Regista o envio do email com o Winston para auditoria.
 
 **Documentação:**
 [Guia Oficial do Nest.js sobre Email](https://docs.nestjs.com/techniques/email)
@@ -235,6 +236,256 @@ npm run test -- auth.service.spec.ts
 
 **Documentação:**
 [Nest.js Testing](https://docs.nestjs.com/fundamentals/testing)
+
+---
+
+### Exemplo de Código Completo: Registo de Utilizador (Backend)
+
+#### Schema Prisma - User Model
+
+```prisma
+// nest-backend/prisma/schema.prisma
+model User {
+ id String @id @default(cuid())
+ email String @unique
+ password String
+ name String
+ role Role @default(USER)
+ isActive Boolean @default(false)
+ avatar String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+
+ sessions Session[]
+ verificationTokens VerificationToken[]
+}
+
+enum Role {
+ ADMIN
+ AGENT
+ USER
+}
+
+model VerificationToken {
+ id String @id @default(cuid())
+ token String @unique
+ email String
+ type TokenType
+ expiresAt DateTime
+ createdAt DateTime @default(now())
+
+ user User @relation(fields: [email], references: [email], onDelete: Cascade)
+
+ @@index([token])
+ @@index([email])
+}
+
+enum TokenType {
+ EMAIL_VERIFICATION
+ PASSWORD_RESET
+}
+```
+
+#### DTO - RegisterUserDto
+
+```typescript
+// nest-backend/src/auth/dto/register-user.dto.ts
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsString, MinLength, Matches } from "class-validator";
+
+export class RegisterUserDto {
+    @ApiProperty({ example: "john.doe@example.com" })
+    @IsEmail({}, { message: "Email inválido" })
+    email: string;
+
+    @ApiProperty({ example: "John Doe" })
+    @IsString()
+    @MinLength(2, { message: "Nome deve ter pelo menos 2 caracteres" })
+    name: string;
+
+    @ApiProperty({ example: "StrongPass123!", minLength: 8 })
+    @IsString()
+    @MinLength(8, { message: "Password deve ter pelo menos 8 caracteres" })
+    @Matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+        {
+            message:
+                "Password deve conter maiúscula, minúscula, número e símbolo",
+        }
+    )
+    password: string;
+}
+```
+
+#### Service - AuthService (Register)
+
+```typescript
+// nest-backend/src/auth/auth.service.ts
+import { Injectable, ConflictException, Inject, Logger } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
+import { RegisterUserDto } from "./dto/register-user.dto";
+import { MailerService } from "@nestjs-modules/mailer";
+import { ConfigService } from "@nestjs/config";
+
+@Injectable()
+export class AuthService {
+    constructor(
+        private prisma: PrismaService,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
+        private mailerService: MailerService,
+        private configService: ConfigService
+    ) {}
+
+    async register(dto: RegisterUserDto) {
+        this.logger.log(
+            `Tentativa de registo para: ${dto.email}`,
+            "AuthService"
+        );
+
+        // Verificar se email já existe
+        const existingUser = await this.prisma.user.findUnique({
+            where: { email: dto.email },
+        });
+
+        if (existingUser) {
+            this.logger.warn(`Email já registado: ${dto.email}`, "AuthService");
+            throw new ConflictException("Email já está registado");
+        }
+
+        // Hash da password
+        const hashedPassword = await bcrypt.hash(dto.password, 12);
+
+        // Criar utilizador
+        const user = await this.prisma.user.create({
+            data: {
+                email: dto.email,
+                name: dto.name,
+                password: hashedPassword,
+                isActive: false,
+            },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                isActive: true,
+                createdAt: true,
+            },
+        });
+
+        this.logger.log(`Utilizador criado: ${user.id}`, "AuthService");
+
+        // Enviar email de verificação
+        await this.sendVerificationEmail(user.email);
+
+        return {
+            userId: user.id,
+            message: "Registo bem-sucedido. Verifique o seu email.",
+        };
+    }
+
+    private async sendVerificationEmail(email: string) {
+        // Gerar token seguro
+        const token = crypto.randomBytes(32).toString("hex");
+
+        // Guardar token na BD (expira em 1 hora)
+        await this.prisma.verificationToken.create({
+            data: {
+                token,
+                email,
+                type: "EMAIL_VERIFICATION",
+                expiresAt: new Date(Date.now() + 3600000), // 1 hora
+            },
+        });
+
+        const verificationUrl = `${this.configService.get(
+            "FRONTEND_URL"
+        )}/verify-email?token=${token}`;
+
+        // Enviar email
+        await this.mailerService.sendMail({
+            to: email,
+            subject: "Verificação de Email - OrionOne",
+            html: `
+ <h2>Bem-vindo ao OrionOne!</h2>
+ <p>Clique no link abaixo para verificar o seu email:</p>
+ <a href="${verificationUrl}">${verificationUrl}</a>
+ <p>Este link expira em 1 hora.</p>
+ `,
+        });
+
+        this.logger.log(
+            `Email de verificação enviado para: ${email}`,
+            "AuthService"
+        );
+    }
+
+    async verifyEmail(token: string) {
+        const verificationToken =
+            await this.prisma.verificationToken.findUnique({
+                where: { token },
+            });
+
+        if (!verificationToken || verificationToken.expiresAt < new Date()) {
+            throw new ConflictException("Token inválido ou expirado");
+        }
+
+        // Ativar utilizador
+        await this.prisma.user.update({
+            where: { email: verificationToken.email },
+            data: { isActive: true },
+        });
+
+        // Apagar token usado
+        await this.prisma.verificationToken.delete({
+            where: { token },
+        });
+
+        this.logger.log(
+            `Email verificado: ${verificationToken.email}`,
+            "AuthService"
+        );
+
+        return { message: "Email verificado com sucesso" };
+    }
+}
+```
+
+#### Controller - AuthController (Register)
+
+```typescript
+// nest-backend/src/auth/auth.controller.ts
+import { Controller, Post, Body, Param } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { AuthService } from "./auth.service";
+import { RegisterUserDto } from "./dto/register-user.dto";
+
+@ApiTags("auth")
+@Controller("auth")
+export class AuthController {
+    constructor(private authService: AuthService) {}
+
+    @Post("register")
+    @ApiOperation({ summary: "Registar novo utilizador" })
+    @ApiResponse({ status: 201, description: "Utilizador criado com sucesso" })
+    @ApiResponse({ status: 409, description: "Email já registado" })
+    @ApiResponse({ status: 400, description: "Dados inválidos" })
+    async register(@Body() dto: RegisterUserDto) {
+        return this.authService.register(dto);
+    }
+
+    @Post("verify-email/:token")
+    @ApiOperation({ summary: "Verificar email com token" })
+    @ApiResponse({ status: 200, description: "Email verificado" })
+    @ApiResponse({ status: 409, description: "Token inválido ou expirado" })
+    async verifyEmail(@Param("token") token: string) {
+        return this.authService.verifyEmail(token);
+    }
+}
+```
 
 ---
 
@@ -327,6 +578,299 @@ try {
 **Documentação:**
 [Guia Oficial do shadcn/ui sobre Toast](https://ui.shadcn.com/docs/components/toast)
 
+---
+
+### Exemplo de Código Completo: Registo de Utilizador (Frontend)
+
+#### Schema Zod - Validação
+
+```typescript
+// next-frontend/lib/validations/auth.ts
+import { z } from "zod";
+
+export const registerSchema = z
+    .object({
+        name: z
+            .string()
+            .min(2, "Nome deve ter pelo menos 2 caracteres")
+            .max(100, "Nome muito longo"),
+        email: z.string().email("Email inválido").toLowerCase(),
+        password: z
+            .string()
+            .min(8, "Password deve ter pelo menos 8 caracteres")
+            .regex(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+                "Password deve conter maiúscula, minúscula, número e símbolo"
+            ),
+        confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "As passwords não coincidem",
+        path: ["confirmPassword"],
+    });
+
+export type RegisterInput = z.infer<typeof registerSchema>;
+```
+
+#### API Client
+
+```typescript
+// next-frontend/lib/api/client.ts
+import axios from "axios";
+
+export const apiClient = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+    withCredentials: true, // CRÍTICO para cookies httpOnly
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
+
+// Interceptor para tratamento de erros
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Redirecionar para login
+            window.location.href = "/login";
+        }
+        return Promise.reject(error);
+    }
+);
+```
+
+#### API Service - Auth
+
+```typescript
+// next-frontend/lib/api/auth.ts
+import { apiClient } from "./client";
+import { RegisterInput } from "../validations/auth";
+
+export const authApi = {
+    register: async (data: RegisterInput) => {
+        const response = await apiClient.post("/auth/register", {
+            name: data.name,
+            email: data.email,
+            password: data.password,
+        });
+        return response.data;
+    },
+
+    verifyEmail: async (token: string) => {
+        const response = await apiClient.post(`/auth/verify-email/${token}`);
+        return response.data;
+    },
+};
+```
+
+#### Componente - RegisterForm
+
+```typescript
+// next-frontend/components/auth/register-form.tsx
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { registerSchema, RegisterInput } from "@/lib/validations/auth";
+import { authApi } from "@/lib/api/auth";
+import { useToast } from "@/hooks/use-toast";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+
+export function RegisterForm() {
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+    const { toast } = useToast();
+
+    const form = useForm<RegisterInput>({
+        resolver: zodResolver(registerSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+        },
+    });
+
+    const onSubmit = async (data: RegisterInput) => {
+        setIsLoading(true);
+
+        try {
+            const response = await authApi.register(data);
+
+            toast({
+                title: "Registo bem-sucedido!",
+                description:
+                    response.message ||
+                    "Verifique o seu email para ativar a conta.",
+            });
+
+            // Redirecionar para página de confirmação
+            router.push("/register/check-email");
+        } catch (error: any) {
+            const errorMessage =
+                error.response?.data?.message ||
+                "Erro ao registar. Tente novamente.";
+
+            toast({
+                title: "Erro no registo",
+                description: Array.isArray(errorMessage)
+                    ? errorMessage.join(", ")
+                    : errorMessage,
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+                <CardTitle>Criar Conta</CardTitle>
+                <CardDescription>
+                    Preencha os dados para se registar
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-4"
+                    >
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nome</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder="João Silva"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="email"
+                                            placeholder="joao@exemplo.com"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            placeholder="********"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="confirmPassword"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Confirmar Password</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            placeholder="********"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "A registar..." : "Registar"}
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
+    );
+}
+```
+
+#### Página - Register
+
+```typescript
+// next-frontend/app/register/page.tsx
+import { RegisterForm } from "@/components/auth/register-form";
+import Link from "next/link";
+
+export default function RegisterPage() {
+    return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="w-full max-w-md space-y-4">
+                <RegisterForm />
+
+                <p className="text-center text-sm text-muted-foreground">
+                    Já tem conta?{" "}
+                    <Link
+                        href="/login"
+                        className="text-primary hover:underline"
+                    >
+                        Fazer login
+                    </Link>
+                </p>
+            </div>
+        </div>
+    );
+}
+```
+
+---
+
 #### 3.7. Testar o Fluxo Completo
 
 **Testes Manuais:**
@@ -374,7 +918,362 @@ Permitir que um utilizador ativado (da US1.1) faça login e receba um JWT seguro
 
 ---
 
-### Fase 1: Base de Dados (Prisma)
+### Exemplo de Código Completo: Login de Utilizador (Backend)
+
+#### Strategies - LocalStrategy
+
+```typescript
+// nest-backend/src/auth/strategies/local.strategy.ts
+import { Strategy } from "passport-local";
+import { PassportStrategy } from "@nestjs/passport";
+import { Injectable, UnauthorizedException, Inject } from "@nestjs/common";
+import { AuthService } from "../auth.service";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { Logger } from "winston";
+
+@Injectable()
+export class LocalStrategy extends PassportStrategy(Strategy) {
+    constructor(
+        private authService: AuthService,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
+    ) {
+        super({
+            usernameField: "email", // Usar email em vez de username
+        });
+    }
+
+    async validate(email: string, password: string): Promise<any> {
+        this.logger.info(`Tentativa de login: ${email}`, {
+            context: "LocalStrategy",
+        });
+
+        const user = await this.authService.validateUser(email, password);
+
+        if (!user) {
+            this.logger.warn(`Login falhado: ${email}`, {
+                context: "LocalStrategy",
+            });
+            throw new UnauthorizedException("Credenciais inválidas");
+        }
+
+        if (!user.isActive) {
+            this.logger.warn(`Login bloqueado (conta não ativa): ${email}`, {
+                context: "LocalStrategy",
+            });
+            throw new UnauthorizedException(
+                "Conta não verificada. Verifique o seu email."
+            );
+        }
+
+        this.logger.info(`Login bem-sucedido: ${email}`, {
+            context: "LocalStrategy",
+        });
+        return user;
+    }
+}
+```
+
+#### Strategies - JwtStrategy
+
+```typescript
+// nest-backend/src/auth/strategies/jwt.strategy.ts
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { PassportStrategy } from "@nestjs/passport";
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { PrismaService } from "../../prisma/prisma.service";
+import { Request } from "express";
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+    constructor(
+        private configService: ConfigService,
+        private prisma: PrismaService
+    ) {
+        super({
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                (request: Request) => {
+                    // Extrair JWT do cookie httpOnly
+                    return request?.cookies?.access_token;
+                },
+            ]),
+            ignoreExpiration: false,
+            secretOrKey: configService.get<string>("JWT_SECRET"),
+        });
+    }
+
+    async validate(payload: any) {
+        // Validar que o utilizador ainda existe
+        const user = await this.prisma.user.findUnique({
+            where: { id: payload.sub },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                isActive: true,
+            },
+        });
+
+        if (!user || !user.isActive) {
+            return null;
+        }
+
+        return user;
+    }
+}
+```
+
+#### Service - AuthService (Login & Validate)
+
+```typescript
+// nest-backend/src/auth/auth.service.ts (adicionar métodos)
+import { JwtService } from "@nestjs/jwt";
+
+@Injectable()
+export class AuthService {
+    constructor(
+        private prisma: PrismaService,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
+        private mailerService: MailerService,
+        private configService: ConfigService,
+        private jwtService: JwtService // Adicionar
+    ) {}
+
+    // ... métodos de registo anteriores ...
+
+    async validateUser(email: string, password: string): Promise<any> {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (!user) {
+            return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return null;
+        }
+
+        // Remover password do objeto retornado
+        const { password: _, ...result } = user;
+        return result;
+    }
+
+    async login(user: any) {
+        const payload = {
+            email: user.email,
+            sub: user.id,
+            role: user.role,
+        };
+
+        const accessToken = this.jwtService.sign(payload, {
+            expiresIn: this.configService.get("JWT_EXPIRES_IN") || "15m",
+        });
+
+        const refreshToken = this.jwtService.sign(payload, {
+            expiresIn: this.configService.get("JWT_REFRESH_EXPIRES_IN") || "7d",
+        });
+
+        // Guardar refresh token na BD
+        await this.prisma.session.create({
+            data: {
+                userId: user.id,
+                refreshToken,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias
+            },
+        });
+
+        this.logger.info(`Tokens gerados para utilizador: ${user.email}`, {
+            context: "AuthService",
+        });
+
+        return {
+            accessToken,
+            refreshToken,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+            },
+        };
+    }
+
+    async logout(userId: string, refreshToken: string) {
+        // Apagar sessão da BD
+        await this.prisma.session.deleteMany({
+            where: {
+                userId,
+                refreshToken,
+            },
+        });
+
+        this.logger.info(`Logout realizado para utilizador: ${userId}`, {
+            context: "AuthService",
+        });
+    }
+}
+```
+
+#### DTO - LoginDto
+
+```typescript
+// nest-backend/src/auth/dto/login.dto.ts
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsString, MinLength } from "class-validator";
+
+export class LoginDto {
+    @ApiProperty({ example: "admin@orionone.com" })
+    @IsEmail({}, { message: "Email inválido" })
+    email: string;
+
+    @ApiProperty({ example: "Admin123!" })
+    @IsString()
+    @MinLength(8, { message: "Password deve ter pelo menos 8 caracteres" })
+    password: string;
+}
+```
+
+#### Controller - AuthController (Login & Logout)
+
+```typescript
+// nest-backend/src/auth/auth.controller.ts (adicionar métodos)
+import {
+    Controller,
+    Post,
+    Body,
+    Param,
+    UseGuards,
+    Req,
+    Res,
+    HttpCode,
+    HttpStatus,
+} from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+} from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
+import { Response, Request } from "express";
+
+@ApiTags("auth")
+@Controller("auth")
+export class AuthController {
+    // ... métodos de registo anteriores ...
+
+    @Post("login")
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(AuthGuard("local"))
+    @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 tentativas por minuto
+    @ApiOperation({ summary: "Login de utilizador" })
+    @ApiResponse({ status: 200, description: "Login bem-sucedido" })
+    @ApiResponse({ status: 401, description: "Credenciais inválidas" })
+    @ApiResponse({ status: 429, description: "Demasiadas tentativas" })
+    async login(
+        @Req() req: Request,
+        @Res({ passthrough: true }) res: Response,
+        @Body() _loginDto: LoginDto // Para documentação Swagger
+    ) {
+        const result = await this.authService.login(req.user);
+
+        // Definir cookies httpOnly
+        res.cookie("access_token", result.accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 15 * 60 * 1000, // 15 minutos
+        });
+
+        res.cookie("refresh_token", result.refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+        });
+
+        return result;
+    }
+
+    @Get("me")
+    @UseGuards(AuthGuard("jwt"))
+    @ApiBearerAuth()
+    @ApiOperation({ summary: "Obter dados do utilizador autenticado" })
+    @ApiResponse({ status: 200, description: "Dados do utilizador" })
+    @ApiResponse({ status: 401, description: "Não autenticado" })
+    async getMe(@Req() req: Request) {
+        return req.user;
+    }
+
+    @Post("logout")
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(AuthGuard("jwt"))
+    @ApiBearerAuth()
+    @ApiOperation({ summary: "Logout de utilizador" })
+    @ApiResponse({ status: 200, description: "Logout bem-sucedido" })
+    async logout(
+        @Req() req: Request,
+        @Res({ passthrough: true }) res: Response
+    ) {
+        const user = req.user as any;
+        const refreshToken = req.cookies?.refresh_token;
+
+        await this.authService.logout(user.id, refreshToken);
+
+        // Limpar cookies
+        res.clearCookie("access_token");
+        res.clearCookie("refresh_token");
+
+        return { message: "Logout bem-sucedido" };
+    }
+}
+```
+
+#### Module - AuthModule
+
+```typescript
+// nest-backend/src/auth/auth.module.ts
+import { Module } from "@nestjs/common";
+import { JwtModule } from "@nestjs/jwt";
+import { PassportModule } from "@nestjs/passport";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { AuthController } from "./auth.controller";
+import { AuthService } from "./auth.service";
+import { LocalStrategy } from "./strategies/local.strategy";
+import { JwtStrategy } from "./strategies/jwt.strategy";
+import { PrismaModule } from "../prisma/prisma.module";
+
+@Module({
+    imports: [
+        PrismaModule,
+        PassportModule,
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                secret: configService.get<string>("JWT_SECRET"),
+                signOptions: {
+                    expiresIn:
+                        configService.get<string>("JWT_EXPIRES_IN") || "15m",
+                },
+            }),
+            inject: [ConfigService],
+        }),
+    ],
+    controllers: [AuthController],
+    providers: [AuthService, LocalStrategy, JwtStrategy],
+    exports: [AuthService],
+})
+export class AuthModule {}
+```
+
+---
+
+### Fase 3: Frontend (Next.js)
 
 #### 1.1. Definir o Modelo Session (Opcional, mas Recomendado)
 
@@ -423,18 +1322,18 @@ npm install @nestjs/passport @nestjs/jwt passport passport-local passport-jwt
 
 **Implementação:**
 
-1.  Injete o `AuthService`.
-2.  Implemente a função `validate()`.
-3.  Recebe `email` e `password`.
-4.  Procura o utilizador e usa `bcrypt.compare()` para verificar a password.
-5.  Se a password for válida, retorna o objeto `user`.
-6.  Adicione logging com Winston para registar tentativas de login (sucesso e falha).
+1. Injete o `AuthService`.
+2. Implemente a função `validate()`.
+3. Recebe `email` e `password`.
+4. Procura o utilizador e usa `bcrypt.compare()` para verificar a password.
+5. Se a password for válida, retorna o objeto `user`.
+6. Adicione logging com Winston para registar tentativas de login (sucesso e falha).
 
 **Proteção Adicional (Rate Limiting):**
 No `auth.controller.ts`, aplique o decorador `@Throttle({ default: { limit: 3, ttl: 60000 } })` ao endpoint de login para prevenir ataques de força bruta, limitando a 3 tentativas por minuto.
 
 **Documentação:**
-[Guia Oficial do Nest.js sobre LocalStrategy](https://docs.nestjs.com/security/authentication#implementing-localstrategy)
+[Guia Oficial do Nest.js sobre Autenticação](https://docs.nestjs.com/security/authentication)
 [Guia Oficial do Nest.js sobre Rate Limiting](https://docs.nestjs.com/security/rate-limiting)
 
 #### 2.3. Implementar a JwtStrategy com Segurança
@@ -446,15 +1345,15 @@ Ler e validar o JWT em TODOS os pedidos futuros, garantindo que apenas utilizado
 
 **Fluxo:**
 
-1.  Extrai o token do cookie `httpOnly`.
-2.  Usa o `JWT_SECRET` do `.env` (através do `ConfigService`) para validar a assinatura e a expiração do token.
-3.  Anexa o payload do token (`userId`, `role`) ao objeto `request.user`, tornando-o disponível em todos os controllers.
+1. Extrai o token do cookie `httpOnly`.
+2. Usa o `JWT_SECRET` do `.env` (através do `ConfigService`) para validar a assinatura e a expiração do token.
+3. Anexa o payload do token (`userId`, `role`) ao objeto `request.user`, tornando-o disponível em todos os controllers.
 
 **Segurança Adicional (Helmet):**
 O Helmet, já configurado globalmente em `main.ts`, adiciona uma camada de segurança essencial ao proteger os cabeçalhos HTTP, prevenindo ataques comuns como XSS e clickjacking.
 
 **Documentação:**
-[Guia Oficial do Nest.js sobre JwtStrategy](https://docs.nestjs.com/security/authentication#implementing-jwt)
+[Guia Oficial do Nest.js sobre JWT Strategy](https://docs.nestjs.com/security/authentication)
 [Guia Oficial do Nest.js sobre Helmet](https://docs.nestjs.com/security/helmet)
 
 #### 2.4. Atualizar o AuthService (Login)
@@ -590,7 +1489,7 @@ withCredentials: true;
 Sem isto, o browser NUNCA irá enviar os cookies `httpOnly` para o backend Nest.js, e a autenticação irá falhar silenciosamente.
 
 **Documentação:**
-[Guia Oficial do Axios sobre withCredentials](https://axios-http.com/docs/config_defaults)
+[Guia Oficial do Axios sobre Configuração de Request](https://axios-http.com/docs/req_config)
 
 #### 3.3. Criar o AuthContext
 
@@ -635,6 +1534,406 @@ Use Middleware do Next.js para verificação no servidor.
 
 **Documentação:**
 [Guia Oficial do Next.js sobre Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware)
+
+---
+
+### Exemplo de Código Completo: Login de Utilizador (Frontend)
+
+#### Schema Zod - Login Validation
+
+```typescript
+// next-frontend/lib/validations/auth.ts (adicionar)
+export const loginSchema = z.object({
+    email: z.string().email("Email inválido").toLowerCase(),
+    password: z.string().min(8, "Password deve ter pelo menos 8 caracteres"),
+});
+
+export type LoginInput = z.infer<typeof loginSchema>;
+```
+
+#### API Service - Auth (adicionar métodos)
+
+```typescript
+// next-frontend/lib/api/auth.ts (adicionar)
+export const authApi = {
+    // ... register e verifyEmail anteriores ...
+
+    login: async (data: LoginInput) => {
+        const response = await apiClient.post("/auth/login", data);
+        return response.data;
+    },
+
+    logout: async () => {
+        const response = await apiClient.post("/auth/logout");
+        return response.data;
+    },
+
+    me: async () => {
+        const response = await apiClient.get("/auth/me");
+        return response.data;
+    },
+};
+```
+
+#### Context - AuthContext
+
+```typescript
+// next-frontend/contexts/auth-context.tsx
+"use client";
+
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    ReactNode,
+} from "react";
+import { authApi } from "@/lib/api/auth";
+import { useRouter } from "next/navigation";
+
+interface User {
+    id: string;
+    email: string;
+    name: string;
+    role: "ADMIN" | "AGENT" | "USER";
+}
+
+interface AuthContextType {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    login: (email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
+
+    const isAuthenticated = !!user;
+
+    // Verificar autenticação ao carregar
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    const checkAuth = async () => {
+        try {
+            const userData = await authApi.me();
+            setUser(userData);
+        } catch (error) {
+            setUser(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const login = async (email: string, password: string) => {
+        const response = await authApi.login({ email, password });
+        setUser(response.user);
+        router.push("/dashboard");
+    };
+
+    const logout = async () => {
+        try {
+            await authApi.logout();
+        } finally {
+            setUser(null);
+            router.push("/login");
+        }
+    };
+
+    return (
+        <AuthContext.Provider
+            value={{ user, isAuthenticated, isLoading, login, logout }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
+}
+
+export function useAuth() {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error("useAuth deve ser usado dentro de AuthProvider");
+    }
+    return context;
+}
+```
+
+#### Componente - LoginForm
+
+```typescript
+// next-frontend/components/auth/login-form.tsx
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginInput } from "@/lib/validations/auth";
+import { useAuth } from "@/contexts/auth-context";
+import { useToast } from "@/hooks/use-toast";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+
+export function LoginForm() {
+    const [isLoading, setIsLoading] = useState(false);
+    const { login } = useAuth();
+    const { toast } = useToast();
+
+    const form = useForm<LoginInput>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+    });
+
+    const onSubmit = async (data: LoginInput) => {
+        setIsLoading(true);
+
+        try {
+            await login(data.email, data.password);
+
+            toast({
+                title: "Login bem-sucedido!",
+                description: "Bem-vindo de volta.",
+            });
+        } catch (error: any) {
+            const errorMessage =
+                error.response?.data?.message ||
+                "Erro ao fazer login. Tente novamente.";
+
+            toast({
+                title: "Erro no login",
+                description: errorMessage,
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+                <CardTitle>Login</CardTitle>
+                <CardDescription>Entre na sua conta OrionOne</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-4"
+                    >
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="email"
+                                            placeholder="joao@exemplo.com"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            placeholder="********"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "A entrar..." : "Entrar"}
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
+    );
+}
+```
+
+#### Página - Login
+
+```typescript
+// next-frontend/app/login/page.tsx
+import { LoginForm } from "@/components/auth/login-form";
+import Link from "next/link";
+
+export default function LoginPage() {
+    return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="w-full max-w-md space-y-4">
+                <LoginForm />
+
+                <div className="space-y-2 text-center text-sm">
+                    <p className="text-muted-foreground">
+                        Não tem conta?{" "}
+                        <Link
+                            href="/register"
+                            className="text-primary hover:underline"
+                        >
+                            Registar
+                        </Link>
+                    </p>
+
+                    <p className="text-muted-foreground">
+                        <Link
+                            href="/forgot-password"
+                            className="text-primary hover:underline"
+                        >
+                            Esqueceu a password?
+                        </Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+```
+
+#### Layout - Root com AuthProvider
+
+```typescript
+// next-frontend/app/layout.tsx
+import { AuthProvider } from "@/contexts/auth-context";
+import { Toaster } from "@/components/ui/toaster";
+
+export default function RootLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return (
+        <html lang="pt">
+            <body>
+                <AuthProvider>
+                    {children}
+                    <Toaster />
+                </AuthProvider>
+            </body>
+        </html>
+    );
+}
+```
+
+#### Componente - RequireAuth (Rotas Protegidas)
+
+```typescript
+// next-frontend/components/auth/require-auth.tsx
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+
+export function RequireAuth({ children }: { children: React.ReactNode }) {
+    const { isAuthenticated, isLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push("/login");
+        }
+    }, [isAuthenticated, isLoading, router]);
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+            </div>
+        );
+    }
+
+    if (!isAuthenticated) {
+        return null;
+    }
+
+    return <>{children}</>;
+}
+```
+
+#### Exemplo de Página Protegida
+
+```typescript
+// next-frontend/app/dashboard/page.tsx
+"use client";
+
+import { RequireAuth } from "@/components/auth/require-auth";
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+
+export default function DashboardPage() {
+    const { user, logout } = useAuth();
+
+    return (
+        <RequireAuth>
+            <div className="container mx-auto p-8">
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold">Dashboard</h1>
+                        <p className="text-muted-foreground">
+                            Bem-vindo, {user?.name}! ({user?.role})
+                        </p>
+                    </div>
+
+                    <Button onClick={logout} variant="outline">
+                        Logout
+                    </Button>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                    {/* Dashboard content aqui */}
+                </div>
+            </div>
+        </RequireAuth>
+    );
+}
+```
+
+---
 
 #### 3.6. Validar Autenticação
 
@@ -728,9 +2027,9 @@ Página:
 **Implementação com CASL:**
 A biblioteca CASL, já configurada no Sprint 0, oferece uma forma mais poderosa e flexível de gerir permissões do que um simples `RolesGuard`.
 
-1.  **Definir Habilidades:** No `casl-ability.factory.ts`, defina o que cada role (`ADMIN`, `AGENT`, `USER`) pode fazer (`Action`) em cada recurso (`Subject`).
-2.  **Criar um `PoliciesGuard`:** Este guarda irá verificar as permissões do utilizador contra a ação necessária para um determinado endpoint.
-3.  **Proteger Endpoints:** Use o `PoliciesGuard` em conjunto com um decorador `@CheckPolicies` para proteger rotas específicas, verificando se o utilizador tem a permissão necessária para a ação.
+1. **Definir Habilidades:** No `casl-ability.factory.ts`, defina o que cada role (`ADMIN`, `AGENT`, `USER`) pode fazer (`Action`) em cada recurso (`Subject`).
+2. **Criar um `PoliciesGuard`:** Este guarda irá verificar as permissões do utilizador contra a ação necessária para um determinado endpoint.
+3. **Proteger Endpoints:** Use o `PoliciesGuard` em conjunto com um decorador `@CheckPolicies` para proteger rotas específicas, verificando se o utilizador tem a permissão necessária para a ação.
 
 **Documentação:**
 [Guia Oficial do CASL com Nest.js](https://casl.js.org/v6/en/package/casl-nestjs)
@@ -739,12 +2038,176 @@ A biblioteca CASL, já configurada no Sprint 0, oferece uma forma mais poderosa 
 
 **Implementação:**
 
-1.  Exponha o `user.role` no `AuthContext`.
-2.  Crie um hook `usePermissions` que utilize a biblioteca `@casl/ability` no frontend para verificar permissões de forma reativa e centralizada.
-3.  Renderize componentes da UI (como botões de edição ou links de administração) condicionalmente, com base nas permissões do utilizador atual.
+1. Exponha o `user.role` no `AuthContext`.
+2. Crie um hook `usePermissions` que utilize a biblioteca `@casl/ability` no frontend para verificar permissões de forma reativa e centralizada.
+3. Renderize componentes da UI (como botões de edição ou links de administração) condicionalmente, com base nas permissões do utilizador atual.
 
 **Documentação:**
 [Guia Oficial do CASL com React](https://casl.js.org/v6/en/package/casl-react)
+
+---
+
+### Exemplo de Código Completo: RBAC com CASL
+
+#### Backend - CASL Ability Factory
+
+```typescript
+// nest-backend/src/casl/casl-ability.factory.ts
+import { Injectable } from "@nestjs/common";
+import {
+    Ability,
+    AbilityBuilder,
+    AbilityClass,
+    ExtractSubjectType,
+    InferSubjects,
+} from "@casl/ability";
+
+export enum Action {
+    Manage = "manage",
+    Create = "create",
+    Read = "read",
+    Update = "update",
+    Delete = "delete",
+}
+
+export type Subjects =
+    | "Incident"
+    | "User"
+    | "KnowledgeBase"
+    | "Comment"
+    | "Attachment"
+    | "all";
+
+export type AppAbility = Ability<[Action, Subjects]>;
+
+@Injectable()
+export class CaslAbilityFactory {
+    createForUser(user: any) {
+        const { can, cannot, build } = new AbilityBuilder<AppAbility>(
+            Ability as AbilityClass<AppAbility>
+        );
+
+        if (user.role === "ADMIN") {
+            can(Action.Manage, "all");
+        } else if (user.role === "AGENT") {
+            can(Action.Manage, "Incident");
+            can([Action.Create, Action.Read, Action.Update], "KnowledgeBase");
+            can(Action.Manage, "Comment");
+            can(Action.Manage, "Attachment");
+            can(Action.Read, "User");
+            can(Action.Update, "User", { id: user.id });
+        } else if (user.role === "USER") {
+            can(Action.Create, "Incident");
+            can([Action.Read, Action.Update], "Incident", {
+                createdById: user.id,
+            });
+            can(Action.Read, "KnowledgeBase", { status: "PUBLISHED" });
+            can(Action.Create, "Comment", {
+                incident: { createdById: user.id },
+            });
+            can(Action.Read, "User", { id: user.id });
+            can(Action.Update, "User", { id: user.id });
+        }
+
+        return build({
+            detectSubjectType: (item) =>
+                item.constructor as ExtractSubjectType<Subjects>,
+        });
+    }
+}
+```
+
+#### Frontend - CASL Hook e Componentes
+
+```typescript
+// next-frontend/lib/casl/ability.ts
+import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
+
+export enum Action {
+    Manage = "manage",
+    Create = "create",
+    Read = "read",
+    Update = "update",
+    Delete = "delete",
+}
+
+export type Subjects =
+    | "Incident"
+    | "User"
+    | "KnowledgeBase"
+    | "Comment"
+    | "Attachment"
+    | "all";
+export type AppAbility = Ability<[Action, Subjects]>;
+
+export function defineAbilityFor(user: any): AppAbility {
+    const { can, build } = new AbilityBuilder<AppAbility>(
+        Ability as AbilityClass<AppAbility>
+    );
+
+    if (user.role === "ADMIN") {
+        can(Action.Manage, "all");
+    } else if (user.role === "AGENT") {
+        can(Action.Manage, "Incident");
+        can([Action.Create, Action.Read, Action.Update], "KnowledgeBase");
+    } else if (user.role === "USER") {
+        can(Action.Create, "Incident");
+        can(Action.Read, "Incident");
+    }
+
+    return build();
+}
+```
+
+```typescript
+// next-frontend/hooks/use-permissions.ts
+"use client";
+
+import { useMemo } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { defineAbilityFor, Action, Subjects } from "@/lib/casl/ability";
+
+export function usePermissions() {
+    const { user } = useAuth();
+
+    const ability = useMemo(() => {
+        if (!user) return null;
+        return defineAbilityFor(user);
+    }, [user]);
+
+    const can = (action: Action, subject: Subjects) => {
+        return ability?.can(action, subject) ?? false;
+    };
+
+    return { can, ability };
+}
+```
+
+```typescript
+// next-frontend/components/auth/can.tsx
+"use client";
+
+import { ReactNode } from "react";
+import { usePermissions } from "@/hooks/use-permissions";
+import { Action, Subjects } from "@/lib/casl/ability";
+
+interface CanProps {
+    do: Action;
+    on: Subjects;
+    children: ReactNode;
+    fallback?: ReactNode;
+}
+
+export function Can({
+    do: action,
+    on: subject,
+    children,
+    fallback = null,
+}: CanProps) {
+    const { can } = usePermissions();
+    return can(action, subject) ? <>{children}</> : <>{fallback}</>;
+}
+```
 
 ---
 

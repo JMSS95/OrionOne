@@ -1,4 +1,4 @@
-# Guia de Implementação do Sprint 6: Dashboard, Notificações e Polimento
+﻿# Guia de Implementação do Sprint 6: Dashboard, Notificações e Polimento
 
 **Período:** 16 de Janeiro a 31 de Janeiro de 2026
 **Foco:** Dashboard, Notificações por Email, Polimento de UI/UX e Testes Finais
@@ -20,6 +20,145 @@ Este sprint final é dedicado à criação de um dashboard central para visualiz
     -   Crie um `DashboardController` com um endpoint `GET /api/dashboard/summary` que retorne os dados agregados.
 -   **Documentação:**
     -   [Prisma: Aggregation, Grouping, and Summarizing](https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-and-summarizing)
+
+**Code Examples:**
+
+```typescript
+// nest-backend/src/dashboard/dashboard.service.ts
+import { Injectable, Inject } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { Logger } from "winston";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
+
+export interface DashboardStats {
+    totalIncidents: number;
+    openIncidents: number;
+    closedIncidents: number;
+    incidentsByStatus: Array<{ status: string; count: number }>;
+    incidentsByPriority: Array<{ priority: string; count: number }>;
+    recentlyUpdated: Array<{ id: string; title: string; updatedAt: Date }>;
+}
+
+@Injectable()
+export class DashboardService {
+    constructor(
+        private readonly prisma: PrismaService,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache
+    ) {}
+
+    async getStats(): Promise<DashboardStats> {
+        const cacheKey = "dashboard:stats";
+
+        // Tentar obter do cache
+        const cached = await this.cacheManager.get<DashboardStats>(cacheKey);
+        if (cached) {
+            this.logger.info("Dashboard stats servido do cache", {
+                context: "DashboardService",
+            });
+            return cached;
+        }
+
+        // Executar queries de agregação em paralelo
+        const [
+            totalIncidents,
+            openIncidents,
+            closedIncidents,
+            incidentsByStatus,
+            incidentsByPriority,
+            recentlyUpdated,
+        ] = await Promise.all([
+            this.prisma.incident.count(),
+            this.prisma.incident.count({
+                where: {
+                    status: { in: ["NEW", "IN_PROGRESS"] },
+                },
+            }),
+            this.prisma.incident.count({
+                where: {
+                    status: { in: ["RESOLVED", "CLOSED"] },
+                },
+            }),
+            this.prisma.incident.groupBy({
+                by: ["status"],
+                _count: { id: true },
+            }),
+            this.prisma.incident.groupBy({
+                by: ["priority"],
+                _count: { id: true },
+            }),
+            this.prisma.incident.findMany({
+                take: 10,
+                orderBy: { updatedAt: "desc" },
+                select: {
+                    id: true,
+                    title: true,
+                    updatedAt: true,
+                    incidentNumber: true,
+                },
+            }),
+        ]);
+
+        const stats: DashboardStats = {
+            totalIncidents,
+            openIncidents,
+            closedIncidents,
+            incidentsByStatus: incidentsByStatus.map((item) => ({
+                status: item.status,
+                count: item._count.id,
+            })),
+            incidentsByPriority: incidentsByPriority.map((item) => ({
+                priority: item.priority,
+                count: item._count.id,
+            })),
+            recentlyUpdated,
+        };
+
+        // Armazenar no cache por 60 segundos
+        await this.cacheManager.set(cacheKey, stats, 60000);
+
+        this.logger.info("Dashboard stats calculado e armazenado em cache", {
+            context: "DashboardService",
+            totalIncidents,
+        });
+
+        return stats;
+    }
+}
+```
+
+```typescript
+// nest-backend/src/dashboard/dashboard.controller.ts
+import { Controller, Get, UseGuards } from "@nestjs/common";
+import { DashboardService } from "./dashboard.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import {
+    ApiTags,
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+} from "@nestjs/swagger";
+
+@ApiTags("Dashboard")
+@ApiBearerAuth()
+@Controller("dashboard")
+@UseGuards(JwtAuthGuard)
+export class DashboardController {
+    constructor(private readonly dashboardService: DashboardService) {}
+
+    @Get("stats")
+    @ApiOperation({ summary: "Obter estatísticas do dashboard" })
+    @ApiResponse({
+        status: 200,
+        description: "Estatísticas do dashboard calculadas com sucesso",
+    })
+    getStats() {
+        return this.dashboardService.getStats();
+    }
+}
+```
 
 ### 2. **Cache de Dados do Dashboard com Redis (Backend)**
 
@@ -45,6 +184,272 @@ Este sprint final é dedicado à criação de um dashboard central para visualiz
     -   [@nestjs-modules/mailer](https://github.com/nest-modules/mailer)
     -   [Nodemailer Documentation](https://nodemailer.com/about/)
     -   [NestJS Configuration](https://docs.nestjs.com/techniques/configuration)
+
+**Code Examples:**
+
+```typescript
+// nest-backend/src/email/email.service.ts
+import { Injectable, Inject } from "@nestjs/common";
+import { MailerService } from "@nestjs-modules/mailer";
+import { ConfigService } from "@nestjs/config";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { Logger } from "winston";
+
+@Injectable()
+export class EmailService {
+    constructor(
+        private readonly mailerService: MailerService,
+        private readonly configService: ConfigService,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
+    ) {}
+
+    async sendIncidentCreationConfirmation(user: any, incident: any) {
+        try {
+            await this.mailerService.sendMail({
+                to: user.email,
+                subject: `Incidente ${incident.incidentNumber} criado com sucesso`,
+                html: `
+          <h2>Incidente Criado</h2>
+          <p>Olá ${user.name},</p>
+          <p>O seu incidente foi criado com sucesso:</p>
+          <ul>
+            <li><strong>Número:</strong> ${incident.incidentNumber}</li>
+            <li><strong>Título:</strong> ${incident.title}</li>
+            <li><strong>Prioridade:</strong> ${incident.priority}</li>
+            <li><strong>Status:</strong> ${incident.status}</li>
+          </ul>
+          <p>Pode acompanhar o progresso através do link:
+            <a href="${this.configService.get("APP_URL")}/incidents/${
+                    incident.id
+                }">
+              Ver Incidente
+            </a>
+          </p>
+        `,
+            });
+
+            this.logger.info(
+                `Email de criação de incidente enviado para ${user.email}`,
+                {
+                    context: "EmailService",
+                    incidentId: incident.id,
+                }
+            );
+        } catch (error) {
+            this.logger.error(`Erro ao enviar email de criação de incidente`, {
+                context: "EmailService",
+                error: error.message,
+                userId: user.id,
+                incidentId: incident.id,
+            });
+        }
+    }
+
+    async sendIncidentAssignmentNotification(assignee: any, incident: any) {
+        try {
+            await this.mailerService.sendMail({
+                to: assignee.email,
+                subject: `Incidente ${incident.incidentNumber} atribuído a si`,
+                html: `
+          <h2>Novo Incidente Atribuído</h2>
+          <p>Olá ${assignee.name},</p>
+          <p>Foi-lhe atribuído um novo incidente:</p>
+          <ul>
+            <li><strong>Número:</strong> ${incident.incidentNumber}</li>
+            <li><strong>Título:</strong> ${incident.title}</li>
+            <li><strong>Prioridade:</strong> ${incident.priority}</li>
+            <li><strong>Criado por:</strong> ${
+                incident.requester?.name || "N/A"
+            }</li>
+          </ul>
+          <p>Por favor, reveja o incidente:
+            <a href="${this.configService.get("APP_URL")}/incidents/${
+                    incident.id
+                }">
+              Ver Incidente
+            </a>
+          </p>
+        `,
+            });
+
+            this.logger.info(
+                `Email de atribuição enviado para ${assignee.email}`,
+                {
+                    context: "EmailService",
+                    incidentId: incident.id,
+                    assigneeId: assignee.id,
+                }
+            );
+        } catch (error) {
+            this.logger.error(`Erro ao enviar email de atribuição`, {
+                context: "EmailService",
+                error: error.message,
+                assigneeId: assignee.id,
+                incidentId: incident.id,
+            });
+        }
+    }
+
+    async sendNewCommentNotification(user: any, incident: any, comment: any) {
+        try {
+            await this.mailerService.sendMail({
+                to: user.email,
+                subject: `Novo comentário no incidente ${incident.incidentNumber}`,
+                html: `
+          <h2>Novo Comentário</h2>
+          <p>Olá ${user.name},</p>
+          <p>Foi adicionado um novo comentário ao incidente <strong>${
+              incident.incidentNumber
+          }</strong>:</p>
+          <blockquote style="border-left: 3px solid #ccc; padding-left: 10px; margin: 10px 0;">
+            ${comment.content}
+          </blockquote>
+          <p><em>Por: ${comment.user?.name || "Desconhecido"}</em></p>
+          <p>Ver incidente:
+            <a href="${this.configService.get("APP_URL")}/incidents/${
+                    incident.id
+                }">
+              Ver Comentário
+            </a>
+          </p>
+        `,
+            });
+
+            this.logger.info(
+                `Email de novo comentário enviado para ${user.email}`,
+                {
+                    context: "EmailService",
+                    incidentId: incident.id,
+                    commentId: comment.id,
+                }
+            );
+        } catch (error) {
+            this.logger.error(`Erro ao enviar email de novo comentário`, {
+                context: "EmailService",
+                error: error.message,
+                userId: user.id,
+                commentId: comment.id,
+            });
+        }
+    }
+
+    async sendSlaWarning(
+        assignee: any,
+        incident: any,
+        slaType: "response" | "resolution"
+    ) {
+        try {
+            const typeText = slaType === "response" ? "Resposta" : "Resolução";
+            const dueDate =
+                slaType === "response"
+                    ? incident.slaResponseDue
+                    : incident.slaResolutionDue;
+
+            await this.mailerService.sendMail({
+                to: assignee.email,
+                subject: `⚠ SLA de ${typeText} a expirar - ${incident.incidentNumber}`,
+                html: `
+          <h2 style="color: orange;">⚠ Alerta de SLA</h2>
+          <p>Olá ${assignee.name},</p>
+          <p>O SLA de <strong>${typeText}</strong> do incidente está prestes a expirar:</p>
+          <ul>
+            <li><strong>Número:</strong> ${incident.incidentNumber}</li>
+            <li><strong>Título:</strong> ${incident.title}</li>
+            <li><strong>Prioridade:</strong> ${incident.priority}</li>
+            <li><strong>Expira em:</strong> ${new Date(dueDate).toLocaleString(
+                "pt-PT"
+            )}</li>
+          </ul>
+          <p><strong>Ação necessária urgentemente!</strong></p>
+          <p>
+            <a href="${this.configService.get("APP_URL")}/incidents/${
+                    incident.id
+                }">
+              Ver Incidente
+            </a>
+          </p>
+        `,
+            });
+
+            this.logger.warn(
+                `Email de alerta de SLA enviado para ${assignee.email}`,
+                {
+                    context: "EmailService",
+                    incidentId: incident.id,
+                    slaType,
+                }
+            );
+        } catch (error) {
+            this.logger.error(`Erro ao enviar email de alerta de SLA`, {
+                context: "EmailService",
+                error: error.message,
+                assigneeId: assignee.id,
+                incidentId: incident.id,
+            });
+        }
+    }
+
+    async sendSlaBreach(
+        assignee: any,
+        incident: any,
+        slaType: "response" | "resolution"
+    ) {
+        try {
+            const typeText = slaType === "response" ? "Resposta" : "Resolução";
+
+            await this.mailerService.sendMail({
+                to: assignee.email,
+                subject: `❌ SLA de ${typeText} VIOLADO - ${incident.incidentNumber}`,
+                html: `
+          <h2 style="color: red;">❌ VIOLAÇÃO DE SLA</h2>
+          <p>Olá ${assignee.name},</p>
+          <p>O SLA de <strong>${typeText}</strong> foi violado:</p>
+          <ul>
+            <li><strong>Número:</strong> ${incident.incidentNumber}</li>
+            <li><strong>Título:</strong> ${incident.title}</li>
+            <li><strong>Prioridade:</strong> ${incident.priority}</li>
+          </ul>
+          <p><strong>Ação imediata necessária!</strong></p>
+          <p>
+            <a href="${this.configService.get("APP_URL")}/incidents/${
+                    incident.id
+                }">
+              Ver Incidente
+            </a>
+          </p>
+        `,
+            });
+
+            this.logger.error(
+                `Email de violação de SLA enviado para ${assignee.email}`,
+                {
+                    context: "EmailService",
+                    incidentId: incident.id,
+                    slaType,
+                }
+            );
+        } catch (error) {
+            this.logger.error(`Erro ao enviar email de violação de SLA`, {
+                context: "EmailService",
+                error: error.message,
+                assigneeId: assignee.id,
+                incidentId: incident.id,
+            });
+        }
+    }
+}
+```
+
+```bash
+# .env (adicionar variáveis de email)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=seu-email@gmail.com
+EMAIL_PASS=sua-senha-app
+EMAIL_FROM=noreply@orionone.com
+APP_URL=http://localhost:3000
+```
 
 ### 4. **Visualização de Dados com Recharts (Frontend)**
 
@@ -244,6 +649,386 @@ Vamos integrar o `nodemailer` para o envio de emails transacionais.
 
 5.  **Montar o Layout do Dashboard:**
     Em `next-frontend/app/dashboard/page.tsx`, use o hook `useDashboardStats` para obter os dados. Apresente um estado de `loading` e de `error`. Se os dados forem carregados com sucesso, organize os componentes de visualização numa grelha (grid) para uma apresentação clara e moderna.
+
+**Code Examples:**
+
+```typescript
+// next-frontend/app/dashboard/page.tsx
+"use client";
+
+import { useDashboardStats } from "@/lib/hooks/use-dashboard-stats";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { IncidentsByPriorityChart } from "@/components/dashboard/incidents-by-priority-chart";
+import { IncidentsByStatusChart } from "@/components/dashboard/incidents-by-status-chart";
+import { RecentActivityFeed } from "@/components/dashboard/recent-activity-feed";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, TrendingUp, CheckCircle, Clock } from "lucide-react";
+
+export default function DashboardPage() {
+    const { data: stats, isLoading, error } = useDashboardStats();
+
+    if (isLoading) {
+        return (
+            <div className="container mx-auto py-10">
+                <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                    {[...Array(4)].map((_, i) => (
+                        <Skeleton key={i} className="h-32" />
+                    ))}
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                    <Skeleton className="h-80" />
+                    <Skeleton className="h-80" />
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container mx-auto py-10">
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                        Erro ao carregar dados do dashboard. Por favor, tente
+                        novamente.
+                    </AlertDescription>
+                </Alert>
+            </div>
+        );
+    }
+
+    if (!stats) return null;
+
+    return (
+        <div className="container mx-auto py-10">
+            <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+
+            {/* Cards de Estatísticas */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                <StatCard
+                    title="Total de Incidentes"
+                    value={stats.totalIncidents}
+                    icon={<AlertCircle className="h-6 w-6" />}
+                    trend={{ value: 12, isPositive: true }}
+                />
+                <StatCard
+                    title="Incidentes Abertos"
+                    value={stats.openIncidents}
+                    icon={<TrendingUp className="h-6 w-6" />}
+                    variant="warning"
+                />
+                <StatCard
+                    title="Incidentes Fechados"
+                    value={stats.closedIncidents}
+                    icon={<CheckCircle className="h-6 w-6" />}
+                    variant="success"
+                />
+                <StatCard
+                    title="Média de Resolução"
+                    value={stats.avgResolutionTime || 0}
+                    icon={<Clock className="h-6 w-6" />}
+                    suffix="h"
+                />
+            </div>
+
+            {/* Gráficos */}
+            <div className="grid gap-4 md:grid-cols-2 mb-8">
+                <IncidentsByStatusChart data={stats.incidentsByStatus} />
+                <IncidentsByPriorityChart data={stats.incidentsByPriority} />
+            </div>
+
+            {/* Atividade Recente */}
+            <RecentActivityFeed incidents={stats.recentlyUpdated} />
+        </div>
+    );
+}
+```
+
+```typescript
+// next-frontend/components/dashboard/stat-card.tsx
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { TrendingUp, TrendingDown } from "lucide-react";
+
+interface StatCardProps {
+    title: string;
+    value: number;
+    icon: React.ReactNode;
+    variant?: "default" | "warning" | "success" | "danger";
+    trend?: {
+        value: number;
+        isPositive: boolean;
+    };
+    suffix?: string;
+}
+
+export function StatCard({
+    title,
+    value,
+    icon,
+    variant = "default",
+    trend,
+    suffix = "",
+}: StatCardProps) {
+    const variantStyles = {
+        default: "border-gray-200",
+        warning: "border-orange-200 bg-orange-50",
+        success: "border-green-200 bg-green-50",
+        danger: "border-red-200 bg-red-50",
+    };
+
+    return (
+        <Card
+            className={cn(
+                "transition-all hover:shadow-md",
+                variantStyles[variant]
+            )}
+        >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                <div className="text-muted-foreground">{icon}</div>
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">
+                    {value.toLocaleString("pt-PT")}
+                    {suffix && (
+                        <span className="text-lg text-muted-foreground ml-1">
+                            {suffix}
+                        </span>
+                    )}
+                </div>
+                {trend && (
+                    <p
+                        className={cn(
+                            "text-xs flex items-center mt-1",
+                            trend.isPositive ? "text-green-600" : "text-red-600"
+                        )}
+                    >
+                        {trend.isPositive ? (
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                        ) : (
+                            <TrendingDown className="h-3 w-3 mr-1" />
+                        )}
+                        {trend.value}% vs mês anterior
+                    </p>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+```
+
+```typescript
+// next-frontend/components/dashboard/incidents-by-status-chart.tsx
+"use client";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
+
+interface IncidentsByStatusChartProps {
+    data: Array<{ status: string; count: number }>;
+}
+
+const statusColors: Record<string, string> = {
+    NEW: "#3b82f6",
+    IN_PROGRESS: "#f59e0b",
+    RESOLVED: "#10b981",
+    CLOSED: "#6b7280",
+};
+
+const statusLabels: Record<string, string> = {
+    NEW: "Novo",
+    IN_PROGRESS: "Em Progresso",
+    RESOLVED: "Resolvido",
+    CLOSED: "Fechado",
+};
+
+export function IncidentsByStatusChart({ data }: IncidentsByStatusChartProps) {
+    const chartData = data.map((item) => ({
+        status: statusLabels[item.status] || item.status,
+        count: item.count,
+        fill: statusColors[item.status] || "#6b7280",
+    }));
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Incidentes por Estado</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="status" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#8884d8" />
+                    </BarChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
+    );
+}
+```
+
+```typescript
+// next-frontend/components/dashboard/incidents-by-priority-chart.tsx
+"use client";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    PieChart,
+    Pie,
+    Cell,
+    ResponsiveContainer,
+    Legend,
+    Tooltip,
+} from "recharts";
+
+interface IncidentsByPriorityChartProps {
+    data: Array<{ priority: string; count: number }>;
+}
+
+const COLORS: Record<string, string> = {
+    P1: "#ef4444",
+    P2: "#f97316",
+    P3: "#f59e0b",
+    P4: "#22c55e",
+};
+
+export function IncidentsByPriorityChart({
+    data,
+}: IncidentsByPriorityChartProps) {
+    const chartData = data.map((item) => ({
+        name: item.priority,
+        value: item.count,
+        fill: COLORS[item.priority] || "#6b7280",
+    }));
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Incidentes por Prioridade</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                        <Pie
+                            data={chartData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) =>
+                                `${name}: ${(percent * 100).toFixed(0)}%`
+                            }
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                        >
+                            {chartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                            ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                    </PieChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
+    );
+}
+```
+
+```typescript
+// next-frontend/components/dashboard/recent-activity-feed.tsx
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { formatDistanceToNow } from "date-fns";
+import { pt } from "date-fns/locale";
+import Link from "next/link";
+import { FileText } from "lucide-react";
+
+interface RecentActivityFeedProps {
+    incidents: Array<{
+        id: string;
+        incidentNumber?: string;
+        title: string;
+        updatedAt: Date | string;
+    }>;
+}
+
+export function RecentActivityFeed({ incidents }: RecentActivityFeedProps) {
+    if (incidents.length === 0) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Atividade Recente</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground text-center py-8">
+                        Nenhuma atividade recente
+                    </p>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Atividade Recente</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-4">
+                    {incidents.map((incident) => (
+                        <Link
+                            key={incident.id}
+                            href={`/incidents/${incident.id}`}
+                            className="flex items-start gap-4 p-3 rounded-lg hover:bg-accent transition-colors"
+                        >
+                            <div className="mt-1">
+                                <FileText className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                                <div className="flex items-center gap-2">
+                                    {incident.incidentNumber && (
+                                        <Badge variant="outline">
+                                            {incident.incidentNumber}
+                                        </Badge>
+                                    )}
+                                    <p className="text-sm font-medium leading-none">
+                                        {incident.title}
+                                    </p>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Atualizado{" "}
+                                    {formatDistanceToNow(
+                                        new Date(incident.updatedAt),
+                                        {
+                                            addSuffix: true,
+                                            locale: pt,
+                                        }
+                                    )}
+                                </p>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+```
 
 ---
 
@@ -598,8 +1383,9 @@ Vamos integrar o `nodemailer` para o envio de emails transacionais.
 
 -   **Nest.js Mailer:** [https://docs.nestjs.com/techniques/mailer](https://docs.nestjs.com/techniques/mailer)
 -   **Nodemailer:** [https://nodemailer.com/](https://nodemailer.com/)
--   **Prisma `groupBy`:** [https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#groupby](https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#groupby)
--   **shadcn/charts:** [https://ui.shadcn.com/charts](https://ui.shadcn.com/charts)
+-   **Prisma `groupBy`:** [https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing](https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing)
+-   **Recharts (usado para gráficos):** [https://recharts.org/en-US/guide](https://recharts.org/en-US/guide)
+-   **shadcn/ui Chart Components:** [https://ui.shadcn.com/docs/components/chart](https://ui.shadcn.com/docs/components/chart)
 -   **TanStack Query (React):** [https://tanstack.com/query/latest/docs/react/overview](https://tanstack.com/query/latest/docs/react/overview)
 -   **Playwright Mocking:** [https://playwright.dev/docs/mocking](https://playwright.dev/docs/mocking)
 
