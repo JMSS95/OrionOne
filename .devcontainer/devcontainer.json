@@ -1,0 +1,146 @@
+{
+    "name": "OrionOne ITSM - Full Stack Development",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "backend",
+    "workspaceFolder": "/app",
+    "shutdownAction": "stopCompose",
+
+    // Portas a encaminhar automaticamente
+    "forwardPorts": [
+        80, // Nginx
+        3000, // Next.js Frontend
+        3001, // NestJS Backend
+        5432, // PostgreSQL
+        6379, // Redis
+        7700, // Meilisearch
+        8025 // Mailpit Web UI
+    ],
+
+    // Atributos das portas
+    "portsAttributes": {
+        "80": {
+            "label": "Nginx (Main)",
+            "onAutoForward": "openBrowser"
+        },
+        "3000": {
+            "label": "Next.js Frontend",
+            "onAutoForward": "notify"
+        },
+        "3001": {
+            "label": "NestJS Backend API",
+            "onAutoForward": "silent"
+        },
+        "5432": {
+            "label": "PostgreSQL",
+            "onAutoForward": "silent"
+        },
+        "6379": {
+            "label": "Redis Cache",
+            "onAutoForward": "silent"
+        },
+        "7700": {
+            "label": "Meilisearch",
+            "onAutoForward": "silent"
+        },
+        "8025": {
+            "label": "Mailpit (Email Testing)",
+            "onAutoForward": "notify"
+        }
+    },
+
+    // Extensões VS Code a instalar automaticamente
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                // Essenciais
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "EditorConfig.EditorConfig",
+
+                // Backend (NestJS + Prisma)
+                "Prisma.prisma",
+                "firsttris.vscode-jest-runner",
+
+                // Frontend (Next.js + React)
+                "bradlc.vscode-tailwindcss",
+                "dsznajder.es7-react-js-snippets",
+
+                // Docker
+                "ms-azuretools.vscode-docker",
+
+                // Git
+                "eamodio.gitlens",
+                "mhutchie.git-graph",
+
+                // Database
+                "ckolkman.vscode-postgres",
+                "Redis.redis-for-vscode",
+
+                // Markdown
+                "yzhang.markdown-all-in-one",
+
+                // Utils
+                "christian-kohler.path-intellisense",
+                "usernamehw.errorlens",
+                "streetsidesoftware.code-spell-checker"
+            ],
+            "settings": {
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "editor.codeActionsOnSave": {
+                    "source.fixAll.eslint": "explicit"
+                },
+                "[prisma]": {
+                    "editor.defaultFormatter": "Prisma.prisma"
+                },
+                "typescript.tsdk": "node_modules/typescript/lib",
+                "typescript.enablePromptUseWorkspaceTsdk": true,
+                "files.watcherExclude": {
+                    "**/node_modules/**": true,
+                    "**/.next/**": true,
+                    "**/dist/**": true
+                }
+            }
+        }
+    },
+
+    // Features adicionais do Dev Container
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "20",
+            "nodeGypDependencies": true,
+            "nvmVersion": "latest"
+        },
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "dockerDashComposeVersion": "v2"
+        }
+    },
+
+    // Montagens adicionais
+    "mounts": [
+        "source=${localWorkspaceFolder}/.devcontainer/scripts,target=/app/.devcontainer/scripts,type=bind,consistency=cached"
+    ],
+
+    // Comando executado APÓS criação do container (primeira vez)
+    "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
+
+    // Comando executado SEMPRE que o container inicia
+    "postStartCommand": "bash .devcontainer/scripts/post-start.sh",
+
+    // Variáveis de ambiente
+    "remoteEnv": {
+        "PATH": "${containerEnv:PATH}:/app/node_modules/.bin"
+    },
+
+    // Configurações de segurança
+    "containerEnv": {
+        "CODESPACE": "true"
+    }
+}
